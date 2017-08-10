@@ -69,7 +69,6 @@ VJType = NTupleObjectType("VJType", baseObjectTypes=[VVType], variables = [
     NTupleSubObject("l2_pruned_s1",  lambda x : x.leg2.substructure.prunedSubjets[0] if len(x.leg2.substructure.prunedSubjets)>0 else dummyLV,fourVectorType),
     NTupleSubObject("l2_pruned_s2",  lambda x : x.leg2.substructure.prunedSubjets[1] if len(x.leg2.substructure.prunedSubjets)>1 else dummyLV,fourVectorType),
     NTupleVariable("btagWeight",  lambda x : x.btagWeight,float),
-    NTupleVariable("gen_partialMass",   lambda x : x.genPartialMass if hasattr(x.leg2,'substructureGEN') else -99, float,"",-99,True),
 
     ## GEN LEVEL STUFF
     NTupleSubObject("l2_gen",  lambda x : x.leg2.substructureGEN.jet if hasattr(x.leg2,'substructureGEN') else dummyLV,fourVectorType,True),
@@ -98,5 +97,6 @@ JJType = NTupleObjectType("JJType", baseObjectTypes=[VJType], variables = [
     NTupleSubObject("l1_gen",  lambda x : x.leg1.substructureGEN.jet if hasattr(x.leg1,'substructureGEN') else dummyLV,fourVectorType,True),
     NTupleSubObject("l1_gen_softDrop",  lambda x : x.leg1.substructureGEN.softDropJet if hasattr(x.leg1,'substructureGEN') else dummyLV,fourVectorType,True),
     NTupleSubObject("l1_gen_pruned",  lambda x : x.leg1.substructureGEN.prunedJet if hasattr(x.leg1,'substructureGEN') else dummyLV,fourVectorType,True),
+    NTupleVariable("gen_partialMass",   lambda x : x.genPartialMass if (hasattr(x.leg2,'substructureGEN') and hasattr(x.leg1,'substructureGEN')) else -99, float,"",-99,True),
 
 ])
