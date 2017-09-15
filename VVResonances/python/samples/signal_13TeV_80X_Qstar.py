@@ -2,100 +2,100 @@ from CMGTools.RootTools.samples.ComponentCreator import ComponentCreator
 kreator = ComponentCreator()
 signalSamples=[]
 
-#QstarToQW_M600
-QstarToQW_M600=kreator.makeMCComponent("QstarToQW_M600", "/QstarToQW_M-600_TuneCUETP8M2T4_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2/MINIAODSIM", "CMS", ".*root",1.0)
-signalSamples.append(QstarToQW_M600)
-#QstarToQW_M800
-QstarToQW_M800=kreator.makeMCComponent("QstarToQW_M800", "/QstarToQW_M-800_TuneCUETP8M2T4_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM", "CMS", ".*root",1.0)
-signalSamples.append(QstarToQW_M800)
-#QstarToQW_M1000
-QstarToQW_M1000=kreator.makeMCComponent("QstarToQW_M1000", "/QstarToQW_M-1000_TuneCUETP8M2T4_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM", "CMS", ".*root",1.0)
-signalSamples.append(QstarToQW_M1000)
-#QstarToQW_M1200
-QstarToQW_M1200=kreator.makeMCComponent("QstarToQW_M1200", "/QstarToQW_M-1200_TuneCUETP8M2T4_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2/MINIAODSIM", "CMS", ".*root",1.0)
-signalSamples.append(QstarToQW_M1200)
-#QstarToQW_M1400
-QstarToQW_M1400=kreator.makeMCComponent("QstarToQW_M1400", "/QstarToQW_M-1400_TuneCUETP8M2T4_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2/MINIAODSIM", "CMS", ".*root",1.0)
-signalSamples.append(QstarToQW_M1400)
-#QstarToQW_M1600
-QstarToQW_M1600=kreator.makeMCComponent("QstarToQW_M1600", "/QstarToQW_M-1600_TuneCUETP8M2T4_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2/MINIAODSIM", "CMS", ".*root",1.0)
-signalSamples.append(QstarToQW_M1600)
-#QstarToQW_M1800
-QstarToQW_M1800=kreator.makeMCComponent("QstarToQW_M1800", "/QstarToQW_M-1800_TuneCUETP8M2T4_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2/MINIAODSIM", "CMS", ".*root",1.0)
-signalSamples.append(QstarToQW_M1800)
-#QstarToQW_M2000
-QstarToQW_M2000=kreator.makeMCComponent("QstarToQW_M2000", "/QstarToQW_M-2000_TuneCUETP8M2T4_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2/MINIAODSIM", "CMS", ".*root",1.0)
-signalSamples.append(QstarToQW_M2000)
-#QstarToQW_M2500
-QstarToQW_M2500=kreator.makeMCComponent("QstarToQW_M2500", "/QstarToQW_M-2500_TuneCUETP8M2T4_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM", "CMS", ".*root",1.0)
-signalSamples.append(QstarToQW_M2500)
-#QstarToQW_M3000
-QstarToQW_M3000=kreator.makeMCComponent("QstarToQW_M3000", "/QstarToQW_M-3000_TuneCUETP8M2T4_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2/MINIAODSIM", "CMS", ".*root",1.0)
-signalSamples.append(QstarToQW_M3000)
-#QstarToQW_M3500
-QstarToQW_M3500=kreator.makeMCComponent("QstarToQW_M3500", "/QstarToQW_M-3500_TuneCUETP8M2T4_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2/MINIAODSIM", "CMS", ".*root",1.0)
-signalSamples.append(QstarToQW_M3500)
-#QstarToQW_M4000
-QstarToQW_M4000=kreator.makeMCComponent("QstarToQW_M4000", "/QstarToQW_M-4000_TuneCUETP8M2T4_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2/MINIAODSIM", "CMS", ".*root",1.0)
-signalSamples.append(QstarToQW_M4000)
-#QstarToQW_M4500
-QstarToQW_M4500=kreator.makeMCComponent("QstarToQW_M4500", "/QstarToQW_M-4500_TuneCUETP8M2T4_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2/MINIAODSIM", "CMS", ".*root",1.0)
-signalSamples.append(QstarToQW_M4500)
-#QstarToQW_M5000
-QstarToQW_M5000=kreator.makeMCComponent("QstarToQW_M5000", "/QstarToQW_M-5000_TuneCUETP8M2T4_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2/MINIAODSIM", "CMS", ".*root",1.0)
-signalSamples.append(QstarToQW_M5000)
-#QstarToQW_M6000
-QstarToQW_M6000=kreator.makeMCComponent("QstarToQW_M6000", "/QstarToQW_M-6000_TuneCUETP8M2T4_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2/MINIAODSIM", "CMS", ".*root",1.0)
-signalSamples.append(QstarToQW_M6000)
-#QstarToQW_M7000
-QstarToQW_M7000=kreator.makeMCComponent("QstarToQW_M7000", "/QstarToQW_M-7000_TuneCUETP8M2T4_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2/MINIAODSIM", "CMS", ".*root",1.0)
-signalSamples.append(QstarToQW_M7000)
+#QstarToQW_600
+QstarToQW_600=kreator.makeMCComponent("QstarToQW_600", "/QstarToQW_-600_TuneCUETP8M2T4_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2/MINIAODSIM", "CMS", ".*root",1.0)
+signalSamples.append(QstarToQW_600)
+#QstarToQW_800
+QstarToQW_800=kreator.makeMCComponent("QstarToQW_800", "/QstarToQW_-800_TuneCUETP8M2T4_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM", "CMS", ".*root",1.0)
+signalSamples.append(QstarToQW_800)
+#QstarToQW_1000
+QstarToQW_1000=kreator.makeMCComponent("QstarToQW_1000", "/QstarToQW_-1000_TuneCUETP8M2T4_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM", "CMS", ".*root",1.0)
+signalSamples.append(QstarToQW_1000)
+#QstarToQW_1200
+QstarToQW_1200=kreator.makeMCComponent("QstarToQW_1200", "/QstarToQW_-1200_TuneCUETP8M2T4_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2/MINIAODSIM", "CMS", ".*root",1.0)
+signalSamples.append(QstarToQW_1200)
+#QstarToQW_1400
+QstarToQW_1400=kreator.makeMCComponent("QstarToQW_1400", "/QstarToQW_-1400_TuneCUETP8M2T4_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2/MINIAODSIM", "CMS", ".*root",1.0)
+signalSamples.append(QstarToQW_1400)
+#QstarToQW_1600
+QstarToQW_1600=kreator.makeMCComponent("QstarToQW_1600", "/QstarToQW_-1600_TuneCUETP8M2T4_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2/MINIAODSIM", "CMS", ".*root",1.0)
+signalSamples.append(QstarToQW_1600)
+#QstarToQW_1800
+QstarToQW_1800=kreator.makeMCComponent("QstarToQW_1800", "/QstarToQW_-1800_TuneCUETP8M2T4_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2/MINIAODSIM", "CMS", ".*root",1.0)
+signalSamples.append(QstarToQW_1800)
+#QstarToQW_2000
+QstarToQW_2000=kreator.makeMCComponent("QstarToQW_2000", "/QstarToQW_-2000_TuneCUETP8M2T4_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2/MINIAODSIM", "CMS", ".*root",1.0)
+signalSamples.append(QstarToQW_2000)
+#QstarToQW_2500
+QstarToQW_2500=kreator.makeMCComponent("QstarToQW_2500", "/QstarToQW_-2500_TuneCUETP8M2T4_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM", "CMS", ".*root",1.0)
+signalSamples.append(QstarToQW_2500)
+#QstarToQW_3000
+QstarToQW_3000=kreator.makeMCComponent("QstarToQW_3000", "/QstarToQW_-3000_TuneCUETP8M2T4_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2/MINIAODSIM", "CMS", ".*root",1.0)
+signalSamples.append(QstarToQW_3000)
+#QstarToQW_3500
+QstarToQW_3500=kreator.makeMCComponent("QstarToQW_3500", "/QstarToQW_-3500_TuneCUETP8M2T4_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2/MINIAODSIM", "CMS", ".*root",1.0)
+signalSamples.append(QstarToQW_3500)
+#QstarToQW_4000
+QstarToQW_4000=kreator.makeMCComponent("QstarToQW_4000", "/QstarToQW_-4000_TuneCUETP8M2T4_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2/MINIAODSIM", "CMS", ".*root",1.0)
+signalSamples.append(QstarToQW_4000)
+#QstarToQW_4500
+QstarToQW_4500=kreator.makeMCComponent("QstarToQW_4500", "/QstarToQW_-4500_TuneCUETP8M2T4_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2/MINIAODSIM", "CMS", ".*root",1.0)
+signalSamples.append(QstarToQW_4500)
+#QstarToQW_5000
+QstarToQW_5000=kreator.makeMCComponent("QstarToQW_5000", "/QstarToQW_-5000_TuneCUETP8M2T4_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2/MINIAODSIM", "CMS", ".*root",1.0)
+signalSamples.append(QstarToQW_5000)
+#QstarToQW_6000
+QstarToQW_6000=kreator.makeMCComponent("QstarToQW_6000", "/QstarToQW_-6000_TuneCUETP8M2T4_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2/MINIAODSIM", "CMS", ".*root",1.0)
+signalSamples.append(QstarToQW_6000)
+#QstarToQW_7000
+QstarToQW_7000=kreator.makeMCComponent("QstarToQW_7000", "/QstarToQW_-7000_TuneCUETP8M2T4_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2/MINIAODSIM", "CMS", ".*root",1.0)
+signalSamples.append(QstarToQW_7000)
 
-#QstarToQZ_M600
-QstarToQZ_M600=kreator.makeMCComponent("QstarToQZ_M600", "/QstarToQZ_M-600_TuneCUETP8M2T4_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2/MINIAODSIM", "CMS", ".*root",1.0)
-signalSamples.append(QstarToQZ_M600)
-#QstarToQZ_M800
-QstarToQZ_M800=kreator.makeMCComponent("QstarToQZ_M800", "/QstarToQZ_M-800_TuneCUETP8M2T4_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2/MINIAODSIM", "CMS", ".*root",1.0)
-signalSamples.append(QstarToQZ_M800)
-#QstarToQZ_M1000
-QstarToQZ_M1000=kreator.makeMCComponent("QstarToQZ_M1000", "/QstarToQZ_M-1000_TuneCUETP8M2T4_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2/MINIAODSIM", "CMS", ".*root",1.0)
-signalSamples.append(QstarToQZ_M1000)
-#QstarToQZ_M1200
-QstarToQZ_M1200=kreator.makeMCComponent("QstarToQZ_M1200", "/QstarToQZ_M-1200_TuneCUETP8M2T4_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2/MINIAODSIM", "CMS", ".*root",1.0)
-signalSamples.append(QstarToQZ_M1200)
-#QstarToQZ_M1400
-QstarToQZ_M1400=kreator.makeMCComponent("QstarToQZ_M1400", "/QstarToQZ_M-1400_TuneCUETP8M2T4_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2/MINIAODSIM", "CMS", ".*root",1.0)
-signalSamples.append(QstarToQZ_M1400)
-#QstarToQZ_M1600
-QstarToQZ_M1600=kreator.makeMCComponent("QstarToQZ_M1600", "/QstarToQZ_M-1600_TuneCUETP8M2T4_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2/MINIAODSIM", "CMS", ".*root",1.0)
-signalSamples.append(QstarToQZ_M1600)
-#QstarToQZ_M1800
-QstarToQZ_M1800=kreator.makeMCComponent("QstarToQZ_M1800", "/QstarToQZ_M-1800_TuneCUETP8M2T4_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2/MINIAODSIM", "CMS", ".*root",1.0)
-signalSamples.append(QstarToQZ_M1800)
-#QstarToQZ_M2000
-QstarToQZ_M2000=kreator.makeMCComponent("QstarToQZ_M2000", "/QstarToQZ_M-2000_TuneCUETP8M2T4_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2/MINIAODSIM", "CMS", ".*root",1.0)
-signalSamples.append(QstarToQZ_M2000)
-#QstarToQZ_M2500
-QstarToQZ_M2500=kreator.makeMCComponent("QstarToQZ_M2500", "/QstarToQZ_M-2500_TuneCUETP8M2T4_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2/MINIAODSIM", "CMS", ".*root",1.0)
-signalSamples.append(QstarToQZ_M2500)
-#QstarToQZ_M3000
-QstarToQZ_M3000=kreator.makeMCComponent("QstarToQZ_M3000", "/QstarToQZ_M-3000_TuneCUETP8M2T4_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2/MINIAODSIM", "CMS", ".*root",1.0)
-signalSamples.append(QstarToQZ_M3000)
-#QstarToQZ_M3500
-QstarToQZ_M3500=kreator.makeMCComponent("QstarToQZ_M3500", "/QstarToQZ_M-3500_TuneCUETP8M2T4_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2/MINIAODSIM", "CMS", ".*root",1.0)
-signalSamples.append(QstarToQZ_M3500)
-#QstarToQZ_M4000
-QstarToQZ_M4000=kreator.makeMCComponent("QstarToQZ_M4000", "/QstarToQZ_M-4000_TuneCUETP8M2T4_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2/MINIAODSIM", "CMS", ".*root",1.0)
-signalSamples.append(QstarToQZ_M4000)
-#QstarToQZ_M4500
-QstarToQZ_M4500=kreator.makeMCComponent("QstarToQZ_M4500", "/QstarToQZ_M-4500_TuneCUETP8M2T4_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2/MINIAODSIM", "CMS", ".*root",1.0)
-signalSamples.append(QstarToQZ_M4500)
-#QstarToQZ_M5000
-QstarToQZ_M5000=kreator.makeMCComponent("QstarToQZ_M5000", "/QstarToQZ_M-5000_TuneCUETP8M2T4_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2/MINIAODSIM", "CMS", ".*root",1.0)
-signalSamples.append(QstarToQZ_M5000)
-#QstarToQZ_M6000
-QstarToQZ_M6000=kreator.makeMCComponent("QstarToQZ_M6000", "/QstarToQZ_M-6000_TuneCUETP8M2T4_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2/MINIAODSIM", "CMS", ".*root",1.0)
-signalSamples.append(QstarToQZ_M6000)
-#QstarToQZ_M7000
-QstarToQZ_M7000=kreator.makeMCComponent("QstarToQZ_M7000", "/QstarToQZ_M-7000_TuneCUETP8M2T4_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2/MINIAODSIM", "CMS", ".*root",1.0)
-signalSamples.append(QstarToQZ_M7000)
+#QstarToQZ_600
+QstarToQZ_600=kreator.makeMCComponent("QstarToQZ_600", "/QstarToQZ_-600_TuneCUETP8M2T4_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2/MINIAODSIM", "CMS", ".*root",1.0)
+signalSamples.append(QstarToQZ_600)
+#QstarToQZ_800
+QstarToQZ_800=kreator.makeMCComponent("QstarToQZ_800", "/QstarToQZ_-800_TuneCUETP8M2T4_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2/MINIAODSIM", "CMS", ".*root",1.0)
+signalSamples.append(QstarToQZ_800)
+#QstarToQZ_1000
+QstarToQZ_1000=kreator.makeMCComponent("QstarToQZ_1000", "/QstarToQZ_-1000_TuneCUETP8M2T4_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2/MINIAODSIM", "CMS", ".*root",1.0)
+signalSamples.append(QstarToQZ_1000)
+#QstarToQZ_1200
+QstarToQZ_1200=kreator.makeMCComponent("QstarToQZ_1200", "/QstarToQZ_-1200_TuneCUETP8M2T4_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2/MINIAODSIM", "CMS", ".*root",1.0)
+signalSamples.append(QstarToQZ_1200)
+#QstarToQZ_1400
+QstarToQZ_1400=kreator.makeMCComponent("QstarToQZ_1400", "/QstarToQZ_-1400_TuneCUETP8M2T4_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2/MINIAODSIM", "CMS", ".*root",1.0)
+signalSamples.append(QstarToQZ_1400)
+#QstarToQZ_1600
+QstarToQZ_1600=kreator.makeMCComponent("QstarToQZ_1600", "/QstarToQZ_-1600_TuneCUETP8M2T4_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2/MINIAODSIM", "CMS", ".*root",1.0)
+signalSamples.append(QstarToQZ_1600)
+#QstarToQZ_1800
+QstarToQZ_1800=kreator.makeMCComponent("QstarToQZ_1800", "/QstarToQZ_-1800_TuneCUETP8M2T4_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2/MINIAODSIM", "CMS", ".*root",1.0)
+signalSamples.append(QstarToQZ_1800)
+#QstarToQZ_2000
+QstarToQZ_2000=kreator.makeMCComponent("QstarToQZ_2000", "/QstarToQZ_-2000_TuneCUETP8M2T4_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2/MINIAODSIM", "CMS", ".*root",1.0)
+signalSamples.append(QstarToQZ_2000)
+#QstarToQZ_2500
+QstarToQZ_2500=kreator.makeMCComponent("QstarToQZ_2500", "/QstarToQZ_-2500_TuneCUETP8M2T4_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2/MINIAODSIM", "CMS", ".*root",1.0)
+signalSamples.append(QstarToQZ_2500)
+#QstarToQZ_3000
+QstarToQZ_3000=kreator.makeMCComponent("QstarToQZ_3000", "/QstarToQZ_-3000_TuneCUETP8M2T4_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2/MINIAODSIM", "CMS", ".*root",1.0)
+signalSamples.append(QstarToQZ_3000)
+#QstarToQZ_3500
+QstarToQZ_3500=kreator.makeMCComponent("QstarToQZ_3500", "/QstarToQZ_-3500_TuneCUETP8M2T4_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2/MINIAODSIM", "CMS", ".*root",1.0)
+signalSamples.append(QstarToQZ_3500)
+#QstarToQZ_4000
+QstarToQZ_4000=kreator.makeMCComponent("QstarToQZ_4000", "/QstarToQZ_-4000_TuneCUETP8M2T4_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2/MINIAODSIM", "CMS", ".*root",1.0)
+signalSamples.append(QstarToQZ_4000)
+#QstarToQZ_4500
+QstarToQZ_4500=kreator.makeMCComponent("QstarToQZ_4500", "/QstarToQZ_-4500_TuneCUETP8M2T4_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2/MINIAODSIM", "CMS", ".*root",1.0)
+signalSamples.append(QstarToQZ_4500)
+#QstarToQZ_5000
+QstarToQZ_5000=kreator.makeMCComponent("QstarToQZ_5000", "/QstarToQZ_-5000_TuneCUETP8M2T4_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2/MINIAODSIM", "CMS", ".*root",1.0)
+signalSamples.append(QstarToQZ_5000)
+#QstarToQZ_6000
+QstarToQZ_6000=kreator.makeMCComponent("QstarToQZ_6000", "/QstarToQZ_-6000_TuneCUETP8M2T4_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2/MINIAODSIM", "CMS", ".*root",1.0)
+signalSamples.append(QstarToQZ_6000)
+#QstarToQZ_7000
+QstarToQZ_7000=kreator.makeMCComponent("QstarToQZ_7000", "/QstarToQZ_-7000_TuneCUETP8M2T4_13TeV-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2/MINIAODSIM", "CMS", ".*root",1.0)
+signalSamples.append(QstarToQZ_7000)

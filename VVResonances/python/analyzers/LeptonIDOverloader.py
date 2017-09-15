@@ -43,7 +43,9 @@ class LeptonIDOverloader( Analyzer ):
     def muonIDTrackerHighPtIso(self,mu):
         return self.muonIDTrackerHighPt(mu) and mu.relIso04 < 0.05
 
-
+    def muonIDTightTrackIso(self,mu):
+        return mu.isTightMuon(mu.associatedVertex) and mu.trackIso()/mu.pt() < 0.1
+	
     def process(self, event):
         self.readCollections( event.input )
 
@@ -56,3 +58,4 @@ class LeptonIDOverloader( Analyzer ):
                 lepton.highPtTrackID = self.muonIDTrackerHighPt(lepton)
                 lepton.highPtIDIso = self.muonIDHighPtIso(lepton)
                 lepton.highPtTrackIDIso = self.muonIDTrackerHighPtIso(lepton)
+		lepton.tightIDTrackIso = self.muonIDTightTrackIso(lepton)

@@ -19,7 +19,7 @@ from CMGTools.RootTools.samples.samples_13TeV_DATA2016 import *
 # Load JSON
 json = '/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt'
 
-JetHT = [JetHT_Run2016B_03Feb2017_v2, JetHT_Run2016C_03Feb2017, JetHT_Run2016D_03Feb2017, JetHT_Run2016E_03Feb2017, JetHT_Run2016F_03Feb2017, JetHT_Run2016G_03Feb2017, JetHT_Run2016H_03Feb2017_v2, JetHT_Run2016H_03Feb2017_v3]
+JetHT = [JetHT_Run2016B_03Feb2017_v2, JetHT_Run2016C_03Feb2017, JetHT_Run2016D_03Feb2017,JetHT_Run2016E_03Feb2017, JetHT_Run2016F_03Feb2017, JetHT_Run2016G_03Feb2017,JetHT_Run2016H_03Feb2017_v2, JetHT_Run2016H_03Feb2017_v3]
 
 # Jet HT to be used for jj (silver)
 for s in JetHT:

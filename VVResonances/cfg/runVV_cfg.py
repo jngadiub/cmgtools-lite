@@ -4,6 +4,7 @@
 ## meant only to check that all common modules run ok   ##
 ##########################################################
 
+import sys
 
 #AAA
 ###
@@ -89,7 +90,6 @@ triggerFlagsAna.triggerBits ={
     "MET120":triggers_metNoMu120_mhtNoMu120
 }
 
-
 #-------- HOW TO RUN
 test = 0
 if test==1:
@@ -98,7 +98,6 @@ if test==1:
     for c in selectedComponents:
         c.files = c.files[:1]
         c.splitFactor = 1
-
 elif test==2:
     # test a single component, using a single thread.
     selectedComponents = [TTJets]
