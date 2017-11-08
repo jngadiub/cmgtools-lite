@@ -1,12 +1,15 @@
 import PhysicsTools.HeppyCore.framework.config as cfg
 import os
 
+
 # Load backgrounds from common place
 from CMGTools.RootTools.samples.samples_13TeV_RunIISummer16MiniAODv2 import *
-background = QCDHT
+#add more QCD samples
+from CMGTools.VVResonances.samples.QCD_13TeV_80X import *
+background = QCDHT+QCDbackgroundSamples
 
 # Load signal from here
-from CMGTools.VVResonances.samples.signal_13TeV_80X_Qstar import *
+from CMGTools.VVResonances.samples.signal_13TeV_80X_Summer16 import *
 
 mcSamples = background+signalSamples
 

@@ -46,7 +46,7 @@ class VVBuilder(Analyzer):
         # btag reweighting
         self.btagSF = BTagEventWeights(
             'btagsf', os.path.expandvars(self.cfg_ana.btagCSVFile))
-
+	    
     def declareHandles(self):
         super(VVBuilder, self).declareHandles()
         self.handles['packed'] = AutoHandle(
@@ -98,7 +98,7 @@ class VVBuilder(Analyzer):
 	  bestPUPPIjet = i
 	
 	if bestPUPPIjet == -1: return
-	
+	 	
 #        setattr(jet,tag,Substructure())
 #        substructure=getattr(jet,tag)
         substructure = Substructure()
@@ -159,7 +159,7 @@ class VVBuilder(Analyzer):
 
         interface.makeSubJets(False, 0, 2)
         substructure.softDropSubjets = self.copyLV(interface.get(False))
-
+	  
         # get NTau
         substructure.ntau = interface.nSubJettiness(bestPUPPIjet, 4, 0, 6, 1.0, 0.8, 999.0, 999.0, 999)
         # calculate DDT tau21 (currently without softDropJetMassCor, but the
@@ -432,54 +432,40 @@ class VVBuilder(Analyzer):
             return output
         	
 	if debug: print "----------------- BEFORE SORTING ----------------- "
-	sortedJets = []
 	i = 1
         for j in fatJets:
 	 if debug: print " * jet ",i," pt ", j.pt(), " eta ", j.eta(), " phi ",j.phi()
-         self.substructure(j, event)
-	 if hasattr(j, 'substructure'): sortedJets.append(j)
 	 i+=1
-	
-        if len(sortedJets) < 2:
-            return output
 
-	sortedJets = sortedJets[:2]
-        
-	#fatJets = sorted(sortedJets,key=(lambda x: x.substructure.softDropJetMassBare*x.substructure.softDropJetMassCor),reverse=True)
-        fatJets = sorted(sortedJets,key=(lambda x: x.substructure.ntau[1]/x.substructure.ntau[0]))
+        fatJets = fatJets[:2]
+        if evt%2 != 0: fatJets = list(reversed(fatJets))
 	
 	if debug:
 	 print "----------------- AFTER SORTING ----------------- "
 	 i = 1
          for j in fatJets:
-	  print " * jet ",i," pt ", j.pt(), " eta ", j.eta(), " mass no corr ",j.substructure.softDropJetMassBare, " mass corr ",j.substructure.softDropJetMassBare*j.substructure.softDropJetMassCor," tau21 ", j.substructure.ntau[1]/j.substructure.ntau[0]  
+	  #print " * jet ",i," pt ", j.pt(), " eta ", j.eta(), " mass no corr ",j.substructure.softDropJetMassBare, " mass corr ",j.substructure.softDropJetMassBare*j.substructure.softDropJetMassCor," tau21 ", j.substructure.ntau[1]/j.substructure.ntau[0]  
+	  print " * jet ",i," pt ", j.pt(), " eta ", j.eta()  
 	  i+=1
 	 	
         VV = Pair(fatJets[0], fatJets[1])
+		 	 
+        # kinematics
+        if abs(VV.leg1.eta() - VV.leg2.eta()) > 1.3 or VV.mass() < 700:
+            return output
+
+        self.substructure(VV.leg1, event)
+        self.substructure(VV.leg2, event)
+
+        # substructure changes jet, so we need to recalculate the resonance mass  
+	VV = Pair(fatJets[0], fatJets[1])
 
         if debug:
 	 print "----------------- AFTER PARING ----------------- "
 	 print " * VV leg1 pt ", VV.leg1.pt(), " eta ", VV.leg1.eta()
 	 print " * VV leg2 pt ", VV.leg2.pt(), " eta ", VV.leg2.eta()
 	 print "    === VV mass ", VV.mass()," deta ", abs(VV.leg1.eta() - VV.leg2.eta()), " ======"
-	 
-	 
-        # kinematics
-        if abs(VV.leg1.eta() - VV.leg2.eta()) > 1.3 or VV.mass() < 1000:
-            return output
-
-        #self.substructure(VV.leg1, event)
-        #self.substructure(VV.leg2, event)
-
-        # substructure changes jet, so we need to recalculate the resonance mass
-	# also resort the jets in softdrop mass
-	#if hasattr(VV.leg2, 'substructure') and hasattr(VV.leg1,'substructure'):	
-	# if( VV.leg1.substructure.softDropJetMassBare*VV.leg1.substructure.softDropJetMassCor > VV.leg2.substructure.softDropJetMassBare*VV.leg2.substructure.softDropJetMassCor):
-        #  VV = Pair(fatJets[0], fatJets[1])
-	# else: VV = Pair(fatJets[1], fatJets[0]) 	
-	#else:    
-	# VV = Pair(fatJets[0], fatJets[1])
-	
+	 	
         # substructure truth
         if self.cfg_comp.isMC:
             self.substructureGEN(VV.leg2, event)
