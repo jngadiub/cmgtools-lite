@@ -94,7 +94,7 @@ triggerFlagsAna.triggerBits ={
 test = 0
 if test==1:
     # test a single component, using a single thread.
-    selectedComponents = [QstarToQW_M600]
+    selectedComponents = [BulkGravToWW_narrow_2000]
     for c in selectedComponents:
         c.files = c.files[:1]
         c.splitFactor = 1
