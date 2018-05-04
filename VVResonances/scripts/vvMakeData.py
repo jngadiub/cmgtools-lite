@@ -20,7 +20,7 @@ parser.add_option("-d","--isData",dest="data",type=int,help="isData",default=1)
 parser.add_option("-f","--factors",dest="factors",type=str,help="factor",default="1")
 parser.add_option("-n","--name",dest="name",help="name",default="histo")
 parser.add_option("--binsMVV",dest="binsMVV",help="use special binning",default="")
-
+parser.add_option("-w","--weights",dest="weights",help="additional weights",default='')
 
 
 (options,args) = parser.parse_args()
@@ -37,6 +37,7 @@ def getBinning(binsMVV):
     return l
 
 sampleTypes=options.samples.split(',')
+weights_ = options.weights.split(',')
 
 dataPlotters=[]
 
@@ -54,7 +55,8 @@ for filename in os.listdir(args[0]):
                 dataPlotters[-1].addCorrectionFactor('xsec','tree')
                 dataPlotters[-1].addCorrectionFactor('genWeight','tree')
                 dataPlotters[-1].addCorrectionFactor('puWeight','tree')
-		
+                for w in weights_:
+	         if w != '': dataPlotters[-1].addCorrectionFactor(w,'tree')		
             corrFactors = options.factors.split(',')
 	    for c in corrFactors:
 	     if len(c.split(':')) < 2: continue

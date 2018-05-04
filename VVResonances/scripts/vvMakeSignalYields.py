@@ -27,6 +27,7 @@ parser.add_option("-f","--function",dest="function",help="interpolating function
 parser.add_option("-b","--BR",dest="BR",type=float, help="branching ratio",default=1)
 parser.add_option("-r","--minMX",dest="minMX",type=float, help="smallest Mx to fit ",default=1000.0)
 parser.add_option("-R","--maxMX",dest="maxMX",type=float, help="largest Mx to fit " ,default=7000.0)
+parser.add_option("-w","--weights",dest="weights",help="additional weights",default='')
 
 (options,args) = parser.parse_args()
 #define output dictionary
@@ -54,17 +55,21 @@ for filename in os.listdir(args[0]):
 
     print 'found',filename,'mass',str(mass) 
 
-
+weights_ = options.weights.split(',')
 #Now we have the samples: Sort the masses and run the fits
 N=0
 for mass in sorted(samples.keys()):
 
+    if mass == 2000: continue
     print 'fitting',str(mass) 
     plotter=TreePlotter(args[0]+'/'+samples[mass]+'.root','tree')
     plotter.setupFromFile(args[0]+'/'+samples[mass]+'.pck')
     plotter.addCorrectionFactor('genWeight','tree')
     plotter.addCorrectionFactor('xsec','tree')
     plotter.addCorrectionFactor('puWeight','tree')
+    for w in weights_:
+     if w != '': plotter.addCorrectionFactor(w,'branch')
+      
     histo = plotter.drawTH1(options.mvv,options.cut,"1",500,options.min,options.max)
     err=ROOT.Double(0)
     integral=histo.IntegralAndError(1,histo.GetNbinsX(),err) 

@@ -121,13 +121,13 @@ for filename in os.listdir(args[0]):
    dataPlotters[-1].addCorrectionFactor('genWeight','tree')
    dataPlotters[-1].addCorrectionFactor('puWeight','tree')
    for w in weights_:
-    if w != '': dataPlotters[-1].addCorrectionFactor(w,'branch')
+    if w != '': dataPlotters[-1].addCorrectionFactor(w,'tree')
    dataPlotters[-1].filename=fname
    dataPlottersNW.append(TreePlotter(args[0]+'/'+fname+'.root','tree'))
    dataPlottersNW[-1].addCorrectionFactor('puWeight','tree')
    dataPlottersNW[-1].addCorrectionFactor('genWeight','tree')
    for w in weights_: 
-    if w != '': dataPlottersNW[-1].addCorrectionFactor(w,'branch')
+    if w != '': dataPlottersNW[-1].addCorrectionFactor(w,'tree')
    dataPlottersNW[-1].filename=fname
 
 data=MergedPlotter(dataPlotters)
@@ -206,7 +206,6 @@ for plotter,plotterNW in zip(dataPlotters,dataPlottersNW):
   if histTMP.Integral()>0:
    histTMP.Scale(histI2D.Integral()/histTMP.Integral())
    histogram.Add(histTMP)
-   mjet_mvv_nominal.Add(histI2D)
    
   histTMP.Delete()    
   histI2D.Delete()	
@@ -230,7 +229,6 @@ for plotter,plotterNW in zip(dataPlotters,dataPlottersNW):
   if histTMP.Integral()>0:
     histTMP.Scale(histI2D.Integral()/histTMP.Integral())
     histogram_altshapeUp.Add(histTMP)
-    mjet_mvv_altshapeUp.Add(histI2D)
    
   histTMP.Delete()
 
@@ -278,7 +276,6 @@ for plotter,plotterNW in zip(dataPlotters,dataPlottersNW):
   if histTMP.Integral()>0:
     histTMP.Scale(histI2D.Integral()/histTMP.Integral())
     histogram_altshape2.Add(histTMP) 
-    mjet_mvv_altshape2.Add(histI2D)
     
   histI2D.Delete()
   histTMP.Delete()

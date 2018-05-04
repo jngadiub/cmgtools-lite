@@ -119,13 +119,13 @@ for filename in os.listdir(args[0]):
             dataPlotters[-1].addCorrectionFactor('genWeight','tree')
             dataPlotters[-1].addCorrectionFactor('puWeight','tree')
             for w in weights_:
-	     if w != '': dataPlotters[-1].addCorrectionFactor(w,'branch')
+	     if w != '': dataPlotters[-1].addCorrectionFactor(w,'tree')
             dataPlotters[-1].filename=fname
             dataPlottersNW.append(TreePlotter(args[0]+'/'+fname+'.root','tree'))
             dataPlottersNW[-1].addCorrectionFactor('puWeight','tree')
             dataPlottersNW[-1].addCorrectionFactor('genWeight','tree')
             for w in weights_: 
-             if w != '': dataPlottersNW[-1].addCorrectionFactor(w,'branch')
+             if w != '': dataPlottersNW[-1].addCorrectionFactor(w,'tree')
             dataPlottersNW[-1].filename=fname
 	    
 data=MergedPlotter(dataPlotters)
