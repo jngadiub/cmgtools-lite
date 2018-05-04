@@ -51,7 +51,7 @@ cuts['nonres'] = '1'
 cuts['res'] = '(jj_l1_mergedVTruth==1&&jj_l1_softDrop_mass>60&&jj_l1_softDrop_mass<110)'
 
 purities=['HPHP','HPLP','LPLP','NP']
-purities=['HPHP']
+purities=['LPLP']
 
 BulkGravWWTemplate="BulkGravToWW_narrow"
 BulkGravZZTemplate="BulkGravToZZToZhadZhad_narrow"
@@ -69,6 +69,8 @@ nonResTemplate="QCD_Pt-" #low stat --> use this for tests
 #nonResTemplate="Dijet" #to compare shapes
 
 resTemplate= "JetsToQQ"
+
+lumi = 35900.
 
 minMJ=55.0
 maxMJ=215.0
@@ -216,6 +218,10 @@ def makeBackgroundShapesMVVKernel(name,filename,template,addCut="1",jobname="1DM
     if wait: merge1DMVVTemplate(jobList,files,jobname,p,binsMVV,binsMJ,minMVV,maxMVV,minMJ,maxMJ,HCALbinsMVV)
   else:
     cmd='vvMake1DMVVTemplateWithKernels.py -H "x" -o "{rootFile}" -s "{samples}" -c "{cut}"  -v "jj_gen_partialMass" -b {binsMVV}  -x {minMVV} -X {maxMVV} -r {res} -w "{weights}" samples'.format(rootFile=rootFile,samples=template,cut=cut,res=resFile,binsMVV=binsMVV,minMVV=minMVV,maxMVV=maxMVV,weights=weights)
+    
+    if template.find('JetsToQQ') != -1:
+     cmd='vvMake1DMVVTemplateWithKernels.py -H "x" -o "{rootFile}" -s "{samples}" -c "{cut}"  -v "jj_gen_partialMass" -b {binsMVV}  -x {minMVV} -X {maxMVV} -r "JJ_nonRes_detectorResponse.root" -w "{weights}" -f "ZJetsToQQ:0.071" samples'.format(rootFile=rootFile,samples=template,cut=cut,binsMVV=binsMVV,minMVV=minMVV,maxMVV=maxMVV,weights=weights)
+    
     cmd = cmd+HCALbinsMVV
     os.system(cmd)	  
 
@@ -308,16 +314,16 @@ def makeNormalizations(name,filename,template,data=0,addCut='1',jobName="nR",fac
 
 weights = "triggerWeight"
 
-	
-makeSignalShapesMVV("JJ_WprimeWZ",WprimeTemplate)
-makeSignalShapesMJ("JJ_WprimeWZ",WprimeTemplate,'l1')
-makeSignalShapesMJ("JJ_WprimeWZ",WprimeTemplate,'l2')
-makeSignalYields("JJ_WprimeWZ",WprimeTemplate,BRWZ,{'HPHP':0.99*0.99,'HPLP':0.99*1.03,'LPLP':1.03*1.03})
 
 makeSignalShapesMVV("JJ_BulkGWW",BulkGravWWTemplate,weights)
 makeSignalShapesMJ("JJ_BulkGWW",BulkGravWWTemplate,'l1',weights)
 makeSignalShapesMJ("JJ_BulkGWW",BulkGravWWTemplate,'l2',weights)
 makeSignalYields("JJ_BulkGWW",BulkGravWWTemplate,BRWW,{'HPHP':0.99*0.99,'HPLP':0.99*1.03,'LPLP':1.03*1.03},weights)
+
+makeSignalShapesMVV("JJ_WprimeWZ",WprimeTemplate)
+makeSignalShapesMJ("JJ_WprimeWZ",WprimeTemplate,'l1')
+makeSignalShapesMJ("JJ_WprimeWZ",WprimeTemplate,'l2')
+makeSignalYields("JJ_WprimeWZ",WprimeTemplate,BRWZ,{'HPHP':0.99*0.99,'HPLP':0.99*1.03,'LPLP':1.03*1.03})
 
 makeSignalShapesMVV("JJ_ZprimeWW",ZprimeWWTemplate)
 makeSignalShapesMJ("JJ_ZprimeWW",ZprimeWWTemplate,'l1')
@@ -342,9 +348,9 @@ makeDetectorResponse("nonRes","JJ",nonResTemplate,cuts['nonres'])
 
 if runParallel and submitToBatch:
 	wait = False
-	makeBackgroundShapesMVVKernel("nonRes","JJ",nonResTemplate,cuts['nonres'],"1D",wait)
-	makeBackgroundShapesMVVConditional("nonRes","JJ",nonResTemplate,'l1',cuts['nonres'],"2Dl1",wait)
-	makeBackgroundShapesMVVConditional("nonRes","JJ",nonResTemplate,'l2',cuts['nonres'],"2Dl2",wait)
+	makeBackgroundShapesMVVKernel("nonRes","JJ",nonResTemplate,cuts['nonres'],"1D",wait,weights)
+	makeBackgroundShapesMVVConditional("nonRes","JJ",nonResTemplate,'l1',cuts['nonres'],"2Dl1",wait,weights)
+	makeBackgroundShapesMVVConditional("nonRes","JJ",nonResTemplate,'l2',cuts['nonres'],"2Dl2",wait,weights)
 	print "Exiting system! When all jobs are finished, please run mergeKernelJobs below"
 	sys.exit()
 	mergeKernelJobs()
@@ -358,12 +364,12 @@ else:
 #mergeKernelJobs()
 mergeBackgroundShapes("nonRes","JJ")
 
-makeBackgroundShapesMVVKernel("VJetsRes","JJ",resTemplate,cuts['res'],"1D",True,weights)
-fitVJets("JJ_VJets",resTemplate,weights) 
+fitVJets("JJ_VJets",resTemplate,weights)
+makeBackgroundShapesMVVKernel("VJets","JJ",resTemplate,"(jj_l1_mergedVTruth==1||jj_l2_mergedVTruth==1)","1D",0,weights)
 
 makeNormalizations("nonRes","JJ",nonResTemplate,0,cuts['nonres'],"nR",weights)
 makeNormalizations("VJets","JJ",resTemplate,0,cuts['res'],"nRes","ZJetsToQQ:0.071")
 ### makeNormalizations("data","JJ",dataTemplate,1,'1',"normD") #run on data. Currently run on pseudodata only (below)
-from modules.submitJobs import makePseudodata
-for p in purities: makePseudodata("JJ_nonRes_%s.root"%p,p) #remove this when running on data!!
+from modules.submitJobs import makePseudoData
+for p in purities: makePseudoData("JJ_nonRes_%s.root"%p,"JJ_nonRes_3D_%s.root"%p,"pythia","JJ_%s.root"%p,lumi)
 

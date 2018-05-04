@@ -1435,38 +1435,36 @@ def getListOfBinsLowEdge(hist,dim):
     return r
 
 	
-def makePseudodata(infile,purity):
-	print "Making pseudodata from infile " ,infile
-	fin = ROOT.TFile.Open(infile,'READ')
-	hmcin = fin.Get('nonRes')
-	
-	xbins = array("f",getListOfBinsLowEdge(hmcin,"x"))
-	zbins = array("f",getListOfBinsLowEdge(hmcin,"z"))
-	print xbins
-	#print zbins
-	#print xbins
-	fout = ROOT.TFile.Open('JJ_%s.root'%purity,'RECREATE')
-	hout = ROOT.TH3F('data','data',len(xbins)-1,xbins,len(xbins)-1,xbins,len(zbins)-1,zbins)
-	hmcout = ROOT.TH3F('nonRes','nonRes',len(xbins)-1,xbins,len(xbins)-1,xbins,len(zbins)-1,zbins)
-	xbins2 = array("f",getListOfBinsLowEdge(hmcout,"x"))
-	zbins2 = array("f",getListOfBinsLowEdge(hmcout,"z"))
-	print xbins2
-	hmcout.Add(hmcin)
-	
-	
-	
-	for k in range(1,hmcin.GetNbinsZ()+1):
-	 for j in range(1,hmcin.GetNbinsY()+1):
-	  for i in range(1,hmcin.GetNbinsX()+1):
-	   evs = hmcin.GetBinContent(i,j,k)*35900.
-	   #if evs >= 1:
-	   err = math.sqrt(evs)
-	   hout.SetBinContent(i,j,k,evs)
-	   hout.SetBinError(i,j,k,err)
-	
-	hout.Write()
-	hmcout.Write()
-	
-	fin.Close()
-        fout.Close()
-        print "made pseudo-data : JJ_"+purity+".root"
+
+def makePseudoData(input="JJ_nonRes_LPLP.root",kernel="JJ_nonRes_3D_LPLP.root",mc="pythia",output="JJ_LPLP.root",lumi=35900):
+
+ pwd = os.getcwd()
+ 
+ ROOT.gRandom.SetSeed(0)
+ 
+ finmc = ROOT.TFile.Open(pwd+'/'+input,'READ')
+ hmcin = finmc.Get('nonRes')
+
+ findata = ROOT.TFile.Open(pwd+'/'+kernel,'READ')
+ #findata.ls()
+ hdata = ROOT.TH3F()
+ 
+ if   mc == 'pythia': hdata = findata.Get('histo')
+ elif mc == 'herwig': hdata = findata.Get('histo_altshapeUp')
+ elif mc == 'madgraph': hdata = findata.Get('histo_altshape2')
+ elif mc == 'powheg': hdata = findata.Get('histo_NLO')
+ 
+ fout = ROOT.TFile.Open(output,'RECREATE')
+ #hmcin.Scale(10.)
+ hmcin.Write('nonRes')
+
+ xbins = array("f",getListOfBinsLowEdge(hmcin,"x"))
+ zbins = array("f",getListOfBinsLowEdge(hmcin,"z"))
+ hout = ROOT.TH3F('data','data',len(xbins)-1,xbins,len(xbins)-1,xbins,len(zbins)-1,zbins)
+ hout.FillRandom(hdata,int(hmcin.Integral()*lumi))
+ hout.Write('data')
+ print "Writing histograms nonRes and data to file ", output
+
+ finmc.Close()
+ findata.Close()
+ fout.Close()
