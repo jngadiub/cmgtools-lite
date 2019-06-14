@@ -152,7 +152,7 @@ legs=["l1","l2"]
 plotters=[]
 names = []
 for name in samples.keys():
-    plotters.append(TreePlotter(args[0]+'/'+samples[name]+'.root','tree'))
+    plotters.append(TreePlotter(args[0]+'/'+samples[name]+'.root','AnalysisTree'))
     plotters[-1].setupFromFile(args[0]+'/'+samples[name]+'.pck')
     plotters[-1].addCorrectionFactor('xsec','tree')
     plotters[-1].addCorrectionFactor('genWeight','tree')
