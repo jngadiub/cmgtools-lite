@@ -188,17 +188,17 @@ else:
 
 #for V+jets
 print "makong V+jets templates!! "
-print "first norm W"
-f.makeNormalizations("WJets","JJ",WresTemplate,0,cuts['nonres'],"nRes","",HPSF,LPSF)
-#print "then norm Z"
-#f.makeNormalizations("ZJets","JJ",ZresTemplate,0,cuts['nonres'],"nRes","",HPSF,LPSF)
-#print "then we fit"
-#f.fitVJets("JJ_WJets",resTemplate,1.,1.)
+print "then we fit"
+f.fitVJets("JJ_WJets",resTemplate,1.,1.)
 #print "and we make kernels"
 #print "first kernel W"
 #f.makeBackgroundShapesMVVKernel("WJets","JJ",WresTemplate,cuts['nonres'],"1D",0,1.,1.)
 #print "then kernel Z"
 #f.makeBackgroundShapesMVVKernel("ZJets","JJ",ZresTemplate,cuts['nonres'],"1D",0,1.,1.)
+#print "first norm W"
+#f.makeNormalizations("WJets","JJ",WresTemplate,0,cuts['nonres'],"nRes","",HPSF,LPSF)
+#print "then norm Z"
+#f.makeNormalizations("ZJets","JJ",ZresTemplate,0,cuts['nonres'],"nRes","",HPSF,LPSF)
 
 ## Do data or pseudodata
 #f.makeNormalizations("data","JJ",dataTemplate,1,'1',"normD") #run on data. Currently run on pseudodata only (below)
