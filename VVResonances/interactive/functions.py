@@ -195,20 +195,16 @@ class AllFunctions():
    for c in self.categories:
      cut='*'.join([self.cuts['common'],self.cuts[c],self.cuts['acceptance']])
      rootFile=filename+"_"+c+".root"
+     pwd = os.getcwd()
+     directory=pwd+"/"+self.samples
 
      print self.cuts["acceptance"]
      fixPars="1"  #"n:0.8,alpha:1.9"
-     cmd='vvMakeVjetsShapes.py -s "{template}" -c "{cut}"  -o "{rootFile}" -m {minMJ} -M {maxMJ} --store "{filename}_{purity}.py" --minMVV {minMVV} --maxMVV {maxMVV} {addOption} --corrFactorW {Wxsec} --corrFactorZ {Zxsec} {samples} '.format(template=template,cut=cut,rootFile=rootFile,minMJ=self.minMJ,maxMJ=self.maxMJ,filename=filename,purity=c,minMVV=self.minMVV,maxMVV=self.maxMVV,addOption=addOption,Wxsec=Wxsec,Zxsec=Zxsec,samples=directory)
+     cmd='vvMakeVjetsShapes.py -s "{template}" -c "{cut}"  -o "{rootFile}" -m {minMJ} -M {maxMJ} --store "{filename}_{purity}.py" --minMVV {minMVV} --maxMVV {maxMVV} {addOption} --corrFactorW {Wxsec} --corrFactorZ {Zxsec} {samples} '.format(template=template,cut=cut,rootFile=rootFile,minMJ=self.minMJ,maxMJ=self.maxMJ,filename=filename,purity=c,minMVV=self.minMVV,maxMVV=self.maxMVV,addOption="",Wxsec=Wxsec,Zxsec=Zxsec,samples=directory)
      cmd+=self.HCALbinsMVV
+     print "going to execute command: "
+     print str(cmd)
      os.system(cmd)
-
-
-
-
-
-
-
-
 
 
  #this one I still have to fix and test, do not use submitToBatch yet
