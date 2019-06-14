@@ -1,7 +1,7 @@
 from functions import *
 
-period = 2016
-samples= "Vjets2018/" #for V+jets we use 2018 samples also for 2016 because the 2016 ones are buggy and they need to be processed before to add the NLO weights!
+period = 2018
+samples= str(period)+"/" #for V+jets we use 2018 samples also for 2016 because the 2016 ones are buggy and they need to be processed before to add the NLO weights!
 #samples= str(period)+"_new/"
 sorting = 'random'
 #sorting = 'btag'
@@ -124,9 +124,12 @@ nonResTemplate="QCD_Pt_" #high stat
 #nonResTemplate="QCD_Pt-"
 nonResTemplate="QCD_HT"
 TTemplate= "TTHad" #do we need a separate fit for ttbar?
-WresTemplate= "WJetsToQQ_HT800toInf_new,TTHad_pow"
-ZresTemplate= "ZJetsToQQ_HT800toInf_new"
-resTemplate= "ZJetsToQQ_HT800toInf_new,WJetsToQQ_HT800toInf_new,TTHad_pow"
+#WresTemplate= "WJetsToQQ_HT800toInf_new,TTHad_pow"
+#ZresTemplate= "ZJetsToQQ_HT800toInf_new"
+#resTemplate= "ZJetsToQQ_HT800toInf_new,WJetsToQQ_HT800toInf_new,TTHad_pow"
+WresTemplate= "WJetsToQQ_HT800toInf,TTHad_pow"
+ZresTemplate= "ZJetsToQQ_HT800toInf"
+resTemplate= "ZJetsToQQ_HT800toInf,WJetsToQQ_HT800toInf,TTHad_pow"
 
 #ranges and binning
 minMJ=55.0
