@@ -39,7 +39,10 @@ sampleTypes=options.samples.split(',')
 
 dataPlotters=[]
 
+print "now we will  make data!"
+print "args[0] "+str(args[0])
 for filename in os.listdir(args[0]):
+    print "filename :"+str(filename)
     for sampleType in sampleTypes:
         if filename.find(sampleType)!=-1:
             fnameParts=filename.split('.')
