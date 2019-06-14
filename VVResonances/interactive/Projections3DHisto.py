@@ -23,7 +23,7 @@ def get_canvas(cname):
  CMS_lumi.lumi_8TeV = "18.3 fb^{-1}"
  CMS_lumi.writeExtraText = 1
  CMS_lumi.extraText = "Simulation"
- CMS_lumi.lumi_sqrtS = "13 TeV (2017)" # used with iPeriod = 0, e.g. for simulation-only plots (default is an empty string)
+ CMS_lumi.lumi_sqrtS = "13 TeV (2016)" # used with iPeriod = 0, e.g. for simulation-only plots (default is an empty string)
 
  iPos = 11
  if( iPos==0 ): CMS_lumi.relPosX = 0.12
@@ -68,7 +68,9 @@ os.system('rm -rf %s'%options.outdir)
 os.system('mkdir %s'%options.outdir)
 
 kfile,kname = options.kernel.split(',')
+print "kfile "+str(kfile)
 fin = rt.TFile.Open(kfile,"READ")
+print "kname "+str(kname)
 hin = fin.Get(kname)
 hin.Scale(1./hin.Integral())
 
@@ -380,7 +382,8 @@ for i in range(5):
 
 #xbinMin = [hin.GetXaxis().FindBin(173)+1]
 #xbinMax = [binsx]
-  
+
+'''  
 hin_PTUp = fin.Get("histo_PTUp")
 hin_PTUp.Scale(1./hin_PTUp.Integral())
 hin_PTDown = fin.Get("histo_PTDown")
@@ -440,15 +443,17 @@ hz_OPT3Up.Scale(1./hz_OPT3Up.Integral())
 hz_OPT3Down = hin_OPT3Down.ProjectionZ("pz_OPT3Down",xbinMin[0],xbinMax[0],xbinMin[0],xbinMax[0])
 hz_OPT3Down.SetLineColor(rt.kViolet-6)
 hz_OPT3Down.Scale(1./hz_OPT3Down.Integral())
-
+'''
 hzMC[0].Scale(1./hzMC[0].Integral())
 hz[0].Scale(1./hz[0].Integral())
+
 #leg3 = rt.TLegend(0.6,0.55,0.95,0.8)
 leg3 = rt.TLegend(0.53,0.55,0.78,0.89)
 leg3.SetBorderSize(0)
 leg3.SetTextSize(0.035)
 leg3.AddEntry(hzMC[0],"Simulation (%s)"%(options.label),"LP")
 leg3.AddEntry(hz[0],"Template","L")
+'''
 leg3.AddEntry(hz_PTUp,"#propto m_{jj} up/down","L")
 leg3.AddEntry(hz_OPTUp,"#propto 1/m_{jj} up/down","L")
 leg3.AddEntry(hz_altshapeUp,"HERWIG up/down","L")
@@ -621,6 +626,8 @@ leg3.AddEntry(hy_altshapeUp,"HERWIG up/down","L")
 leg3.AddEntry(hy_altshape2Up,"MADGRAPH+PYTHIA up/down","L")
 #leg3.AddEntry(hy_altshape3Up,"POWHEG up/down","L")
 leg3.AddEntry(hy_OPT3Up,"m_{jj} turn-on up/down","L")
+'''
+
 
 cySyst = get_canvas("cySyst")
 cySyst.cd()
@@ -628,6 +635,7 @@ cySyst.cd()
 hy[0].SetMinimum(0)
 hy[0].SetMaximum(0.04)
 hy[0].Draw("HIST")
+'''
 hy_PTUp.Draw("HISTsame")
 hy_PTDown.Draw("HISTsame") 
 hy_OPTUp.Draw("HISTsame")
@@ -641,6 +649,7 @@ hy_altshape2Down.Draw("HISTsame")
 hy_OPT3Up.Draw("HISTsame")
 hy_OPT3Down.Draw("HISTsame")
 hyMC[0].Draw("same")
+'''
 leg3.Draw()
 
 CMS_lumi.CMS_lumi(cySyst, 0, 11)
