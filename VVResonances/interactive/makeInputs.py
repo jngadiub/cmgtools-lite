@@ -1,11 +1,12 @@
 from functions import *
 
 period = 2016
-samples= str(period)+"_new/"
+samples= "Vjets2018/" #for V+jets we use 2018 samples also for 2016 because the 2016 ones are buggy and they need to be processed before to add the NLO weights!
+#samples= str(period)+"_new/"
 sorting = 'random'
 #sorting = 'btag'
 
-submitToBatch = True #Set to true if you want to submit kernels + makeData to batch!
+submitToBatch = False #Set to true if you want to submit kernels + makeData to batch!
 runParallel   = False #Set to true if you want to run all kernels in parallel! This will exit this script and you will have to run mergeKernelJobs when your jobs are done! TODO! Add waitForBatchJobs also here?
 dijetBinning = True
 useTriggerWeights = False
@@ -164,7 +165,7 @@ xsec_inuse=BRWW
 #f.makeSignalYields("JJ_"+str(signal_inuse)+"_"+str(period),signaltemplate_inuse,xsec_inuse,{'VH_HPHP':HPSF*HPSF,'VH_HPLP':HPSF*LPSF,'VH_LPHP':HPSF*LPSF,'VH_LPLP':LPSF*LPSF,'VV_HPHP':HPSF*HPSF,'VV_HPLP':HPSF*LPSF})
 
 #Detector response
-f.makeDetectorResponse("nonRes","JJ_"+str(period),nonResTemplate,cuts['nonres'])
+#f.makeDetectorResponse("nonRes","JJ_"+str(period),nonResTemplate,cuts['nonres'])
 
 # Make nonresonant QCD templates and normalization
 if runParallel and submitToBatch:
@@ -177,12 +178,27 @@ if runParallel and submitToBatch:
   f.mergeKernelJobs()
 else:
   wait = True
-  f.makeBackgroundShapesMVVKernel("nonRes","JJ_"+str(period),nonResTemplate,cuts['nonres'],"1D",wait)
-  f.makeBackgroundShapesMVVConditional("nonRes","JJ_"+str(period),nonResTemplate,'l1',cuts['nonres'],"2Dl1",wait)
-  f.makeBackgroundShapesMVVConditional("nonRes","JJ_"+str(period),nonResTemplate,'l2',cuts['nonres'],"2Dl2",wait)
+#  f.makeBackgroundShapesMVVKernel("nonRes","JJ_"+str(period),nonResTemplate,cuts['nonres'],"1D",wait)
+#  f.makeBackgroundShapesMVVConditional("nonRes","JJ_"+str(period),nonResTemplate,'l1',cuts['nonres'],"2Dl1",wait)
+#  f.makeBackgroundShapesMVVConditional("nonRes","JJ_"+str(period),nonResTemplate,'l2',cuts['nonres'],"2Dl2",wait)
 
-f.mergeBackgroundShapes("nonRes","JJ_"+str(period))
-f.makeNormalizations("nonRes","JJ_"+str(period),nonResTemplate,0,cuts['nonres'],"nRes")
+#f.mergeBackgroundShapes("nonRes","JJ_"+str(period))
+#f.makeNormalizations("nonRes","JJ_"+str(period),nonResTemplate,0,cuts['nonres'],"nRes")
+
+
+#for V+jets
+print "makong V+jets templates!! "
+print "first norm W"
+f.makeNormalizations("WJets","JJ",WresTemplate,0,cuts['nonres'],"nRes","",HPSF,LPSF)
+#print "then norm Z"
+#f.makeNormalizations("ZJets","JJ",ZresTemplate,0,cuts['nonres'],"nRes","",HPSF,LPSF)
+#print "then we fit"
+#f.fitVJets("JJ_WJets",resTemplate,1.,1.)
+#print "and we make kernels"
+#print "first kernel W"
+#f.makeBackgroundShapesMVVKernel("WJets","JJ",WresTemplate,cuts['nonres'],"1D",0,1.,1.)
+#print "then kernel Z"
+#f.makeBackgroundShapesMVVKernel("ZJets","JJ",ZresTemplate,cuts['nonres'],"1D",0,1.,1.)
 
 ## Do data or pseudodata
 #f.makeNormalizations("data","JJ",dataTemplate,1,'1',"normD") #run on data. Currently run on pseudodata only (below)
