@@ -445,9 +445,12 @@ def merge2DDetectorParam(resFile,binsxStr,jobname):
 
     outdir = 'res'+jobname
     jobdir = 'tmp'+jobname
-    
+    print "jobname "+str(jobname)
+    print "outdir "+str(outdir)
+    print "jobdir "+str(jobdir)
    
     filelist = os.listdir('./res'+jobname+'/')
+    print "filelist "+str(filelist)
 
     pythia_files = []
     herwig_files = []
@@ -463,6 +466,7 @@ def merge2DDetectorParam(resFile,binsxStr,jobname):
     #now hadd them
     tmp_files = []
     if len(pythia_files) > 0:
+        print "doing pythia"
         cmd = 'hadd -f tmp_nominal.root '
         for f in pythia_files:
          cmd += f
@@ -472,6 +476,7 @@ def merge2DDetectorParam(resFile,binsxStr,jobname):
         tmp_files.append('tmp_nominal.root')
         
     if len(mg_files) > 0:
+        print "doing mg"
         cmd = 'hadd -f tmp_altshape2.root '
         for f in mg_files:
          cmd += f
@@ -481,6 +486,7 @@ def merge2DDetectorParam(resFile,binsxStr,jobname):
         tmp_files.append('tmp_altshape2.root')  
 
     if len(herwig_files) > 0:
+        print "doing herwig"
         cmd = 'hadd -f tmp_altshapeUp.root '
         for f in herwig_files:
          cmd += f
@@ -505,6 +511,7 @@ def merge2DDetectorParam(resFile,binsxStr,jobname):
      for b in binsxStr.split(','):
          binsx.append(float(b))
      outname = resFile.replace(".root","")+f.split('_')[1]
+     print "outname "+str(outname)
      fout = ROOT.TFile(outname,"RECREATE")
      
      scalexHisto=ROOT.TH1F("scalexHisto","scaleHisto",len(binsx)-1,array('d',binsx))
