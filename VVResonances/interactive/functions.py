@@ -15,7 +15,8 @@ class AllFunctions():
   self.minMJ = parameters[9]
   self.maxMJ = parameters[10]
   self.binsMJ = parameters[11]
-  self.submitToBatch = parameters[12]
+  self.lumi = parameters[12]
+  self.submitToBatch = parameters[13]
 
   self.printAllParameters()
   
@@ -200,7 +201,7 @@ class AllFunctions():
 
      print self.cuts["acceptance"]
      fixPars="1"  #"n:0.8,alpha:1.9"
-     cmd='vvMakeVjetsShapes.py -s "{template}" -c "{cut}"  -o "{rootFile}" -m {minMJ} -M {maxMJ} --store "{filename}_{purity}.py" --minMVV {minMVV} --maxMVV {maxMVV} {addOption} --corrFactorW {Wxsec} --corrFactorZ {Zxsec} {samples} '.format(template=template,cut=cut,rootFile=rootFile,minMJ=self.minMJ,maxMJ=self.maxMJ,filename=filename,purity=c,minMVV=self.minMVV,maxMVV=self.maxMVV,addOption="",Wxsec=Wxsec,Zxsec=Zxsec,samples=directory)
+     cmd='vvMakeVjetsShapes.py -s "{template}" -c "{cut}"  -o "{rootFile}" -m {minMJ} -M {maxMJ} --store "{filename}_{purity}.py" --minMVV {minMVV} --maxMVV {maxMVV} {addOption} --corrFactorW {Wxsec} --corrFactorZ {Zxsec} {samples} {lumi}'.format(template=template,cut=cut,rootFile=rootFile,minMJ=self.minMJ,maxMJ=self.maxMJ,filename=filename,purity=c,minMVV=self.minMVV,maxMVV=self.maxMVV,addOption="",Wxsec=Wxsec,Zxsec=Zxsec,samples=directory,lumi=self.lumi)
      cmd+=self.HCALbinsMVV
      print "going to execute command: "
      print str(cmd)

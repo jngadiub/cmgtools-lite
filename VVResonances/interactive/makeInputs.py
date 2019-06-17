@@ -127,9 +127,9 @@ TTemplate= "TTHad" #do we need a separate fit for ttbar?
 #WresTemplate= "WJetsToQQ_HT800toInf_new,TTHad_pow"
 #ZresTemplate= "ZJetsToQQ_HT800toInf_new"
 #resTemplate= "ZJetsToQQ_HT800toInf_new,WJetsToQQ_HT800toInf_new,TTHad_pow"
-WresTemplate= "WJetsToQQ_HT800toInf,TTHad_pow"
-ZresTemplate= "ZJetsToQQ_HT800toInf"
-resTemplate= "ZJetsToQQ_HT800toInf,WJetsToQQ_HT800toInf,TTHad_pow"
+WresTemplate= "WJetsToQQ_HT400to600,WJetsToQQ_HT600to800,WJetsToQQ_HT800toInf,TTToHadronic"
+ZresTemplate= "ZJetsToQQ_HT400to600,ZJetsToQQ_HT600to800,ZJetsToQQ_HT800toInf"
+resTemplate= "ZJetsToQQ_HT400to600,ZJetsToQQ_HT600to800,ZJetsToQQ_HT800toInf,WJetsToQQ_HT400to600,WJetsToQQ_HT600to800,WJetsToQQ_HT800toInf,TTToHadronic"
 
 #ranges and binning
 minMJ=55.0
@@ -155,7 +155,7 @@ cuts['acceptanceGEN']='(jj_l1_gen_softDrop_mass>20.&&jj_l2_gen_softDrop_mass>20.
 cuts['looseacceptanceMJ']= "(jj_l1_softDrop_mass>35&&jj_l1_softDrop_mass<300&&jj_l2_softDrop_mass>35&&jj_l2_softDrop_mass<300)"
 
 #do not change the order here, add at the end instead
-parameters = [cuts,minMVV,maxMVV,minMX,maxMX,binsMVV,HCALbinsMVV,samples,categories,minMJ,maxMJ,binsMJ,submitToBatch]   
+parameters = [cuts,minMVV,maxMVV,minMX,maxMX,binsMVV,HCALbinsMVV,samples,categories,minMJ,maxMJ,binsMJ,lumi,submitToBatch]   
 f = AllFunctions(parameters)
 
 signal_inuse="BulkGravWW"

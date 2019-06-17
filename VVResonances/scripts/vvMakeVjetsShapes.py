@@ -29,7 +29,8 @@ parser.add_option("-t","--triggerweight",dest="triggerW",action="store_true",hel
 
 (options,args) = parser.parse_args()
 samples={}
-
+lumi = args[1]
+print "luminosity is "+str(lumi)
 
 def getBinning(binsMVV,minx,maxx,bins):
     l=[]
@@ -115,6 +116,8 @@ def getCanvas(name):
     c.SetBottomMargin( 0.12 )
     return c
 
+########################################3
+
 label = options.output.split(".root")[0]
 t  = label.split("_")
 el=""
@@ -132,13 +135,13 @@ for filename in os.listdir(args[0]):
 
 
         fnameParts=filename.split('.')
+        print "fnameParts "+str(fnameParts)
         fname=fnameParts[0]
         ext=fnameParts[1]
         if ext.find("root") ==-1:
             continue
     
-        name = fname.split('_')[0]
-    
+        name = fname.split('_')[0]    
         samples[name] = fname
 
         print 'found',filename
@@ -176,6 +179,7 @@ histos2D_nonRes={}
 histos2D_nonRes_l2={}
 
 for p in range(0,len(plotters)):
+     print "plotting "+str(p)
      key ="Wjets"
      if str(names[p]).find("ZJets")!=-1: key = "Zjets"
      if str(names[p]).find("TT")!=-1: key = "TTbar"
@@ -184,21 +188,18 @@ for p in range(0,len(plotters)):
      histos2D_nonRes [key].SetName(key+"_nonResl1")
      
      histos2D [key] = plotters[p].drawTH2("jj_l1_softDrop_mass:jj_l2_softDrop_mass",options.cut+"*(jj_l1_mergedVTruth==1)*(jj_l1_softDrop_mass>55&&jj_l1_softDrop_mass<215)","1",80,55,215,80,55,215)
-     
      histos2D [key].SetName(key+"_Resl1")
       
      histos2D_nonRes_l2 [key] = plotters[p].drawTH2("jj_l2_softDrop_mass:jj_l1_softDrop_mass",options.cut+"*(jj_l2_mergedVTruth==0)*(jj_l2_softDrop_mass>55&&jj_l2_softDrop_mass<215)","1",80,55,215,80,55,215)
      histos2D_nonRes_l2 [key].SetName(key+"_nonResl2")
      
      histos2D_l2 [key] = plotters[p].drawTH2("jj_l2_softDrop_mass:jj_l1_softDrop_mass",options.cut+"*(jj_l2_mergedVTruth==1)*(jj_l2_softDrop_mass>55&&jj_l2_softDrop_mass<215)","1",80,55,215,80,55,215)
-     
      histos2D_l2 [key].SetName(key+"_Resl2")
      
-      
-     histos2D[key].Scale(35900.)
-     histos2D_l2[key].Scale(35900.)
-     histos2D_nonRes[key].Scale(35900.)
-     histos2D_nonRes_l2[key].Scale(35900.)
+     histos2D[key].Scale(lumi) 
+     histos2D_l2[key].Scale(lumi)
+     histos2D_nonRes[key].Scale(lumi)
+     histos2D_nonRes_l2[key].Scale(lumi)
  
 ############################
 tmpfile = ROOT.TFile("test.root","RECREATE")
@@ -273,7 +274,11 @@ for leg in legs:
         params["ratio_Res_nonRes_"+leg]= {'ratio': scales["Wjets"]/scales_nonRes["Wjets"] , 'ratio_Z': scales["Zjets"]/scales_nonRes["Zjets"]}
     if "Zjets" in histos.keys() and "TTbar" in histos.keys():
         params["ratio_Res_nonRes_"+leg]= {'ratio': scales["Wjets"]/scales_nonRes["Wjets"] , 'ratio_Z':  scales["Zjets"]/scales_nonRes["Zjets"],'ratio_TT':  scales["TTbar"]/scales_nonRes["TTbar"]}
-        
+    print "going to call fitter.drawVjets for "+str(leg)+" "+str(purity)
+    print "histos "+str(histos)       
+    print "histos_nonRes "+str(histos_nonRes)       
+    print "scales "+str(scales)       
+    print "scales_nonRes "+str(scales_nonRes)       
     fitter.drawVjets("Vjets_mjetRes_"+leg+"_"+purity+".pdf",histos,histos_nonRes,scales,scales_nonRes)
     del histos,histos_nonRes,fitter,fitterZ
 
