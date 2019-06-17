@@ -129,6 +129,9 @@ label = el
 
 samplenames = options.sample.split(",")
 for filename in os.listdir(args[0]):
+    if filename.find(".")==-1:
+        print "in "+str(filename)+"the separator . was not found. -> continue!"
+        continue
     for samplename in samplenames:
         if not (filename.find(samplename)!=-1):
             continue
@@ -196,10 +199,10 @@ for p in range(0,len(plotters)):
      histos2D_l2 [key] = plotters[p].drawTH2("jj_l2_softDrop_mass:jj_l1_softDrop_mass",options.cut+"*(jj_l2_mergedVTruth==1)*(jj_l2_softDrop_mass>55&&jj_l2_softDrop_mass<215)","1",80,55,215,80,55,215)
      histos2D_l2 [key].SetName(key+"_Resl2")
      
-     histos2D[key].Scale(lumi) 
-     histos2D_l2[key].Scale(lumi)
-     histos2D_nonRes[key].Scale(lumi)
-     histos2D_nonRes_l2[key].Scale(lumi)
+     histos2D[key].Scale(float(lumi)) 
+     histos2D_l2[key].Scale(float(lumi))
+     histos2D_nonRes[key].Scale(float(lumi))
+     histos2D_nonRes_l2[key].Scale(float(lumi))
  
 ############################
 tmpfile = ROOT.TFile("test.root","RECREATE")
