@@ -56,21 +56,26 @@ def returnString(func,ftype,varname):
 
 def doFit(fitter,histo,histo_nonRes,label,leg):
   params={}
-  print "fitting "+histo.GetName()+" contribution "    
+  print "****** fitting "+histo.GetName()+" contribution ********"    
+  print "____________________________________"
   exp  = ROOT.TF1("gaus" ,"gaus",55,215)  
   histo_nonRes.Fit(exp,"R")
- 
+  print "parameters from gaussian fit on nonRes hist: "
+  print "mean "+str(exp.GetParameter(1))
+  print "sigma "+str(exp.GetParameter(2))
+  print "____________________________________"
   gauss  = ROOT.TF1("gauss" ,"gaus",74,94) 
   if histo.GetName().find("Z")!=-1:
       gauss = ROOT.TF1("gauss","gaus",80,100)
-  histo.Fit(gauss,"R")
+  histo.Fit(gauss,"R") 
   mean = gauss.GetParameter(1)
   sigma = gauss.GetParameter(2)
  
   print "____________________________________"
+  print "parameters from gaussian fit on Res hist: "
   print "mean "+str(mean)
   print "sigma "+str(sigma)
-  print "set paramters of double CB constant aground the ones from gaussian fit"
+  print "set paramters of double CB constant around the ones from gaussian fit"
   fitter.w.var("mean").setVal(mean)
   fitter.w.var("mean").setConstant(1)
   #fitter.w.var("sigma").setVal(sigma)
@@ -160,8 +165,14 @@ names = []
 for name in samples.keys():
     plotters.append(TreePlotter(args[0]+'/'+samples[name]+'.root','AnalysisTree'))
     plotters[-1].setupFromFile(args[0]+'/'+samples[name]+'.pck')
-    plotters[-1].addCorrectionFactor('xsec','tree')
-    plotters[-1].addCorrectionFactor('genWeight','tree')
+    if str(samples[name]).find("TT")!=-1:
+        plotters[-1].addCorrectionFactor(380.13/313.9,'tree')
+        print " temporary fix for TT cross section rescaled!!"
+        plotters[-1].addCorrectionFactor(1,'tree')
+        print " temporary fix for TT genweight=1 rescaled!!"
+    else:
+        plotters[-1].addCorrectionFactor('xsec','tree')
+        plotters[-1].addCorrectionFactor('genWeight','tree')
     plotters[-1].addCorrectionFactor('puWeight','tree')
     if options.triggerW: plotters[-1].addCorrectionFactor('triggerWeight','tree')	
     corrFactor = options.corrFactorW
@@ -229,6 +240,7 @@ for leg in legs:
     
     
     fitter=Fitter(['x'])
+    print "generating event with fitter.jetResonanceVjets('model','x')"
     fitter.jetResonanceVjets('model','x')
     
     if options.fixPars!="1":
@@ -248,14 +260,16 @@ for leg in legs:
             histos_nonRes [key] = histos2D_nonRes_l2[key].ProjectionY()
             histos  [key] = histos2D_l2[key].ProjectionY()
         
+        print "Y projection of 2 D hists have been created"
         histos_nonRes[key].SetName(key+"_nonRes")
         histos [key].SetName(key)
         scales [key] = histos[key].Integral()
         scales_nonRes [key] = histos_nonRes[key].Integral()
+        print " scale of Res "+str(key)+" is "+str(scales [key]  )
+        print " scale of non Res "+str(key)+" is "+str(scales_nonRes [key]  )
    
    
-   
-    # combine ttbar and wjets contributions:  
+    print "combining  ttbar and wjets contributions"  
     Wjets = histos["Wjets"]
     Wjets_nonRes = histos_nonRes["Wjets"]
     if 'TTbar' in histos.keys(): Wjets.Add(histos["TTbar"]); Wjets_nonRes.Add(histos_nonRes["TTbar"])
@@ -285,7 +299,8 @@ for leg in legs:
     fitter.drawVjets("Vjets_mjetRes_"+leg+"_"+purity+".pdf",histos,histos_nonRes,scales,scales_nonRes)
     del histos,histos_nonRes,fitter,fitterZ
 
-
+'''
+#this was a first attempt to parametrize the V+jets backround. It is not used anymore. Instead the parametrization pf the PDF in section '5.2.2 Resonant background' of CMS-B2G-18-002 is used
 graphs={}
 projections=[[1,3],[4,6],[7,10],[11,15],[16,20],[21,26],[27,35],[36,50],[51,61],[62,75],[76,80]]
 for key in keys:
@@ -411,6 +426,7 @@ if 'TTbar' in graphs.keys():
     c.SaveAs("debug_corr_l1_l2_TTbar.pdf")
 
 
+'''
 
 if options.store!="":
     print "write to file "+options.store
