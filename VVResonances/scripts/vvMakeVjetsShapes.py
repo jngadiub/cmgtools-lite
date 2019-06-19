@@ -412,13 +412,13 @@ if 'TTbar' in graphs.keys():
     c.SaveAs("debug_corr_l1_l2_TTbar.pdf")
 
 
-
+'''
 if options.store!="":
     print "write to file "+options.store
     f=open(options.store,"w")
     for par in params:
         f.write(str(par)+ " = " +str(params[par])+"\n")
-'''
+
  
 
 
