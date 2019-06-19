@@ -89,7 +89,7 @@ class AllFunctions():
    jobname = jobName+"_"+c
    print "Working on purity: ", c
    
-   resFile  = pwd + "/"+ filename+"_"+name+"_detectorResponse.root"
+   resFile=filename+"_nonRes_detectorResponse.root"
    print "Reading " ,resFile
 
    rootFile = filename+"_"+name+"_MVV_"+c+".root"
