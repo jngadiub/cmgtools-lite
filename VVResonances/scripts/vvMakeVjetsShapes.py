@@ -285,7 +285,8 @@ for leg in legs:
     fitter.drawVjets("Vjets_mjetRes_"+leg+"_"+purity+".pdf",histos,histos_nonRes,scales,scales_nonRes)
     del histos,histos_nonRes,fitter,fitterZ
 
-
+'''
+#this was a first attempt to parametrize the V+jets backround. It is not used anymore. Instead the parametrization pf the PDF in section '5.2.2 Resonant background' of CMS-B2G-18-002 is used
 graphs={}
 projections=[[1,3],[4,6],[7,10],[11,15],[16,20],[21,26],[27,35],[36,50],[51,61],[62,75],[76,80]]
 for key in keys:
@@ -417,7 +418,7 @@ if options.store!="":
     f=open(options.store,"w")
     for par in params:
         f.write(str(par)+ " = " +str(params[par])+"\n")
-
+'''
  
 
 
