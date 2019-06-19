@@ -170,7 +170,7 @@ class AllFunctions():
   for c in self.categories:
    
    #apply V/H tagging scale factors --> this will have to be updated
-   if name.find("Jets")!=--1:
+   if name.find("Jets")!=-1:
         if c.find("HPLP"): factors=factors+",sf:"+str(LPSF)
         else: factors=factors+",sf:"+str(HPSF)
       
@@ -189,6 +189,8 @@ class AllFunctions():
    else:
         cmd='vvMakeData.py -s "{template}" -d {data} -c "{cut}"  -o "{rootFile}" -v "jj_l1_softDrop_mass,jj_l2_softDrop_mass,jj_LV_mass" -b "{bins},{bins},{BINS}" -m "{mini},{mini},{MINI}" -M "{maxi},{maxi},{MAXI}" -f {factors} -n "{name}" {samples}'.format(template=template,cut=cut,rootFile=rootFile,BINS=self.binsMVV,bins=self.binsMJ,MINI=self.minMVV,MAXI=self.maxMVV,mini=self.minMJ,maxi=self.maxMJ,factors=factors,name=name,data=data,samples=sam)
         cmd=cmd+self.HCALbinsMVV
+        print "going to execute command "+str(cmd)
+        print " "
         os.system(cmd)
 
 
