@@ -193,16 +193,16 @@ else:
 print "making V+jets templates!! "
 #print "first we fit"
 #f.fitVJets("JJ_WJets",resTemplate,1.,1.)
-print "and then we make kernels"
-print " did you run Detector response  for this period? otherwise the kernels steps will not work!"
+#print "and then we make kernels"
+#print " did you run Detector response  for this period? otherwise the kernels steps will not work!"
 #print "first kernel W"
 #f.makeBackgroundShapesMVVKernel("WJets","JJ_"+str(period),WresTemplate,cuts['nonres'],"1D",0,1.,1.)
-print "then kernel Z"
-f.makeBackgroundShapesMVVKernel("ZJets","JJ_"+str(period),ZresTemplate,cuts['nonres'],"1D",0,1.,1.)
-#print "first norm W"
-#f.makeNormalizations("WJets","JJ",WresTemplate,0,cuts['nonres'],"nRes","",HPSF,LPSF)
-#print "then norm Z"
-#f.makeNormalizations("ZJets","JJ",ZresTemplate,0,cuts['nonres'],"nRes","",HPSF,LPSF)
+#print "then kernel Z"
+#f.makeBackgroundShapesMVVKernel("ZJets","JJ_"+str(period),ZresTemplate,cuts['nonres'],"1D",0,1.,1.)
+#print "then norm W"
+#f.makeNormalizations("WJets","JJ_"+str(period),WresTemplate,0,cuts['nonres'],"nRes","",HPSF,LPSF)
+print "then norm Z"
+f.makeNormalizations("ZJets","JJ_"+str(period),ZresTemplate,0,cuts['nonres'],"nRes","",HPSF,LPSF)
 
 ## Do data or pseudodata
 #f.makeNormalizations("data","JJ",dataTemplate,1,'1',"normD") #run on data. Currently run on pseudodata only (below)
@@ -210,3 +210,6 @@ f.makeBackgroundShapesMVVKernel("ZJets","JJ_"+str(period),ZresTemplate,cuts['non
 #for p in purities: makePseudoData("JJ_nonRes_%s.root"%p,"JJ_nonRes_3D_%s.root"%p,"pythia","JJ_PDnoVjets_%s.root"%p,lumi)
 #from modules.submitJobs import makePseudoDataVjets
 #for p in purities: makePseudoDataVjets("/afs/cern.ch/user/t/thaarres/public/forJen/looseDDT/JJ_nonRes_%s.root"%p,"/afs/cern.ch/user/t/thaarres/public/forJen/looseDDT/JJ_nonRes_3D_%s.root"%p,"pythia","/afs/cern.ch/user/t/thaarres/public/forJen/looseDDT/JJ_PD_%s.root"%p,lumi,"/afs/cern.ch/user/t/thaarres/public/forJen/looseDDT/workspace_JJ_13TeV_2017.root",2017,p)
+
+
+print " ########## I did everything I could! ###### "
