@@ -190,14 +190,15 @@ else:
 
 
 #for V+jets
-print "makong V+jets templates!! "
-print "then we fit"
-f.fitVJets("JJ_WJets",resTemplate,1.,1.)
-#print "and we make kernels"
+print "making V+jets templates!! "
+#print "first we fit"
+#f.fitVJets("JJ_WJets",resTemplate,1.,1.)
+print "and then we make kernels"
+print " did you run Detector response  for this period? otherwise the kernels steps will not work!"
 #print "first kernel W"
-#f.makeBackgroundShapesMVVKernel("WJets","JJ",WresTemplate,cuts['nonres'],"1D",0,1.,1.)
-#print "then kernel Z"
-#f.makeBackgroundShapesMVVKernel("ZJets","JJ",ZresTemplate,cuts['nonres'],"1D",0,1.,1.)
+#f.makeBackgroundShapesMVVKernel("WJets","JJ_"+str(period),WresTemplate,cuts['nonres'],"1D",0,1.,1.)
+print "then kernel Z"
+f.makeBackgroundShapesMVVKernel("ZJets","JJ_"+str(period),ZresTemplate,cuts['nonres'],"1D",0,1.,1.)
 #print "first norm W"
 #f.makeNormalizations("WJets","JJ",WresTemplate,0,cuts['nonres'],"nRes","",HPSF,LPSF)
 #print "then norm Z"
