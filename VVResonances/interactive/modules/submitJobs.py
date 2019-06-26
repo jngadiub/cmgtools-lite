@@ -745,6 +745,7 @@ def merge1DMVVTemplate(jobList,files,jobname,purity,binsMVV,minMVV,maxMVV,HCALbi
 		doMadGraph = True
 		
 	if len(herwig_files) > 0:
+
 		cmd = 'hadd -f %s_%s_MVV_%s_altshapeUp.root '%(filename,name,purity)
 		for f in herwig_files:
 		 cmd += f
@@ -833,6 +834,8 @@ def merge1DMVVTemplate(jobList,files,jobname,purity,binsMVV,minMVV,maxMVV,HCALbi
     
 		print "Now pT"
 		alpha=1.5/float(maxMVV)
+                print " commented histo nominal part!! "
+                '''
 		histogram_altshapeUp_pt_up,histogram_altshapeUp_pt_down=unequalScale(histo_nominal,"histo_altshapeUp_PT",alpha)
 		histogram_altshapeUp_pt_down.SetName('histo_altshapeUp_PTDown')
 		histogram_altshapeUp_pt_down.SetTitle('histo_altshapeUp_PTDown')
@@ -840,7 +843,7 @@ def merge1DMVVTemplate(jobList,files,jobname,purity,binsMVV,minMVV,maxMVV,HCALbi
 		histogram_altshapeUp_pt_up.SetName('histo_altshapeUp_PTUp')
 		histogram_altshapeUp_pt_up.SetTitle('histo_altshapeUp_PTUp')
 		histogram_altshapeUp_pt_up.Write('histo_altshapeUp_PTUp')
-
+                '''
                 print "Now OPT"
 		alpha=1.5*float(minMVV)
 		histogram_altshapeUp_opt_up,histogram_altshapeUp_opt_down=unequalScale(histo_altshapeUp,"histo_altshapeUp_OPT",alpha,-1)
@@ -864,14 +867,16 @@ def merge1DMVVTemplate(jobList,files,jobname,purity,binsMVV,minMVV,maxMVV,HCALbi
     
 		print "Now pT"
 		alpha=1.5/float(maxMVV)
-                print " #################   careful!!! newt line are commented out because histo_nominal is missing at the moment!!! ####################"
-#		histogram_altshape2_pt_up,histogram_altshape2_pt_down=unequalScale(histo_nominal,"histo_altshape2_PT",alpha)
-#		histogram_altshape2_pt_down.SetName('histo_altshape2_PTDown')
-#		histogram_altshape2_pt_down.SetTitle('histo_altshape2_PTDown')
-#		histogram_altshape2_pt_down.Write('histo_altshape2_PTDown')
-#		histogram_altshape2_pt_up.SetName('histo_altshape2_PTUp')
-#		histogram_altshape2_pt_up.SetTitle('histo_altshape2_PTUp')
-#		histogram_altshape2_pt_up.Write('histo_altshape2_PTUp')
+                print " commented histo nominal part!! "
+                '''
+		histogram_altshape2_pt_up,histogram_altshape2_pt_down=unequalScale(histo_nominal,"histo_altshape2_PT",alpha)
+		histogram_altshape2_pt_down.SetName('histo_altshape2_PTDown')
+		histogram_altshape2_pt_down.SetTitle('histo_altshape2_PTDown')
+		histogram_altshape2_pt_down.Write('histo_altshape2_PTDown')
+		histogram_altshape2_pt_up.SetName('histo_altshape2_PTUp')
+		histogram_altshape2_pt_up.SetTitle('histo_altshape2_PTUp')
+		histogram_altshape2_pt_up.Write('histo_altshape2_PTUp')
+                '''
 
                 print "Now OPT"
 		alpha=1.5*float(minMVV)
