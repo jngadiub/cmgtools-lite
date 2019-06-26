@@ -42,7 +42,9 @@ dataPlotters=[]
 print "now we will  make data!"
 print "args[0] "+str(args[0])
 for filename in os.listdir(args[0]):
-    print "filename :"+str(filename)
+    if filename.find(".")==-1:
+        print "in "+str(filename)+"the separator . was not found. -> continue!"
+        continue
     for sampleType in sampleTypes:
         if filename.find(sampleType)!=-1:
             fnameParts=filename.split('.')
