@@ -165,14 +165,8 @@ names = []
 for name in samples.keys():
     plotters.append(TreePlotter(args[0]+'/'+samples[name]+'.root','AnalysisTree'))
     plotters[-1].setupFromFile(args[0]+'/'+samples[name]+'.pck')
-    if str(samples[name]).find("TT")!=-1:
-        plotters[-1].addCorrectionFactor(380.13/313.9,'tree')
-        print " temporary fix for TT cross section rescaled!!"
-        plotters[-1].addCorrectionFactor(1,'tree')
-        print " temporary fix for TT genweight=1 rescaled!!"
-    else:
-        plotters[-1].addCorrectionFactor('xsec','tree')
-        plotters[-1].addCorrectionFactor('genWeight','tree')
+    plotters[-1].addCorrectionFactor('xsec','tree')
+    plotters[-1].addCorrectionFactor('genWeight','tree')
     plotters[-1].addCorrectionFactor('puWeight','tree')
     if options.triggerW: plotters[-1].addCorrectionFactor('triggerWeight','tree')	
     corrFactor = options.corrFactorW
@@ -209,12 +203,12 @@ for p in range(0,len(plotters)):
      
      histos2D_l2 [key] = plotters[p].drawTH2("jj_l2_softDrop_mass:jj_l1_softDrop_mass",options.cut+"*(jj_l2_mergedVTruth==1)*(jj_l2_softDrop_mass>55&&jj_l2_softDrop_mass<215)","1",80,55,215,80,55,215)
      histos2D_l2 [key].SetName(key+"_Resl2")
-     
+
      histos2D[key].Scale(float(lumi)) 
      histos2D_l2[key].Scale(float(lumi))
      histos2D_nonRes[key].Scale(float(lumi))
      histos2D_nonRes_l2[key].Scale(float(lumi))
- 
+
 ############################
 tmpfile = ROOT.TFile("test.root","RECREATE")
 for key in histos2D.keys():
@@ -224,6 +218,10 @@ for key in histos2D.keys():
     histos2D_nonRes_l2[key].Write()
     histos2D[key].Write()
 
+    histos2D_nonRes[key].ProjectionY().Write()
+    histos2D[key].ProjectionY().Write()
+    histos2D_nonRes_l2[key].ProjectionY().Write()
+    histos2D_l2[key].ProjectionY().Write()
 
 ###########################
  
