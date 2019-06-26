@@ -1,8 +1,8 @@
 from functions import *
 
-period = 2018
-samples= str(period)+"/" #for V+jets we use 2018 samples also for 2016 because the 2016 ones are buggy and they need to be processed before to add the NLO weights!
-#samples= str(period)+"_new/"
+period = 2016
+#samples= str(period)+"/" #for V+jets we use 2018 samples also for 2016 because the 2016 ones are buggy and they need to be processed before to add the NLO weights!
+samples= str(period)+"_new/"
 sorting = 'random'
 #sorting = 'btag'
 
@@ -70,8 +70,11 @@ if sorting == 'random':
  cuts['VH_LPHP'] = '(' + '('+  '&&'.join([catVtag['LP1'],catHtag['HP2']]) + ')' + '||' + '(' + '&&'.join([catVtag['LP2'],catHtag['HP1']]) + ')' + ')'
  cuts['VH_LPLP'] = '(' + '('+  '&&'.join([catVtag['LP1'],catHtag['LP2']]) + ')' + '||' + '(' + '&&'.join([catVtag['LP2'],catHtag['LP1']]) + ')' + ')'
  cuts['VH_all'] =  '('+  '||'.join([cuts['VH_HPHP'],cuts['VH_HPLP'],cuts['VH_LPHP'],cuts['VH_LPLP']]) + ')'
- cuts['VV_HPHP'] = '(' + '!' + cuts['VH_all'] + '&&' + '(' + '&&'.join([catVtag['HP1'],catVtag['HP2']]) + ')' + ')'
- cuts['VV_HPLP'] = '(' + '!' + cuts['VH_all'] + '&&' + '(' + '('+  '&&'.join([catVtag['HP1'],catVtag['LP2']]) + ')' + '||' + '(' + '&&'.join([catVtag['HP2'],catVtag['LP1']]) + ')' + ')' + ')'
+#commented because we need VH to try to reproduce B2G-18-002
+# cuts['VV_HPHP'] = '(' + '!' + cuts['VH_all'] + '&&' + '(' + '&&'.join([catVtag['HP1'],catVtag['HP2']]) + ')' + ')'
+# cuts['VV_HPLP'] = '(' + '!' + cuts['VH_all'] + '&&' + '(' + '('+  '&&'.join([catVtag['HP1'],catVtag['LP2']]) + ')' + '||' + '(' + '&&'.join([catVtag['HP2'],catVtag['LP1']]) + ')' + ')' + ')'
+ cuts['VV_HPHP'] = '('  +  '&&'.join([catVtag['HP1'],catVtag['HP2']]) + ')' 
+ cuts['VV_HPLP'] = '('  + '(' +  '&&'.join([catVtag['HP1'],catVtag['LP2']]) + ')' + '||' + '(' + '&&'.join([catVtag['HP2'],catVtag['LP1']]) + ')' + ')'
 else:
  print "Use b-tagging sorting"
  cuts['VH_HPHP'] = '('+  '&&'.join([catHtag['HP1'],catVtag['HP2']]) + ')'
@@ -81,6 +84,7 @@ else:
  cuts['VH_all'] =  '('+  '||'.join([cuts['VH_HPHP'],cuts['VH_HPLP'],cuts['VH_LPHP'],cuts['VH_LPLP']]) + ')'
  cuts['VV_HPHP'] = '(' + '!' + cuts['VH_all'] + '&&' + '(' + '&&'.join([catVtag['HP1'],catVtag['HP2']]) + ')' + ')'
  cuts['VV_HPLP'] = '(' + '!' + cuts['VH_all'] + '&&' + '(' + '('+  '&&'.join([catVtag['HP1'],catVtag['LP2']]) + ')' + '||' + '(' + '&&'.join([catVtag['HP2'],catVtag['LP1']]) + ')' + ')' + ')'
+
 
 #validation regions --> we might need more of these here (control region of b-tagging?)
 cuts['VV_LPLP'] = '(' + '&&'.join([catVtag['LP1'],catVtag['LP2']]) + ')'
@@ -121,15 +125,15 @@ dataTemplate="JetHT"
 nonResTemplate="QCD_Pt_" #high stat
 
 #background samples
-#nonResTemplate="QCD_Pt-"
-nonResTemplate="QCD_HT"
-TTemplate= "TTHad" #do we need a separate fit for ttbar?
-#WresTemplate= "WJetsToQQ_HT800toInf_new,TTHad_pow"
-#ZresTemplate= "ZJetsToQQ_HT800toInf_new"
-#resTemplate= "ZJetsToQQ_HT800toInf_new,WJetsToQQ_HT800toInf_new,TTHad_pow"
-WresTemplate= "WJetsToQQ_HT400to600,WJetsToQQ_HT600to800,WJetsToQQ_HT800toInf,TTToHadronic"
+nonResTemplate="QCD_Pt-"
+#nonResTemplate="QCD_HT"
+if(period == 2016):
+    TTemplate= "TT_Mtt-700to1000,TT_Mtt-1000toInf" #do we need a separate fit for ttbar?
+else:
+    TTemplate= "TTToHadronic" #do we need a separate fit for ttbar?
+WresTemplate= "WJetsToQQ_HT400to600,WJetsToQQ_HT600to800,WJetsToQQ_HT800toInf,"+str(TTemplate)
 ZresTemplate= "ZJetsToQQ_HT400to600,ZJetsToQQ_HT600to800,ZJetsToQQ_HT800toInf"
-resTemplate= "ZJetsToQQ_HT400to600,ZJetsToQQ_HT600to800,ZJetsToQQ_HT800toInf,WJetsToQQ_HT400to600,WJetsToQQ_HT600to800,WJetsToQQ_HT800toInf,TTToHadronic"
+resTemplate= "ZJetsToQQ_HT400to600,ZJetsToQQ_HT600to800,ZJetsToQQ_HT800toInf,WJetsToQQ_HT400to600,WJetsToQQ_HT600to800,WJetsToQQ_HT800toInf,"+str(TTemplate)
 
 #ranges and binning
 minMJ=55.0
@@ -181,7 +185,7 @@ if runParallel and submitToBatch:
   f.mergeKernelJobs()
 else:
   wait = True
-#  f.makeBackgroundShapesMVVKernel("nonRes","JJ_"+str(period),nonResTemplate,cuts['nonres'],"1D",wait)
+  #f.makeBackgroundShapesMVVKernel("nonRes","JJ_"+str(period),nonResTemplate,cuts['nonres'],"1D",wait)
 #  f.makeBackgroundShapesMVVConditional("nonRes","JJ_"+str(period),nonResTemplate,'l1',cuts['nonres'],"2Dl1",wait)
 #  f.makeBackgroundShapesMVVConditional("nonRes","JJ_"+str(period),nonResTemplate,'l2',cuts['nonres'],"2Dl2",wait)
 
@@ -191,8 +195,8 @@ else:
 
 #for V+jets
 print "making V+jets templates!! "
-#print "first we fit"
-#f.fitVJets("JJ_WJets",resTemplate,1.,1.)
+print "first we fit"
+f.fitVJets("JJ_WJets",resTemplate,1.,1.)
 #print "and then we make kernels"
 #print " did you run Detector response  for this period? otherwise the kernels steps will not work!"
 #print "first kernel W"
@@ -201,8 +205,8 @@ print "making V+jets templates!! "
 #f.makeBackgroundShapesMVVKernel("ZJets","JJ_"+str(period),ZresTemplate,cuts['nonres'],"1D",0,1.,1.)
 #print "then norm W"
 #f.makeNormalizations("WJets","JJ_"+str(period),WresTemplate,0,cuts['nonres'],"nRes","",HPSF,LPSF)
-print "then norm Z"
-f.makeNormalizations("ZJets","JJ_"+str(period),ZresTemplate,0,cuts['nonres'],"nRes","",HPSF,LPSF)
+#print "then norm Z"
+#f.makeNormalizations("ZJets","JJ_"+str(period),ZresTemplate,0,cuts['nonres'],"nRes","",HPSF,LPSF)
 
 ## Do data or pseudodata
 #f.makeNormalizations("data","JJ",dataTemplate,1,'1',"normD") #run on data. Currently run on pseudodata only (below)
