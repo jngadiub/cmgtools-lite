@@ -55,7 +55,7 @@ def getCanvas(name="c1"):
 def getMVVPdf(j,MH,postfix=""):
 
         var = w.var(options.var)
-        
+
         pdfName 	= "signal_%d%s" %(MH,postfix)
         Jmean 		= eval(j['MEAN'])
         Jsigma		= eval(j['SIGMA'])
@@ -65,7 +65,7 @@ def getMVVPdf(j,MH,postfix=""):
         Jn2 		= eval(j['N2'])
         
         mean        = ROOT.RooRealVar("mean_%d%s"%(MH,postfix),"mean_%d%s"%(MH,postfix),Jmean)
-        sigma       = ROOT.RooRealVar("sigma","sigma_%d%s"%(MH,postfix),Jsigma)        
+        sigma       = ROOT.RooRealVar("sigma_%d%s"%(MH,postfix),Jsigma)        
         alpha1      = ROOT.RooRealVar("alpha1_%d%s"%(MH,postfix),"alpha1_%d%s"%(MH,postfix),Jalpha1)
         alpha2      = ROOT.RooRealVar("alpha2_%d%s"%(MH,postfix),"alpha2_%d%s"%(MH,postfix),Jalpha2)
         n1          = ROOT.RooRealVar("n1_%d%s"%(MH,postfix),"n1_%d%s"%(MH,postfix),Jn1)
@@ -78,8 +78,7 @@ def getMVVPdf(j,MH,postfix=""):
         n1.setConstant(ROOT.kTRUE)
         mean.setConstant(ROOT.kTRUE)
         sigma.setConstant(ROOT.kTRUE)
-        
-        
+                
         # gauss     = ROOT.RooGaussian("gauss_%d%s"%(MH,postfix), "gauss_%d%s"%(MH,postfix), var, mean, gsigma)
         # cb        = ROOT.RooCBShape("cb_%d%s"%(MH,postfix), "cb_%d%s"%(MH,postfix),var, mean, sigma, alpha, sign)
         # function = ROOT.RooAddPdf(pdfName, pdfName,gauss, cb, sigfrac)
@@ -118,14 +117,17 @@ def getMJPdf(j,MH,postfix=""):
 parser = optparse.OptionParser()
 parser.add_option("-f","--file",dest="file",default='JJ_BulkGWW_MVV.json',help="input file")
 parser.add_option("-v","--var",dest="var",help="mVV or mJ",default='mVV')
-parser.add_option("-l","--leg",dest="leg",help="mVV or mJ",default='l1')
+parser.add_option("-l","--leg",dest="leg",help="l1 or l2",default='l1')
+parser.add_option("-p","--period",dest="period",help="2016 or 2017 or 2018",default='2016')
+
 postfix = "Jet 1 "
 (options,args) = parser.parse_args()
 if options.leg == "l2" !=-1: postfix = "Jet 2 "
 
 inFileName = options.file
-massPoints = [1000,1200,1400,1600,1800,2000,2500,3000,3500,4000,4500]
-massPoints = [1200,1400,1600,1800,2000,2200,2400,2600,2800,3000,3200,3400,3600,3800,4000,4200,4400,4600,4800,5000,5200]
+#massPoints = [1000,1200,1400,1600,1800,2000,2500,3000,3500,4000,4500]
+massPoints = [1200,1400,1600,1800,2000,2500,3000,3500,4000,4500]
+#massPoints = [1200,1400,1600,1800,2000,2200,2400,2600,2800,3000,3200,3400,3600,3800,4000,4200,4400,4600,4800,5000,5200]
 varName = {'mVV':'M_{VV} (GeV)','mJ':'%ssoftdrop mass (GeV)'%postfix}
 varBins = {'mVV':'[37,1000,5500]','mJ':'[80,55,215]'}
 w=ROOT.RooWorkspace("w","w")
@@ -185,8 +187,8 @@ def doSingle():
       c1.SaveAs(path+"signalShapes%s_%s.root" %(options.var, inFileName.rsplit(".", 1)[0]))
   
 def doAll():
-    if options.var == 'mJ':  jsons = ["JJ_BulkGWW_MJl1_HPHP.json","JJ_WprimeWZ_MJl1_HPHP.json","JJ_BulkGZZ_MJl1_HPHP.json"]
-    if options.var == 'mVV': jsons = ["JJ_BulkGWW_MVV.json","JJ_WprimeWZ_MVV.json","JJ_BulkGZZ_MVV.json"]
+    if options.var == 'mJ':  jsons = ["JJ_BulkGravWW_"+str(options.period)+"_MJl1_VV_HPHP.json","JJ_WprimeWZ_"+str(options.period)+"_MJl1_VV_HPHP.json","JJ_BulkGravZZ_"+str(options.period)+"_MJl1_VV_HPHP.json"]
+    if options.var == 'mVV': jsons = ["JJ_BulkGravWW_"+str(options.period)+"_MVV.json","JJ_WprimeWZ_"+str(options.period)+"_MVV.json","JJ_BulkGravZZ_"+str(options.period)+"_MVV.json"]
     legs = ["G_{B} #rightarrow WW","W' #rightarrow WZ","G_{B} #rightarrow ZZ"]
     c1 = getCanvas()
     c1.Draw()
@@ -198,6 +200,7 @@ def doAll():
         with open(f) as jsonFile:
           j = json.load(jsonFile)
           for i, MH in enumerate(massPoints):  # mind that MH is evaluated below
+            print " i "+str(i)+" MH "+str(MH)+" j "+str(j)+" name " +str(name)
             if options.var == 'mVV': getMVVPdf(j,MH,name)
             else: getMJPdf(j,MH,name)
             w.pdf('signal_%d%s'%(MH,name)).plotOn(frame, ROOT.RooFit.LineColor(ROOT.TColor.GetColor(colors[ii][i])),ROOT.RooFit.Name(str(MH)+name))#,ROOT.RooFit.Range(MH*0.8,1.2*MH))#ROOT.RooFit.Normalization(1, ROOT.RooAbsReal.RelativeExpected),
@@ -226,5 +229,5 @@ def doAll():
     # sleep(1000)
       
 if __name__ == '__main__':
-    doSingle()
-    #doAll()
+#    doSingle()
+    doAll()
