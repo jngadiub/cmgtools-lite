@@ -48,6 +48,8 @@ class AllFunctions():
    
    jsonFile=filename+"_MJ"+leg+"_"+c+".json"   
    cmd='vvMakeJSON.py  -o "{jsonFile}" -g "mean:pol3,sigma:pol3,alpha:pol3,n:pol3,alpha2:pol3,n2:pol3,slope:pol0,f:pol0,meanH:pol0,sigmaH:pol0,alphaH:pol0,nH:pol0,alpha2H:pol0,n2H:pol0,slopeH:pol0,fH:pol0" -m {minMX} -M {maxMX} {rootFile}  '.format(jsonFile=jsonFile,rootFile=rootFile,minMX=self.minMX,maxMX=self.maxMX)
+#from Dani local                           mean:pol5,sigma:pol3,alpha:pol0,n:pol0,alpha2:pol3,n2:pol0,slope:pol0,f:pol3
+#   cmd='vvMakeJSON.py  -o "{jsonFile}" -g "mean:pol3,sigma:pol3,alpha:pol0,n:pol0,alpha2:pol3,n2:pol0,slope:pol0,f:pol3" -m {minMX} -M {maxMX} {rootFile}  '.format(jsonFile=jsonFile,rootFile=rootFile,minMX=self.minMX,maxMX=self.maxMX)
    if filename.find('WH') != -1 or filename.find('ZH') != -1: cmd='vvMakeJSON.py  -o "{jsonFile}" -g "mean:pol3,sigma:pol3,alpha:pol3,n:pol3,alpha2:pol3,n2:pol3,slope:pol0,f:pol0,meanH:pol3,sigmaH:pol3,alphaH:pol3,nH:pol3,alpha2H:pol3,n2H:pol3,slopeH:pol0,fH:pol0" -m {minMX} -M {maxMX} {rootFile}  '.format(jsonFile=jsonFile,rootFile=rootFile,minMX=self.minMX,maxMX=self.maxMX)   
    os.system(cmd)
 
