@@ -185,7 +185,7 @@ if runParallel and submitToBatch:
   f.mergeKernelJobs()
 else:
   wait = True
-  #f.makeBackgroundShapesMVVKernel("nonRes","JJ_"+str(period),nonResTemplate,cuts['nonres'],"1D",wait)
+#  f.makeBackgroundShapesMVVKernel("nonRes","JJ_"+str(period),nonResTemplate,cuts['nonres'],"1D",wait)
 #  f.makeBackgroundShapesMVVConditional("nonRes","JJ_"+str(period),nonResTemplate,'l1',cuts['nonres'],"2Dl1",wait)
 #  f.makeBackgroundShapesMVVConditional("nonRes","JJ_"+str(period),nonResTemplate,'l2',cuts['nonres'],"2Dl2",wait)
 
@@ -195,6 +195,7 @@ else:
 
 #for V+jets
 #print "making V+jets templates!! "
+print "making V+jets templates!! "
 #print "first we fit"
 #f.fitVJets("JJ_WJets",resTemplate,1.,1.)
 #print "and then we make kernels"
@@ -209,6 +210,7 @@ print "then norm Z"
 f.makeNormalizations("ZJets","JJ_"+str(period),ZresTemplate,0,cuts['nonres'],"nRes","",HPSF,LPSF)
 print "then norm TT"
 f.makeNormalizations("TTJets","JJ_"+str(period),TTemplate,0,cuts['nonres'],"nRes","")
+
 ## Do data or pseudodata
 #f.makeNormalizations("data","JJ",dataTemplate,1,'1',"normD") #run on data. Currently run on pseudodata only (below)
 #from modules.submitJobs import makePseudoData
