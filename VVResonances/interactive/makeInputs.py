@@ -162,9 +162,9 @@ cuts['looseacceptanceMJ']= "(jj_l1_softDrop_mass>35&&jj_l1_softDrop_mass<300&&jj
 parameters = [cuts,minMVV,maxMVV,minMX,maxMX,binsMVV,HCALbinsMVV,samples,categories,minMJ,maxMJ,binsMJ,lumi,submitToBatch]   
 f = AllFunctions(parameters)
 
-signal_inuse="BulkGravWW"
-signaltemplate_inuse=BulkGravWWTemplate
-xsec_inuse=BRWW
+signal_inuse="BulkGravZZ"
+signaltemplate_inuse=BulkGravZZTemplate
+xsec_inuse=BRZZ
 #Fitting steps for one signal sample 
 #f.makeSignalShapesMVV("JJ_"+str(signal_inuse)+"_"+str(period),signaltemplate_inuse) #nb, to be optimized
 #f.makeSignalShapesMJ("JJ_"+str(signal_inuse)+"_"+str(period),signaltemplate_inuse,'l1')
@@ -194,20 +194,21 @@ else:
 
 
 #for V+jets
-print "making V+jets templates!! "
-print "first we fit"
-f.fitVJets("JJ_WJets",resTemplate,1.,1.)
+#print "making V+jets templates!! "
+#print "first we fit"
+#f.fitVJets("JJ_WJets",resTemplate,1.,1.)
 #print "and then we make kernels"
 #print " did you run Detector response  for this period? otherwise the kernels steps will not work!"
 #print "first kernel W"
 #f.makeBackgroundShapesMVVKernel("WJets","JJ_"+str(period),WresTemplate,cuts['nonres'],"1D",0,1.,1.)
 #print "then kernel Z"
 #f.makeBackgroundShapesMVVKernel("ZJets","JJ_"+str(period),ZresTemplate,cuts['nonres'],"1D",0,1.,1.)
-#print "then norm W"
-#f.makeNormalizations("WJets","JJ_"+str(period),WresTemplate,0,cuts['nonres'],"nRes","",HPSF,LPSF)
-#print "then norm Z"
-#f.makeNormalizations("ZJets","JJ_"+str(period),ZresTemplate,0,cuts['nonres'],"nRes","",HPSF,LPSF)
-
+print "then norm W"
+f.makeNormalizations("WJets","JJ_"+str(period),WresTemplate,0,cuts['nonres'],"nRes","",HPSF,LPSF)
+print "then norm Z"
+f.makeNormalizations("ZJets","JJ_"+str(period),ZresTemplate,0,cuts['nonres'],"nRes","",HPSF,LPSF)
+print "then norm TT"
+f.makeNormalizations("TTJets","JJ_"+str(period),TTemplate,0,cuts['nonres'],"nRes","")
 ## Do data or pseudodata
 #f.makeNormalizations("data","JJ",dataTemplate,1,'1',"normD") #run on data. Currently run on pseudodata only (below)
 #from modules.submitJobs import makePseudoData
