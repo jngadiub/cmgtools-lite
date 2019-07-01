@@ -6,7 +6,7 @@ samples= str(period)+"_new/"
 sorting = 'random'
 #sorting = 'btag'
 
-submitToBatch = False #Set to true if you want to submit kernels + makeData to batch!
+submitToBatch = True #Set to true if you want to submit kernels + makeData to batch!
 runParallel   = False #Set to true if you want to run all kernels in parallel! This will exit this script and you will have to run mergeKernelJobs when your jobs are done! TODO! Add waitForBatchJobs also here?
 dijetBinning = True
 useTriggerWeights = False
@@ -125,7 +125,7 @@ dataTemplate="JetHT"
 nonResTemplate="QCD_Pt_" #high stat
 
 #background samples
-nonResTemplate="QCD_Pt-"
+#nonResTemplate="QCD_Pt-"
 #nonResTemplate="QCD_HT"
 if(period == 2016):
     TTemplate= "TT_Mtt-700to1000,TT_Mtt-1000toInf" #do we need a separate fit for ttbar?
@@ -172,7 +172,7 @@ xsec_inuse=BRZZ
 #f.makeSignalYields("JJ_"+str(signal_inuse)+"_"+str(period),signaltemplate_inuse,xsec_inuse,{'VH_HPHP':HPSF*HPSF,'VH_HPLP':HPSF*LPSF,'VH_LPHP':HPSF*LPSF,'VH_LPLP':LPSF*LPSF,'VV_HPHP':HPSF*HPSF,'VV_HPLP':HPSF*LPSF})
 
 #Detector response
-#f.makeDetectorResponse("nonRes","JJ_"+str(period),nonResTemplate,cuts['nonres'])
+f.makeDetectorResponse("nonRes","JJ_"+str(period),nonResTemplate,cuts['nonres'])
 
 # Make nonresonant QCD templates and normalization
 if runParallel and submitToBatch:
@@ -194,7 +194,6 @@ else:
 
 
 #for V+jets
-#print "making V+jets templates!! "
 #print "making V+jets templates!! "
 #print "first we fit"
 #f.fitVJets("JJ_WJets",resTemplate,1.,1.)
