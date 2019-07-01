@@ -458,7 +458,7 @@ def merge2DDetectorParam(resFile,binsxStr,jobname):
 
     for f in filelist:
      if f.find(resFile.replace(".root",""))==-1: continue
-     if f.find('QCD_Pt_') != -1: pythia_files.append('./res'+jobname+'/'+f)
+     if f.find('QCD_Pt-') != -1: pythia_files.append('./res'+jobname+'/'+f)
      elif f.find('QCD_HT') != -1: mg_files.append('./res'+jobname+'/'+f)
      else: herwig_files.append('./res'+jobname+'/'+f)
     
