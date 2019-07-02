@@ -75,7 +75,7 @@ class AllFunctions():
     jobList, files = Make2DDetectorParam(resFile,template,cut,self.samples,jobName,bins)
     jobList = []
     files = []
-    merge2DDetectorParam(resFile,bins,jobName)
+    merge2DDetectorParam(resFile,bins,jobName,template)
    else:
     cmd='vvMake2DDetectorParam.py  -o "{rootFile}" -s "{template}" -c "{cut}"  -v "jj_LV_mass,jj_l1_softDrop_mass"  -g "jj_gen_partialMass,jj_l1_gen_softDrop_mass,jj_l1_gen_pt"  -b {bins}   {samples}'.format(rootFile=resFile,template=template,cut=cut,minMVV=self.minMVV,maxMVV=self.maxMVV,tag=name,bins=bins,samples=self.samples)
     os.system(cmd)
