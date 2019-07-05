@@ -783,7 +783,7 @@ def merge1DMVVTemplate(jobList,files,jobname,purity,binsMVV,minMVV,maxMVV,HCALbi
 		print cmd
 		os.system(cmd)
 		
-		fhadd_pythia = ROOT.TFile.Open('%s_%s_MVV_%s_nominal.root'%(purity),'READ')
+		fhadd_pythia = ROOT.TFile.Open('%s_%s_MVV_%s_nominal.root'%(filename,name,purity),'READ')
 		mvv_nominal = fhadd_pythia.Get('mvv_nominal')
 		mvv_nominal.SetName('mvv_nominal')
 		mvv_nominal.SetTitle('mvv_nominal')
@@ -801,7 +801,7 @@ def merge1DMVVTemplate(jobList,files,jobname,purity,binsMVV,minMVV,maxMVV,HCALbi
 		print cmd
 		os.system(cmd)
 		
-		fhadd_dijet = ROOT.TFile.Open('%s_%s_MVV_%s_NLO.root'%(purity),'READ')
+		fhadd_dijet = ROOT.TFile.Open('%s_%s_MVV_%s_NLO.root'%(filename,name,purity),'READ')
 		mvv_NLO = fhadd_dijet.Get('mvv_nominal')
 		mvv_NLO.SetName('mvv_NLO')
 		mvv_NLO.SetTitle('mvv_NLO')
@@ -846,8 +846,6 @@ def merge1DMVVTemplate(jobList,files,jobname,purity,binsMVV,minMVV,maxMVV,HCALbi
     
 		print "Now pT"
 		alpha=1.5/float(maxMVV)
-                print " commented histo nominal part!! "
-                '''
 		histogram_altshapeUp_pt_up,histogram_altshapeUp_pt_down=unequalScale(histo_nominal,"histo_altshapeUp_PT",alpha)
 		histogram_altshapeUp_pt_down.SetName('histo_altshapeUp_PTDown')
 		histogram_altshapeUp_pt_down.SetTitle('histo_altshapeUp_PTDown')
@@ -855,7 +853,7 @@ def merge1DMVVTemplate(jobList,files,jobname,purity,binsMVV,minMVV,maxMVV,HCALbi
 		histogram_altshapeUp_pt_up.SetName('histo_altshapeUp_PTUp')
 		histogram_altshapeUp_pt_up.SetTitle('histo_altshapeUp_PTUp')
 		histogram_altshapeUp_pt_up.Write('histo_altshapeUp_PTUp')
-                '''
+
                 print "Now OPT"
 		alpha=1.5*float(minMVV)
 		histogram_altshapeUp_opt_up,histogram_altshapeUp_opt_down=unequalScale(histo_altshapeUp,"histo_altshapeUp_OPT",alpha,-1)
@@ -879,8 +877,7 @@ def merge1DMVVTemplate(jobList,files,jobname,purity,binsMVV,minMVV,maxMVV,HCALbi
     
 		print "Now pT"
 		alpha=1.5/float(maxMVV)
-                print " commented histo nominal part!! "
-                '''
+
 		histogram_altshape2_pt_up,histogram_altshape2_pt_down=unequalScale(histo_nominal,"histo_altshape2_PT",alpha)
 		histogram_altshape2_pt_down.SetName('histo_altshape2_PTDown')
 		histogram_altshape2_pt_down.SetTitle('histo_altshape2_PTDown')
@@ -888,7 +885,7 @@ def merge1DMVVTemplate(jobList,files,jobname,purity,binsMVV,minMVV,maxMVV,HCALbi
 		histogram_altshape2_pt_up.SetName('histo_altshape2_PTUp')
 		histogram_altshape2_pt_up.SetTitle('histo_altshape2_PTUp')
 		histogram_altshape2_pt_up.Write('histo_altshape2_PTUp')
-                '''
+
 
                 print "Now OPT"
 		alpha=1.5*float(minMVV)
