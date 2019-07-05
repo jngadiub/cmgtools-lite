@@ -1,4 +1,4 @@
-3#!/bin/env python
+#!/bin/env python
 import ROOT
 import json
 import math
@@ -240,7 +240,9 @@ def doAll():
     frame.GetYaxis().SetTitleSize(0.055)
     frame.GetYaxis().SetLabelSize(0.05)
     frame.GetXaxis().SetLabelSize(0.05)
-    if options.var == 'mVV':frame.SetMaximum(0.45)
+    if options.var == 'mVV':
+      frame.SetMaximum(0.3)
+      frame.GetXaxis().SetTitle("Dijet invariant mass [GeV]")
     frame.Draw()
     leg.Draw("same")
  
