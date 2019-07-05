@@ -123,7 +123,8 @@ if options.samples.find("HT800")!=-1:
     period = "2017"
 
 stack = ROOT.THStack("stack","")
-
+Wjets = False
+Zjets = False
 print "Creating datasets for samples: " ,sampleTypes
 dataPlotters=[]
 dataPlottersNW=[]
@@ -147,9 +148,11 @@ for filename in os.listdir(args[0]):
 	    corrFactor = 1
             if filename.find('Z') != -1:
                 corrFactor = options.corrFactorZ
+                Zjets = True
                 print "add correction factor for Z+jets sample"
             if filename.find('W') != -1:
                 corrFactor = options.corrFactorW
+                Wjets = True
                 print "add correction factor for W+jets sample"
             dataPlotters[-1].addCorrectionFactor(corrFactor,'flat') 
 
@@ -207,10 +210,32 @@ histograms=[
 maxEvents = -1
 #ok lets populate!
 for plotter,plotterNW in zip(dataPlotters,dataPlottersNW):
+ '''
+ if plotter.filename.find("Jets") != -1 or plotter.filename.find("TT") !=-1:
+   print "Preparing nominal histogram for "
+   print "filename: ", plotter.filename, " preparing central values histo"
+   histI2=plotter.drawTH1Binned('jj_LV_mass',options.cut,"1",array('f',binning))
+   canv = ROOT.TCanvas("c1","c1",800,600)
+   dataset=plotterNW.makeDataSet('jj_gen_partialMass,jj_l1_gen_pt,jj_l1_gen_softDrop_mass',options.cut,options.firstEv,options.lastEv)
+
+   histTMP=ROOT.TH1F("histoTMP","histo",options.binsx,array('f',binning))
+   if not(options.usegenmass):
+    datamaker=ROOT.cmg.GaussianSumTemplateMaker1D(dataset,options.var,'jj_l1_gen_pt',scale,res,histTMP)
+   else: datamaker=ROOT.cmg.GaussianSumTemplateMaker1D(dataset,options.var,'jj_l1_gen_softDrop_mass',scale,res,histTMP)
+
+   if histTMP.Integral()>0:
+    histTMP.Scale(histI2.Integral()/histTMP.Integral())
+    histogram_nominal.Add(histTMP)
+    mvv_nominal.Add(histI2)
+
+   histI2.Delete()
+   histTMP.Delete()
+ '''
+
 
  #Nominal histogram Pythia8
  c=0
- if plotter.filename.find(sampleTypes[0].replace('.root','')) != -1: 
+ if plotter.filename.find(sampleTypes[0].replace('.root','')) != -1 : #and plotter.filename.find("Jets") == -1 and plotter.filename.find("TT") ==-1: 
    print "Preparing nominal histogram for sampletype " ,sampleTypes[0]
    print "filename: ", plotter.filename, " preparing central values histo"
    histI2=plotter.drawTH1Binned('jj_LV_mass',options.cut,"1",array('f',binning))
@@ -232,7 +257,7 @@ for plotter,plotterNW in zip(dataPlotters,dataPlottersNW):
 
 
  if len(sampleTypes)<2: continue
- elif plotter.filename.find(sampleTypes[1].replace('.root','')) != -1: #alternative shape Herwig
+ elif plotter.filename.find(sampleTypes[1].replace('.root','')) != -1 : #and plotter.filename.find("Jets") == -1 and plotter.filename.find("TT") ==-1: #alternative shape Herwig
    print "Preparing alternative shapes for sampletype " ,sampleTypes[1]
    print "filename: ", plotter.filename, " preparing alternate shape histo"
    histI2=plotter.drawTH1Binned('jj_LV_mass',options.cut,"1",array('f',binning))
@@ -258,7 +283,7 @@ for plotter,plotterNW in zip(dataPlotters,dataPlottersNW):
    stack.Add(histogram_altshapeUp)
 
  if len(sampleTypes)<3: continue
- elif plotter.filename.find(sampleTypes[2].replace('.root','')) != -1: #alternative shape Pythia8+Madgraph (not used for syst but only for cross checks)
+ elif plotter.filename.find(sampleTypes[2].replace('.root','')) != -1 : #and plotter.filename.find("Jets") == -1 and plotter.filename.find("TT") ==-1: #alternative shape Pythia8+Madgraph (not used for syst but only for cross checks)
    print "Preparing alternative shapes for sampletype " ,sampleTypes[2]
    print "filename: ", plotter.filename, " preparing alternate shape histo"
    
@@ -393,11 +418,13 @@ l.AddEntry(histogram_opt_up,"#propto 1/m_{jj}","l")
 l.Draw("same")
 
 tmplabel = "nonRes"
-if 'Jets' in sampleTypes: tmplabel="Jets"
+print "samples types ",sampleTypes 
+if Wjets or Zjets : tmplabel="Jets"
 if options.output.find('HPLP')!=-1: tmplabel+='_HPLP'
 if options.output.find('HPHP')!=-1: tmplabel+='_HPHP'
-if 'W' in sampleTypes: tmplabel="W"+tmplabel
-if 'Z' in sampleTypes: tmplabel="Z"+tmplabel
+if Wjets : tmplabel="W"+tmplabel
+if Zjets : tmplabel="Z"+tmplabel
+print "tmplabel ",tmplabel
 c.SaveAs("debug_mVV_kernels_"+tmplabel+".pdf")
 print "for debugging save","debug_mVV_kernels_"+tmplabel+".pdf"
 
