@@ -2,7 +2,7 @@ from functions import *
 
 period = 2016
 #samples= str(period)+"/" #for V+jets we use 2018 samples also for 2016 because the 2016 ones are buggy and they need to be processed before to add the NLO weights!
-samples= str(period)+"_new/"
+samples= str(period)+"/"
 sorting = 'random'
 #sorting = 'btag'
 
@@ -185,12 +185,12 @@ if runParallel and submitToBatch:
   f.mergeKernelJobs()
 else:
   wait = True
-#  f.makeBackgroundShapesMVVKernel("nonRes","JJ_"+str(period),nonResTemplate,cuts['nonres'],"1D",wait)
-#  f.makeBackgroundShapesMVVConditional("nonRes","JJ_"+str(period),nonResTemplate,'l1',cuts['nonres'],"2Dl1",wait)
-#  f.makeBackgroundShapesMVVConditional("nonRes","JJ_"+str(period),nonResTemplate,'l2',cuts['nonres'],"2Dl2",wait)
+  f.makeBackgroundShapesMVVKernel("nonRes","JJ_"+str(period),nonResTemplate,cuts['nonres'],"1D",wait)
+  f.makeBackgroundShapesMVVConditional("nonRes","JJ_"+str(period),nonResTemplate,'l1',cuts['nonres'],"2Dl1",wait)
+  f.makeBackgroundShapesMVVConditional("nonRes","JJ_"+str(period),nonResTemplate,'l2',cuts['nonres'],"2Dl2",wait)
 
-#f.mergeBackgroundShapes("nonRes","JJ_"+str(period))
-#f.makeNormalizations("nonRes","JJ_"+str(period),nonResTemplate,0,cuts['nonres'],"nRes")
+f.mergeBackgroundShapes("nonRes","JJ_"+str(period))
+f.makeNormalizations("nonRes","JJ_"+str(period),nonResTemplate,0,cuts['nonres'],"nRes")
 
 
 #for V+jets
@@ -211,7 +211,7 @@ else:
 #f.makeNormalizations("TTJets","JJ_"+str(period),TTemplate,0,cuts['nonres'],"nRes","")
 
 ## Do data or pseudodata
-f.makeNormalizations("data","JJ_"+str(period),dataTemplate,1,'1',"normD") #run on data. Currently run on pseudodata only (below)
+#f.makeNormalizations("data","JJ_"+str(period),dataTemplate,1,'1',"normD") #run on data. Currently run on pseudodata only (below)
 #from modules.submitJobs import makePseudoData
 #for p in categories: makePseudoData("JJ_nonRes_%s.root"%p,"JJ_nonRes_3D_%s.root"%p,"pythia","JJ_PDnoVjets_%s.root"%p,lumi)
 #from modules.submitJobs import makePseudoDataVjets
