@@ -6,7 +6,7 @@ samples= str(period)+"/"
 sorting = 'random'
 #sorting = 'btag'
 
-submitToBatch = True #Set to true if you want to submit kernels + makeData to batch!
+submitToBatch = False #Set to true if you want to submit kernels + makeData to batch!
 runParallel   = False #Set to true if you want to run all kernels in parallel! This will exit this script and you will have to run mergeKernelJobs when your jobs are done! TODO! Add waitForBatchJobs also here?
 dijetBinning = True
 useTriggerWeights = False
@@ -70,6 +70,7 @@ if sorting == 'random':
  cuts['VH_LPHP'] = '(' + '('+  '&&'.join([catVtag['LP1'],catHtag['HP2']]) + ')' + '||' + '(' + '&&'.join([catVtag['LP2'],catHtag['HP1']]) + ')' + ')'
  cuts['VH_LPLP'] = '(' + '('+  '&&'.join([catVtag['LP1'],catHtag['LP2']]) + ')' + '||' + '(' + '&&'.join([catVtag['LP2'],catHtag['LP1']]) + ')' + ')'
  cuts['VH_all'] =  '('+  '||'.join([cuts['VH_HPHP'],cuts['VH_HPLP'],cuts['VH_LPHP'],cuts['VH_LPLP']]) + ')'
+
 #commented because we need VH to try to reproduce B2G-18-002
 # cuts['VV_HPHP'] = '(' + '!' + cuts['VH_all'] + '&&' + '(' + '&&'.join([catVtag['HP1'],catVtag['HP2']]) + ')' + ')'
 # cuts['VV_HPLP'] = '(' + '!' + cuts['VH_all'] + '&&' + '(' + '('+  '&&'.join([catVtag['HP1'],catVtag['LP2']]) + ')' + '||' + '(' + '&&'.join([catVtag['HP2'],catVtag['LP1']]) + ')' + ')' + ')'
@@ -122,11 +123,12 @@ BRWH=1.*0.001*0.676*0.584
 
 #data samples
 dataTemplate="JetHT"
-nonResTemplate="QCD_Pt_" #high stat
 
 #background samples
-#nonResTemplate="QCD_Pt-"
-#nonResTemplate="QCD_HT"
+nonResTemplate="QCD_Pt-" #low stat herwig
+#nonResTemplate="QCD_HT" #medium stat madgraph+pythia
+#nonResTemplate="QCD_Pt_" #high stat pythia8
+
 if(period == 2016):
     TTemplate= "TT_Mtt-700to1000,TT_Mtt-1000toInf" #do we need a separate fit for ttbar?
 else:
@@ -172,7 +174,7 @@ xsec_inuse=BRZZ
 #f.makeSignalYields("JJ_"+str(signal_inuse)+"_"+str(period),signaltemplate_inuse,xsec_inuse,{'VH_HPHP':HPSF*HPSF,'VH_HPLP':HPSF*LPSF,'VH_LPHP':HPSF*LPSF,'VH_LPLP':LPSF*LPSF,'VV_HPHP':HPSF*HPSF,'VV_HPLP':HPSF*LPSF})
 
 #Detector response
-#f.makeDetectorResponse("nonRes","JJ_"+str(period),nonResTemplate,cuts['nonres'])
+f.makeDetectorResponse("nonRes","JJ_"+str(period),nonResTemplate,cuts['nonres'])
 
 # Make nonresonant QCD templates and normalization
 if runParallel and submitToBatch:
@@ -182,7 +184,7 @@ if runParallel and submitToBatch:
   f.makeBackgroundShapesMVVConditional("nonRes","JJ_"+str(period),nonResTemplate,'l2',cuts['nonres'],"2Dl2",wait)
   print "Exiting system! When all jobs are finished, please run mergeKernelJobs below"
   sys.exit()
-  f.mergeKernelJobs()
+  f.mergeKernelJobs("nonRes","JJ_"+str(period))
 else:
   wait = True
   f.makeBackgroundShapesMVVKernel("nonRes","JJ_"+str(period),nonResTemplate,cuts['nonres'],"1D",wait)
@@ -191,7 +193,6 @@ else:
 
 f.mergeBackgroundShapes("nonRes","JJ_"+str(period))
 f.makeNormalizations("nonRes","JJ_"+str(period),nonResTemplate,0,cuts['nonres'],"nRes")
-
 
 #for V+jets
 #print "making V+jets templates!! "
@@ -216,6 +217,5 @@ f.makeNormalizations("nonRes","JJ_"+str(period),nonResTemplate,0,cuts['nonres'],
 #for p in categories: makePseudoData("JJ_nonRes_%s.root"%p,"JJ_nonRes_3D_%s.root"%p,"pythia","JJ_PDnoVjets_%s.root"%p,lumi)
 #from modules.submitJobs import makePseudoDataVjets
 #for p in purities: makePseudoDataVjets("/afs/cern.ch/user/t/thaarres/public/forJen/looseDDT/JJ_nonRes_%s.root"%p,"/afs/cern.ch/user/t/thaarres/public/forJen/looseDDT/JJ_nonRes_3D_%s.root"%p,"pythia","/afs/cern.ch/user/t/thaarres/public/forJen/looseDDT/JJ_PD_%s.root"%p,lumi,"/afs/cern.ch/user/t/thaarres/public/forJen/looseDDT/workspace_JJ_13TeV_2017.root",2017,p)
-
 
 print " ########## I did everything I could! ###### "

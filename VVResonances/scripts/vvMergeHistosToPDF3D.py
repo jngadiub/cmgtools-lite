@@ -54,13 +54,6 @@ def makeHisto(name,fx,nhistox,fy,nhistoy,fz,nhistoz,fout):
     binningz= getBinning(hxy)
     binningz2= getBinning(histoz)
     binningz3= getBinning(histoy.ProjectionY("projY2"))
-    print binningx
-    print binningz
-    print binningz2
-    print binningz3
-   
-    print len(binningz)-1
-    print histoz.GetNbinsX() 
     h=ROOT.TH3F(name,name,len(binningx)-1,binningx,len(binningx)-1,binningx,len(binningz)-1,binningz)
     for k in range(1,histoz.GetNbinsX()+2):
      for j in range(1,histoy.GetNbinsX()+2):
@@ -237,15 +230,15 @@ makeHisto("histo_madgraph_PTDown",inputx,"histo_altshape2_PTDown",inputy,"histo_
 print "   - Opt x,y,z up/down"
 makeHisto("histo_madgraph_OPTUp",inputx,"histo_altshape2_OPTUp",inputy,"histo_altshape2_OPTUp",inputz,"histo_altshape2_OPTUp",output)
 makeHisto("histo_madgraph_OPTDown",inputx,"histo_altshape2_OPTDown",inputy,"histo_altshape2_OPTDown",inputz,"histo_altshape2_OPTDown",output)
-#print "   - pythia pdf 4 madgraph"
-#makeHisto("histo_madgraph_altshapeUp",inputx,"histo_nominal",inputy,"histo_nominal",inputz,"histo_nominal",output)
-#makeHisto("histo_madgraph_altshapeDown",inputx,"histo_altshape2_altshapeDown",inputy,"histo_altshape2_altshapeDown",inputz,"histo_altshape2_altshapeDown",output)
-#print "   - herwig pdf 4 madgraph"
-#makeHisto("histo_madgraph_altshape2Up",inputx,"histo_altshapeUp",inputy,"histo_altshapeUp",inputz,"histo_altshapeUp",output)
-#makeHisto("histo_madgraph_altshape2Down",inputx,"histo_altshape2_altshape2Down",inputy,"histo_altshape2_altshape2Down",inputz,"histo_altshape2_altshape2Down",output)
-#print "   - powheg pdf 4 madgraph"
-#makeHisto("histo_madgraph_altshape3Up",inputx,"histo_NLO",inputy,"histo_NLO",inputz,"histo_NLO",output)
-#makeHisto("histo_madgraph_altshape3Down",inputx,"histo_altshape2_NLODown",inputy,"histo_altshape2_NLODown",inputz,"histo_altshape2_NLODown",output)
+print "   - pythia pdf 4 madgraph"
+makeHisto("histo_madgraph_altshapeUp",inputx,"histo_nominal",inputy,"histo_nominal",inputz,"histo_nominal",output)
+makeHisto("histo_madgraph_altshapeDown",inputx,"histo_altshape2_altshapeDown",inputy,"histo_altshape2_altshapeDown",inputz,"histo_altshape2_altshapeDown",output)
+print "   - herwig pdf 4 madgraph"
+makeHisto("histo_madgraph_altshape2Up",inputx,"histo_altshapeUp",inputy,"histo_altshapeUp",inputz,"histo_altshapeUp",output)
+makeHisto("histo_madgraph_altshape2Down",inputx,"histo_altshape2_altshape2Down",inputy,"histo_altshape2_altshape2Down",inputz,"histo_altshape2_altshape2Down",output)
+print "   - powheg pdf 4 madgraph"
+makeHisto("histo_madgraph_altshape3Up",inputx,"histo_NLO",inputy,"histo_NLO",inputz,"histo_NLO",output)
+makeHisto("histo_madgraph_altshape3Down",inputx,"histo_altshape2_NLODown",inputy,"histo_altshape2_NLODown",inputz,"histo_altshape2_NLODown",output)
 
 print "Write file "+options.output
 
