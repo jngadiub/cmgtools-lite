@@ -187,7 +187,7 @@ class AllFunctions():
        from modules.submitJobs import makeData,mergeData
        jobList, files = makeData(template,cut,rootFile,self.binsMVV,self.binsMJ,self.minMVV,self.maxMVV,self.minMJ,self.maxMJ,factors,name,data,jobname,sam,wait,self.HCALbinsMVV) #,addOption) #irene
        wait = True
-       if wait: mergeData(jobname,c,rootFile,filename,name)
+       if wait: mergeData(jobList, files,jobname,c,rootFile,filename,name)
    else:
         cmd='vvMakeData.py -s "{template}" -d {data} -c "{cut}"  -o "{rootFile}" -v "jj_l1_softDrop_mass,jj_l2_softDrop_mass,jj_LV_mass" -b "{bins},{bins},{BINS}" -m "{mini},{mini},{MINI}" -M "{maxi},{maxi},{MAXI}" -f {factors} -n "{name}" {samples}'.format(template=template,cut=cut,rootFile=rootFile,BINS=self.binsMVV,bins=self.binsMJ,MINI=self.minMVV,MAXI=self.maxMVV,mini=self.minMJ,maxi=self.maxMJ,factors=factors,name=name,data=data,samples=sam)
         cmd=cmd+self.HCALbinsMVV

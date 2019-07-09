@@ -420,6 +420,31 @@ def getJobs(files,jobList,outdir,purity):
 	   resubmit.append(s+"_"+jobid)
 	 if len(filelist) > 0: jobsPerSample[s] = filelist
 	return resubmit, jobsPerSample,exit_flag	 
+
+def getNormJobs(files,jobList,outdir,purity):
+	resubmit = []
+	jobsPerSample = {}
+	exit_flag = False
+
+	for s in files:
+	 s = s.replace('.root','')
+	 filelist = []
+	 for t in jobList:
+	  if t.find(s) == -1: continue
+	  jobid = t
+	  found = False
+	  for o in os.listdir(outdir):
+	   if o.find(s) != -1 and o.find(jobid) != -1 and o.find(purity)!=-1:
+	    found = True
+	    filelist.append(outdir+"/"+o)
+	    break
+	  if not found:
+	   print "SAMPLE ",s," JOBID ",jobid," NOT FOUND"
+	   exit_flag = True
+	   resubmit.append(s+"_"+jobid)
+	 if len(filelist) > 0: jobsPerSample[s] = filelist
+	return resubmit, jobsPerSample,exit_flag	 
+
 	
 def reSubmit(jobdir,resubmit,jobname):
  jobs = []
@@ -1421,12 +1446,41 @@ def makeData(template,cut,rootFile,binsMVV,binsMJ,minMVV,maxMVV,minMJ,maxMJ,fact
     print
     return joblist, files
 
-def mergeData(jobname,purity,rootFile,filename,name):
+def mergeData(jobList, files,jobname,purity,rootFile,filename,name):
     
     print "Merging data from job " ,jobname
     print "Purity is " ,purity
+    print "Jobs to merge :   " ,jobList
+    print "Files ran over:   " ,files
+
+    outdir = 'res'+jobname
+    jobdir = 'tmp'+jobname
+
+    resubmit, jobsPerSample,exit_flag = getNormJobs(files,jobList,outdir,purity)
+
+    print "getJobs done"
+
+    if exit_flag:
+        submit = raw_input("The following files are missing: %s. Do you  want to resubmit the jobs to the batch system before merging? [y/n] "%resubmit)
+        if submit == 'y' or submit=='Y':
+            print "Resubmitting jobs:"
+            jobs = reSubmit(jobdir,resubmit,jobname)
+            waitForBatchJobs(jobname,len(resubmit),len(resubmit), userName, timeCheck)
+            resubmit, jobsPerSample,exit_flag = getNormJobs(files,jobList,outdir,purity)
+            if exit_flag:
+                print "Job crashed again! Please resubmit manually before attempting to merge again"
+                for j in jobs: print j
+                sys.exit()
+            else:
+                submit = raw_input("Some files are missing. [y] == Exit without merging, [n] == continue ? ")
+                if submit == 'y' or submit=='Y':
+                    print "Exit without merging!"
+                    sys.exit()
+                else:
+                    print "Continuing merge!"
+            
     # read out files
-    filelist = os.listdir('./res'+jobname+'/')
+    filelist = os.listdir('./'+outdir+'/')
 
     mg_files     = []
     pythia_files = []
