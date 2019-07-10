@@ -6,8 +6,8 @@ samples= str(period)+"/"
 sorting = 'random'
 #sorting = 'btag'
 
-submitToBatch = False #Set to true if you want to submit kernels + makeData to batch!
-runParallel   = False #Set to true if you want to run all kernels in parallel! This will exit this script and you will have to run mergeKernelJobs when your jobs are done! TODO! Add waitForBatchJobs also here?
+submitToBatch = True #Set to true if you want to submit kernels + makeData to batch!
+runParallel   = True #Set to true if you want to run all kernels in parallel! This will exit this script and you will have to run mergeKernelJobs when your jobs are done! TODO! Add waitForBatchJobs also here?
 dijetBinning = True
 useTriggerWeights = False
 
@@ -125,9 +125,9 @@ BRWH=1.*0.001*0.676*0.584
 dataTemplate="JetHT"
 
 #background samples
-nonResTemplate="QCD_Pt-" #low stat herwig
+#nonResTemplate="QCD_Pt-" #low stat herwig
 #nonResTemplate="QCD_HT" #medium stat madgraph+pythia
-#nonResTemplate="QCD_Pt_" #high stat pythia8
+nonResTemplate="QCD_Pt_" #high stat pythia8
 
 if(period == 2016):
     TTemplate= "TT_Mtt-700to1000,TT_Mtt-1000toInf" #do we need a separate fit for ttbar?
@@ -174,16 +174,16 @@ xsec_inuse=BRZZ
 #f.makeSignalYields("JJ_"+str(signal_inuse)+"_"+str(period),signaltemplate_inuse,xsec_inuse,{'VH_HPHP':HPSF*HPSF,'VH_HPLP':HPSF*LPSF,'VH_LPHP':HPSF*LPSF,'VH_LPLP':LPSF*LPSF,'VV_HPHP':HPSF*HPSF,'VV_HPLP':HPSF*LPSF})
 
 #Detector response
-f.makeDetectorResponse("nonRes","JJ_"+str(period),nonResTemplate,cuts['nonres'])
+#f.makeDetectorResponse("nonRes","JJ_"+str(period),nonResTemplate,cuts['nonres'])
 
 # Make nonresonant QCD templates and normalization
 if runParallel and submitToBatch:
   wait = False
-  f.makeBackgroundShapesMVVKernel("nonRes","JJ_"+str(period),nonResTemplate,cuts['nonres'],"1D",wait)
-  f.makeBackgroundShapesMVVConditional("nonRes","JJ_"+str(period),nonResTemplate,'l1',cuts['nonres'],"2Dl1",wait)
-  f.makeBackgroundShapesMVVConditional("nonRes","JJ_"+str(period),nonResTemplate,'l2',cuts['nonres'],"2Dl2",wait)
-  print "Exiting system! When all jobs are finished, please run mergeKernelJobs below"
-  sys.exit()
+#  f.makeBackgroundShapesMVVKernel("nonRes","JJ_"+str(period),nonResTemplate,cuts['nonres'],"1D",wait)
+#  f.makeBackgroundShapesMVVConditional("nonRes","JJ_"+str(period),nonResTemplate,'l1',cuts['nonres'],"2Dl1",wait)
+#  f.makeBackgroundShapesMVVConditional("nonRes","JJ_"+str(period),nonResTemplate,'l2',cuts['nonres'],"2Dl2",wait)
+#  print "Exiting system! When all jobs are finished, please run mergeKernelJobs below"
+#  sys.exit()
   f.mergeKernelJobs("nonRes","JJ_"+str(period))
 else:
   wait = True
