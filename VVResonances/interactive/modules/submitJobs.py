@@ -1489,6 +1489,8 @@ def mergeData(jobList, files,jobname,purity,rootFile,filename,name):
      #if f.find('COND2D') == -1: continue
      if f.find(purity)==-1:
              continue
+     if f.find(filename)==-1:
+         continue
      if f.find('QCD_HT')    != -1: mg_files.append('./res'+jobname+'/'+f)
      elif f.find('QCD_Pt_') != -1: pythia_files.append('./res'+jobname+'/'+f)
      elif f.find('JetHT')   != -1: data_files.append('./res'+jobname+'/'+f)

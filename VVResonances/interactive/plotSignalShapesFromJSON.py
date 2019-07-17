@@ -9,8 +9,6 @@ from  CMGTools.VVResonances.plotting.CMS_lumi import *
 
 # ROOT.gROOT.SetBatch(True)
 
-path = "../plots/"
-
 def getLegend(x1=0.70010112,y1=0.693362,x2=0.90202143,y2=0.829833):
   legend = ROOT.TLegend(x1,y1,x2,y2)
   legend.SetTextSize(0.032)
@@ -124,14 +122,18 @@ def getMJPdf(j,MH,postfix=""):
 	getattr(w,'import')(function,ROOT.RooFit.Rename(pdfName))
 		
 parser = optparse.OptionParser()
-parser.add_option("-f","--file",dest="file",default='JJ_BulkGWW_MVV.json',help="input file")
+parser.add_option("-f","--file",dest="file",default='JJ_BulkGWW_2016_MVV.json',help="input file (JJ_{sig}_2016_MVV.json,JJ_{sig}_2016_MJl1_VV_HPLP.json,JJ_{sig}_2016_MJl2_VV_HPLP.json)")
 parser.add_option("-v","--var",dest="var",help="mVV or mJ",default='mVV')
 parser.add_option("-l","--leg",dest="leg",help="l1 or l2",default='l1')
 parser.add_option("-p","--period",dest="period",help="2016 or 2017 or 2018",default='2016')
 parser.add_option("-c","--category",dest="category",help="VV_HPHP or VV_HPLP or VH_HPHP etc",default='VV_HPLP')
+parser.add_option("-o","--outdir",dest="outdir",help="output directory",default='./')
+
+(options,args) = parser.parse_args()
+
+path = options.outdir
 
 postfix = "Jet 1 "
-(options,args) = parser.parse_args()
 if options.leg == "l2" !=-1: postfix = "Jet 2 "
 purity  = options.category
 
