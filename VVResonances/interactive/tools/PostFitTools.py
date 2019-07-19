@@ -456,6 +456,7 @@ class PostFitTools():
     graphs[1].Draw("AP")
     c.SaveAs(self.output+"PostFit_"+htitle.replace(' ','_')+"_"+self.label+".png")
     c.SaveAs(self.output+"PostFit_"+htitle.replace(' ','_')+"_"+self.label+".root")
+    c.SaveAs(self.output+"PostFit_"+htitle.replace(' ','_')+"_"+self.label+".pdf")
     
  def getChi2fullModel(self,pdf,data,norm):
     pr=[]
