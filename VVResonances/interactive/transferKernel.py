@@ -403,19 +403,36 @@ def makeNonResCard():
  cardName='datacard_'+cat+'.txt'
  workspaceName='workspace_'+cat+'.root'
       
- DTools.AddSignal(card,dataset,purity,sig,'results_2016',0)
+# DTools.AddSignal(card,dataset,purity,sig,'results_2016',0)
+ DTools.AddSignal(card,dataset,purity,sig,'results_%s'%options.year,0)
  hname = 'histo'
  if options.sample!='pythia': hname+=('_'+options.sample)
- card.addHistoShapeFromFile("nonRes",["MJ1","MJ2","MJJ"],options.pdfIn,hname,['OPTXY:CMS_VV_JJ_nonRes_OPTXY_'+category_pdf,'OPTZ:CMS_VV_JJ_nonRes_OPTZ_'+category_pdf,'OPT3:CMS_VV_JJ_nonRes_OPT3_'+category_pdf],False,0) ,    
+ print "adding shapes bkg"
+# card.addHistoShapeFromFile("nonRes",["MJ1","MJ2","MJJ"],options.pdfIn,hname,['PT:CMS_VV_JJ_nonRes_PT_'+category_pdf,'OPT:CMS_VV_JJ_nonRes_OPT_'+category_pdf,'OPT3:CMS_VV_JJ_nonRes_OPT3_'+category_pdf,'altshape:CMS_VV_JJ_nonRes_altshape_'+category_pdf,'altshape2:CMS_VV_JJ_nonRes_altshape2_'+category_pdf],False,0)
+# card.addHistoShapeFromFile("nonRes",["MJ1","MJ2","MJJ"],options.pdfIn,hname,['PT:CMS_VV_JJ_nonRes_PT_'+category_pdf,'OPT3:CMS_VV_JJ_nonRes_OPT3_'+category_pdf],False,0)
+# card.addHistoShapeFromFile("nonRes",["MJ1","MJ2","MJJ"],options.pdfIn,hname,['OPTXY:CMS_VV_JJ_nonRes_OPTXY_'+category_pdf,'OPTZ:CMS_VV_JJ_nonRes_OPTZ_'+category_pdf,'OPT3:CMS_VV_JJ_nonRes_OPT3_'+category_pdf],False,0) ,    
+ card.addHistoShapeFromFile("nonRes",["MJ1","MJ2","MJJ"],options.pdfIn,hname,['PT:CMS_VV_JJ_nonRes_PT_'+category_pdf,'OPTXY:CMS_VV_JJ_nonRes_OPTXY_'+category_pdf,'OPTZ:CMS_VV_JJ_nonRes_OPTZ_'+category_pdf,'OPT3:CMS_VV_JJ_nonRes_OPT3_'+category_pdf],False,0) ,    
  card.addFixedYieldFromFile("nonRes",1,options.input,"nonRes",1)
  DTools.AddData(card,options.input,"nonRes",lumi[dataset] )
  DTools.AddSigSystematics(card,sig,dataset,purity,0)
 
+ print "Adding systematics to card"
+ print "norm"
  card.addSystematic("CMS_VV_JJ_nonRes_norm","lnN",{'nonRes':1.5}) 
- card.addSystematic("CMS_VV_JJ_nonRes_OPTZ_"+category_pdf,"param",[0.0,0.333])
- card.addSystematic("CMS_VV_JJ_nonRes_OPTXY_"+category_pdf,"param",[0.0,0.333])
- card.addSystematic("CMS_VV_JJ_nonRes_OPT3_"+category_pdf,"param",[1.0,0.333])
-      
+ print "OPTZ"
+ card.addSystematic("CMS_VV_JJ_nonRes_OPTZ_"+category_pdf,"param",[0.0,0.333]) #orig
+ #card.addSystematic("CMS_VV_JJ_nonRes_OPTZ_"+category_pdf,"param",[0.0,0.5])
+ print "OPTXY"
+ card.addSystematic("CMS_VV_JJ_nonRes_OPTXY_"+category_pdf,"param",[0.0,0.333]) #orig
+# card.addSystematic("CMS_VV_JJ_nonRes_OPTXY_"+category_pdf,"param",[0.0,0.5])
+ print "OPT3"
+# card.addSystematic("CMS_VV_JJ_nonRes_OPT3_"+category_pdf,"param",[1.0,0.333]) #orig
+ card.addSystematic("CMS_VV_JJ_nonRes_OPT3_"+category_pdf,"param",[0.0,0.333]) 
+ #card.addSystematic("CMS_VV_JJ_nonRes_OPT3_"+category_pdf,"param",[10.,20.])
+ print "PT"
+ card.addSystematic("CMS_VV_JJ_nonRes_PT_"+category_pdf,"param",[0.0,0.333]) #orig
+ 
+ print " and now make card"     
  card.makeCard()
 
  t2wcmd = "text2workspace.py %s -o %s"%(cardName,workspaceName)
@@ -440,8 +457,9 @@ if __name__=="__main__":
      else: purity = "VV_LPLP"  
      print "Using purity: " ,purity    
 
+     print " ########################       makeNonResCard      ###"
      w_name = makeNonResCard()
-
+     print " ########################   DONE    makeNonResCard      ###"
      print 
      print "open file " +w_name
      f = ROOT.TFile(w_name,"READ")
@@ -459,7 +477,7 @@ if __name__=="__main__":
      argset.add(MJ1);
 
      #################################################
-               
+     print " ########################       PostFitTools      ###"          
      Tools = PostFitTools(hinMC,argset,options.xrange,options.yrange,options.zrange,purity+'_'+options.sample,options.output)
      xBins,xBinslowedge,xBinsWidth,yBins,yBinslowedge,yBinsWidth,zBins,zBinslowedge,zBinsWidth = Tools.getBins()
      
@@ -489,6 +507,7 @@ if __name__=="__main__":
      #################################################
      
      if options.merge:
+      print "merging"
       merge_all()
       sys.exit()
                   
@@ -496,20 +515,26 @@ if __name__=="__main__":
      model = workspace.pdf("model_b") 
      data = workspace.data("data_obs")
      #del workspace
-     data.Print()     
+     print "data ",     data.Print()     
           
      print
      print "Observed number of events:",data.sumEntries()
      
      args  = model.getComponents()
+     print "model ",model.Print()
+     print "args = model comp[onents ",args.Print()
      pdfName = "pdf_binJJ_"+purity+"_13TeV_%s_bonly"%options.year
 
      print "Expected number of QCD events:",(args[pdfName].getComponents())["n_exp_binJJ_"+purity+"_13TeV_%s_proc_nonRes"%options.year].getVal()
     
      #################################################
-     print "Fitting:"
+     print "###########        Fitting:            ################"
      fitresult = model.fitTo(data,ROOT.RooFit.SumW2Error(1),ROOT.RooFit.Minos(0),ROOT.RooFit.Verbose(0),ROOT.RooFit.Save(1),ROOT.RooFit.NumCPU(8))#,ROOT.RooFit.DataError(ROOT.RooAbsData.SumW2))
+     print "#####   Fitting results ###########" 
      fitresult.Print()
+     print "###########        Fitting DONE            ################"
+     print "model ",model.Print()
+
      #################################################
      print            
             
