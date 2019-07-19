@@ -13,7 +13,7 @@ parser.add_option("-b","--binning",action="store_false",dest="binning",help="use
 parser.add_option("--batch",action="store_false",dest="batch",help="submit to batch or not ",default=True)
 parser.add_option("--trigg",action="store_true",dest="trigg",help="add trigger weights or not ",default=False)
 parser.add_option("--run",dest="run",help="decide which parts of the code should be run right now possible optoins are: all : run everything, sigmvv: run signal mvv fit sigmj: run signal mj fit, signorm: run signal norm, vjets: run vjets , qcdtemplates: run qcd templates, qcdkernel: run qcd kernel, qcdnorm: run qcd merge and norm, detector: run detector fit , data : run the data or pseudodata scripts ",default="all")
-parser.add_option("--signal",dest="signal",default="BGWW",help="which signal do you want to run? options are BGWW, BGZZ, WprimeWZ, ZprimeWW, ZprimeZH")
+parser.add_option("--signal",dest="signal",default="BGWW",help="which signal do you want to run? options are BulkGWW, BulkGZZ, WprimeWZ, ZprimeWW, ZprimeZH")
 
 
 (options,args) = parser.parse_args()
@@ -198,11 +198,11 @@ if options.run.find("all")!=-1 or options.run.find("sig")!=-1:
         signal_inuse="ZprimeZH"
         signaltemplate_inuse=ZprimeZHTemplate
         xsec_inuse=BRZH
-    elif options.signal.find("BGWW")!=-1:
+    elif options.signal.find("BulkGWW")!=-1:
         signal_inuse="BulkGWW"
         signaltemplate_inuse=BulkGravWWTemplate
         xsec_inuse=BRWW
-    elif options.signal.find("BGZZ")!=-1:
+    elif options.signal.find("BulkGZZ")!=-1:
         signal_inuse="BulkGZZ"
         signaltemplate_inuse=BulkGravZZTemplate
         xsec_inuse=BRZZ
