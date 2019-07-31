@@ -31,7 +31,7 @@ class AllFunctions():
   
   jsonFile=filename+"_MVV.json"
   cmd='vvMakeJSON.py  -o "{jsonFile}" -g {pols} -m {minMX} -M {maxMX} {rootFile}  '.format(jsonFile=jsonFile,rootFile=rootFile,minMX=self.minMX,maxMX=self.maxMX,pols=fixParsMVV["pol"])
-  #os.system(cmd)
+  os.system(cmd)
 
  def makeSignalShapesMJ(self,filename,template,leg,fixPars,addcuts="1"):
 
