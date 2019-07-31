@@ -203,8 +203,8 @@ def doSingle():
       c1.SaveAs(path+"signalShapes%s_%s.root" %(options.var, inFileName.rsplit(".", 1)[0]))
   
 def doAll():
-    if options.var == 'mJ':  jsons = ["JJ_BulkGravZZ_"+str(options.period)+"_MJl1_"+str(purity)+".json","JJ_WprimeWZ_"+str(options.period)+"_MJl1_"+str(purity)+".json","JJ_BulkGravWW_"+str(options.period)+"_MJl1_"+str(purity)+".json","JJ_ZprimeWW_"+str(options.period)+"_MJl1_"+str(purity)+".json"]
-    if options.var == 'mVV': jsons = ["JJ_BulkGravZZ_"+str(options.period)+"_MVV.json","JJ_WprimeWZ_"+str(options.period)+"_MVV.json","JJ_BulkGravWW_"+str(options.period)+"_MVV.json","JJ_ZprimeWW_"+str(options.period)+"_MVV.json"]
+    if options.var == 'mJ':  jsons = ["JJ_BulkGZZ_"+str(options.period)+"_MJl1_"+str(purity)+".json","JJ_WprimeWZ_"+str(options.period)+"_MJl1_"+str(purity)+".json","JJ_BulkGWW_"+str(options.period)+"_MJl1_"+str(purity)+".json","JJ_ZprimeWW_"+str(options.period)+"_MJl1_"+str(purity)+".json"]
+    if options.var == 'mVV': jsons = ["JJ_BulkGZZ_"+str(options.period)+"_MVV.json","JJ_WprimeWZ_"+str(options.period)+"_MVV.json","JJ_BulkGWW_"+str(options.period)+"_MVV.json","JJ_ZprimeWW_"+str(options.period)+"_MVV.json"]
     legs = ["G_{bulk} #rightarrow ZZ","W' #rightarrow WZ","G_{bulk} #rightarrow WW","Z'#rightarrow WW"]
     c1,leg,pt = getCanvasPaper("c1")
     c1.Draw()
