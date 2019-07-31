@@ -78,8 +78,8 @@ catHtag['NP2'] = '(jj_l2_MassDecorrelatedDeepBoosted_ZHbbvsQCD<0.5)'
 
 cuts={}
 
-cuts['common'] = '((HLT_JJ)*(run>500) + (run<500))*(passed_METfilters&&passed_PVfilter&&njj>0&&jj_LV_mass>700&&abs(jj_l1_eta-jj_l2_eta)<1.3&&jj_l1_softDrop_mass>0.&&jj_l2_softDrop_mass>0.)' #without rho
-#cuts['common'] = '((HLT_JJ)*(run>500) + (run<500))*(passed_METfilters&&passed_PVfilter&&njj>0&&jj_LV_mass>700&&abs(jj_l1_eta-jj_l2_eta)<1.3&&jj_l1_softDrop_mass>0.&&jj_l2_softDrop_mass>0.&&TMath::Log(jj_l1_softDrop_mass**2/jj_l1_pt**2)<-1.8&&TMath::Log(jj_l2_softDrop_mass**2/jj_l2_pt**2)<-1.8)' #with rho
+#cuts['common'] = '((HLT_JJ)*(run>500) + (run<500))*(passed_METfilters&&passed_PVfilter&&njj>0&&jj_LV_mass>700&&abs(jj_l1_eta-jj_l2_eta)<1.3&&jj_l1_softDrop_mass>0.&&jj_l2_softDrop_mass>0.)' #without rho
+cuts['common'] = '((HLT_JJ)*(run>500) + (run<500))*(passed_METfilters&&passed_PVfilter&&njj>0&&jj_LV_mass>700&&abs(jj_l1_eta-jj_l2_eta)<1.3&&jj_l1_softDrop_mass>0.&&jj_l2_softDrop_mass>0.&&TMath::Log(jj_l1_softDrop_mass**2/jj_l1_pt**2)<-1.8&&TMath::Log(jj_l2_softDrop_mass**2/jj_l2_pt**2)<-1.8)' #with rho
 
 #signal regions
 if sorting == 'random':
@@ -89,13 +89,6 @@ if sorting == 'random':
  cuts['VH_LPHP'] = '(' + '('+  '&&'.join([catVtag['LP1'],catHtag['HP2']]) + ')' + '||' + '(' + '&&'.join([catVtag['LP2'],catHtag['HP1']]) + ')' + ')'
  cuts['VH_LPLP'] = '(' + '('+  '&&'.join([catVtag['LP1'],catHtag['LP2']]) + ')' + '||' + '(' + '&&'.join([catVtag['LP2'],catHtag['LP1']]) + ')' + ')'
  cuts['VH_all'] =  '('+  '||'.join([cuts['VH_HPHP'],cuts['VH_HPLP'],cuts['VH_LPHP'],cuts['VH_LPLP']]) + ')'
-#commented because we need VH to try to reproduce B2G-18-002
-# cuts['VV_HPHP'] = '(' + '!' + cuts['VH_all'] + '&&' + '(' + '&&'.join([catVtag['HP1'],catVtag['HP2']]) + ')' + ')'
-# cuts['VV_HPLP'] = '(' + '!' + cuts['VH_all'] + '&&' + '(' + '('+  '&&'.join([catVtag['HP1'],catVtag['LP2']]) + ')' + '||' + '(' + '&&'.join([catVtag['HP2'],catVtag['LP1']]) + ')' + ')' + ')'
- cuts['VV_HPHP'] = '('  +  '&&'.join([catVtag['HP1'],catVtag['HP2']]) + ')' 
- cuts['VV_HPLP'] = '('  + '(' +  '&&'.join([catVtag['HP1'],catVtag['LP2']]) + ')' + '||' + '(' + '&&'.join([catVtag['HP2'],catVtag['LP1']]) + ')' + ')'
-
-
 #commented because we need VH to try to reproduce B2G-18-002
 # cuts['VV_HPHP'] = '(' + '!' + cuts['VH_all'] + '&&' + '(' + '&&'.join([catVtag['HP1'],catVtag['HP2']]) + ')' + ')'
 # cuts['VV_HPLP'] = '(' + '!' + cuts['VH_all'] + '&&' + '(' + '('+  '&&'.join([catVtag['HP1'],catVtag['LP2']]) + ')' + '||' + '(' + '&&'.join([catVtag['HP2'],catVtag['LP1']]) + ')' + ')' + ')'
@@ -152,9 +145,9 @@ BRWH=1.*0.001*0.676*0.584
 dataTemplate="JetHT"
 
 #background samples
-nonResTemplate="QCD_Pt-" #low stat herwig
+#nonResTemplate="QCD_Pt-" #low stat herwig
 #nonResTemplate="QCD_HT" #medium stat madgraph+pythia
-#nonResTemplate="QCD_Pt_" #high stat pythia8
+nonResTemplate="QCD_Pt_" #high stat pythia8
 
 if(period == 2016):
     TTemplate= "TT_Mtt-700to1000,TT_Mtt-1000toInf" #do we need a separate fit for ttbar?
@@ -228,8 +221,9 @@ fixParsSig={"ZprimeZH":{ "VV_HPLP": {"fixPars":"mean:91.5,n:1.83,n2:4.22,alphaH:
             "VV_HPHP":{"fixPars":"n:2,n2:2,alpha:1.505","pol":"mean:pol3,sigma:pol3,alpha:pol3,n:pol0,alpha2:pol3,n2:pol1"}}}
 
 
-
-fixParsSigMVV={"ZprimeZH":{"fixPars":"ALPHA2:2.42,N1:126.5", "pol":"MEAN:pol1,SIGMA:pol1,N1:pol0,ALPHA1:pol9,N2:pol3,ALPHA2:pol0"},"WprimeWZ":{"fixPars":"N1:7,N2:4","pol": "MEAN:pol1,SIGMA:pol3,N1:pol0,ALPHA1:pol7,N2:pol0,ALPHA2:pol5"}}
+#fixPars = "N1:1.61364,N2:4.6012"  
+#fixParsSigMVV={"ZprimeZH":{"fixPars":"ALPHA2:2.42,N1:126.5", "pol":"MEAN:pol1,SIGMA:pol1,N1:pol0,ALPHA1:pol9,N2:pol3,ALPHA2:pol0"},"WprimeWZ":{"fixPars":"N1:7,N2:4","pol": "MEAN:pol1,SIGMA:pol3,N1:pol0,ALPHA1:pol7,N2:pol0,ALPHA2:pol5"}}
+fixParsSigMVV={"ZprimeZH":{"fixPars":"ALPHA2:2.42,N1:126.5", "pol":"MEAN:pol1,SIGMA:pol1,N1:pol0,ALPHA1:pol9,N2:pol3,ALPHA2:pol0"},"WprimeWZ":{"fixPars":"N1:7,N2:4","pol": "MEAN:pol1,SIGMA:pol3,N1:pol0,ALPHA1:pol7,N2:pol0,ALPHA2:pol5"},"BulkGWW":{"fixPars":"N1:1.61364,N2:4.6012","pol":"MEAN:pol1,SIGMA:pol6,ALPHA1:pol5,N1:pol0,ALPHA2:pol4,N2:pol0"},"BulkGZZ":{"fixPars":"N1:1.61364,N2:4.6012","pol":"MEAN:pol1,SIGMA:pol6,ALPHA1:pol5,N1:pol0,ALPHA2:pol4,N2:pol0"},"ZprimeWW":{"fixPars":"N1:1.61364,N2:4.6012","pol":"MEAN:pol1,SIGMA:pol6,ALPHA1:pol5,N1:pol0,ALPHA2:pol4,N2:pol0"}}
 
 
 if options.run.find("all")!=-1 or options.run.find("sig")!=-1:
@@ -252,8 +246,8 @@ if options.run.find("all")!=-1 or options.run.find("sig")!=-1:
                 f.makeSignalShapesMJ("JJ_"+str(signal_inuse)+"_"+str(period),signaltemplate_inuse,'l1',fixParsSig[signal_inuse])
                 f.makeSignalShapesMJ("JJ_"+str(signal_inuse)+"_"+str(period),signaltemplate_inuse,'l2',fixParsSig[signal_inuse])
     if options.run.find("all")!=-1 or options.run.find("mvv")!=-1:
-        print "mjj fit for signal "
-        f.makeSignalShapesMVV("JJ_"+str(signal_inuse)+"_"+str(period),signaltemplate_inuse,fixParsSigMVV[signal_inuse])#,cuts["VV_HPLP"])
+        print "mjj fit for signal ", signal_inuse
+        f.makeSignalShapesMVV("JJ_"+str(signal_inuse)+"_"+str(period),signaltemplate_inuse,fixParsSigMVV[signal_inuse])#,cuts["VV_HPLP"])                                                                                                                                
     if options.run.find("all")!=-1 or options.run.find("norm")!=-1:
         print "fit signal norm "
         f.makeSignalYields("JJ_"+str(signal_inuse)+"_"+str(period),signaltemplate_inuse,xsec_inuse,{'VH_HPHP':HPSF*HPSF,'VH_HPLP':HPSF*LPSF,'VH_LPHP':HPSF*LPSF,'VH_LPLP':LPSF*LPSF,'VV_HPHP':HPSF*HPSF,'VV_HPLP':HPSF*LPSF})
