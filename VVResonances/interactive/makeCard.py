@@ -24,8 +24,8 @@ vtag_unc['VV_LPLP'] = {'2016':'1.063','2017':'1.043'}
 
 vtag_pt_dependence = {'VV_HPHP':'((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))','VV_HPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))'}
   
-purities= ['VV_HPLP']
-#purities= ['VV_HPLP','VV_HPHP']
+#purities= ['VV_HPLP']
+purities= ['VV_HPLP','VV_HPHP']
 #signals = ["BulkGWW", "BulkGZZ","ZprimeWW","WprimeWZ","VprimeWV","'ZprimeZH'"]
 signals = ["BulkGWW"]
 
@@ -59,8 +59,8 @@ for sig in signals:
       Tools.AddZResBackground(card,dataset,p,rootFileMVV,rootFileNorm,resultsDir[dataset],ncontrib)
       ncontrib+=1
       
-      rootFile3DPDF = resultsDir[dataset]+'/JJ_2016_nonRes_3D_VV_HPLP.root'
-      #rootFile3DPDF = resultsDir[dataset]+"/save_new_shapes_pythia_"+p+"_3D.root"
+      #rootFile3DPDF = resultsDir[dataset]+'/JJ_2016_nonRes_3D_VV_HPLP.root'
+      rootFile3DPDF = resultsDir[dataset]+"/save_new_shapes_%s_pythia_"%dataset+p+"_3D.root"
       rootFileNorm = resultsDir[dataset]+"/JJ_%s_nonRes_"%dataset+p+".root"   
       Tools.AddNonResBackground(card,dataset,p,rootFile3DPDF,rootFileNorm,ncontrib) 
 
