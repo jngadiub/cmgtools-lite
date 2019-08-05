@@ -122,19 +122,20 @@ def getMJPdf(j,MH,postfix=""):
 	getattr(w,'import')(function,ROOT.RooFit.Rename(pdfName))
 		
 parser = optparse.OptionParser()
-parser.add_option("-f","--file",dest="file",default='JJ_BulkGWW_2016_MVV.json',help="input file (JJ_{sig}_2016_MVV.json,JJ_{sig}_2016_MJl1_VV_HPLP.json,JJ_{sig}_2016_MJl2_VV_HPLP.json)")
+parser.add_option("-f","--file",dest="file",default='JJ_BulkGWW_2016_MVV.json',help="input file (JJ_{sig}_2016_MVV.json,JJ_{sig}_2016_MJrandom_VV_HPLP.json)")
 parser.add_option("-v","--var",dest="var",help="mVV or mJ",default='mVV')
-parser.add_option("-l","--leg",dest="leg",help="l1 or l2",default='l1')
 parser.add_option("-p","--period",dest="period",help="2016 or 2017 or 2018",default='2016')
 parser.add_option("-c","--category",dest="category",help="VV_HPHP or VV_HPLP or VH_HPHP etc",default='VV_HPLP')
-parser.add_option("-o","--outdir",dest="outdir",help="output directory",default='./')
+parser.add_option("-o","--outdir",dest="outdir",help="output directory",default='../plots/')
+parser.add_option("-i","--indir",dest="indir",help="input directory",default='results_2016/')
+parser.add_option("-n","--name",dest="name",help="you may specify an additional label for the output file",default='test')
 
 (options,args) = parser.parse_args()
 
 path = options.outdir
 
-postfix = "Jet 1 "
-if options.leg == "l2" !=-1: postfix = "Jet 2 "
+postfix = "Jet random"
+
 purity  = options.category
 
 
@@ -152,6 +153,7 @@ colors.append(["#f9c677","#f9d077","#f9f577","#ffd300","#f9fe77","#f9fe64","#f9f
 colors.append(["#fee0d2","#fcbba1","#fc9272","#ef3b2c","#ef3b2c","#cb181d","#a50f15","#67000d"]*3) 
 colors.append(["#e5f5e0","#c7e9c0","#a1d99b","#41ab5d","#41ab5d","#238b45","#006d2c","#00441b"]*3) 
 colors.append(["#02fefe","#02e5fe","#02d7fe","#4292c6","#02b5fe","#02a8fe","#0282fe","#0300fc"]*3)  
+colors.append(["#e6a3e1","#d987e6","#ce5ce0","#822391","#8526bd","#9b20e3","#a87eed","#8649eb"]*3)
 
 def doSingle():
     with open(inFileName) as jsonFile:
@@ -203,9 +205,15 @@ def doSingle():
       c1.SaveAs(path+"signalShapes%s_%s.root" %(options.var, inFileName.rsplit(".", 1)[0]))
   
 def doAll():
-    if options.var == 'mJ':  jsons = ["JJ_BulkGZZ_"+str(options.period)+"_MJl1_"+str(purity)+".json","JJ_WprimeWZ_"+str(options.period)+"_MJl1_"+str(purity)+".json","JJ_BulkGWW_"+str(options.period)+"_MJl1_"+str(purity)+".json","JJ_ZprimeWW_"+str(options.period)+"_MJl1_"+str(purity)+".json"]
-    if options.var == 'mVV': jsons = ["JJ_BulkGZZ_"+str(options.period)+"_MVV.json","JJ_WprimeWZ_"+str(options.period)+"_MVV.json","JJ_BulkGWW_"+str(options.period)+"_MVV.json","JJ_ZprimeWW_"+str(options.period)+"_MVV.json"]
-    legs = ["G_{bulk} #rightarrow ZZ","W' #rightarrow WZ","G_{bulk} #rightarrow WW","Z'#rightarrow WW"]
+    if options.var == 'mJ' and purity.find("VV_HPHP") ==-1:  
+      jsons = ["JJ_BulkGZZ_"+str(options.period)+"_MJrandom_"+str(purity)+".json","JJ_WprimeWZ_"+str(options.period)+"_MJrandom_"+str(purity)+".json","JJ_BulkGWW_"+str(options.period)+"_MJrandom_"+str(purity)+".json","JJ_ZprimeWW_"+str(options.period)+"_MJrandom_"+str(purity)+".json","JJ_Vjet_ZprimeZH_"+str(options.period)+"_MJrandom_"+str(purity)+".json"]
+      legs = ["G_{bulk} #rightarrow ZZ","W' #rightarrow WZ","G_{bulk} #rightarrow WW","Z'#rightarrow WW","Z'#rightarrow ZH"]
+    if options.var == 'mJ' and purity.find("VV_HPHP") !=-1:  
+      jsons = ["JJ_BulkGZZ_"+str(options.period)+"_MJrandom_"+str(purity)+".json","JJ_WprimeWZ_"+str(options.period)+"_MJrandom_"+str(purity)+".json","JJ_BulkGWW_"+str(options.period)+"_MJrandom_"+str(purity)+".json","JJ_ZprimeWW_"+str(options.period)+"_MJrandom_"+str(purity)+".json"] 
+      legs = ["G_{bulk} #rightarrow ZZ","W' #rightarrow WZ","G_{bulk} #rightarrow WW","Z'#rightarrow WW"]
+    if options.var == 'mVV': 
+      jsons = ["JJ_BulkGZZ_"+str(options.period)+"_MVV.json","JJ_WprimeWZ_"+str(options.period)+"_MVV.json","JJ_BulkGWW_"+str(options.period)+"_MVV.json","JJ_ZprimeWW_"+str(options.period)+"_MVV.json"] #,"JJ_ZprimeZH_"+str(options.period)+"_MVV.json"]
+      legs = ["G_{bulk} #rightarrow ZZ","W' #rightarrow WZ","G_{bulk} #rightarrow WW","Z'#rightarrow WW"] #,"Z'#rightarrow ZH"]
     c1,leg,pt = getCanvasPaper("c1")
     c1.Draw()
     #leg = getLegend()
@@ -214,7 +222,7 @@ def doAll():
     for ii,f in enumerate(jsons):
         print f
         name = f.split("_")[1]
-        with open(f) as jsonFile:
+        with open(options.indir+f) as jsonFile:
           j = json.load(jsonFile)
           for i, MH in enumerate(massPoints):  # mind that MH is evaluated below
             print " i "+str(i)+" MH "+str(MH)+" j "+str(j)+" name " +str(name)
@@ -258,13 +266,13 @@ def doAll():
     pt2.SetFillColor(0)
     pt2.SetBorderSize(0)
     pt2.SetFillStyle(0)
-    if options.var == 'mJ': pt2.AddText(str(purity)+" category")
+    pt2.AddText(str(purity)+" category")
     pt2.Draw()
 
     w.Print()
 
-    if options.var == 'mVV': name = path+"signalShapes_%s_%s_All"  %(options.var,options.period)
-    if options.var == 'mJ': name = path+"signalShapes_%s_%s_%s_All"  %(options.var,options.period,options.category)
+    if options.var == 'mVV': name = path+"signalShapes_%s_%s_%s_All_%s"  %(options.var,options.period,options.category,options.name)
+    if options.var == 'mJ': name = path+"signalShapes_%s_%s_%s_All_%s"  %(options.var,options.period,options.category,options.name)
     c1.SaveAs(name+".png")
     c1.SaveAs(name+".pdf" )
     c1.SaveAs(name+".C"   )
