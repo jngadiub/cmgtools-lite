@@ -113,7 +113,7 @@ Run the limits with combine and make final plot (but not tested because datacard
 
 ```
 vvSubmitLimits.py JJ_BulkGWW_HPHP_13TeV_workspace.root -s 100 -q "workday" -m 1200 -M 4200 -C 1
-find higgsCombineTest.Asymptotic.* -size +1500c | xargs hadd Limits_BulkGWW_HPHP_13TeV.root
+find higgsCombineTest.AsymptoticLimits.* -size +1500c | xargs hadd Limits_BulkGWW_HPHP_13TeV.root
 vvMakeLimitPlot.py Limits_BulkGWW_HPHP_13TeV.root -x 1200 -X 4200 #(expected limits)
 vvMakeLimitPlot.py Limits_BulkGWW_HPHP_13TeV.root -x 1200 -X 4200 -b 0 #(expected+observed limits)
 ```
