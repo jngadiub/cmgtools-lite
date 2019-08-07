@@ -27,7 +27,7 @@ vtag_pt_dependence = {'VV_HPHP':'((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))
 #purities= ['VV_HPLP']
 purities= ['VV_HPLP','VV_HPHP']
 #signals = ["BulkGWW", "BulkGZZ","ZprimeWW","WprimeWZ","VprimeWV","'ZprimeZH'"]
-signals = ["BulkGWW"]
+signals = ["BulkGVV"]
 
 Tools = DatacardTools(scales,vtag_pt_dependence,lumi_unc,vtag_unc,sf_qcd,pseudodata,outlabel)
 
@@ -64,12 +64,12 @@ for sig in signals:
       rootFileNorm = resultsDir[dataset]+"/JJ_%s_nonRes_"%dataset+p+".root"   
       Tools.AddNonResBackground(card,dataset,p,rootFile3DPDF,rootFileNorm,ncontrib) 
 
-      #rootFileData = resultsDir[dataset]+"/JJ_"+p+".root"
-      #histName="data"
-      #scaleData=1.0 #f you ru on real data
-      rootFileData = "results_2016/JJ_2016_nonRes_VV_HPLP.root"   
-      histName="nonRes"
-      scaleData=lumi[dataset] #if you run on MC for transfer-kernel
+      rootFileData = resultsDir[dataset]+"/JJ_"+p+".root"
+      histName="data"
+      scaleData=1.0 #if you ru on real data
+#      rootFileData = "results_2016/JJ_2016_nonRes_VV_HPLP.root"   
+#      histName="nonRes"
+#      scaleData=lumi[dataset] #if you run on MC for transfer-kernel
       if pseudodata=="ZprimeZH":
        rootFileData = resultsDir[dataset]+"/JJ_ZprimeZH_VH_all_M2000.root"
        histName="data_obs"
