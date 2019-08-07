@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-
+# vvMakeLimitPlot.py Limits_BulkGWW_VV_HPHP_HPLP13TeV.root -x 1200 -X 4200 -s BulkGWW --hvt 2 --HVTworkspace results_QCD_pythia_signals_2016_tau21DDT_rho_VVpaper_HPHP_HPLP/workspace_JJ_BulkGWW_VV_13TeV.root -p 2016
+# vvMakeLimitPlot.py Limits_BulkGVV_HPLP_13TeV.root -x 1200 -X 4200 -b 0 -s BulkGVV  --hvt 2 --HVTworkspace workspace_JJ_BulkGVV_HPLP_13TeV_2016.root -p 2016
 #vvMakeLimitPlot.py limits.root -x 1200 -X 5200 -b 0 -s VprimeWV --hvt 1 ---HVTworkspace workspace_JJ_VprimeWV_13TeV.root
 import ROOT
 import optparse, time, sys, math
@@ -20,7 +21,7 @@ parser.add_option("-l","--log",dest="log",type=int,help="Log plot",default=1)
 parser.add_option("-t","--titleX",dest="titleX",default='M_{X} [GeV]',help="title of x axis")
 parser.add_option("-T","--titleY",dest="titleY",default='#sigma x BR(X #rightarrow WW) [pb]  ',help="title of y axis")
 
-parser.add_option("-p","--period",dest="period",default='2017',help="period")
+parser.add_option("-p","--period",dest="period",default='2016',help="period")
 parser.add_option("-f","--final",dest="final",type=int, default=1,help="Preliminary or not")
 parser.add_option("--hvt","--hvt",dest="hvt",type=int, default=0,help="do HVT (1) or do BulkG (2)")
 parser.add_option("--HVTworkspace","--HVTworkspace",dest="HVTworkspace",default="workspace_JJ_VprimeWV_13TeV.root",help="HVT workspace with spline interpolation")
@@ -75,11 +76,11 @@ if options.hvt>0:
   argset.add(MH)
   MH.setVal(m)
   if options.hvt == 1:
-   func1 = w.function('ZprimeWW_JJ_HPHP_13TeV_2016_sigma')
-   func2 = w.function('WprimeWZ_JJ_HPHP_13TeV_2016_sigma')  
+   func1 = w.function('ZprimeWW_JJ_VV_HPHP_13TeV_2016_sigma')
+   func2 = w.function('WprimeWZ_JJ_VV_HPHP_13TeV_2016_sigma')  
   else: 
-   func1 = w.function('BulkGWW_JJ_HPHP_13TeV_2016_sigma')
-   func2 = w.function('BulkGZZ_JJ_HPHP_13TeV_2016_sigma')  
+   func1 = w.function('BulkGWW_JJ_VV_HPHP_13TeV_2016_sigma') #orig
+   func2 = w.function('BulkGZZ_JJ_VV_HPHP_13TeV_2016_sigma') #orif 
   scaleLimits[str(int(m))] = func1.getVal(argset)+func2.getVal(argset) 
   
  spline_x_wp = []
