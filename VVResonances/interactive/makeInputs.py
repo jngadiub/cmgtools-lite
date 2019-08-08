@@ -3,10 +3,11 @@ from optparse import OptionParser
 
 #examples:
 # python makeInputs.py -p 2016 --run "signorm" --signal "ZprimeWW" --batch False 
-# python makeInputs.py -p 2016 --run "vjets" --batch False                                                                                                                                                                                               
+# python makeInputs.py -p 2016 --run "vjets" --batch False                                                                                                                                                
 # python makeInputs.py -p 2016 --run "qcdtemplates"
 # python makeInputs.py -p 2016 --run "qcdkernel"
 # python makeInputs.py -p 2016 --run "qcdnmorm"
+# python makeInputs.py -p 2016 --run "data"
 parser = OptionParser()
 parser.add_option("-p","--period",dest="period",type="int",default=2016,help="run period")
 parser.add_option("-s","--sorting",dest="sorting",help="b-tag or random sorting",default='random')
@@ -91,10 +92,10 @@ if sorting == 'random':
  cuts['VH_LPLP'] = '(' + '('+  '&&'.join([catVtag['LP1'],catHtag['LP2']]) + ')' + '||' + '(' + '&&'.join([catVtag['LP2'],catHtag['LP1']]) + ')' + ')'
  cuts['VH_all'] =  '('+  '||'.join([cuts['VH_HPHP'],cuts['VH_HPLP'],cuts['VH_LPHP'],cuts['VH_LPLP']]) + ')'
 #commented because we need VH to try to reproduce B2G-18-002
-# cuts['VV_HPHP'] = '(' + '!' + cuts['VH_all'] + '&&' + '(' + '&&'.join([catVtag['HP1'],catVtag['HP2']]) + ')' + ')'
-# cuts['VV_HPLP'] = '(' + '!' + cuts['VH_all'] + '&&' + '(' + '('+  '&&'.join([catVtag['HP1'],catVtag['LP2']]) + ')' + '||' + '(' + '&&'.join([catVtag['HP2'],catVtag['LP1']]) + ')' + ')' + ')'
- cuts['VV_HPHP'] = '('  +  '&&'.join([catVtag['HP1'],catVtag['HP2']]) + ')' 
- cuts['VV_HPLP'] = '('  + '(' +  '&&'.join([catVtag['HP1'],catVtag['LP2']]) + ')' + '||' + '(' + '&&'.join([catVtag['HP2'],catVtag['LP1']]) + ')' + ')'
+ cuts['VV_HPHP'] = '(' + '!' + cuts['VH_all'] + '&&' + '(' + '&&'.join([catVtag['HP1'],catVtag['HP2']]) + ')' + ')'
+ cuts['VV_HPLP'] = '(' + '!' + cuts['VH_all'] + '&&' + '(' + '('+  '&&'.join([catVtag['HP1'],catVtag['LP2']]) + ')' + '||' + '(' + '&&'.join([catVtag['HP2'],catVtag['LP1']]) + ')' + ')' + ')'
+# cuts['VV_HPHP'] = '('  +  '&&'.join([catVtag['HP1'],catVtag['HP2']]) + ')' 
+# cuts['VV_HPLP'] = '('  + '(' +  '&&'.join([catVtag['HP1'],catVtag['LP2']]) + ')' + '||' + '(' + '&&'.join([catVtag['HP2'],catVtag['LP1']]) + ')' + ')'
 else:
  print "Use b-tagging sorting"
  cuts['VH_HPHP'] = '('+  '&&'.join([catHtag['HP1'],catVtag['HP2']]) + ')'
@@ -123,7 +124,7 @@ cuts['resTT'] = '(jj_l1_mergedVTruth==1&&jj_l1_softDrop_mass>140&&jj_l1_softDrop
 
 #all categories
 #categories=['VH_HPHP','VH_HPLP','VH_LPHP','VH_LPLP','VV_HPHP','VV_HPLP']
-categories=['VV_HPLP','VV_HPHP']
+categories=['VV_HPHP','VV_HPLP']
 
 
 
@@ -170,7 +171,7 @@ maxMVV=6000.
 binsMVV=100
 
 minMX=1200.0
-maxMX=4500.0
+maxMX=4000.0
     
 if dijetBinning:
     minMVV = float(dijetbins[0])
@@ -303,10 +304,10 @@ if options.run.find("all")!=-1 or options.run.find("vjets")!=-1:
 if options.run.find("all")!=-1 or options.run.find("data")!=-1:
     print " Do data or pseudodata"
     f.makeNormalizations("data","JJ_"+str(period),dataTemplate,1,'1',"normD") #run on data. Currently run on pseudodata only (below)
-    from modules.submitJobs import makePseudoData
-    for p in categories: makePseudoData("JJ_"+str(period)+"_nonRes_%s.root"%p,"JJ_"+str(period)+"_nonRes_3D_%s.root"%p,"pythia","JJ_PDnoVjets_%s.root"%p,lumi)
-    from modules.submitJobs import makePseudoDataVjets
-    for p in categories: makePseudoDataVjets("/afs/cern.ch/user/t/thaarres/public/forJen/looseDDT/JJ_nonRes_%s.root"%p,"/afs/cern.ch/user/t/thaarres/public/forJen/looseDDT/JJ_nonRes_3D_%s.root"%p,"pythia","/afs/cern.ch/user/t/thaarres/public/forJen/looseDDT/JJ_PD_%s.root"%p,lumi,"/afs/cern.ch/user/t/thaarres/public/forJen/looseDDT/workspace_JJ_13TeV_2017.root",2017,p)
+#    from modules.submitJobs import makePseudoData
+#    for p in categories: makePseudoData("JJ_"+str(period)+"_nonRes_%s.root"%p,"JJ_"+str(period)+"_nonRes_3D_%s.root"%p,"pythia","JJ_PDnoVjets_%s.root"%p,lumi)
+#    from modules.submitJobs import makePseudoDataVjets
+#    for p in categories: makePseudoDataVjets("/afs/cern.ch/user/t/thaarres/public/forJen/looseDDT/JJ_nonRes_%s.root"%p,"/afs/cern.ch/user/t/thaarres/public/forJen/looseDDT/JJ_nonRes_3D_%s.root"%p,"pythia","/afs/cern.ch/user/t/thaarres/public/forJen/looseDDT/JJ_PD_%s.root"%p,lumi,"/afs/cern.ch/user/t/thaarres/public/forJen/looseDDT/workspace_JJ_13TeV_2017.root",2017,p)
 
 
 print " ########## I did everything I could! ###### "
