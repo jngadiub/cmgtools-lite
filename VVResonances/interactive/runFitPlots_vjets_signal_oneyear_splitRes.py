@@ -16,7 +16,7 @@ ROOT.gROOT.ProcessLine(".x tdrstyle.cc");
 #python runFitPlots_vjets_signal_bigcombo_splitRes.py -n workspace_combo_"+signalName+".root  -l comboHPLP -i /afs/cern.ch/user/j/jngadiub/public/2016/JJ_nonRes_HPLP.root -M 1200
 
 addTT = False 
-doFit = False
+doFit = True
 parser = optparse.OptionParser()
 parser.add_option("-o","--output",dest="output",help="Output folder name",default='')
 parser.add_option("-n","--name",dest="name",help="Input workspace",default='workspace.root')
@@ -42,7 +42,7 @@ ROOT.RooMsgService.instance().setGlobalKillBelow(ROOT.RooFit.FATAL)
 #colors = [ROOT.kBlack,ROOT.kPink-1,ROOT.kAzure+1,ROOT.kAzure+1,210,210,ROOT.kMagenta,ROOT.kMagenta,ROOT.kOrange,ROOT.kOrange,ROOT.kViolet,ROOT.kViolet]
 colors = [ROOT.kGray+2,ROOT.kRed,ROOT.kBlue,ROOT.kGray+1,210,210,ROOT.kMagenta,ROOT.kMagenta,ROOT.kOrange,ROOT.kOrange,ROOT.kViolet,ROOT.kViolet]
 
-signalName = "ZprimeZH"
+signalName = "BulkGWW"
 period = "2016"
 if options.name.find("2017")!=-1: period = "2017"
 
@@ -89,7 +89,8 @@ def get_pad(name):
  #change the CMS_lumi variables (see CMS_lumi.py)
  CMS_lumi.lumi_7TeV = "4.8 fb^{-1}"
  CMS_lumi.lumi_8TeV = "18.3 fb^{-1}"
- CMS_lumi.lumi_13TeV = "77.3 fb^{-1}"
+ if period =="2016":  CMS_lumi.lumi_13TeV = "35.9 fb^{-1}"
+ if period =="2017":  CMS_lumi.lumi_13TeV = "77.3 fb^{-1}"
  CMS_lumi.writeExtraText = 1
  CMS_lumi.lumi_sqrtS = "13 TeV (2016+2017)" # used with iPeriod = 0, e.g. for simulation-only plots (default is an empty string)
  if options.prelim==0:
@@ -313,19 +314,19 @@ def MakePlots(histos,hdata,hsig,axis,nBins,errors=None):
         errors[0].SetLineWidth(0)
         errors[0].SetMarkerSize(0)
     
-    scaling = 1000.
+    scaling = 500.
     eff = 0.1
-    if purity =="HPHP":
+    if purity.find("HPHP") != -1:
         scaling = 5
         eff = 0.02
     
     if hsig:
       if hsig.Integral()!=0.:   
-        #hsig.Scale(1/hsig.Integral())
+        print "sig integral ",hsig.Integral()
+        hsig.Scale(scaling/hsig.Integral())
         #hsig.Scale(histos[2].Integral()*0.4)
         #hsig.Scale(scaling/hsig.Integral()*0.013146*77300.*eff)
-        print hsig.Integral()
-        hsig.Scale(scaling/0.0865311263651)#/0.270828488383)
+        #hsig.Scale(scaling/0.0865311263651)#/0.270828488383)
         #hsig.Scale(scaling/1.12624917194)
         #hsig.Scale(scaling/7.8149570876e-09)
       hsig.SetFillColor(ROOT.kGreen-6)
@@ -416,7 +417,7 @@ def MakePlots(histos,hdata,hsig,axis,nBins,errors=None):
     pt3.Draw()
 
     CMS_lumi.CMS_lumi(pad1, 4, 10)
-        
+    
     pad1.Modified()
     pad1.Update()
     
@@ -1040,18 +1041,17 @@ if __name__=="__main__":
      print model
      args  = model.getComponents()
      pdf1Name = "pdf_binJJ_"+purity+"_13TeV_"+period+"_bonly"
-     print pdf1Name
      if options.fitSignal:
       pdf1Name = "pdf_binJJ_"+purity+"_13TeV_"+period
+     print "pdf1Name ",pdf1Name
      print args
      print "Expected number of QCD events:",(args[pdf1Name].getComponents())["n_exp_binJJ_"+purity+"_13TeV_"+period+"_proc_nonRes"].getVal(),"("+period+")"
      print "Expected number of W+jets events:",(args[pdf1Name].getComponents())["n_exp_binJJ_"+purity+"_13TeV_"+period+"_proc_Wjets"].getVal(),"("+period+")"
      print "Expected number of Z+jets events:",(args[pdf1Name].getComponents())["n_exp_binJJ_"+purity+"_13TeV_"+period+"_proc_Zjets"].getVal(),"("+period+")"
-     
+
      qcd_exp        = (args[pdf1Name].getComponents())["n_exp_binJJ_"+purity+"_13TeV_"+period+"_proc_nonRes"].getVal()
      wjets_exp      = (args[pdf1Name].getComponents())["n_exp_binJJ_"+purity+"_13TeV_"+period+"_proc_Wjets"].getVal()
      zjets_exp      = (args[pdf1Name].getComponents())["n_exp_binJJ_"+purity+"_13TeV_"+period+"_proc_Zjets"].getVal()
-         
      
      
      if options.addTop:
@@ -1061,6 +1061,7 @@ if __name__=="__main__":
       workspace.var("MH").setConstant(1)
       #workspace.var("r").setRange(0,1000)
       #workspace.var("r").setVal(9)
+      print "signalName ",signalName
       print "Expected signal yields:",(args[pdf1Name].getComponents())["n_exp_final_binJJ_"+purity+"_13TeV_"+period+"_proc_"+signalName+""].getVal(),"("+period+")"
      print 
 
@@ -1177,7 +1178,6 @@ if __name__=="__main__":
      norm1_Zres[0] = (args[pdf1Name].getComponents())["n_exp_binJJ_"+purity+"_13TeV_"+period+"_proc_Zjets"].getVal()
      norm1_TThad = [0,0]
      norm1_sig = [0,0]
-     norm1_sig[0] = (args[pdf1Name].getComponents())["n_exp_final_binJJ_"+purity+"_13TeV_"+period+"_proc_"+signalName+""].getVal()
      if doFit: 
         print
         (args[pdf1Name].getComponents())["n_exp_binJJ_"+purity+"_13TeV_"+period+"_proc_nonRes"].dump()     
@@ -1207,10 +1207,10 @@ if __name__=="__main__":
             norm2_TThad[0] = 1.
             norm2_TThad[1] = 1.
         
-        norm1_sig = 0
         if options.fitSignal:
             print
             #(args[pdfName].getComponents())["n_exp_final_binJJ_"+purity+"_13TeV_proc_"+signalName+""].dump()
+            norm1_sig[0] = (args[pdf1Name].getComponents())["n_exp_final_binJJ_"+purity+"_13TeV_"+period+"_proc_"+signalName+""].getVal() 
             norm1_sig[1] = (args[pdf1Name].getComponents())["n_exp_final_binJJ_"+purity+"_13TeV_"+period+"_proc_"+signalName+""].getPropagatedError(fitresult)
             
                     
