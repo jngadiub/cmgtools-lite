@@ -1,10 +1,11 @@
 import ROOT
 from ROOT import *
 from array import array
+import sys, math
 
 class PostFitTools():
 
- def __init__(self,hist,argset,xrange,yrange,zrange,label,outdir):
+ def __init__(self,hist,argset,xrange,yrange,zrange,label,outdir,data):
   print "PostFitTools__init__!"
   self.xrange = xrange
   self.yrange = yrange
@@ -14,6 +15,35 @@ class PostFitTools():
   self.label = label
   self.output = outdir
   self.colors = [ROOT.kBlack,ROOT.kPink-1,ROOT.kAzure+1,ROOT.kAzure+1,210,210,ROOT.kMagenta,ROOT.kMagenta,ROOT.kOrange,ROOT.kOrange,ROOT.kViolet,ROOT.kViolet]
+  
+  self.ndata = {}
+  self.errdata_lo = {}
+  self.errdata_hi = {}
+  for xk, xv in self.xBins.iteritems():
+    self.ndata[xv] = {}
+    self.errdata_lo[xv] = {}
+    self.errdata_hi[xv] = {}
+    for yk, yv in self.yBins.iteritems():
+      self.ndata[xv][yv] = {}
+      self.errdata_lo[xv][yv] = {}
+      self.errdata_hi[xv][yv] = {}
+      for zk,zv in self.zBins.iteritems():
+  	 self.ndata[xv][yv][zv] = 0
+  	 self.errdata_lo[xv][yv][zv] = 0
+  	 self.errdata_hi[xv][yv][zv] = 0
+
+  data_ = ROOT.RooDataHist("data_","data_",self.argset,data)
+  for i in range(data_.numEntries()):
+    entry = data_.get(i)
+    mj1 = entry.find('MJ1').getVal()
+    mj2 = entry.find('MJ2').getVal()
+    mjj = entry.find('MJJ').getVal()
+    self.ndata[mj1][mj2][mjj] = data_.weight()
+    hi = ROOT.Double(0.)
+    lo = ROOT.Double(0.)
+    data_.weightError(lo,hi)
+    self.errdata_lo[mj1][mj2][mjj] = lo
+    self.errdata_hi[mj1][mj2][mjj] = hi
  
  def setBins(self,hist):
  
@@ -238,7 +268,130 @@ class PostFitTools():
     proj.SetBinErrorOption(ROOT.TH1.kPoisson)
     self.MakePlots(h,proj,'y',self.yBinslowedge) 
  
+ def doZprojection2(self,pdfs,data,norm,proj=0):
+    data_ = ROOT.RooDataHist("data_","data_",self.argset,data)
+    h=[]
+    lv=[]
+    dh = ROOT.TH1F("dh","dh",len(self.zBinslowedge)-1,self.zBinslowedge)
+    neventsPerBin = [0 for zv in range(len(self.zBins_redux))]
+    errPerBin = [0 for zv in range(len(self.zBins_redux))]
+    for p in pdfs:
+        h.append( ROOT.TH1F("h_"+p.GetName(),"h_"+p.GetName(),len(self.zBinslowedge)-1,self.zBinslowedge))
+        lv.append({})
+    for i in range(0,len(pdfs)):
+        for zk,zv in self.zBins_redux.iteritems():
+            lv[i][zv]=0    
+    for xk, xv in self.xBins_redux.iteritems():
+         self.argset['MJ1'].setVal(xv)
+         for yk, yv in self.yBins_redux.iteritems():
+             self.argset['MJ2'].setVal(yv)
+             for zk,zv in self.zBins_redux.iteritems():
+                 self.argset['MJJ'].setVal(zv)
+                 neventsPerBin[zk-1] += self.ndata[xv][yv][zv]
+		 errPerBin[zk-1] += self.errdata_lo[xv][yv][zv]*self.errdata_lo[xv][yv][zv]
+                 i=0
+                 binV = self.zBinsWidth[zk]*self.xBinsWidth[xk]*self.yBinsWidth[yk]     
+                 for p in pdfs:
+                    if "pdfdata" in p.GetName():
+                            lv[i][zv] += p.weight(self.argset)
+                    else:
+                            lv[i][zv] += p.getVal(self.argset)*binV
+                    i+=1
+    for i in range(0,len(pdfs)):
+        for zk,zv in self.zBins_redux.iteritems():
+            if "pdfdata" in pdfs[i].GetName():
+                h[i].Fill(zv,lv[i][zv])
+            else:
+                h[i].Fill(zv,lv[i][zv]*norm)
+     
+    for b,e in enumerate(neventsPerBin):
+     dh.SetBinContent(b+1,e)           
+     dh.SetBinError(b+1,math.sqrt(errPerBin[b]))
+    self.MakePlots(h,dh,'z',self.zBinslowedge)    
 
+ def doXprojection2(self,pdfs,data,norm,hin=0):
+    data_ = ROOT.RooDataHist("data_","data_",self.argset,data)
+    h=[]
+    lv=[]
+    proj = ROOT.TH1F("px","px",len(self.xBinslowedge)-1,self.xBinslowedge)
+    neventsPerBin = [0 for xv in range(len(self.xBins_redux))]
+    errPerBin = [0 for xv in range(len(self.xBins_redux))]
+    
+    for p in pdfs:
+        h.append( ROOT.TH1F("hx_"+p.GetName(),"hx_"+p.GetName(),len(self.xBinslowedge)-1,self.xBinslowedge))
+        lv.append({})
+    for xk, xv in self.xBins_redux.iteritems():
+         self.argset['MJ1'].setVal(xv)
+         for i in range(0,len(pdfs)):
+            lv[i][xv]=0
+         for yk, yv in self.yBins_redux.iteritems():
+             self.argset['MJ2'].setVal(yv)
+             for zk,zv in self.zBins_redux.iteritems():
+                 self.argset['MJJ'].setVal(zv)
+                 i=0
+                 binV = self.zBinsWidth[zk]*self.xBinsWidth[xk]*self.yBinsWidth[yk]
+                 neventsPerBin[xk-1] += self.ndata[xv][yv][zv]
+		 errPerBin[xk-1] += self.errdata_lo[xv][yv][zv]*self.errdata_lo[xv][yv][zv]
+                 for p in pdfs:
+                     if "postfit" in p.GetName():
+                         if "data_" in p.GetName():
+                            lv[i][xv] += p.weight(self.argset)#p.evaluate()*binV
+                         else:
+                             lv[i][xv] += p.evaluate()*binV
+                     else:
+                        lv[i][xv] += p.getVal(self.argset)*binV
+                     i+=1
+    for i in range(0,len(pdfs)):
+        for key, value in lv[i].iteritems():
+            if "pdfdata" in pdfs[i].GetName():
+                h[i].Fill(key,value)
+            else:
+                h[i].Fill(key,value*norm)
+
+    for b,e in enumerate(neventsPerBin):
+     proj.SetBinContent(b+1,e)           
+     proj.SetBinError(b+1,math.sqrt(errPerBin[b]))
+    self.MakePlots(h,proj,'x',self.xBinslowedge)  
+
+ def doYprojection2(self,pdfs,data,norm):
+    h=[]
+    lv=[]
+    proj = ROOT.TH1F("py","py",len(self.yBinslowedge)-1,self.yBinslowedge)
+    neventsPerBin = [0 for yv in range(len(self.yBins_redux))]
+    errPerBin = [0 for yv in range(len(self.yBins_redux))]
+    for p in pdfs:
+        h.append( ROOT.TH1F("hy_"+p.GetName(),"hy_"+p.GetName(),len(self.yBinslowedge)-1,self.yBinslowedge))
+        lv.append({})
+    for yk, yv in self.yBins_redux.iteritems():
+         self.argset['MJ2'].setVal(yv)
+         for i in range(0,len(pdfs)):
+            lv[i][yv]=0
+         for xk, xv in self.xBins_redux.iteritems():
+             self.argset['MJ1'].setVal(xv)
+             for zk,zv in self.zBins_redux.iteritems():
+                 self.argset['MJJ'].setVal(zv)
+                 i=0
+                 neventsPerBin[yk-1] += self.ndata[xv][yv][zv]
+		 errPerBin[yk-1] += self.errdata_lo[xv][yv][zv]*self.errdata_lo[xv][yv][zv]
+                 binV = self.zBinsWidth[zk]*self.xBinsWidth[xk]*self.yBinsWidth[yk]
+                 for p in pdfs:
+                    if "pdfdata" in p.GetName():
+                            lv[i][yv] += p.weight(self.argset)#p.evaluate()*binV
+                    else:
+                            lv[i][yv] += p.getVal(self.argset)*binV
+                    i+=1
+    for i in range(0,len(pdfs)):
+        for key, value in lv[i].iteritems():
+            if "pdfdata" in pdfs[i].GetName():
+                h[i].Fill(key,value)
+            else:
+                h[i].Fill(key,value*norm)
+
+    for b,e in enumerate(neventsPerBin):
+     proj.SetBinContent(b+1,e)           
+     proj.SetBinError(b+1,math.sqrt(errPerBin[b]))
+    self.MakePlots(h,proj,'y',self.yBinslowedge) 
+        
  def addPullPlot(self,hdata,hprefit,hpostfit,nBins):
     #print "make pull plots: (data-fit)/sigma_data"
     N = hdata.GetNbinsX()
@@ -348,9 +501,8 @@ class PostFitTools():
     gt.GetYaxis().SetTitleOffset(0.4);
     gt.GetYaxis().SetTitleFont(42);
     gt.GetXaxis().SetNdivisions(505)
-    #gpre.SetHistogram(gt);
-    gpost.SetHistogram(gt);       
-    return [gpre,gpost] 
+    gpost.SetHistogram(gt);     
+    return [gpost] 
 
  def MakePlots(self,histos,hdata,axis,nBins):
    
@@ -453,7 +605,7 @@ class PostFitTools():
     pad2.cd()
     graphs = self.addRatioPlot(hdata,histos[0],histos[1],nBins)
     #graphs[0].Draw("AP")
-    graphs[1].Draw("AP")
+    graphs[0].Draw("AP")
     c.SaveAs(self.output+"PostFit_"+htitle.replace(' ','_')+"_"+self.label+".png")
     c.SaveAs(self.output+"PostFit_"+htitle.replace(' ','_')+"_"+self.label+".root")
     c.SaveAs(self.output+"PostFit_"+htitle.replace(' ','_')+"_"+self.label+".pdf")
