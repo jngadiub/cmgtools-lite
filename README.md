@@ -82,9 +82,9 @@ python Projections3DHisto.py --mc results_2016/JJ_2016_nonRes_VV_HPLP_altshape2.
 fit HPHP MC with post-fit HPLP kernel
 
 ```
-python transferKernel.py -i results_2016/JJ_2016_nonRes_VV_HPHP.root --sample pythia --year 2016 -p z --pdfIn results_2016/JJ_2016_nonRes_3D_VV_HPLP.root 
-python transferKernel.py -i results_2016/JJ_2016_nonRes_VV_HPHP.root --sample herwig --year 2016 -p z --pdfIn results_2016/JJ_2016_nonRes_3D_VV_HPLP.root 
-python transferKernel.py -i results_2016/JJ_2016_nonRes_VV_HPHP.root --sample madgraph --year 2016 -p z --pdfIn results_2016/JJ_2016_nonRes_3D_VV_HPLP.root
+python transferKernel.py -i results_2016/JJ_2016_nonRes_VV_HPHP.root --sample pythia --year 2016 -p z --pdfIn save_new_shapes_2016_pythia_VV_HPLP_3D.root
+python transferKernel.py -i results_2016/JJ_2016_nonRes_VV_HPHP.root --sample herwig --year 2016 -p z --pdfIn save_new_shapes_2016_herwig_VV_HPLP_3D.root 
+python transferKernel.py -i results_2016/JJ_2016_nonRes_VV_HPHP.root --sample madgraph --year 2016 -p z --pdfIn save_new_shapes_2016_madgraph_VV_HPLP_3D.root
 ```
 
 merge 1Dx2Dx2D HPHP kernels
