@@ -69,7 +69,7 @@ class DatacardTools():
            card.addParametricYieldWithUncertainty("%s"%sig,ncontrib,resultsDir+"/JJ_%s_%s_VV_%s_yield.json"%(sig,dataset,p),1,'CMS_tau21_PtDependence',self.vtag_pt_dependence[category],100.)
 
  def AddSingleSignal(self,card,dataset,category,sig,resultsDir,ncontrib):
-
+  #NB since the signals are scaled by xsec BulkG = BulkGWW + BulkGZZ, they need to be rescaled accordingly when producing the limit plot!!! 
   if sig=='ZprimeWW':
    card.addMVVSignalParametricShape("%s_MVV"%sig,"MJJ",resultsDir+"/JJ_%s_%s_MVV.json"%(sig,dataset),{'CMS_scale_j':1},{'CMS_res_j':1.0})
    card.addMJJSignalParametricShapeNOEXP("%s_Wqq1"%sig,"MJ1" ,resultsDir+"/JJ_%s_%s_MJrandom_"%(sig,dataset)+category+".json",{'CMS_scale_prunedj':1.},{'CMS_res_prunedj':1.},self.scales[dataset])
