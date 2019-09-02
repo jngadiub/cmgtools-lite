@@ -45,8 +45,11 @@ for sig in signals:
       cmd_combo=cmd_combo+" "+cat.replace('_%s'%sig,'')+'=datacard_'+cat+'.txt '
       cardName='datacard_'+cat+'.txt'
       workspaceName='workspace_'+cat+outlabel+'.root'
-            
-      Tools.AddSignal(card,dataset,p,sig,resultsDir[dataset],ncontrib)                
+
+      if sig.find("VV")!=-1 or options.run.find("WV")!=-1 :            
+        Tools.AddSignal(card,dataset,p,sig,resultsDir[dataset],ncontrib)
+      else:
+        Tools.AddSingleSignal(card,dataset,p,sig,resultsDir[dataset],ncontrib)                 
       ncontrib+=1
 
       rootFileMVV = resultsDir[dataset]+'/JJ_%s_WJets_MVV_'%dataset+p+'.root' 
