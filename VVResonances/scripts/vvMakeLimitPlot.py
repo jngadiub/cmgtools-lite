@@ -85,7 +85,7 @@ if options.hvt>=0: #the = is only needed to get the right xsec sf for the single
    func2 = w.function('BulkGZZ_JJ_VV_HPHP_13TeV_2016_sigma') #orig 
   elif options.hvt == 0 :
    if "WprimeWZ"  in options.sig:
-   func = w.function('WprimeWZ_JJ_VV_HPHP_13TeV_2016_sigma')
+    func = w.function('WprimeWZ_JJ_VV_HPHP_13TeV_2016_sigma')
    if "BulkGWW" in options.sig:
     func = w.function('BulkGWW_JJ_VV_HPHP_13TeV_2016_sigma') 
    if "BulkGZZ" in options.sig:
