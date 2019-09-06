@@ -220,6 +220,8 @@ def doAll():
         print gr.GetY()[i]
 
       gr.SetLineColor(ROOT.TColor.GetColor(colors[ii][3]))
+      gr.SetLineStyle(2)
+      gr.SetLineWidth(2)
       gr.SetMarkerColor(ROOT.TColor.GetColor(colors[ii][3]))
       gr.SetMarkerStyle(24)
       gr.GetYaxis().SetTitle("a.u.")
@@ -235,9 +237,8 @@ def doAll():
       gr.GetXaxis().SetLabelSize(0.05)
       ff = gr.GetFunction("func")
       gr.Fit(ff)
-      ff.SetLineColor(ROOT.TColor.GetColor(colors[ii][3]))
-      ff.SetLineStyle(2)
-      ff.SetLineWidth(2)
+      ff.SetLineColor(0) 
+      ff.SetLineWidth(0)
       #ff1000.Draw("same")
       leg.AddEntry(gr, legs[ii], "L")
       #    if options.var == 'mVV':gr.SetMaximum(0.45)
@@ -249,11 +250,11 @@ def doAll():
 
 
 
-    gr_gzz.Draw("AP")
-    gr_w.Draw("P")
-    gr_z.Draw("P")
-    gr_gww.Draw("P")
-    gr_zh.Draw("P")
+    gr_gzz.Draw("APL")
+    gr_w.Draw("PL")
+    gr_z.Draw("PL")
+    gr_gww.Draw("PL")
+    gr_zh.Draw("PL")
     leg.Draw("same")
  
     
