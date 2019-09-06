@@ -9,7 +9,7 @@ from CMGTools.VVResonances.statistics.Fitter import Fitter
 from math import log
 import os, sys, re, optparse,pickle,shutil,json
 ROOT.gROOT.SetBatch(True)
-testcorr= True
+ROOT.gStyle.SetOptStat(0)
 
 def returnString(func):
     st='0'
@@ -73,21 +73,16 @@ def getMJPdf(mvv_min,mvv_max,MH,postfix="",fixPars="1"):
                     if par.find("N2")!=-1:
                         sign2.setVal(float(parVal[1]))
                         sign2.setConstant(1)
-        print "================================================"
-        print fixPars
+       
 	function = ROOT.RooDoubleCB(pdfName, pdfName, var, mean, sigma, alpha, sign,  alpha2, sign2)  
 	return function,var,[mean,sigma,alpha,alpha2,sign,sign2]
 
 def dodCBFits(h1,mass,prefix,fixpars):
-    #h1 = plotter.drawTH1Binned(options.mvv,options.cut+"*(jj_LV_mass>%f&&jj_LV_mass<%f)*(jj_l1_softDrop_mass >65 && jj_l1_softDrop_mass < 85)"%(0.80*mass,1.2*mass),"1",binning)
     
     func,var,params = getMJPdf(1126,5000,mass,options.sample,fixpars)
     data1 = ROOT.RooDataHist("dh","dh", ROOT.RooArgList(var), ROOT.RooFit.Import(h1)) 
     
-    print data1
     
-    print func
-    print var
     func.fitTo(data1,ROOT.RooFit.Range(mass*0.6,mass*1.3),ROOT.RooFit.PrintEvalErrors(-1))
     
     c3 = ROOT.TCanvas("test3","test3",400,400)
@@ -104,6 +99,7 @@ def dodCBFits(h1,mass,prefix,fixpars):
 parser = optparse.OptionParser()
 parser.add_option("-s","--sample",dest="sample",default='',help="Type of sample")
 parser.add_option("-c","--cut",dest="cut",help="Cut to apply for shape",default='')
+parser.add_option("--addcut",dest="addcut",help="Cut to apply for shape",default='')
 parser.add_option("-o","--output",dest="output",help="Output JSON",default='')
 parser.add_option("-V","--MVV",dest="mvv",help="mVV variable",default='')
 parser.add_option("--fix",dest="fixPars",help="Fixed parameters",default="")
@@ -116,9 +112,14 @@ parser.add_option("-t","--triggerweight",dest="triggerW",action="store_true",hel
 
 (options,args) = parser.parse_args()
 #define output dictionary
+print options.addcut
 
 samples={}
 graphs={'MEAN':ROOT.TGraphErrors(),'SIGMA':ROOT.TGraphErrors(),'ALPHA1':ROOT.TGraphErrors(),'N1':ROOT.TGraphErrors(),'ALPHA2':ROOT.TGraphErrors(),'N2':ROOT.TGraphErrors()}
+
+testcorr= False
+if options.sample.find("ZH")!=-1 or options.sample.find("WZ")!=-1:
+    testcorr = True
 
 for filename in os.listdir(args[0]):
     if not (filename.find(options.sample)!=-1):
@@ -145,12 +146,48 @@ for filename in os.listdir(args[0]):
 
 #Now we have the samples: Sort the masses and run the fits
 N=0
+allgraphs = {}
 
-Fhists=ROOT.TFile("massHISTOS_"+options.output,"RECREATE")
+if options.sample.find("ZH")!=-1 or options.sample.find("WZ")!=-1:
+    for mass in samples.keys():
+        if samples[mass].find("WH")!=-1:
+            h = ROOT.TH2F("corr_mean_M"+str(mass),"corr_mean_M"+str(mass),2,array("f",[65,105,145]),2,array("f",[65,105,145]))
+        if samples[mass].find("ZH")!=-1:
+            h = ROOT.TH2F("corr_mean_M"+str(mass),"corr_mean_M"+str(mass),2,array("f",[85,105,145]),2,array("f",[85,105,145]))
+        if samples[mass].find("WZ")!=-1:
+            h = ROOT.TH2F("corr_mean_M"+str(mass),"corr_mean_M"+str(mass),2,array("f",[76,86,94]),2,array("f",[76,86,94]))
+        allgraphs[mass] = h
+    allgraphs_sigma = {}
+    for mass in samples.keys():
+        h = ROOT.TH2F("corr_sigma_M"+str(mass),"corr_sigma_M"+str(mass),2,array("f",[55,105,215]),2,array("f",[55,105,215]))
+        if samples[mass].find("WZ")!=-1:
+             h = ROOT.TH2F("corr_sigma_M"+str(mass),"corr_sigma_M"+str(mass),2,array("f",[55,85,215]),2,array("f",[55,85,215]))
+        allgraphs_sigma[mass] = h
+
+    graph_sum_sigma = ROOT.TH2F("corr_sigma","corr_sigma",2,array("f",[55,105,215]),2,array("f",[55,105,215]))
+    if samples[mass].find("WZ")!=-1:
+        graph_sum_sigma = ROOT.TH2F("corr_sigma","corr_sigma",2,array("f",[55,85,215]),2,array("f",[55,85,215]))
+    if options.sample.find("WH")!=-1:
+        graph_sum_mean  = ROOT.TH2F("corr_mean","corr_mean",2,array("f",[65,105,145]),2,array("f",[65,105,145]))
+    if samples[mass].find("ZH")!=-1:
+        graph_sum_mean = ROOT.TH2F("corr_mean","corr_mean",2,array("f",[85,105,145]),2,array("f",[85,105,145]))
+    if samples[mass].find("WZ")!=-1:
+        graph_sum_mean = ROOT.TH2F("corr_mean","corr_mean",2,array("f",[76,86,94]),2,array("f",[76,86,94]))
+    minmjet = 55
+    maxmjet = 215 
+    binsmjet = 80
+    bins_all = [[5,25],[25,50]]
+    binmidpoint = 25
+    if options.sample.find("WH")!=-1:
+        bins_all = [[5,15],[15,50]]
+        binmidpoint = 15
+    if options.sample.find("WZ")!=-1:
+        bins_all = [[5,15],[15,25]]
+        binmidpoint = 15
+
 
 
 for mass in sorted(samples.keys()):
-
     print 'fitting',str(mass) 
     plotter=TreePlotter(args[0]+'/'+samples[mass]+'.root','AnalysisTree')
     plotter.addCorrectionFactor('genWeight','tree')
@@ -164,67 +201,44 @@ for mass in sorted(samples.keys()):
    
     fitter.w.var("MH").setVal(mass)
 
+    extra_extra_cut = "&& (jj_LV_mass>%f&&jj_LV_mass<%f)"%(0.8*mass,1.1*mass)
     binning= truncate(getBinning(options.binsMVV,options.min,options.max,100),0.80*mass,1.2*mass)    
-    histo = plotter.drawTH1Binned(options.mvv,options.cut+"*(jj_LV_mass>%f&&jj_LV_mass<%f)"%(0.80*mass,1.2*mass),"1",binning)
+    histo = plotter.drawTH1Binned(options.mvv,options.cut+extra_extra_cut,"1",binning)
     fitter.importBinnedData(histo,['MVV'],'data')
     ps = []
     if testcorr==True:
-        print "do 2D histos"
-        histos2D = plotter.drawTH2("jj_LV_mass:jj_l2_softDrop_mass",options.cut,"1",80,55,215,50,1126,5000)
-        ctest = ROOT.TCanvas("test","test",400,400)
-        histos2D.Draw("colz")
-        ctest.SaveAs(samples[mass]+"_M"+str(mass)+"_2D.pdf")
-        ctest.SaveAs(samples[mass]+"_M"+str(mass)+"_2D.png")
+        histos2D = plotter.drawTH2("jj_LV_mass:jj_l2_softDrop_mass",options.cut.replace(options.addcut,"1"),"1",binsmjet,minmjet,maxmjet,100,options.min,options.max)
         proj = histos2D.ProjectionX("p")
+      
         
-        graph_mean = ROOT.TGraphErrors()
-        graph_sigma = ROOT.TGraphErrors()
-        graph_alpha = ROOT.TGraphErrors()
-        graph_alpha2 = ROOT.TGraphErrors()
-        graph_n = ROOT.TGraphErrors()
-        graph_n2 = ROOT.TGraphErrors()
-        n=-1
-        bins_all = [[0,80],[0,10],[10,20],[20,40],[40,80]]
-        if samples[mass].find("hbb")==-1:
-            bins_all = [[0,80],[0,11],[11,16],[16,22],[22,80]]
+        histos3D = plotter.drawTH3("jj_LV_mass:jj_l2_softDrop_mass:jj_l1_softDrop_mass",options.cut.replace(options.addcut,"1")+extra_extra_cut,"1",binsmjet,minmjet,maxmjet,binsmjet,minmjet,maxmjet,100,options.min,options.max)
+       
+        hall = histos3D.ProjectionZ("all",0,binmidpoint,binmidpoint,binsmjet)
+        par = dodCBFits(hall,mass,"all","1")
+        mean = par["MEAN"] 
+        sigma = par["SIGMA"] 
+        print " mean " +str(mean)
+        n=0
         for bins in bins_all:
-            ps .append( histos2D.ProjectionY("p2"+str(n+1),bins[0],bins[1]))#,proj.GetBin(55),proj.GetBin(85))
-            par = dodCBFits(ps[-1],mass,str(n+1),options.fixPars)
-            if n==-1:
-                mean = par["MEAN"] #fit.GetParameter(1)
-                sigma = par["SIGMA"] #fit.GetParameter(2)
-                alpha = par["ALPHA1"]
-                alpha2 = par["ALPHA2"]
-                n1 = par["N1"]
-                n2 = par["N2"]
-                n+=1
-            else:
-                graph_mean.SetPoint(n,proj.GetBinCenter(bins[0])+ (proj.GetBinCenter(bins[1])-proj.GetBinCenter(bins[0]))/2. ,par["MEAN"]/mean)
-                graph_mean.SetPointError(n,(proj.GetBinCenter(bins[1])-proj.GetBinCenter(bins[0]))/2., par["MEANERR"]/mean)
-                #graph_mean.SetPointError(n,0, fit.GetParError(1)/mean)
-                graph_sigma.SetPoint(n,proj.GetBinCenter(bins[0])+ (proj.GetBinCenter(bins[1])-proj.GetBinCenter(bins[0]))/2. ,par["SIGMA"]/sigma)
-                graph_sigma.SetPointError(n,(proj.GetBinCenter(bins[1])-proj.GetBinCenter(bins[0]))/2., par["SIGMAERR"]/sigma)
-                graph_alpha.SetPoint(n,proj.GetBinCenter(bins[0])+ (proj.GetBinCenter(bins[1])-proj.GetBinCenter(bins[0]))/2. ,par["ALPHA1"]/alpha)
-                graph_alpha.SetPointError(n,(proj.GetBinCenter(bins[1])-proj.GetBinCenter(bins[0]))/2., par["ALPHA1ERR"]/alpha)
-                graph_alpha2.SetPoint(n,proj.GetBinCenter(bins[0])+ (proj.GetBinCenter(bins[1])-proj.GetBinCenter(bins[0]))/2. ,par["ALPHA2"]/alpha2)
-                graph_alpha2.SetPointError(n,(proj.GetBinCenter(bins[1])-proj.GetBinCenter(bins[0]))/2., par["ALPHA2ERR"]/alpha2)
-                graph_n.SetPoint(n,proj.GetBinCenter(bins[0])+ (proj.GetBinCenter(bins[1])-proj.GetBinCenter(bins[0]))/2. ,par["N1"]/n1)
-                graph_n.SetPointError(n,(proj.GetBinCenter(bins[1])-proj.GetBinCenter(bins[0]))/2., par["N1ERR"]/n1)
-                graph_n2.SetPoint(n,proj.GetBinCenter(bins[0])+ (proj.GetBinCenter(bins[1])-proj.GetBinCenter(bins[0]))/2. ,par["N2"]/n2)
-                graph_n2.SetPointError(n,(proj.GetBinCenter(bins[1])-proj.GetBinCenter(bins[0]))/2., par["N2ERR"]/n2)
-                
-                n+=1
+          for bins2 in bins_all:
+            ps .append( histos3D.ProjectionZ("p2"+str(n+1),bins[0],bins[1],bins2[0],bins2[1]))
+            
+            par = dodCBFits(ps[-1],mass,str(n+1),"1")
+            b1 = proj.GetBinCenter(bins[0])+ (proj.GetBinCenter(bins[1])-proj.GetBinCenter(bins[0]))/2. 
+            b2 = proj.GetBinCenter(bins2[0])+ (proj.GetBinCenter(bins2[1])-proj.GetBinCenter(bins2[0]))/2.
+            if b1 < 105 and b1 > 85: b1 = 90
+            if b2 < 105 and b2 > 85: b2 = 90
+            if b1 < 85 and b1 > 65: b1 = 80
+            if b2 < 85 and b2 > 65: b2 = 80
+            if b1 > 105: b1 = 120
+            if b2 > 105: b2 = 120
+            print "mean ratio "+str(par["MEAN"])+" / "+str(mean)
+            
+            allgraphs[mass].Fill(b1 ,b2 , par['MEAN']/mean)
+            allgraphs_sigma[mass].Fill(b1 ,b2 , par['SIGMA']/sigma)
+            n+=1
        
-        graph_mean.SetName("corr_mean")
-        graph_sigma.SetName("corr_sigma")
-        graph_alpha.SetName("corr_alpha")
-        graph_alpha2.SetName("corr_alpha2")
-        graph_n.SetName("corr_n")
-        graph_n2.SetName("corr_n2")
-       
-
-    Fhists.cd()
-    histo.Write("%i"%mass)
+   
     roobins = ROOT.RooBinning(len(binning)-1,array("d",binning))
    
    
@@ -252,21 +266,23 @@ for mass in sorted(samples.keys()):
     N=N+1
     fitter.delete()
     
-Fhists.Write()
-Fhists.Close()        
-F=ROOT.TFile(options.output,"RECREATE")
-F.cd()
+
+F =ROOT.TFile(options.output,"RECREATE")
 for name,graph in graphs.iteritems():
     graph.Write(name)
  
-if testcorr==True: 
-    graph_mean   .Write()
-    graph_sigma  .Write()
-    graph_alpha  .Write()
-    graph_alpha2 .Write()
-    graph_n      .Write()
-    graph_n2     .Write()
+if testcorr==True:
+    for mass in allgraphs.keys():
+        graph_sum_sigma.Add(allgraphs_sigma[mass])
+        graph_sum_mean.Add(allgraphs[mass])
+    graph_sum_sigma.Scale(1/float(N))
+    graph_sum_mean .Scale(1/float(N))
+    graph_sum_sigma.Write()
+    graph_sum_mean .Write()
+    print graph_sum_mean.Integral()
+
 F.Close()
 
 print 'wrote file '+options.output
+
             

@@ -6,16 +6,18 @@ from CMGTools.VVResonances.statistics.DataCardMaker import DataCardMaker
 cmd='combineCards.py '
 
 sf_qcd = 1.0
-pseudodata = ""
-outlabel = ""
+pseudodata = ""#"ZprimeZH"
+outlabel = ""#"sigonly_ZprimeZH_M2000"
 
 datasets=['2016']#,'2017']
+
 resultsDir = {'2016':'results_2016','2017':'results_2017'}
 
 lumi = {'2016':35900,'2017':41367}
 lumi_unc = {'2016':1.025,'2017':1.023}
 
 scales = {"2017" :[0.983,1.08], "2016":[1.014,1.086]}
+scalesHiggs = {"2017" :[1.,1.], "2016":[1.,1.]}
 
 vtag_unc = {'VV_HPHP':{},'VV_HPLP':{},'VV_LPLP':{}}
 vtag_unc['VV_HPHP'] = {'2016':'1.232/0.792','2017':'1.269/0.763'}
@@ -29,7 +31,7 @@ purities= ['VV_HPLP','VV_HPHP']
 #signals = ["BulkGWW", "BulkGZZ","ZprimeWW","WprimeWZ","VprimeWV","'ZprimeZH'"]
 signals = ["BulkGVV"]
 
-Tools = DatacardTools(scales,vtag_pt_dependence,lumi_unc,vtag_unc,sf_qcd,pseudodata,outlabel)
+Tools = DatacardTools(scales,scalesHiggs,vtag_pt_dependence,lumi_unc,vtag_unc,sf_qcd,pseudodata,outlabel)
 
 for sig in signals:
   cmd ="combineCards.py"
@@ -64,6 +66,7 @@ for sig in signals:
       
       #rootFile3DPDF = resultsDir[dataset]+'/JJ_2016_nonRes_3D_VV_HPLP.root'
       rootFile3DPDF = resultsDir[dataset]+"/save_new_shapes_%s_pythia_"%dataset+p+"_3D.root"
+
       rootFileNorm = resultsDir[dataset]+"/JJ_%s_nonRes_"%dataset+p+".root"   
       Tools.AddNonResBackground(card,dataset,p,rootFile3DPDF,rootFileNorm,ncontrib) 
 
@@ -78,7 +81,7 @@ for sig in signals:
        histName="data_obs"
        scaleData=1.0
       if pseudodata=="WprimeWZ":
-       rootFileData = resultsDir[dataset]+"/JJ_WprimeWZ_VV_HPLP_M2000.root" 
+       rootFileData = resultsDir[dataset]+"/JJ_WprimeWZ_VV_HPLP_M4500.root" 
        histName="data_obs"    
        scaleData=1.0
       Tools.AddData(card,rootFileData,histName,scaleData)
@@ -95,7 +98,7 @@ for sig in signals:
     del card
     #make combined HPHP+HPLP card   
     combo_card = 'datacard_'+cat.replace("_HPHP","").replace("_HPLP","").replace("_LPLP","")+'.txt'
-    combo_workspace = 'workspace_'+cat.replace("_HPHP","").replace("_HPLP","").replace("_LPLP","")+pseudodata+'.root'
+    combo_workspace = 'workspace_'+cat.replace("_HPHP","").replace("_HPLP","").replace("_LPLP","")+'.root'
     os.system('rm %s'%combo_card)
     cmd_combo+=' >> %s'%combo_card
     print cmd_combo
@@ -106,7 +109,7 @@ for sig in signals:
   
   #make combine 2016+2017 card
   combo_card = 'datacard_'+cat.replace("_HPHP","").replace("_HPLP","").replace("_LPLP","").replace('_2016','').replace('_2017','')+'.txt'
-  combo_workspace = 'workspace_'+cat.replace("_HPHP","").replace("_HPLP","").replace("_LPLP","").replace('_2016','').replace('_2017','')+pseudodata+'.root'
+  combo_workspace = 'workspace_'+cat.replace("_HPHP","").replace("_HPLP","").replace("_LPLP","").replace('_2016','').replace('_2017','')+'.root'
   os.system('rm %s'%combo_card)
   cmd+=' >> %s'%combo_card
   print cmd
@@ -117,10 +120,5 @@ for sig in signals:
   t2wcmd = "text2workspace.py %s -o %s"%(combo_card,combo_workspace)
   print t2wcmd
   os.system(t2wcmd)
-  
-  
-  
-
-
 
 

@@ -27,7 +27,7 @@ parser.add_option("-z","--zrange",dest="zrange",help="set range for z bins in pr
 parser.add_option("-p","--projection",dest="projection",help="choose which projection should be done",default="xyz")
 parser.add_option("-d","--data",dest="data",action="store_true",help="make also postfit plots",default=True)
 parser.add_option("-l","--label",dest="label",help="add extra label such as pythia or herwig",default="")
-parser.add_option("--log",dest="log",help="write fit result to log file",default="fit_results.log")
+#parser.add_option("--log",dest="log",help="write fit result to log file",default="fit_results.log")
 parser.add_option("--pdfz",dest="pdfz",help="name of pdfs lie PTZUp etc",default="")
 parser.add_option("--pdfx",dest="pdfx",help="name of pdfs lie PTXUp etc",default="")
 parser.add_option("--pdfy",dest="pdfy",help="name of pdfs lie PTYUp etc",default="")
@@ -35,6 +35,7 @@ parser.add_option("-s","--signal",dest="fitSignal",action="store_true",help="do 
 parser.add_option("-t","--addTop",dest="addTop",action="store_true",help="Fit top",default=False)
 parser.add_option("-M","--mass",dest="signalMass",type=float,help="signal mass",default=1560.)
 parser.add_option("--prelim",dest="prelim",type=int,help="add preliminary label",default=0)
+parser.add_option("--log",dest="log",help="write output in logfile given as argument here!",default="chi2.log")
 
 (options,args) = parser.parse_args()
 ROOT.gStyle.SetOptStat(0)
@@ -45,6 +46,31 @@ colors = [ROOT.kGray+2,ROOT.kRed,ROOT.kBlue,ROOT.kGray+1,210,210,ROOT.kMagenta,R
 signalName = "BulkGWW"
 period = "2016"
 if options.name.find("2017")!=-1: period = "2017"
+
+
+def calculateChi2ForSig(hsig,pred,axis,logfile,label):
+    if axis.find("z")!=-1:
+        #logfile.open("testChi2.log","rw")
+        chi2 = getChi2proj(pred,hsig)
+        #print hsig.GetEntries(),hsig.Integral()
+        logfile.write(label+"\n")
+        logfile.write("full chi2 \n ")
+        logfile.write( "Projection %s: Chi2/ndf = %.2f/%i"%(axis,chi2[0],chi2[1])+"= %.2f"%(chi2[0]/chi2[1])+" prob = "+str(ROOT.TMath.Prob(chi2[0],chi2[1]))+"\n")
+        logfile.write( "\n calculate Chi2 value around 2RMS of the mean value \n")
+        
+        mean = hsig.GetMean()
+        rms = hsig.GetRMS()
+        logfile.write( "mean : "+str(mean)+"  RMS "+str(rms)+" \n")
+        chi2 = getChi2proj(pred,hsig,mean-rms,mean+rms)
+        print hsig.GetEntries(),hsig.Integral()
+        logfile.write( "Projection %s: Chi2/ndf = %.2f/%i"%(axis,chi2[0],chi2[1])+"= %.2f"%(chi2[0]/chi2[1])+" prob = "+str(ROOT.TMath.Prob(chi2[0],chi2[1]))+"\n")
+        
+        logfile.write("\n chi2 basen on window 10% around the mean:  \n")
+        chi2 = getChi2proj(pred,hsig,mean*0.9,mean*1.1)
+        print hsig.GetEntries(),hsig.Integral()
+        logfile.write( "Projection %s: Chi2/ndf = %.2f/%i"%(axis,chi2[0],chi2[1])+"= %.2f"%(chi2[0]/chi2[1])+" prob = "+str(ROOT.TMath.Prob(chi2[0],chi2[1]))+"\n")
+    
+    
 
 def get_canvas(cname):
 
@@ -221,7 +247,7 @@ def reduceBinsToRange(Bins,r):
     return result
 
 
-def MakePlots(histos,hdata,hsig,axis,nBins,errors=None):
+def MakePlots(histos,hdata,hsig,axis,nBins,normsig = 1.,errors=None):
    
     extra1 = ''
     extra2 = ''
@@ -239,7 +265,7 @@ def MakePlots(histos,hdata,hsig,axis,nBins,errors=None):
      htitle = "Z-Proj. x : "+options.xrange+" y : "+options.yrange
      xtitle = "Dijet invariant mass [GeV]"
      ymin = 0.2
-     ymax = hdata.GetMaximum()*10
+     ymax = hdata.GetMaximum()*50000
      extra1 = xrange.split(',')[0]+' < m_{jet1} < '+ xrange.split(',')[1]+' GeV'
      extra2 = yrange.split(',')[0]+' < m_{jet2} < '+ yrange.split(',')[1]+' GeV'
     elif axis=='x':
@@ -277,8 +303,8 @@ def MakePlots(histos,hdata,hsig,axis,nBins,errors=None):
     histos[0].GetYaxis().SetTitleOffset(1.3)
     histos[0].GetYaxis().SetTitle("Events")
     histos[0].GetYaxis().SetTitleOffset(1.3)
-    histos[0].GetYaxis().SetTitle("Events/ 2 GeV")
-    if axis == 'z': histos[0].GetYaxis().SetTitle("Events/ 100 GeV")
+    histos[0].GetYaxis().SetTitle("Events / 2 GeV")
+    if axis == 'z': histos[0].GetYaxis().SetTitle("Events / 100 GeV")
     histos[0].GetYaxis().SetTitleSize(0.06)
     histos[0].GetYaxis().SetLabelSize(0.06)
     histos[0].Draw('HIST')
@@ -314,6 +340,8 @@ def MakePlots(histos,hdata,hsig,axis,nBins,errors=None):
         errors[0].SetLineWidth(0)
         errors[0].SetMarkerSize(0)
     
+    
+    #change this scaling in case you don't just want to plot signal! has to match number of generated signal events
     scaling = 500.
     eff = 0.1
     if purity.find("HPHP") != -1:
@@ -322,13 +350,11 @@ def MakePlots(histos,hdata,hsig,axis,nBins,errors=None):
     
     if hsig:
       if hsig.Integral()!=0.:   
-        print "sig integral ",hsig.Integral()
-        hsig.Scale(scaling/hsig.Integral())
-        #hsig.Scale(histos[2].Integral()*0.4)
-        #hsig.Scale(scaling/hsig.Integral()*0.013146*77300.*eff)
-        #hsig.Scale(scaling/0.0865311263651)#/0.270828488383)
-        #hsig.Scale(scaling/1.12624917194)
-        #hsig.Scale(scaling/7.8149570876e-09)
+        hsig.Scale(scaling/normsig)
+#        print "sig integral ",hsig.Integral()
+#        hsig.Scale(scaling/hsig.Integral())
+ 
+
       hsig.SetFillColor(ROOT.kGreen-6)
       hsig.SetLineColor(ROOT.kBlack)
       hsig.SetLineStyle(1)
@@ -377,6 +403,7 @@ def MakePlots(histos,hdata,hsig,axis,nBins,errors=None):
     leg.Draw("same")
     
     #errors[0].Draw("E2same")
+    print "projection "+extra1+"  "+extra2+" \n"
     
     chi2 = getChi2proj(histos[0],hdata)
     print hdata.GetEntries(),hdata.Integral()
@@ -393,7 +420,8 @@ def MakePlots(histos,hdata,hsig,axis,nBins,errors=None):
     pt.AddText("Prob = %.3f"%ROOT.TMath.Prob(chi2[0],chi2[1]))
     #pt.Draw()
 
-    pt2 = ROOT.TPaveText(0.55,0.29,0.99,0.4,"NDC")
+    #pt2 = ROOT.TPaveText(0.55,0.29,0.99,0.4,"NDC")
+    pt2 = ROOT.TPaveText(0.55,0.39,0.99,0.52,"NDC")
     pt2.SetTextFont(42)
     pt2.SetTextSize(0.05)
     pt2.SetTextAlign(12)
@@ -411,10 +439,10 @@ def MakePlots(histos,hdata,hsig,axis,nBins,errors=None):
     pt3.SetFillColor(0)
     pt3.SetBorderSize(0)
     pt3.SetFillStyle(0)
-    pt3.AddText("%s category"%purity)
+    #pt3.AddText("%s category"%purity)
     #pt3.AddText(extra1)
     #pt3.AddText(extra2)
-    pt3.Draw()
+    #pt3.Draw()
 
     CMS_lumi.CMS_lumi(pad1, 4, 10)
     
@@ -460,6 +488,8 @@ def MakePlots(histos,hdata,hsig,axis,nBins,errors=None):
     #c.RedrawAxis()
     #frame = c.GetFrame()
     #frame.Draw()
+    
+    calculateChi2ForSig(hdata,hsig,axis,logfile,"\n \n projection "+extra1+"  "+extra2+" \n")
     if options.prelim==0:
         c.SaveAs(options.output+"PostFit"+options.label+"_"+htitle.replace(' ','_').replace('.','_').replace(':','_').replace(',','_')+".png")
         c.SaveAs(options.output+"PostFit"+options.label+"_"+htitle.replace(' ','_').replace('.','_').replace(':','_').replace(',','_')+".pdf")
@@ -509,9 +539,11 @@ def doZprojection(pdfs,data,norm_nonres,norm_Wres,pdf_sig,norm_sig,norm_Zres,nor
                     lv[i][zv] += p.getVal(argset)*binV
                     i+=1
 		 if pdf_sig:
-                     for s in range(0,100):
-                        MJJ.setVal(zv-zBinsWidth[zk]//2.+s*zBinsWidth[zk]/100.)
-                        lv1_sig[0][zv] += pdf_sig.getVal(argset)*binV/100.
+                     lv1_sig[0][zv] += pdf_sig.getVal(argset)*binV
+                     #print pdf_sig.getVal(argset)
+                     #for s in range(0,100):
+                     #   MJJ.setVal(zv-zBinsWidth[zk]//2.+s*zBinsWidth[zk]/100.)
+                     #   lv1_sig[0][zv] += pdf_sig.getVal(argset)*binV/100.
 
 		 		    
     for i in range(0,len(pdfs)):
@@ -558,8 +590,8 @@ def doZprojection(pdfs,data,norm_nonres,norm_Wres,pdf_sig,norm_sig,norm_Zres,nor
     dh.SetBinErrorOption(ROOT.TH1.kPoisson)
     if doFit:
         errors = draw_error_band(htot,norm_nonres[0]+norm_Wres[0]+norm_Zres[0]+norm_TThad[0],math.sqrt(norm_nonres[1]*norm_nonres[1]+norm_Wres[1]*norm_Wres[1]+norm_Zres[1]*norm_Zres[1]+norm_TThad[1]*norm_TThad[1]),pdfs[-1],zBinslowedge,'z')
-        MakePlots(hfinals,dh,htot_sig,'z',zBinslowedge,errors)
-    else: MakePlots(hfinals,dh,htot_sig,'z',zBinslowedge)
+        MakePlots(hfinals,dh,htot_sig,'z',zBinslowedge,norm_sig[0],errors)
+    else: MakePlots(hfinals,dh,htot_sig,'z',zBinslowedge,norm_sig[0])
         
 def doXprojection(pdfs,data1,norm1_nonres,norm1_Wres,pdf1_sig,norm1_sig,norm1_Zres,norm1_TThad):
     data1 = ROOT.RooDataHist("data1","data1",args_ws,data1)
@@ -647,8 +679,8 @@ def doXprojection(pdfs,data1,norm1_nonres,norm1_Wres,pdf1_sig,norm1_sig,norm1_Zr
     dh.SetBinErrorOption(ROOT.TH1.kPoisson)
     if doFit:
         errors = draw_error_band(htot,norm1_nonres[0]+norm1_Wres[0]+norm1_Zres[0]+norm1_TThad[0],math.sqrt(norm1_nonres[1]*norm1_nonres[1]+norm1_Wres[1]*norm1_Wres[1]+norm1_Zres[1]*norm1_Zres[1]+norm1_TThad[1]*norm1_TThad[1]),pdfs[-1],xBinslowedge,'x')
-        MakePlots(hfinals,dh,htot_sig,'x',xBinslowedge,errors)
-    else: MakePlots(hfinals,dh,htot_sig,'x',xBinslowedge)
+        MakePlots(hfinals,dh,htot_sig,'x',xBinslowedge,norm1_sig[0],errors)
+    else: MakePlots(hfinals,dh,htot_sig,'x',xBinslowedge,norm1_sig[0])
 
 def doYprojection(pdfs,data1,norm1_nonres,norm1_Wres,pdf1_sig,norm1_sig,norm1_Zres,norm1_TThad):
     data1 = ROOT.RooDataHist("data1","data1",args_ws,data1)
@@ -735,8 +767,8 @@ def doYprojection(pdfs,data1,norm1_nonres,norm1_Wres,pdf1_sig,norm1_sig,norm1_Zr
     dh.SetBinErrorOption(ROOT.TH1.kPoisson)
     if doFit:
         errors = draw_error_band(htot,norm1_nonres[0]+norm1_Wres[0]+norm1_Zres[0]+norm1_TThad[0],math.sqrt(norm1_nonres[1]*norm1_nonres[1]+norm1_Wres[1]*norm1_Wres[1]+norm1_Zres[1]*norm1_Zres[1]+norm1_TThad[1]*norm1_TThad[1]),pdfs[-1],yBinslowedge,'y')
-        MakePlots(hfinals,dh,htot_sig,'y',yBinslowedge,errors)
-    else: MakePlots(hfinals,dh,htot_sig,'y',yBinslowedge)
+        MakePlots(hfinals,dh,htot_sig,'y',yBinslowedge,norm1_sig[0],errors)
+    else: MakePlots(hfinals,dh,htot_sig,'y',yBinslowedge,norm1_sig[0])
  
 
 def addPullPlot(hdata,hpostfit,nBins,error_band):
@@ -771,8 +803,8 @@ def addPullPlot(hdata,hpostfit,nBins,error_band):
     gt.SetTitle("")
     #gt.SetMinimum(0.5);
     #gt.SetMaximum(1.5);
-    gt.SetMinimum(-2.499);
-    gt.SetMaximum(2.499);
+    gt.SetMinimum(-3.5);
+    gt.SetMaximum(3.5);
     gt.SetDirectory(0);
     gt.SetStats(0);
     gt.SetLineStyle(0);
@@ -956,14 +988,19 @@ def getChi2fullModel(pdf,data,norm):
             continue
         ndof+=1
         #chi2+= pow((dr[i] - pr[i]),2)/pr[i]
-        chi2+= 2*( pr[i] - dr[i] + dr[i]* ROOT.TMath.Log(dr[i]/pr[i]))
+        if pr[i] > 10e-10:
+            chi2+= 2*( pr[i] - dr[i] + dr[i]* ROOT.TMath.Log(dr[i]/pr[i]))
 
     return [chi2,ndof]
 
-def getChi2proj(histo_pdf,histo_data):
+def getChi2proj(histo_pdf,histo_data,minx=-1,maxx=-1):
     pr=[]
     dr=[]
     for b in range(1,histo_pdf.GetNbinsX()+1):
+     if minx!=-1:
+         if histo_pdf.GetBinCenter(b) < minx: continue
+     if maxx!=-1:
+         if histo_pdf.GetBinCenter(b) > maxx: continue
      dr.append(histo_data.GetBinContent(b))
      pr.append(histo_pdf.GetBinContent(b))
     
@@ -975,7 +1012,8 @@ def getChi2proj(histo_pdf,histo_data):
         ndof+=1
         #chi2+= pow((dr[i] - pr[i]),2)/pr[i]
 	#print i,dr[i],pr[i],(dr[i] - pr[i]),pow((dr[i] - pr[i]),2)/pr[i],(dr[i] - pr[i])/histo_data.GetBinError(i+1)
-        chi2+= 2*( pr[i] - dr[i] + dr[i]* ROOT.TMath.Log(dr[i]/pr[i]))
+	if pr[i] > 10e-10:
+            chi2+= 2*( pr[i] - dr[i] + dr[i]* ROOT.TMath.Log(dr[i]/pr[i]))
 
     return [chi2,ndof]   
 
@@ -983,6 +1021,10 @@ if __name__=="__main__":
      finMC = ROOT.TFile(options.input,"READ");
      hinMC = finMC.Get("nonRes");
      purity = options.input.replace('.root','').split('_')[-1]   
+<<<<<<< HEAD
+=======
+
+>>>>>>> 375d15015ef144c6647af2feb60a30e836acb406
      if options.input.find("VV") !=-1: purity="VV_"+purity
      elif options.input.find("VH") !=-1: purity="VH_"+purity
                    
@@ -1251,7 +1293,8 @@ if __name__=="__main__":
      print zBins_redux
      print 
 
-     #################################################     
+     #################################################  
+     logfile = open(options.log,"a")
      #make projections onto MJJ axis
      if options.projection =="z": doZprojection(allpdfsz,data1,norm1_nonres,norm1_Wres,pdf1_signal_postfit,norm1_sig,norm1_Zres,norm1_TThad)
          
@@ -1266,4 +1309,4 @@ if __name__=="__main__":
       doXprojection(allpdfsx,data1,norm1_nonres,norm1_Wres,pdf1_signal_postfit,norm1_sig,norm1_Zres,norm1_TThad)
       doYprojection(allpdfsy,data1,norm1_nonres,norm1_Wres,pdf1_signal_postfit,norm1_sig,norm1_Zres,norm1_TThad)
      
-  
+     logfile.close()

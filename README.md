@@ -101,21 +101,33 @@ python Projections3DHisto_HPHP.py --mc results_2016/JJ_2016_nonRes_VV_HPHP_altsh
 python Projections3DHisto_HPHP.py --mc results_2016/JJ_2016_nonRes_VV_HPHP_altshape2.root,nonRes -k save_new_shapes_2016_pythia_VV_HPHP_3D.root,histo -o control-plots-HPHP-madgraph
 ```
 
-Create datacard and workspace and run post fit 
+Create datacard and workspaces: in order to call the 'addParametricYieldHVTBR' function the signal name BulkGVV or VprimeWV should be used
 
 ```
 python makeCard.py
-text2workspace.py datacard_JJ_HPHP_13TeV.txt -o JJ_BulkGWW_HPHP_13TeV_workspace.root
-python runPostFit.py
+#text2workspace.py datacard_JJ_HPHP_13TeV.txt -o JJ_BulkGWW_HPHP_13TeV_workspace.root
+#python runPostFit.py 
 ```
 
-Run the limits with combine and make final plot (but not tested because datacards missing, will need modification for desy condor)
+Run the limits with combine and make final plot
 
 ```
-vvSubmitLimits.py JJ_BulkGWW_HPHP_13TeV_workspace.root -s 100 -q "workday" -m 1200 -M 4200 -C 1
-find higgsCombineTest.AsymptoticLimits.* -size +1500c | xargs hadd Limits_BulkGWW_HPHP_13TeV.root
-vvMakeLimitPlot.py Limits_BulkGWW_HPHP_13TeV.root -x 1200 -X 4200 #(expected limits)
+vvSubmitLimits.py workspace_JJ_BulkGVV_VV_13TeV_2016.root -s 100 -q "tomorrow" -m 1200 -M 4200 -C 1
+find higgsCombineTest.AsymptoticLimits.* -size +1500c | xargs hadd Limits_BulkGVV_13TeV_2016.root
+vvMakeLimitPlot.py Limits_BulkGVV_13TeV_2016.root -x 1200 -X 4200 -s BulkGVV  --hvt 2 --HVTworkspace workspace_JJ_BulkGVV_VV_13TeV_2016.root -p 2016 #(expected limits)
 vvMakeLimitPlot.py Limits_BulkGWW_HPHP_13TeV.root -x 1200 -X 4200 -b 0 #(expected+observed limits)
+```
+Run post fit control plots
+
+```
+python runFitPlots_vjets_signal_oneyear_splitRes.py -n results_2016/workspace_JJ_BulkGVV_VV_13TeV_2016.root  -l sigonly -i results_2016/JJ_2016_nonRes_VV_HPLP.root -M 2000 -s
+```
+
+Get pulls of systematics for 1 mass points and produce a nice plot:
+
+```
+combine -M FitDiagnostics -m 1200 workspace.root
+root -l PlotPulls.C
 ```
 
 Further instructions on how to run the code can be found at:

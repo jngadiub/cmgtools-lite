@@ -59,30 +59,34 @@ class DataCardMaker:
 
         SCALEVar="_".join(["MEAN",name,self.tag])
         SIGMAVar="_".join(["SIGMA",name,self.tag])
-        if name.find("H")!=-1:
-            self.w.factory("expr::"+SCALEVar+"('("+info['MEAN']+")*(1+"+scaleStr+")',{MH,MJ1,MJ2},"+','.join(scaleSysts)+")")
-            self.w.factory("expr::"+SIGMAVar+"('("+info['SIGMA']+")*(1+"+resolutionStr+")',{MH,MJ1,MJ2},"+','.join(resolutionSysts)+")") 
+        ALPHA1Var="_".join(["ALPHA1",name,self.tag])
+        ALPHA2Var="_".join(["ALPHA2",name,self.tag])
+        N2Var="_".join(["N2",name,self.tag])
+        N1Var="_".join(["N1",name,self.tag])
+        if name.find("H")!=-1 or name.find("WZ")!=-1:
+            self.w.factory("expr::"+SIGMAVar+"('("+info['SIGMA']+")*"+info['corr_sigma']+"*(1+"+resolutionStr+")',{MH,MJ1,MJ2},"+resolutionSysts[0]+")")
+            self.w.factory("expr::"+SCALEVar+"('("+info['MEAN']+")*"+info['corr_mean']+"*(1+"+scaleStr+")',{MH,MJ1,MJ2},"+scaleSysts[0]+")")
+            
+            self.w.factory("expr::{name}('MH*0+{param}',MH)".format(name=ALPHA2Var,param=info['ALPHA2']))
+            self.w.factory("expr::{name}('MH*0+{param}',MH)".format(name=ALPHA1Var,param=info['ALPHA1']))
+            self.w.factory("expr::{name}('MH*0+{param}',MH)".format(name=N1Var,param=info['N1']))
+            self.w.factory("expr::{name}('MH*0+{param}',MH)".format(name=N2Var,param=info['N2']))  
         else:    
             self.w.factory("expr::"+SCALEVar+"('("+info['MEAN']+")*(1+"+scaleStr+")',MH,"+','.join(scaleSysts)+")")
             self.w.factory("expr::"+SIGMAVar+"('("+info['SIGMA']+")*(1+"+resolutionStr+")',MH,"+','.join(resolutionSysts)+")")
+            self.w.factory("expr::{name}('MH*0+{param}',MH)".format(name=ALPHA1Var,param=info['ALPHA1']))
+            self.w.factory("expr::{name}('MH*0+{param}',MH)".format(name=ALPHA2Var,param=info['ALPHA2']))
+            self.w.factory("expr::{name}('MH*0+{param}',MH)".format(name=N1Var,param=info['N1']))
+            self.w.factory("expr::{name}('MH*0+{param}',MH)".format(name=N2Var,param=info['N2']))     
+                
+            
+
         
         
-
-        ALPHA1Var="_".join(["ALPHA1",name,self.tag])
-        self.w.factory("expr::{name}('MH*0+{param}',MH)".format(name=ALPHA1Var,param=info['ALPHA1']))
-
-        ALPHA2Var="_".join(["ALPHA2",name,self.tag])
-        self.w.factory("expr::{name}('MH*0+{param}',MH)".format(name=ALPHA2Var,param=info['ALPHA2']))
-
-        N1Var="_".join(["N1",name,self.tag])
-        self.w.factory("expr::{name}('MH*0+{param}',MH)".format(name=N1Var,param=info['N1']))
-
-        N2Var="_".join(["N2",name,self.tag])
-        self.w.factory("expr::{name}('MH*0+{param}',MH)".format(name=N2Var,param=info['N2']))        
 
         pdfName="_".join([name,self.tag])
         vvMass = ROOT.RooDoubleCB(pdfName,pdfName,self.w.var(MVV),self.w.function(SCALEVar),self.w.function(SIGMAVar),self.w.function(ALPHA1Var),self.w.function(N1Var),self.w.function(ALPHA2Var),self.w.function(N2Var))
- 	getattr(self.w,'import')(vvMass,ROOT.RooFit.Rename(pdfName))
+ 	getattr(self.w,'import')(vvMass,ROOT.RooFit.RenameVariable(pdfName,pdfName))
         f.close()
 	
     def addMVVSignalParametricShape2(self,name,variable,jsonFile,scale ={},resolution={}):
@@ -145,7 +149,7 @@ class DataCardMaker:
 	gaus = ROOT.RooGaussian(pdfName+'_Gaus',pdfName+'_Gaus',self.w.var(MVV),self.w.function(SCALEVar),self.w.function(GSIGMAVar))
 	cb = ROOT.RooCBShape(pdfName+'_CB',pdfName+'_CB',self.w.var(MVV),self.w.function(SCALEVar),self.w.function(SIGMAVar),self.w.function(ALPHAVar),self.w.function(NVar))
         vvMass = ROOT.RooAddPdf(pdfName,pdfName,gaus,cb,self.w.function(fVar))
-        getattr(self.w,'import')(vvMass,ROOT.RooFit.Rename(pdfName))
+        getattr(self.w,'import')(vvMass,ROOT.RooFit.RenameVariable(pdfName,pdfName))
         f.close()
         
         
@@ -181,7 +185,7 @@ class DataCardMaker:
         print 'function '
         pdfName="_".join([name,self.tag])
 	gaus = ROOT.RooGaussian(pdfName,pdfName,self.w.var(Mjet),self.w.var(mean),self.w.var(sigma))
-        getattr(self.w,'import')(gaus,ROOT.RooFit.Rename(pdfName))
+        getattr(self.w,'import')(gaus,ROOT.RooFit.RenameVariable(pdfName,pdfName))
 
 
 
@@ -232,7 +236,7 @@ class DataCardMaker:
 
         pdfName="_".join([name+"peak",self.tag])
         vvMass = ROOT.RooDoubleCB(pdfName,pdfName,self.w.var(MJJ),self.w.function(SCALEVar),self.w.function(SIGMAVar),self.w.function(ALPHAVar),self.w.function(NVar),self.w.function(ALPHAVar2),self.w.function(NVar2))
-        getattr(self.w,'import')(vvMass,ROOT.RooFit.Rename(pdfName))
+        getattr(self.w,'import')(vvMass,ROOT.RooFit.RenameVariable(pdfName,pdfName))
 
 
         SLOPEVar="_".join(["slope",name,self.tag])
@@ -318,11 +322,11 @@ class DataCardMaker:
 
         pdfNameW="_".join([name+"PeakW",self.tag])
         vvMass = ROOT.RooDoubleCB(pdfNameW,pdfNameW,self.w.var(MJJ),self.w.function(MEANWVar),self.w.function(SIGMAWVar),self.w.function(ALPHAWVar),self.w.function(NVar),self.w.function(ALPHAWVar2),self.w.function(NVar))
-        getattr(self.w,'import')(vvMass,ROOT.RooFit.Rename(pdfNameW))
+        getattr(self.w,'import')(vvMass,ROOT.RooFit.RenameVariable(pdfNameW,pdfNameW))
 
         pdfNameTop="_".join([name+"PeakTop",self.tag])
         vvMass2 = ROOT.RooDoubleCB(pdfNameTop,pdfNameTop,self.w.var(MJJ),self.w.function(MEANTOPVar),self.w.function(SIGMATOPVar),self.w.function(ALPHATOPVar),self.w.function(NVar),self.w.function(ALPHATOPVar2),self.w.function(NVar))
-        getattr(self.w,'import')(vvMass2,ROOT.RooFit.Rename(pdfNameTop))
+        getattr(self.w,'import')(vvMass2,ROOT.RooFit.RenameVariable(pdfNameTop,pdfNameTop))
 
         pdfNamePeak="_".join([name+"Peak",self.tag])
         self.w.factory("SUM::{name}({f}*{PDF1},{PDF2})".format(name=pdfNamePeak,f=FVar,PDF1=pdfNameW,PDF2=pdfNameTop))
@@ -394,15 +398,15 @@ class DataCardMaker:
 
         pdfName="_".join([name,self.tag])
         vvMass = ROOT.RooDoubleCB(pdfName,pdfName,self.w.var(MJJ),self.w.function(SCALEVar),self.w.function(SIGMAVar),self.w.function(ALPHAVar),self.w.function(NVar),self.w.function(ALPHAVar2),self.w.function(NVar2))
-        getattr(self.w,'import')(vvMass,ROOT.RooFit.Rename(pdfName))
+        getattr(self.w,'import')(vvMass,ROOT.RooFit.RenameVariable(pdfName,pdfName))
 
         f.close()
         
     def addMJJSignalParametricShapeHiggs(self,name,variable,jsonFile,scale ={},resolution={},scales=[1,1],varToReplace="MH"):
 
-        if self.w.var("MH") == None: self.w.factory("MH[2000]")
-	self.w.var("MH").setVal(2000.)
-        self.w.var("MH").setConstant(1)
+        #if self.w.var("MH") == None: self.w.factory("MH[2000]")
+	#self.w.var("MH").setVal(2000.)
+        #self.w.var("MH").setConstant(1)
        
         scaleStr='0'
         resolutionStr='0'
@@ -422,7 +426,7 @@ class DataCardMaker:
             resolutionSysts.append(syst)
        
         MJJ=variable            
-        if self.w.var(MJJ) == None: self.w.factory(MJJ+"[0,1000]")
+        if self.w.var(MJJ) == None: self.w.factory(MJJ+"[0,13000]")
 
         f=open(jsonFile)
         info=json.load(f)
@@ -433,7 +437,7 @@ class DataCardMaker:
         SCALEVar="_".join(["meanH",name,self.tag])
         self.w.factory("expr::{name}('({param}*{sc})*(1+{vv_syst})',MH,{vv_systs})".format(name=SCALEVar,param=info['meanH'],sc=scales[0],vv_syst=scaleStr,vv_systs=','.join(scaleSysts)).replace("MH",varToReplace))
 
-        
+        print info['meanH']
         SIGMAVar="_".join(["sigmaH",name,self.tag])
         self.w.factory("expr::{name}('({param}*{res})*(1+{vv_syst})',MH,{vv_systs})".format(name=SIGMAVar,param=info['sigmaH'],res=scales[1],vv_syst=resolutionStr,vv_systs=','.join(resolutionSysts)).replace("MH",varToReplace))
 
@@ -451,7 +455,7 @@ class DataCardMaker:
 
         pdfName="_".join([name,self.tag])
         vvMass = ROOT.RooDoubleCB(pdfName,pdfName,self.w.var(MJJ),self.w.function(SCALEVar),self.w.function(SIGMAVar),self.w.function(ALPHAVar),self.w.function(NVar),self.w.function(ALPHAVar2),self.w.function(NVar2))
-        getattr(self.w,'import')(vvMass,ROOT.RooFit.Rename(pdfName))
+        getattr(self.w,'import')(vvMass,ROOT.RooFit.RenameVariable(pdfName,pdfName))
 
         f.close()    
 
@@ -496,7 +500,7 @@ class DataCardMaker:
 
         pdfName="_".join([name,self.tag])
         vvMass = ROOT.RooDoubleCB(pdfName,pdfName,self.w.var(MJJ),self.w.function(SCALEVar),self.w.function(SIGMAVar),self.w.function(ALPHAVar),self.w.function(NVar),self.w.function(ALPHAVar2),self.w.function(NVar2))
-        getattr(self.w,'import')(vvMass,ROOT.RooFit.Rename(pdfName))
+        getattr(self.w,'import')(vvMass,ROOT.RooFit.RenameVariable(pdfName,pdfName))
 
     def addHistoShapeFromFile(self,name,observables,filename,histoname,systematics=[],conditional = False,order=0,newTag=""):     
         varset=ROOT.RooArgSet()
@@ -534,8 +538,8 @@ class DataCardMaker:
 	varset.Print()
 	varlist.Print()
         pdf=ROOT.RooHistPdf(pdfName,pdfName,varset,roohist,order)
-        if self.w.data(histName) == None: getattr(self.w,'import')(roohist,ROOT.RooFit.Rename(histName))
-        if self.w.pdf(pdfName) == None: getattr(self.w,'import')(pdf,ROOT.RooFit.Rename(pdfName))
+        if self.w.data(histName) == None: getattr(self.w,'import')(roohist,ROOT.RooFit.RenameVariable(histName,histName))
+        if self.w.pdf(pdfName) == None: getattr(self.w,'import')(pdf,ROOT.RooFit.RenameVariable(pdfName,pdfName))
         #Load SYstematics
         coeffList=ROOT.RooArgList()
         pdfList=ROOT.RooArgList(self.w.pdf(pdfName))
@@ -556,8 +560,8 @@ class DataCardMaker:
                 pdfName="_".join([name+"_"+syst+variation,self.tag])
                 pdf=ROOT.RooHistPdf(pdfName,pdfName,varset,roohist,order)
 
-                if self.w.data(histName) == None: getattr(self.w,'import')(roohist,ROOT.RooFit.Rename(histName))
-                if self.w.pdf(pdfName) == None: getattr(self.w,'import')(pdf,ROOT.RooFit.Rename(pdfName))
+                if self.w.data(histName) == None: getattr(self.w,'import')(roohist,ROOT.RooFit.RenameVariable(histName,histName))
+                if self.w.pdf(pdfName) == None: getattr(self.w,'import')(pdf,ROOT.RooFit.RenameVariable(pdfName,pdfName))
                 pdfList.add(self.w.pdf(pdfName))
 
         pdfName="_".join([name,self.tag])
@@ -569,7 +573,7 @@ class DataCardMaker:
             elif len(observables)==3:
 		total=ROOT.FastVerticalInterpHistPdf3D(pdfName,pdfName,self.w.var(observables[0]),self.w.var(observables[1]),self.w.var(observables[2]),conditional,pdfList,coeffList,1,-1)
 	    
-	    if self.w.pdf(pdfName) == None: getattr(self.w,'import')(total,ROOT.RooFit.Rename(pdfName))
+	    if self.w.pdf(pdfName) == None: getattr(self.w,'import')(total,ROOT.RooFit.RenameVariable(pdfName,pdfName))
 
 
     def addShapes(self,name,observables,filename,histoname,systematics=[],conditional = False,order=0,newTag="",filename2="",systematics2=[]):     
@@ -608,8 +612,8 @@ class DataCardMaker:
 	varset.Print()
 	varlist.Print()
         pdf=ROOT.RooHistPdf(pdfName,pdfName,varset,roohist,order)
-        getattr(self.w,'import')(roohist,ROOT.RooFit.Rename(histName))
-        getattr(self.w,'import')(pdf,ROOT.RooFit.Rename(pdfName))
+        getattr(self.w,'import')(roohist,ROOT.RooFit.RenameVariable(histName,histName))
+        getattr(self.w,'import')(pdf,ROOT.RooFit.RenameVariable(pdfName,pdfName))
         #Load SYstematics
         coeffList=ROOT.RooArgList()
         pdfList=ROOT.RooArgList(self.w.pdf(pdfName))
@@ -630,8 +634,8 @@ class DataCardMaker:
                 pdfName="_".join([name+"_"+syst+variation,self.tag])
                 pdf=ROOT.RooHistPdf(pdfName,pdfName,varset,roohist,order)
 
-                getattr(self.w,'import')(roohist,ROOT.RooFit.Rename(histName))
-                getattr(self.w,'import')(pdf,ROOT.RooFit.Rename(pdfName))
+                getattr(self.w,'import')(roohist,ROOT.RooFit.RenameVariable(histName,histName))
+                getattr(self.w,'import')(pdf,ROOT.RooFit.RenameVariable(pdfName,pdfName))
                 pdfList.add(self.w.pdf(pdfName))
          
         
@@ -654,8 +658,8 @@ class DataCardMaker:
                     pdfName="_".join([name+"_"+syst+variation,self.tag])
                     pdf=ROOT.RooHistPdf(pdfName,pdfName,varset,roohist,order)
 
-                    getattr(self.w,'import')(roohist,ROOT.RooFit.Rename(histName))
-                    getattr(self.w,'import')(pdf,ROOT.RooFit.Rename(pdfName))
+                    getattr(self.w,'import')(roohist,ROOT.RooFit.RenameVariable(histName,histName))
+                    getattr(self.w,'import')(pdf,ROOT.RooFit.RenameVariable(pdfName,pdfName))
                     pdfList.add(self.w.pdf(pdfName))
                 
         
@@ -663,7 +667,7 @@ class DataCardMaker:
         pdfName="_".join([name,self.tag])
         if len(systematics)>0:
             total=ROOT.FastVerticalInterpHistPdf3D(pdfName,pdfName,self.w.var(observables[0]),self.w.var(observables[1]),self.w.var(observables[2]),conditional,pdfList,coeffList,1,-1)
-	    getattr(self.w,'import')(total,ROOT.RooFit.Rename(pdfName))
+	    getattr(self.w,'import')(total,ROOT.RooFit.RenameVariable(pdfName,pdfName))
 
 
 
@@ -710,7 +714,7 @@ class DataCardMaker:
 
         pdfName="_".join([name,self.tag])
         erfexp = ROOT.RooErfExpPdf(pdfName,pdfName,self.w.var(MJJ),self.w.function(p0),self.w.function(p1),self.w.function(p2))
-        getattr(self.w,'import')(erfexp,ROOT.RooFit.Rename(pdfName))
+        getattr(self.w,'import')(erfexp,ROOT.RooFit.RenameVariable(pdfName,pdfName))
         f.close()
 
 
@@ -761,7 +765,7 @@ class DataCardMaker:
 
         pdfName="_".join([name,self.tag])
         bernsteinPDF = ROOT.RooErfExpPdf(pdfName,pdfName,self.w.var(MJJ),self.w.var(p0),self.w.var(p1),self.w.var(p2))
-        getattr(self.w,'import')(bernsteinPDF,ROOT.RooFit.Rename(pdfName))
+        getattr(self.w,'import')(bernsteinPDF,ROOT.RooFit.RenameVariable(pdfName,pdfName))
 
     def addMJJFloatingBackgroundShapeBifur(self,name,variable,newTag=""):
         MJJ=variable
@@ -830,7 +834,7 @@ class DataCardMaker:
         
         pdfName="_".join([name,self.tag])
         qcd = ROOT.RooQCDPdf(pdfName,pdfName,self.w.var(MVV),self.w.var(p0),self.w.var(p1),self.w.var(p2))
-        getattr(self.w,'import')(qcd,ROOT.RooFit.Rename(pdfName))
+        getattr(self.w,'import')(qcd,ROOT.RooFit.RenameVariable(pdfName,pdfName))
         
         
     def addMjetBackgroundShapeVJets(self,name,variable,newTag="",preconstrains={}):
@@ -871,7 +875,7 @@ class DataCardMaker:
         self.w.factory("{name}[{val},-{err},{err}]".format(name=p2,val=val,err=err))
         pdfName="_".join([name,self.tag])
         wjet = ROOT.RooErfPowPdf(pdfName,pdfName,self.w.var(Mjet),self.w.var(p0),self.w.var(p1),self.w.var(p2))
-        getattr(self.w,'import')(wjet,ROOT.RooFit.Rename(pdfName))
+        getattr(self.w,'import')(wjet,ROOT.RooFit.RenameVariable(pdfName,pdfName))
 
 
     def addMjetBackgroundShapeVJetsGaus(self,name,variable,newTag="",preconstrains={},scale ={},resolution={}):
@@ -906,7 +910,7 @@ class DataCardMaker:
         
         pdfName="_".join([name,self.tag])
         wjet = ROOT.RooGaussian(pdfName,pdfName,self.w.var(Mjet),self.w.function(mean),self.w.function(sigma))
-        getattr(self.w,'import')(wjet,ROOT.RooFit.Rename(pdfName))
+        getattr(self.w,'import')(wjet,ROOT.RooFit.RenameVariable(pdfName,pdfName))
 
     def addMjetBackgroundShapeVJetsRes(self,name,variable,newTag="",preconstrains={},scale ={},resolution={}):
         print "start importing shapes for resonant Vjets backgorund "+str(name)
@@ -993,10 +997,10 @@ class DataCardMaker:
         pdfName="_".join([name,self.tag])
         if len(resolutionSysts)>=1:
             wjet = ROOT.RooDoubleCB(pdfName,pdfName,self.w.var(Mjet),self.w.function(mean),self.w.function(sigma),self.w.var(alpha),self.w.var(n),self.w.var(alpha2),self.w.var(n2))
-        #getattr(self.w,'import')(vvMass,ROOT.RooFit.Rename(pdfName))
+        #getattr(self.w,'import')(vvMass,ROOT.RooFit.RenameVariable(pdfName,pdfName))
         else:
             wjet = ROOT.RooDoubleCB(pdfName,pdfName,self.w.var(Mjet),self.w.var(mean),self.w.var(sigma),self.w.var(alpha),self.w.var(n),self.w.var(alpha2),self.w.var(n2))
-        getattr(self.w,'import')(wjet,ROOT.RooFit.Rename(pdfName))
+        getattr(self.w,'import')(wjet,ROOT.RooFit.RenameVariable(pdfName,pdfName))
         
         
     
@@ -1022,7 +1026,7 @@ class DataCardMaker:
 
         pdfName="_".join([name,self.tag])
         qcd = ROOT.RooPower(pdfName,pdfName,self.w.var(MVV),self.w.var(p0))
-        getattr(self.w,'import')(qcd,ROOT.RooFit.Rename(pdfName))
+        getattr(self.w,'import')(qcd,ROOT.RooFit.RenameVariable(pdfName,pdfName))
 
     def addMjetBackgroundShapeVJetsRes2(self,name,variable,newTag="",preconstrains={},preconstrains2={},scale ={},resolution={}):
         print "start importing shapes for resonant Vjets backgorund "+str(name)
@@ -1102,7 +1106,7 @@ class DataCardMaker:
             wjet = ROOT.RooAddPdf(pdfName,pdfName,wjet_res,gaus,self.w.var(fVar))
         else:
             wjet = ROOT.RooDoubleCB(pdfName,pdfName,self.w.var(Mjet),self.w.var(mean),self.w.var(sigma),self.w.var(alpha),self.w.var(n),self.w.var(alpha2),self.w.var(n2))
-        getattr(self.w,'import')(wjet,ROOT.RooFit.Rename(pdfName))
+        getattr(self.w,'import')(wjet,ROOT.RooFit.RenameVariable(pdfName,pdfName))
     
     def addMVVBackgroundShapeEXPN(self,name,variable,newTag="",preconstrains={}):
         
@@ -1135,7 +1139,7 @@ class DataCardMaker:
 
         pdfName="_".join([name,self.tag])
         qcd = ROOT.RooExpNPdf(pdfName,pdfName,self.w.var(MVV),self.w.var(p0),self.w.var(p1))
-        getattr(self.w,'import')(qcd,ROOT.RooFit.Rename(pdfName))
+        getattr(self.w,'import')(qcd,ROOT.RooFit.RenameVariable(pdfName,pdfName))
 
 
     def addMVVBackgroundShapeEXPNFromMC(self,name,variable,newTag,filename):
@@ -1162,7 +1166,7 @@ class DataCardMaker:
 
         pdfName="_".join([name,self.tag])
         qcd = ROOT.RooExpNPdf(pdfName,pdfName,self.w.var(MVV),self.w.var(p0),self.w.var(p1))
-        getattr(self.w,'import')(qcd,ROOT.RooFit.Rename(pdfName))
+        getattr(self.w,'import')(qcd,ROOT.RooFit.RenameVariable(pdfName,pdfName))
 
 
     def addMVVBackgroundShapeErfPow(self,name,variable,newTag="",preconstrains={}):
@@ -1208,7 +1212,7 @@ class DataCardMaker:
         pdfName="_".join([name,self.tag])
         qcd = ROOT.RooErfPowPdf(pdfName,pdfName,self.w.var(MVV),self.w.function(p0),self.w.function(p1),self.w.function(p2))
 
-        getattr(self.w,'import')(qcd,ROOT.RooFit.Rename(pdfName))
+        getattr(self.w,'import')(qcd,ROOT.RooFit.RenameVariable(pdfName,pdfName))
 
 
 
@@ -1279,7 +1283,7 @@ class DataCardMaker:
             pdfName="_".join([name,pdfTag])
 
         erfexp = ROOT.RooErfPowPdf(pdfName,pdfName,self.w.var(MVV),self.w.function(p0),self.w.function(p1),self.w.function(p2))
-        getattr(self.w,'import')(erfexp,ROOT.RooFit.Rename(name))
+        getattr(self.w,'import')(erfexp,ROOT.RooFit.RenameVariable(pdfname,name))
 
 
 
@@ -1310,12 +1314,12 @@ class DataCardMaker:
 
         pdfName="_".join([name,self.tag])
         qcd = ROOT.RooPower(pdfName,pdfName,self.w.var(MVV),self.w.function(p0))
-        getattr(self.w,'import')(erfexp,ROOT.RooFit.Rename(name))
+        getattr(self.w,'import')(erfexp,ROOT.RooFit.RenameVariable(pdfname,name))
 
 
 
 
-    def sum(self,name,pdf1,pdf2,sumVar,sumVarExpr=""):
+    def sumSimple(self,name,pdf1,pdf2,sumVar,sumVarExpr=""):
         pdfName="_".join([name,self.tag])
         pdfName1="_".join([pdf1,self.tag])
         pdfName2="_".join([pdf2,self.tag])
@@ -1333,8 +1337,7 @@ class DataCardMaker:
         pdfName="_".join([name,self.tag])
         pdfName1="_".join([pdf1,self.tag])
         pdfName2="_".join([pdf2,self.tag])
-        
-           
+        print "import summed pdf "+pdfName
         self.w.factory("SUM::{name}(expr::{name2}_ratio1('(1-{f})',{f})*{name1},{f}*{name2})".format(name=pdfName,name1=pdfName1,f=variable,name2=pdfName2))
        
             
@@ -1468,7 +1471,7 @@ class DataCardMaker:
 
         pdfSigma="_".join([name,self.tag,"sigma"])
         spline=ROOT.RooSpline1D(pdfSigma,pdfSigma,self.w.var("MH"),len(xArr),array('d',xArr),array('d',yArr))    
-        getattr(self.w,'import')(spline,ROOT.RooFit.Rename(pdfSigma))
+        getattr(self.w,'import')(spline,ROOT.RooFit.RenameVariable(pdfSigma,pdfSigma))
         fCS.close()
 
         f=open(jsonFile)
@@ -1497,11 +1500,11 @@ class DataCardMaker:
 
         pdfSigma="_".join([name,self.tag,"sigma"])
         spline=ROOT.RooSpline1D(pdfSigma,pdfSigma,self.w.var("MH"),len(xArr),array('d',xArr),array('d',yArr))    
-        getattr(self.w,'import')(spline,ROOT.RooFit.Rename(pdfSigma))
+        getattr(self.w,'import')(spline,ROOT.RooFit.RenameVariable(pdfSigma,pdfSigma))
 
         pdfErrSigma="_".join([name,self.tag,"sigmaErr"])
         splineErr=ROOT.RooSpline1D(pdfErrSigma,pdfErrSigma,self.w.var("MH"),len(xArr),array('d',xArr),array('d',yErrArr))    
-        getattr(self.w,'import')(splineErr,ROOT.RooFit.Rename(pdfErrSigma))
+        getattr(self.w,'import')(splineErr,ROOT.RooFit.RenameVariable(pdfErrSigma,pdfErrSigma))
         fCS.close()
 
         f=open(jsonFile)
@@ -1543,7 +1546,7 @@ class DataCardMaker:
 
         pdfSigma="_".join([name,self.tag,"sigma"])
         spline=ROOT.RooSpline1D(pdfSigma,pdfSigma,self.w.var("MH"),len(xArr),array('d',xArr),array('d',yArr))    
-        getattr(self.w,'import')(spline,ROOT.RooFit.Rename(pdfSigma))
+        getattr(self.w,'import')(spline,ROOT.RooFit.RenameVariable(pdfSigma,pdfSigma))
 
         f=open(jsonFile)
         info=json.load(f)      
@@ -1758,5 +1761,5 @@ class DataCardMaker:
             self.w.var(p).setBins(bins)
         dataHist=ROOT.RooDataHist(name,name,cList,histogram)
 
-        getattr(self.w,'import')(dataHist,ROOT.RooFit.Rename(name))
+        getattr(self.w,'import')(dataHist,ROOT.RooFit.RenameVariable(name,name))
         
