@@ -1021,10 +1021,7 @@ if __name__=="__main__":
      finMC = ROOT.TFile(options.input,"READ");
      hinMC = finMC.Get("nonRes");
      purity = options.input.replace('.root','').split('_')[-1]   
-<<<<<<< HEAD
-=======
 
->>>>>>> 375d15015ef144c6647af2feb60a30e836acb406
      if options.input.find("VV") !=-1: purity="VV_"+purity
      elif options.input.find("VH") !=-1: purity="VH_"+purity
                    
