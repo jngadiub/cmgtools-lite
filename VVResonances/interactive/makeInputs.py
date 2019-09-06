@@ -278,7 +278,6 @@ if options.run.find("all")!=-1 or options.run.find("detector")!=-1:
 
 if options.run.find("all")!=-1 or options.run.find("qcd")!=-1:
     print "Make nonresonant QCD templates and normalization"
-    if options.run.find("all")!=-1 or options.run.find("norm")!=-1: 
     if runParallel and submitToBatch:
         if options.run.find("all")!=-1 or options.run.find("templates")!=-1:
             wait = False
