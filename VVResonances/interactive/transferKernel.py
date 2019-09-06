@@ -403,6 +403,7 @@ def makeNonResCard():
  lumi = {'2016':35900,'2017':41367}
  lumi_unc = {'2016':1.025,'2017':1.023}
  scales = {"2017" :[0.983,1.08], "2016":[1.014,1.086]}
+ scalesHiggs = {"2017" :[1.,1.], "2016":[1.,1.]}
 
  vtag_unc = {'VV_HPHP':{},'VV_HPLP':{},'VV_LPLP':{}}
  vtag_unc['VV_HPHP'] = {'2016':'1.232/0.792','2017':'1.269/0.763'}
@@ -411,8 +412,8 @@ def makeNonResCard():
 
  vtag_pt_dependence = {'VV_HPHP':'((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))','VV_HPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))','VV_LPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))'} #irene added fake LPLP for a quick test!
 # vtag_pt_dependence = {'VV_HPHP':'((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))','VV_HPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))'}
- 
- DTools = DatacardTools(scales,vtag_pt_dependence,lumi_unc,vtag_unc,1.0,"","")
+
+ DTools = DatacardTools(scales,scalesHiggs,vtag_pt_dependence,lumi_unc,vtag_unc,1.0,"","")
  
  cat='_'.join(['JJ',sig,purity,'13TeV_'+dataset])
  card=DataCardMaker('',purity,'13TeV_'+dataset,lumi[dataset],'JJ',cat)
