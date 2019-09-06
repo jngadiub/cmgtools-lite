@@ -409,7 +409,8 @@ def makeNonResCard():
  vtag_unc['VV_HPLP'] = {'2016':'0.882/1.12','2017':'0.866/1.136'}    
  vtag_unc['VV_LPLP'] = {'2016':'1.063','2017':'1.043'}
 
- vtag_pt_dependence = {'VV_HPHP':'((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))','VV_HPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))'}
+ vtag_pt_dependence = {'VV_HPHP':'((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))','VV_HPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))','VV_LPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))'} #irene added fake LPLP for a quick test!
+# vtag_pt_dependence = {'VV_HPHP':'((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))','VV_HPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))'}
  
  DTools = DatacardTools(scales,vtag_pt_dependence,lumi_unc,vtag_unc,1.0,"","")
  
@@ -443,17 +444,19 @@ def makeNonResCard():
  print "norm"
  card.addSystematic("CMS_VV_JJ_nonRes_norm","lnN",{'nonRes':1.5}) 
  print "OPTZ"
- card.addSystematic("CMS_VV_JJ_nonRes_OPTZ_"+category_pdf,"param",[0.0,1.5]) #orig
+ card.addSystematic("CMS_VV_JJ_nonRes_OPTZ_"+category_pdf,"param",[0.0,1.]) 
  #card.addSystematic("CMS_VV_JJ_nonRes_OPTZ_"+category_pdf,"param",[0.0,0.5])
  print "OPTXY"
- card.addSystematic("CMS_VV_JJ_nonRes_OPTXY_"+category_pdf,"param",[0.0,0.333]) #orig
+ card.addSystematic("CMS_VV_JJ_nonRes_OPTXY_"+category_pdf,"param",[0.0,1.]) #orig
 # card.addSystematic("CMS_VV_JJ_nonRes_OPTXY_"+category_pdf,"param",[0.0,0.5])
  print "OPT3"
 # card.addSystematic("CMS_VV_JJ_nonRes_OPT3_"+category_pdf,"param",[1.0,0.333]) #orig
- card.addSystematic("CMS_VV_JJ_nonRes_OPT3_"+category_pdf,"param",[0.0,0.333]) 
+ card.addSystematic("CMS_VV_JJ_nonRes_OPT3_"+category_pdf,"param",[1.0,1.]) 
  #card.addSystematic("CMS_VV_JJ_nonRes_OPT3_"+category_pdf,"param",[10.,20.])
 # print "PT"
 # card.addSystematic("CMS_VV_JJ_nonRes_PT_"+category_pdf,"param",[0.0,0.333]) #orig
+# print "PTZ"
+# card.addSystematic("CMS_VV_JJ_nonRes_PTZ_"+category_pdf,"param",[0.0,0.5]) 
  
  print " and now make card"     
  card.makeCard()
