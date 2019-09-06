@@ -323,8 +323,8 @@ def makeProjections(histo,range1,range2,axis,label):
 
 
 if __name__=="__main__":
-    f_kernel = ROOT.TFile(sys.argv[1],"READ")
-    f_sample = ROOT.TFile(sys.argv[2],"READ")
+    f_kernel = ROOT.TFile(sys.argv[1],"READ") #eg JJ_2016_nonRes_3D_VV_HPHP.root 
+    f_sample = ROOT.TFile(sys.argv[2],"READ") #eg JJ_2016_nonRes_VV_HPHP.root
     print f_kernel
     print f_sample  
     

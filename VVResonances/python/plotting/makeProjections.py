@@ -478,9 +478,9 @@ if __name__=="__main__":
     ############## make stackplots of all backgrounds ####################
     purity = sys.argv[1] 
     year = sys.argv[2] 
-    f_Wjets  = ROOT.TFile("../../interactive/JJ_"+str(year)+"_WJets_"+str(purity)+".root","READ")
-    f_Zjets  = ROOT.TFile("../../interactive/JJ_"+str(year)+"_ZJets_"+str(purity)+".root","READ")
-    f_ttjets = ROOT.TFile("../../interactive/JJ_"+str(year)+"_TTJets_"+str(purity)+".root","READ")
+    f_Wjets  = ROOT.TFile("../../interactive/results_QCD_pythia_signals_2016_DeepW_VVpaper_HPHP_HPLP/JJ_"+str(year)+"_WJets_"+str(purity)+".root","READ")
+    f_Zjets  = ROOT.TFile("../../interactive/results_QCD_pythia_signals_2016_DeepW_VVpaper_HPHP_HPLP/JJ_"+str(year)+"_ZJets_"+str(purity)+".root","READ")
+    f_ttjets = ROOT.TFile("../../interactive/results_QCD_pythia_signals_2016_DeepW_VVpaper_HPHP_HPLP/JJ_"+str(year)+"_TTJets_"+str(purity)+".root","READ")
     
     #qcd = f_sample.Get("nonRes")
     Wjets = f_Wjets.Get("WJets")
