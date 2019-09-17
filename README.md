@@ -17,6 +17,7 @@ git fetch origin
 git checkout v8.0.0
 scramv1 b clean && scramv1 b -j 8
 ```
+NB: currently under test: https://github.com/IreneZoi/HiggsAnalysis-CombinedLimit.git branch my_102x with the commit https://github.com/IreneZoi/HiggsAnalysis-CombinedLimit/commit/157d5e0849eb3e03811ca638c00e8470903d958c to manage to have a workspace with all the needed categories
 
 Fork cmgtools from https://github.com/Diboson3D/cmgtools-lite and checkout the VV statistical tools
 
