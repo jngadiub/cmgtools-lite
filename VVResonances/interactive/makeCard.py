@@ -1,4 +1,4 @@
-1;95;0cfrom tools.DatacardTools import *
+from tools.DatacardTools import *
 import sys,os
 import ROOT
 ROOT.gSystem.Load("libHiggsAnalysisCombinedLimit")
@@ -61,7 +61,7 @@ for sig in signals:
       cardName='datacard_'+cat+'.txt'
       workspaceName='workspace_'+cat+outlabel+'.root'
 
-      if sig.find("VV")!=-1 or options.run.find("WV")!=-1 :            
+      if sig.find("VV")!=-1 or sig.find("WV")!=-1 :            
         Tools.AddSignal(card,dataset,p,sig,resultsDir[dataset],ncontrib)
       else:
         Tools.AddSingleSignal(card,dataset,p,sig,resultsDir[dataset],ncontrib)                 
