@@ -393,8 +393,11 @@ def save_shape(final_shape,norm_nonres,pTools,sample="pythia"):
 
 def makeNonResCard():
 
- if options.pdfIn.find("HPHP")!=-1: category_pdf = "VV_HPHP"
- elif options.pdfIn.find("HPLP")!=-1: category_pdf = "VV_HPLP"
+ if options.pdfIn.find("VV_HPHP")!=-1: category_pdf = "VV_HPHP"
+ elif options.pdfIn.find("VV_HPLP")!=-1: category_pdf = "VV_HPLP"
+ if options.pdfIn.find("VH_HPHP")!=-1: category_pdf = "VH_HPHP" 
+ elif options.pdfIn.find("VH_HPLP")!=-1: category_pdf = "VH_HPLP"
+ elif options.pdfIn.find("VH_LPHP")!=-1: category_pdf = "VH_LPHP"
  else: category_pdf = "VV_LPLP"  
      
  dataset = options.year
@@ -405,23 +408,29 @@ def makeNonResCard():
  scales = {"2017" :[0.983,1.08], "2016":[1.014,1.086]}
  scalesHiggs = {"2017" :[1.,1.], "2016":[1.,1.]}
 
- vtag_unc = {'VV_HPHP':{},'VV_HPLP':{},'VV_LPLP':{}}
+ vtag_unc = {'VV_HPHP':{},'VV_HPLP':{},'VV_LPLP':{},'VH_HPHP':{},'VH_HPLP':{},'VH_LPHP':{} }
  vtag_unc['VV_HPHP'] = {'2016':'1.232/0.792','2017':'1.269/0.763'}
  vtag_unc['VV_HPLP'] = {'2016':'0.882/1.12','2017':'0.866/1.136'}    
  vtag_unc['VV_LPLP'] = {'2016':'1.063','2017':'1.043'}
+ #this is a quick fix! these values are probably wrong!!
+ vtag_unc['VH_HPHP'] = {'2016':'1.232/0.792','2017':'1.269/0.763'}
+ vtag_unc['VH_HPLP'] = {'2016':'0.882/1.12','2017':'0.866/1.136'}    
+ vtag_unc['VH_LPHP'] = {'2016':'1.063','2017':'1.043'}
 
- vtag_pt_dependence = {'VV_HPHP':'((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))','VV_HPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))','VV_LPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))'} #irene added fake LPLP for a quick test!
+ vtag_pt_dependence = {'VV_HPHP':'((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))','VV_HPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))','VV_LPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))','VH_HPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))','VH_LPHP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))','VH_HPHP':'((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))'} #irene added fakes  for a quick test!
 # vtag_pt_dependence = {'VV_HPHP':'((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))','VV_HPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))'}
 
  DTools = DatacardTools(scales,scalesHiggs,vtag_pt_dependence,lumi_unc,vtag_unc,1.0,"","")
- 
+ print '##########      PURITY      :', purity 
  cat='_'.join(['JJ',sig,purity,'13TeV_'+dataset])
  card=DataCardMaker('',purity,'13TeV_'+dataset,lumi[dataset],'JJ',cat)
  cardName='datacard_'+cat+'.txt'
  workspaceName='workspace_'+cat+'.root'
       
 # DTools.AddSignal(card,dataset,purity,sig,'results_2016',0)
+ print "Adding Signal"
  DTools.AddSignal(card,dataset,purity,sig,'results_%s'%options.year,0)
+ print "Signal Added 1!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
  hname = 'histo'
  if options.sample!='pythia': hname+=('_'+options.sample)
  fin = ROOT.TFile.Open(options.pdfIn)
@@ -434,30 +443,36 @@ def makeNonResCard():
 # card.addHistoShapeFromFile("nonRes",["MJ1","MJ2","MJJ"],options.pdfIn,hname,['PT:CMS_VV_JJ_nonRes_PT_'+category_pdf,'OPT3:CMS_VV_JJ_nonRes_OPT3_'+category_pdf],False,0)
 # card.addHistoShapeFromFile("nonRes",["MJ1","MJ2","MJJ"],options.pdfIn,hname,['PT:CMS_VV_JJ_nonRes_PT_'+category_pdf,'OPTXY:CMS_VV_JJ_nonRes_OPTXY_'+category_pdf],False,0)
 # card.addHistoShapeFromFile("nonRes",["MJ1","MJ2","MJJ"],options.pdfIn,hname,['PT:CMS_VV_JJ_nonRes_PT_'+category_pdf],False,0)
- card.addHistoShapeFromFile("nonRes",["MJ1","MJ2","MJJ"],options.pdfIn,hname,['OPTXY:CMS_VV_JJ_nonRes_OPTXY_'+category_pdf,'OPTZ:CMS_VV_JJ_nonRes_OPTZ_'+category_pdf,'OPT3:CMS_VV_JJ_nonRes_OPT3_'+category_pdf],False,0) 
+ card.addHistoShapeFromFile("nonRes",["MJ1","MJ2","MJJ"],options.pdfIn,hname,['OPTXY:CMS_VV_JJ_nonRes_OPTXY_'+category_pdf,'OPTZ:CMS_VV_JJ_nonRes_OPTZ_'+category_pdf,'OPT3:CMS_VV_JJ_nonRes_OPT3_'+category_pdf,'PTZ:CMS_VV_JJ_nonRes_PTZ_'+category_pdf],False,0) 
  #card.addHistoShapeFromFile("nonRes",["MJ1","MJ2","MJJ"],options.pdfIn,hname,['OPTXY:CMS_VV_JJ_nonRes_OPTXY_'+category_pdf,'OPTZ:CMS_VV_JJ_nonRes_OPTZ_'+category_pdf,'OPT3:CMS_VV_JJ_nonRes_OPT3_'+category_pdf],False,0) 
 # card.addHistoShapeFromFile("nonRes",["MJ1","MJ2","MJJ"],options.pdfIn,hname,['PT:CMS_VV_JJ_nonRes_PT_'+category_pdf,'OPTXY:CMS_VV_JJ_nonRes_OPTXY_'+category_pdf,'OPTZ:CMS_VV_JJ_nonRes_OPTZ_'+category_pdf,'OPT3:CMS_VV_JJ_nonRes_OPT3_'+category_pdf],False,0) ,    
+ print "adding yield"
  card.addFixedYieldFromFile("nonRes",1,options.input,"nonRes",1)
+ print "adding data"
  DTools.AddData(card,options.input,"nonRes",lumi[dataset] )
+ print "adding sig sys for purity", purity
  DTools.AddSigSystematics(card,sig,dataset,purity,0)
 
  print "Adding systematics to card"
  print "norm"
  card.addSystematic("CMS_VV_JJ_nonRes_norm","lnN",{'nonRes':1.5}) 
  print "OPTZ"
- card.addSystematic("CMS_VV_JJ_nonRes_OPTZ_"+category_pdf,"param",[0.0,1.]) 
+ card.addSystematic("CMS_VV_JJ_nonRes_OPTZ_"+category_pdf,"param",[1.5,2.]) #test for VH_LPHP 
+# card.addSystematic("CMS_VV_JJ_nonRes_OPTZ_"+category_pdf,"param",[0.0,1.]) 
  #card.addSystematic("CMS_VV_JJ_nonRes_OPTZ_"+category_pdf,"param",[0.0,0.5])
  print "OPTXY"
- card.addSystematic("CMS_VV_JJ_nonRes_OPTXY_"+category_pdf,"param",[0.0,1.]) #orig
+ card.addSystematic("CMS_VV_JJ_nonRes_OPTXY_"+category_pdf,"param",[0.0,2.]) #test for VH_HPHP
+# card.addSystematic("CMS_VV_JJ_nonRes_OPTXY_"+category_pdf,"param",[0.0,1.]) #orig
 # card.addSystematic("CMS_VV_JJ_nonRes_OPTXY_"+category_pdf,"param",[0.0,0.5])
  print "OPT3"
 # card.addSystematic("CMS_VV_JJ_nonRes_OPT3_"+category_pdf,"param",[1.0,0.333]) #orig
- card.addSystematic("CMS_VV_JJ_nonRes_OPT3_"+category_pdf,"param",[1.0,1.]) 
+# card.addSystematic("CMS_VV_JJ_nonRes_OPT3_"+category_pdf,"param",[1.0,1.]) #good
+ card.addSystematic("CMS_VV_JJ_nonRes_OPT3_"+category_pdf,"param",[0.0,1.]) #test for VH_HPHP  
  #card.addSystematic("CMS_VV_JJ_nonRes_OPT3_"+category_pdf,"param",[10.,20.])
 # print "PT"
 # card.addSystematic("CMS_VV_JJ_nonRes_PT_"+category_pdf,"param",[0.0,0.333]) #orig
-# print "PTZ"
-# card.addSystematic("CMS_VV_JJ_nonRes_PTZ_"+category_pdf,"param",[0.0,0.5]) 
+ print "PTZ"
+ card.addSystematic("CMS_VV_JJ_nonRes_PTZ_"+category_pdf,"param",[0.0,2.]) 
  
  print " and now make card"     
  card.makeCard()
@@ -479,8 +494,11 @@ if __name__=="__main__":
               
      finMC = ROOT.TFile(options.input,"READ");
      hinMC = finMC.Get("nonRes");
-     if options.input.find("HPHP")!=-1: purity = "VV_HPHP"
-     elif options.input.find("HPLP")!=-1: purity = "VV_HPLP"
+     if options.input.find("VV_HPHP")!=-1: purity = "VV_HPHP"
+     elif options.input.find("VV_HPLP")!=-1: purity = "VV_HPLP"
+     if options.input.find("VH_HPHP")!=-1: purity = "VH_HPHP"
+     elif options.input.find("VH_HPLP")!=-1: purity = "VH_HPLP"
+     elif options.input.find("VH_LPHP")!=-1: purity = "VH_LPHP"
      else: purity = "VV_LPLP"  
      print "Using purity: " ,purity    
 
