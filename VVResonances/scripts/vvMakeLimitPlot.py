@@ -22,6 +22,7 @@ parser.add_option("-l","--log",dest="log",type=int,help="Log plot",default=1)
 
 parser.add_option("-t","--titleX",dest="titleX",default='M_{X} [GeV]',help="title of x axis")
 parser.add_option("-T","--titleY",dest="titleY",default='#sigma x BR(X #rightarrow WW) [pb]  ',help="title of y axis")
+parser.add_option("-n","--name",dest="name",default='test ',help="add a label to the output file name")
 
 parser.add_option("-p","--period",dest="period",default='2016',help="period")
 parser.add_option("-f","--final",dest="final",type=int, default=1,help="Preliminary or not")
@@ -473,11 +474,12 @@ c.RedrawAxis()
 
 if options.blind==0:
     bandObs.Draw("PLsame")
-c.SaveAs(options.output+options.sig+".png")    
-c.SaveAs(options.output+options.sig+".pdf")    
-c.SaveAs(options.output+options.sig+".C")    
+filename=options.output+"_"+options.sig+"_"+options.name
+c.SaveAs(filename+".png")    
+c.SaveAs(filename+".pdf")    
+c.SaveAs(filename+".C")    
 
-fout=ROOT.TFile(options.output+options.sig+".root","RECREATE")
+fout=ROOT.TFile(filename+".root","RECREATE")
 fout.cd()
 c.Write()
 band68.Write()
