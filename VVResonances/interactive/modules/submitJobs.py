@@ -1577,10 +1577,13 @@ def makePseudoData(input="JJ_nonRes_LPLP.root",kernel="JJ_nonRes_3D_LPLP.root",m
 
  xbins = array("f",getListOfBinsLowEdge(hmcin,"x"))
  zbins = array("f",getListOfBinsLowEdge(hmcin,"z"))
- hout = ROOT.TH3F('data','data',len(xbins)-1,xbins,len(xbins)-1,xbins,len(zbins)-1,zbins)
+ hout = ROOT.TH3F('datah','datah',len(xbins)-1,xbins,len(xbins)-1,xbins,len(zbins)-1,zbins)
+# hout.FillRandom(hdata,int(hmcin.Integral())) #irene making test
  hout.FillRandom(hdata,int(hmcin.Integral()*lumi))
- hout.Write('data')
+ print "hout data integral ",hout.Integral()
+ hout.Write('datah')
  print "Writing histograms nonRes and data to file ", output
+ fout.Write()
 
  finmc.Close()
  findata.Close()
