@@ -1,13 +1,13 @@
 from functions import *
 from optparse import OptionParser
 
-#examples:
 # python makeInputs.py -p 2016 --run "signorm" --signal "ZprimeWW" --batch False 
 # python makeInputs.py -p 2016 --run "vjets" --batch False                                                                                                                                      
 # python makeInputs.py -p 2016 --run "qcdtemplates"
 # python makeInputs.py -p 2016 --run "qcdkernel"
 # python makeInputs.py -p 2016 --run "qcdnorm"
 # python makeInputs.py -p 2016 --run "data"
+# python makeInputs.py -p 2016 --run "pseudo"
 parser = OptionParser()
 parser.add_option("-p","--period",dest="period",type="int",default=2016,help="run period")
 parser.add_option("-s","--sorting",dest="sorting",help="b-tag or random sorting",default='random')
@@ -103,7 +103,6 @@ if sorting == 'random':
  cuts['VH_LPHP'] = '('+ '('+  '&&'.join([catVtag['LP1'],catHtag['HP2']]) + ')' + '||' + '(' + '&&'.join([catVtag['LP2'],catHtag['HP1']]) + ')' + '||' + '(' + '&&'.join([catHtag['LP2'],catHtag['HP1']]) + ')'+'||'+ '(' + '&&'.join([catHtag['LP1'],catHtag['HP2']]) + ')'+')'
  cuts['VH_LPLP'] = '('+'('+ '&&'.join([catVtag['LP1'],catHtag['LP2']]) + ')'+ '||' +'(' + '&&'.join([catVtag['LP2'],catHtag['LP1']]) + ')' + '||' + '(' + '&&'.join([catVtag['LP2'],catHtag['LP1']]) + ')' +'||' + '(' + '&&'.join([catHtag['LP2'],catHtag['LP1']]) + ')' + ')'
  cuts['VH_all'] =  '('+  '||'.join([cuts['VH_HPHP'],cuts['VH_HPLP'],cuts['VH_LPHP'],cuts['VH_LPLP']]) + ')'
- #commented because we need VH to try to reproduce B2G-18-002
  print " ################ VV orthogonal  VH CATEGORY ############" 
  cuts['VV_HPHP'] = '('+'!'+cuts['VH_all']+'&&'+'(' +  '&&'.join([catVtag['HP1'],catVtag['HP2']]) + ')' + ')'
  cuts['VV_HPLP'] = '(' + '!' + cuts['VH_all'] + '&&' + '(' + '('+  '&&'.join([catVtag['HP1'],catVtag['LP2']]) + ')' + '||' + '(' + '&&'.join([catVtag['HP2'],catVtag['LP1']]) + ')' + ')' + ')'
@@ -137,8 +136,9 @@ cuts['res'] = '(jj_l1_mergedVTruth==1&&jj_l1_softDrop_mass>60&&jj_l1_softDrop_ma
 cuts['resTT'] = '(jj_l1_mergedVTruth==1&&jj_l1_softDrop_mass>140&&jj_l1_softDrop_mass<200)'
 
 #all categories
-#categories=['VH_HPHP','VH_HPLP','VH_LPHP','VH_LPLP','VV_HPHP','VV_HPLP']
-categories=['VH_LPHP']
+#categories=['VH_HPHP','VH_HPLP','VH_LPHP','VV_HPHP','VV_HPLP']
+categories=['VV_HPLP']
+
 
 
 #list of signal samples --> nb, radion and vbf samples to be added
@@ -230,7 +230,7 @@ if options.run.find("all")!=-1 or options.run.find("sig")!=-1:
 
 
 fixParsSig={"ZprimeZH":{ "VV_HPLP": {"fixPars":"mean:91.5,n:1.83,n2:4.22,alphaH:0.51,sigmaH:10.7","pol":"mean:pol0,sigma:pol5,alpha:pol5,n:pol0,alpha2:pol5,n2:pol0,meanH:pol4,sigmaH:pol0,alphaH:pol0,nH:pol3,alpha2H:pol3,n2H:pol4"}, "VH_all": {"fixPars":"mean:91.5,n2:4.22,n:128,alphaH:0.51,nH:127","pol":"mean:pol0,sigma:pol5,alpha:pol5,n:pol0,alpha2:pol5,n2:pol0,meanH:pol5,sigmaH:pol7,alphaH:pol0,nH:pol3,alpha2H:pol3,n2H:pol4"} },
-"BulkGWW":{ "VV_HPLP": {"fixPars":"alpha:1.125,n:2,n2:2","pol":"mean:pol4,sigma:pol3,alpha:pol3,n:pol0,alpha2:pol3,n2:pol3"},"VV_HPHP": {"fixPars":"alpha:1.08,n:6,n2:2","pol":"mean:pol5,sigma:pol5,alpha:pol0,n:pol0,alpha2:pol5,n2:pol0"}},
+            "BulkGWW":{ "VV_HPLP": {"fixPars":"alpha:1.125,n:2,n2:2","pol":"mean:pol4,sigma:pol3,alpha:pol3,n:pol0,alpha2:pol3,n2:pol3"},"VV_HPHP": {"fixPars":"alpha:1.08,n:6,n2:2","pol":"mean:pol5,sigma:pol5,alpha:pol0,n:pol0,alpha2:pol5,n2:pol0"}, "VH_HPLP": {"fixPars":"alpha:1.125,n:2,n2:2","pol":"mean:pol4,sigma:pol3,alpha:pol3,n:pol0,alpha2:pol3,n2:pol3"}, "VH_LPHP": {"fixPars":"alpha:1.125,n:2,n2:2","pol":"mean:pol4,sigma:pol3,alpha:pol3,n:pol0,alpha2:pol3,n2:pol3"},"VH_HPHP": {"fixPars":"alpha:1.08,n:6,n2:2","pol":"mean:pol5,sigma:pol5,alpha:pol0,n:pol0,alpha2:pol5,n2:pol0"}},
 "BulkGZZ":{"VV_HPLP":{"fixPars":"alpha:1.024,n:3.25","pol":"mean:pol4,sigma:pol3,alpha:pol0,n:pol0,alpha2:pol3,n2:pol4"},
            "VV_HPHP":{"fixPars":"n:2.1,n2:3.5","pol":"mean:pol3,sigma:pol5,alpha:pol5,n:pol0,alpha2:pol3,n2:pol0"}},
 "ZprimeWW":{"VV_HPLP": {"fixPars":"alpha:1.125","pol":"mean:pol5,sigma:pol5,alpha:pol0,n:pol3,alpha2:pol3,n2:pol3"},
@@ -333,10 +333,12 @@ if options.run.find("all")!=-1 or options.run.find("vjets")!=-1:
 
 
 if options.run.find("all")!=-1 or options.run.find("data")!=-1:
-    print " Do data or pseudodata"
+    print " Do data "
     f.makeNormalizations("data","JJ_"+str(period),dataTemplate,1,'1',"normD") #run on data. Currently run on pseudodata only (below)
-#    from modules.submitJobs import makePseudoData
-#    for p in categories: makePseudoData("JJ_"+str(period)+"_nonRes_%s.root"%p,"JJ_"+str(period)+"_nonRes_3D_%s.root"%p,"pythia","JJ_PDnoVjets_%s.root"%p,lumi)
+if options.run.find("all")!=-1 or options.run.find("pseudo")!=-1:
+    print " Do pseudodata "
+    from modules.submitJobs import makePseudoData
+    for p in categories: makePseudoData("JJ_"+str(period)+"_nonRes_%s.root"%p,"save_new_shapes_"+str(period)+"_pythia_%s_3D.root"%p,"pythia","JJ_PDnoVjets_%s.root"%p,lumi)
 #    from modules.submitJobs import makePseudoDataVjets
 #    for p in categories: makePseudoDataVjets("/afs/cern.ch/user/t/thaarres/public/forJen/looseDDT/JJ_nonRes_%s.root"%p,"/afs/cern.ch/user/t/thaarres/public/forJen/looseDDT/JJ_nonRes_3D_%s.root"%p,"pythia","/afs/cern.ch/user/t/thaarres/public/forJen/looseDDT/JJ_PD_%s.root"%p,lumi,"/afs/cern.ch/user/t/thaarres/public/forJen/looseDDT/workspace_JJ_13TeV_2017.root",2017,p)
 
