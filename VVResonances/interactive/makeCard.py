@@ -6,11 +6,12 @@ from CMGTools.VVResonances.statistics.DataCardMaker import DataCardMaker
 cmd='combineCards.py '
 
 sf_qcd = 1.0
-pseudodata = ""#"ZprimeZH"
+pseudodata = "noVjets" #"ZprimeZH"
 outlabel = ""#"sigonly_ZprimeZH_M2000"
 
 datasets=['2016']#,'2017']
 
+doVjets=False
 resultsDir = {'2016':'results_2016','2017':'results_2017'}
 
 lumi = {'2016':35900,'2017':41367}
@@ -39,8 +40,8 @@ vtag_unc['VV_LPLP'] = {'2016':'1.063','2017':'1.043'}
 vtag_pt_dependence = {'VV_HPHP':'((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))','VV_HPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))'}
 '''  
 #purities= ['VV_HPLP']
-#purities= ['VV_HPLP','VV_HPHP']
-purities= ['VV_HPLP','VV_HPHP','VH_HPLP','VH_HPHP','VH_LPHP']
+purities= ['VV_HPLP','VV_HPHP']
+#purities= ['VV_HPLP','VV_HPHP','VH_HPLP','VH_HPHP','VH_LPHP']
 #signals = ["BulkGWW", "BulkGZZ","ZprimeWW","WprimeWZ","VprimeWV","'ZprimeZH'"]
 signals = ["BulkGWW"]
 
@@ -67,28 +68,33 @@ for sig in signals:
         Tools.AddSingleSignal(card,dataset,p,sig,resultsDir[dataset],ncontrib)                 
       ncontrib+=1
 
-      rootFileMVV = resultsDir[dataset]+'/JJ_%s_WJets_MVV_'%dataset+p+'.root' 
-      rootFileNorm = resultsDir[dataset]+'/JJ_%s_WJets_%s.root'%(dataset,p)
-      Tools.AddWResBackground(card,dataset,p,rootFileMVV,rootFileNorm,resultsDir[dataset],ncontrib)
-      ncontrib+=1
-      
-      rootFileMVV = resultsDir[dataset]+'/JJ_%s_ZJets_MVV_'%dataset+p+'.root'
-      rootFileNorm = resultsDir[dataset]+"/JJ_%s_ZJets_%s.root"%(dataset,p)
-      Tools.AddZResBackground(card,dataset,p,rootFileMVV,rootFileNorm,resultsDir[dataset],ncontrib)
-      ncontrib+=1
-      
+      if doVjets:
+        print "including W/Z jets in datacard"
+        rootFileMVV = resultsDir[dataset]+'/JJ_%s_WJets_MVV_'%dataset+p+'.root' 
+        rootFileNorm = resultsDir[dataset]+'/JJ_%s_WJets_%s.root'%(dataset,p)
+        Tools.AddWResBackground(card,dataset,p,rootFileMVV,rootFileNorm,resultsDir[dataset],ncontrib)
+        ncontrib+=1
+        
+        rootFileMVV = resultsDir[dataset]+'/JJ_%s_ZJets_MVV_'%dataset+p+'.root'
+        rootFileNorm = resultsDir[dataset]+"/JJ_%s_ZJets_%s.root"%(dataset,p)
+        Tools.AddZResBackground(card,dataset,p,rootFileMVV,rootFileNorm,resultsDir[dataset],ncontrib)
+        ncontrib+=1
+
       #rootFile3DPDF = resultsDir[dataset]+'/JJ_2016_nonRes_3D_VV_HPLP.root'
       rootFile3DPDF = resultsDir[dataset]+"/save_new_shapes_%s_pythia_"%dataset+p+"_3D.root"
-
+      print "rootFile3DPDF ",rootFile3DPDF
       rootFileNorm = resultsDir[dataset]+"/JJ_%s_nonRes_"%dataset+p+".root"   
+      print "rootFileNorm ",rootFileNorm
       Tools.AddNonResBackground(card,dataset,p,rootFile3DPDF,rootFileNorm,ncontrib) 
 
       rootFileData = resultsDir[dataset]+"/JJ_"+p+".root"
       histName="data"
-      scaleData=1.0 #if you ru on real data
-#      rootFileData = "results_2016/JJ_2016_nonRes_VV_HPLP.root"   
-#      histName="nonRes"
-#      scaleData=lumi[dataset] #if you run on MC for transfer-kernel
+      scaleData=1.0 #if you ru on real data OR PSEUDODATA
+      if pseudodata=="noVjets":
+        print "Using pseudodata without vjets"
+        rootFileData = resultsDir[dataset]+"/JJ_PDnoVjets_"+p+".root"
+        histName="datah"
+        scaleData=1.0
       if pseudodata=="ZprimeZH":
        rootFileData = resultsDir[dataset]+"/JJ_ZprimeZH_VH_all_M2000.root"
        histName="data_obs"
@@ -174,7 +180,7 @@ for sig in signals:
     t2wcmd = "text2workspace.py %s -o %s"%(combo_card_vh,combo_workspace_vh)
     print t2wcmd
     os.system(t2wcmd)
-
+    
     print "######### Make VV + VH card ###########"     
     combo_card_tot="datacard_JJ_BulkGWW_TOT_13TeV_2016.txt"
     combo_workspace_tot = "workspace_JJ_BulkGWW_TOT_13TeV_2016.root"
@@ -189,12 +195,9 @@ for sig in signals:
 
     '''
     #make combined VV+VH card
-    print "######### Make VV + VH card ###########"
-
+    print "#######     going to combine purity categories: ",purities    
     combo_card = 'datacard_'+cat.replace("VV_HPHP","").replace("VV_HPLP","").replace("VV_LPLP","").replace("VH_HPHP","").replace("VH_HPLP","").replace("VH_LPHP","")+'.txt'
-
     combo_workspace = 'workspace_'+cat.replace("VV_HPHP","").replace("VV_HPLP","").replace("VV_LPLP","").replace("VH_HPHP","").replace("VH_HPLP","").replace("VH_LPHP","")+'.root'
-
     os.system('rm %s'%combo_card)
     cmd_combo+=' >> %s'%combo_card
     print cmd_combo
@@ -202,21 +205,22 @@ for sig in signals:
     t2wcmd = "text2workspace.py %s -o %s"%(combo_card,combo_workspace)
     print t2wcmd
     os.system(t2wcmd)
+    print "#####################################"
 
+  if len(datasets)>1:   
+    #make combine 2016+2017 card
+    print "more than one year, making combined cards"
+    combo_card = 'datacard_'+cat.replace("_HPHP","").replace("_HPLP","").replace("_LPLP","").replace('_2016','').replace('_2017','')+'.txt'
+    combo_workspace = 'workspace_'+cat.replace("_HPHP","").replace("_HPLP","").replace("_LPLP","").replace('_2016','').replace('_2017','')+'.root'
+    os.system('rm %s'%combo_card)
+    cmd+=' >> %s'%combo_card
+    print cmd
 
   
-  #make combine 2016+2017 card
-  combo_card = 'datacard_'+cat.replace("_HPHP","").replace("_HPLP","").replace("_LPLP","").replace('_2016','').replace('_2017','')+'.txt'
-  combo_workspace = 'workspace_'+cat.replace("_HPHP","").replace("_HPLP","").replace("_LPLP","").replace('_2016','').replace('_2017','')+'.root'
-  os.system('rm %s'%combo_card)
-  cmd+=' >> %s'%combo_card
-  print cmd
-
   
-  
-  os.system(cmd)
-  t2wcmd = "text2workspace.py %s -o %s"%(combo_card,combo_workspace)
-  print t2wcmd
-  os.system(t2wcmd)
+#  os.system(cmd)
+#  t2wcmd = "text2workspace.py %s -o %s"%(combo_card,combo_workspace)
+#  print t2wcmd
+#  os.system(t2wcmd)
 
 
