@@ -43,9 +43,20 @@ ROOT.RooMsgService.instance().setGlobalKillBelow(ROOT.RooFit.FATAL)
 #colors = [ROOT.kBlack,ROOT.kPink-1,ROOT.kAzure+1,ROOT.kAzure+1,210,210,ROOT.kMagenta,ROOT.kMagenta,ROOT.kOrange,ROOT.kOrange,ROOT.kViolet,ROOT.kViolet]
 colors = [ROOT.kGray+2,ROOT.kRed,ROOT.kBlue,ROOT.kGray+1,210,210,ROOT.kMagenta,ROOT.kMagenta,ROOT.kOrange,ROOT.kOrange,ROOT.kViolet,ROOT.kViolet]
 
-signalName = "BulkGWW"
+signalName = "ZprimeZH"
+if options.name.find("WZ")!=-1:
+    signalName="WprimeWZ"
+if options.name.find("ZprimeWW")!=-1:
+    signalName="ZprimeWW"
+if options.name.find("BulkGWW")!=-1:
+    signalName="BulkGWW"
+if options.name.find("BulkGZZ")!=-1:
+    signalName="BulkGZZ"
 period = "2016"
 if options.name.find("2017")!=-1: period = "2017"
+
+if options.label.find("sigonly")!=-1:
+    doFit=False
 
 
 def calculateChi2ForSig(hsig,pred,axis,logfile,label):
@@ -263,6 +274,7 @@ def MakePlots(histos,hdata,hsig,axis,nBins,normsig = 1.,errors=None):
     if options.zrange == '0,-1': zrange = '1126,5500'
     if axis=='z':
      htitle = "Z-Proj. x : "+options.xrange+" y : "+options.yrange
+     hhtitle = purity
      xtitle = "Dijet invariant mass [GeV]"
      ymin = 0.2
      ymax = hdata.GetMaximum()*50000
@@ -270,6 +282,7 @@ def MakePlots(histos,hdata,hsig,axis,nBins,normsig = 1.,errors=None):
      extra2 = yrange.split(',')[0]+' < m_{jet2} < '+ yrange.split(',')[1]+' GeV'
     elif axis=='x':
      htitle = "X-Proj. y : "+options.yrange+" z : "+options.zrange
+     hhtitle = purity
      xtitle = " m_{jet1} [GeV]"
      ymin = 0.02
      ymax = hdata.GetMaximum()*1.3
@@ -277,6 +290,7 @@ def MakePlots(histos,hdata,hsig,axis,nBins,normsig = 1.,errors=None):
      extra2 = zrange.split(',')[0]+' < m_{jj} < '+ zrange.split(',')[1]+' GeV'
     elif axis=='y':
      htitle = "Y-Proj. x : "+options.xrange+" z : "+options.zrange
+     hhtitle = purity
      xtitle = " m_{jet2} [GeV]"
      ymin = 0.02
      ymax = hdata.GetMaximum()*1.3
@@ -284,9 +298,9 @@ def MakePlots(histos,hdata,hsig,axis,nBins,normsig = 1.,errors=None):
      extra2 = zrange.split(',')[0]+' < m_{jj} < '+ zrange.split(',')[1]+' GeV'
                    
     #leg = ROOT.TLegend(0.450436242,0.5531968,0.7231544,0.8553946)
-    leg = ROOT.TLegend(0.50809045,0.5063636,0.7622613,0.8520979)
+    leg = ROOT.TLegend(0.40809045,0.5063636,0.7622613,0.8520979)
     leg.SetTextSize(0.05)
-    c = ROOT.TCanvas('c')
+    c = get_canvas('c')
     pad1 = get_pad("pad1") #ROOT.TPad("pad1", "pad1", 0, 0.3, 1, 1.0)
     if axis == 'z': pad1.SetLogy()
     pad1.SetBottomMargin(0.01)    
@@ -296,7 +310,7 @@ def MakePlots(histos,hdata,hsig,axis,nBins,normsig = 1.,errors=None):
  
     histos[0].SetMinimum(ymin)
     histos[0].SetMaximum(ymax) 
-    histos[0].SetTitle(htitle)
+    histos[0].SetTitle(hhtitle)
     histos[0].SetLineColor(colors[0])
     histos[0].SetLineWidth(2)
     histos[0].GetXaxis().SetTitle(xtitle)
@@ -345,10 +359,11 @@ def MakePlots(histos,hdata,hsig,axis,nBins,normsig = 1.,errors=None):
     scaling = 500.
     eff = 0.1
     if purity.find("HPHP") != -1:
-        scaling = 5
+        scaling = 500.
         eff = 0.02
     
     if hsig:
+      print hsig.Integral()
       if hsig.Integral()!=0.:   
         hsig.Scale(scaling/normsig)
 #        print "sig integral ",hsig.Integral()
@@ -421,7 +436,7 @@ def MakePlots(histos,hdata,hsig,axis,nBins,normsig = 1.,errors=None):
     #pt.Draw()
 
     #pt2 = ROOT.TPaveText(0.55,0.29,0.99,0.4,"NDC")
-    pt2 = ROOT.TPaveText(0.55,0.39,0.99,0.52,"NDC")
+    pt2 = ROOT.TPaveText(0.55,0.35,0.99,0.52,"NDC")
     pt2.SetTextFont(42)
     pt2.SetTextSize(0.05)
     pt2.SetTextAlign(12)
@@ -466,7 +481,7 @@ def MakePlots(histos,hdata,hsig,axis,nBins,normsig = 1.,errors=None):
     
     #for pulls
     if errors ==None: errors=[0,0];
-    if options.name.find('sigonly')!=-1: graphs = addPullPlot(hdata,hsig,nBins,errors[0])
+    if options.name.find('sigOnly')!=-1: graphs = addPullPlot(hdata,hsig,nBins,errors[0])
     else:
         graphs = addPullPlot(hdata,histos[0],nBins,errors[0])
     # graphs = addRatioPlot(hdata,histos[0],nBins,errors[0])
@@ -580,6 +595,9 @@ def doZprojection(pdfs,data,norm_nonres,norm_Wres,pdf_sig,norm_sig,norm_Zres,nor
     if options.addTop: htot.Add(htot_TThad)
     htot.Add(htot_sig)
 
+    print htot_sig
+    print " event for signal " +str(htot_sig.Integral())
+    print " norm sig "+str(norm_sig[0])
     hfinals = []
     hfinals.append(htot)
     hfinals.append(htot_Wres)
@@ -1020,10 +1038,11 @@ def getChi2proj(histo_pdf,histo_data,minx=-1,maxx=-1):
 if __name__=="__main__":
      finMC = ROOT.TFile(options.input,"READ");
      hinMC = finMC.Get("nonRes");
-     purity = options.input.replace('.root','').split('_')[-1]   
-
-     if options.input.find("VV") !=-1: purity="VV_"+purity
-     elif options.input.find("VH") !=-1: purity="VH_"+purity
+     print options.name
+     purity = options.name.split('_')[3]+"_"+ options.name.split('_')[4]
+     print purity
+     #if options.input.find("VV") !=-1: purity="VV_"+purity
+     #elif options.input.find("VH") !=-1: purity="VH_"+purity
                    
      #################################################
      xBins= getListOfBins(hinMC,"x")
@@ -1217,42 +1236,48 @@ if __name__=="__main__":
      norm1_Zres[0] = (args[pdf1Name].getComponents())["n_exp_binJJ_"+purity+"_13TeV_"+period+"_proc_Zjets"].getVal()
      norm1_TThad = [0,0]
      norm1_sig = [0,0]
-     if doFit: 
-        print
-        (args[pdf1Name].getComponents())["n_exp_binJJ_"+purity+"_13TeV_"+period+"_proc_nonRes"].dump()     
+      
+     print
+     (args[pdf1Name].getComponents())["n_exp_binJJ_"+purity+"_13TeV_"+period+"_proc_nonRes"].dump() 
+     if doFit:
         norm1_nonres[1] = (args[pdf1Name].getComponents())["n_exp_binJJ_"+purity+"_13TeV_"+period+"_proc_nonRes"].getPropagatedError(fitresult)
         
                     
-        print
-        (args[pdf1Name].getComponents())["n_exp_binJJ_"+purity+"_13TeV_"+period+"_proc_Wjets"].dump()
+     print
+     (args[pdf1Name].getComponents())["n_exp_binJJ_"+purity+"_13TeV_"+period+"_proc_Wjets"].dump()
+     if doFit:
         norm1_Wres[1] = (args[pdf1Name].getComponents())["n_exp_binJJ_"+purity+"_13TeV_"+period+"_proc_Wjets"].getPropagatedError(fitresult)
         
-        print
-        (args[pdf1Name].getComponents())["n_exp_binJJ_"+purity+"_13TeV_"+period+"_proc_Zjets"].dump()
+     print
+     (args[pdf1Name].getComponents())["n_exp_binJJ_"+purity+"_13TeV_"+period+"_proc_Zjets"].dump()
+     if doFit:
         norm1_Zres[1] = (args[pdf1Name].getComponents())["n_exp_binJJ_"+purity+"_13TeV_"+period+"_proc_Zjets"].getPropagatedError(fitresult)
         
         
-        if options.addTop:
-            print
-            (args[pdf1Name].getComponents())["n_exp_binJJ_"+purity+"_13TeV_"+period+"_proc_TThad"].dump()
-            norm1_TThad[0] = (args[pdf1Name].getComponents())["n_exp_binJJ_"+purity+"_13TeV_"+period+"_proc_TThad"].getVal()
+     if options.addTop:
+        print
+        (args[pdf1Name].getComponents())["n_exp_binJJ_"+purity+"_13TeV_"+period+"_proc_TThad"].dump()
+        norm1_TThad[0] = (args[pdf1Name].getComponents())["n_exp_binJJ_"+purity+"_13TeV_"+period+"_proc_TThad"].getVal()
+        if doFit:
             norm1_TThad[1] = (args[pdf1Name].getComponents())["n_exp_binJJ_"+purity+"_13TeV_"+period+"_proc_TThad"].getPropagatedError(fitresult)
         
-        else:
-            norm1_TThad    = [0,0]
-            norm1_TThad[0] = 1.
-            norm1_TThad[1] = 1.
-            norm2_TThad    = [0,0]
-            norm2_TThad[0] = 1.
-            norm2_TThad[1] = 1.
+     else:
+        norm1_TThad    = [0,0]
+        norm1_TThad[0] = 1.
+        norm1_TThad[1] = 1.
+        norm2_TThad    = [0,0]
+        norm2_TThad[0] = 1.
+        norm2_TThad[1] = 1.
         
-        if options.fitSignal:
-            print
-            #(args[pdfName].getComponents())["n_exp_final_binJJ_"+purity+"_13TeV_proc_"+signalName+""].dump()
-            norm1_sig[0] = (args[pdf1Name].getComponents())["n_exp_final_binJJ_"+purity+"_13TeV_"+period+"_proc_"+signalName+""].getVal() 
+     if options.fitSignal:
+         print
+         #(args[pdfName].getComponents())["n_exp_final_binJJ_"+purity+"_13TeV_proc_"+signalName+""].dump()
+         norm1_sig[0] = (args[pdf1Name].getComponents())["n_exp_final_binJJ_"+purity+"_13TeV_"+period+"_proc_"+signalName+""].getVal() 
+         if doFit:
             norm1_sig[1] = (args[pdf1Name].getComponents())["n_exp_final_binJJ_"+purity+"_13TeV_"+period+"_proc_"+signalName+""].getPropagatedError(fitresult)
+         print "get norm sig "+str(norm1_sig[0])
             
-                    
+     if doFit:                
         print
         print "QCD normalization after fit: ",norm1_nonres[0],"+/-",norm1_nonres[1],"("+period+")"
         print "W+jets normalization after fit: ",norm1_Wres[0],"+/-",norm1_Wres[1],"("+period+")"
@@ -1307,3 +1332,5 @@ if __name__=="__main__":
       doYprojection(allpdfsy,data1,norm1_nonres,norm1_Wres,pdf1_signal_postfit,norm1_sig,norm1_Zres,norm1_TThad)
      
      logfile.close()
+
+     print purity

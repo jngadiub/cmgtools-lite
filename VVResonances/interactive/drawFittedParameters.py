@@ -1,4 +1,4 @@
-from ROOT import TFile, TCanvas, TPaveText, TLegend, gDirectory, TH1F,gROOT,gStyle, TLatex
+from ROOT import TFile, TCanvas, TPaveText, TLegend, gDirectory, TH1F,gROOT,gStyle, TLatex,TF1
 import sys,copy
 import tdrstyle
 tdrstyle.setTDRStyle()
@@ -9,9 +9,9 @@ gROOT.SetBatch(True)
 # infile = sys.argv[1]
 # f = TFile(infile,"READ")
 
-path = "/eos/user/t/thaarres/www/vvana/3D_latest/signalFits/"
+path = sys.argv[1]
 cols = [46,30]
-colors = ["#4292c6","#41ab5d","#ef3b2c","#ffd300","#fdae61","#abd9e9","#2c7bb6"]
+colors = ["#4292c6","#41ab5d","#ef3b2c","#ffd300","#D02090","#fdae61","#abd9e9","#2c7bb6"]
 mstyle = [8,4]
 
 def beautify(h1,color,linestyle=1,markerstyle=8):
@@ -22,9 +22,9 @@ def beautify(h1,color,linestyle=1,markerstyle=8):
     h1.SetLineStyle(linestyle)
     h1.SetMarkerStyle(markerstyle)
     
-def getLegend(x1=0.70010112,y1=0.123362,x2=0.90202143,y2=0.279833):
+def getLegend(x1=0.5809045,y1=0.6363636,x2=0.9522613,y2=0.9020979):
   legend = TLegend(x1,y1,x2,y2)
-  legend.SetTextSize(0.032)
+  legend.SetTextSize(0.04)
   legend.SetLineColor(0)
   legend.SetShadowColor(0)
   legend.SetLineStyle(1)
@@ -32,6 +32,7 @@ def getLegend(x1=0.70010112,y1=0.123362,x2=0.90202143,y2=0.279833):
   legend.SetFillColor(0)
   legend.SetFillStyle(0)
   legend.SetMargin(0.35)
+  legend.SetTextFont(42)
   return legend
 
 def getPavetext():
@@ -45,47 +46,51 @@ def getPavetext():
   addInfo.SetTextAlign(12)
   return addInfo
     
-def getCanvas(w=800,h=600):
-    H_ref = 600; 
-    W_ref = 800; 
-    W = W_ref
-    H = H_ref
     
-    T = 0.08*H_ref
-    B = 0.12*H_ref 
-    L = 0.12*W_ref
-    R = 0.04*W_ref
-    c=TCanvas("c","c",50,50,W,H)
-    c.SetFillColor(0)
-    c.SetBorderMode(0)
-    c.SetFrameFillStyle(0)
-    c.SetFrameBorderMode(0)
-    c.SetLeftMargin( L/W )
-    c.SetRightMargin( R/W )
-    c.SetTopMargin( T/H )
-    c.SetBottomMargin( 1.2*B/H )
-    c.SetTickx(0)
-    c.SetTicky(0)
-    c.GetWindowHeight()
-    c.GetWindowWidth()
-    # c.SetLogy()
-    # c.SetGrid()
-    return c
+def getCanvas(w=800,h=600):
+   
+ H_ref = 600 
+ W_ref = 600 
+ W = W_ref
+ H  = H_ref
+
+ iPeriod = 0
+
+ # references for T, B, L, R
+ T = 0.08*H_ref
+ B = 0.12*H_ref 
+ L = 0.13*W_ref
+ R = 0.04*W_ref
+ cname = "c"
+ canvas = TCanvas(cname,cname,50,50,W,H)
+ canvas.SetFillColor(0)
+ canvas.SetBorderMode(0)
+ canvas.SetFrameFillStyle(0)
+ canvas.SetFrameBorderMode(0)
+ canvas.SetLeftMargin( L/W )
+ canvas.SetRightMargin( R/W )
+ canvas.SetTopMargin( T/H )
+ canvas.SetBottomMargin( B/H )
+ canvas.SetTickx()
+ canvas.SetTicky()
+ 
+ return canvas
     
 
-def doSignalEff():
+def doSignalEff(signals,titles,categories):
     gStyle.SetOptFit(0)
-    signals = ["ZprimeWW","BulkGWW","WprimeWZ","BulkGZZ"]
-    titles =  ["Z' #rightarrow WW","G_{B}#rightarrow WW","W' #rightarrow WZ","G_{B}#rightarrow ZZ"]
     fitsHP=[]
     fitsLP=[]
+    fitstmpHP=[]
+    fitstmpLP=[]
+    
     datasHP=[]
     datasLP=[]
     
     
     c = getCanvas()
-    l = getLegend(0.7788945,0.723362,0.9974874,0.879833)
-    l2 = getLegend(0.7788945,0.1783217,0.9974874,0.2482517)
+    l = getLegend()#0.7788945,0.723362,0.9974874,0.879833)
+    l2 = getLegend(0.15,0.5783217,0.4974874,0.7482517)
     gStyle.SetOptStat(0)
     gStyle.SetOptTitle(0)
     
@@ -93,37 +98,56 @@ def doSignalEff():
     filesLP=[]
 
     for i,s in enumerate(signals):
-        filesLP.append(TFile("JJ_"+s+"_HPLP_yield_eff.root","READ"))
-        filesHP.append(TFile("JJ_"+s+"_HPHP_yield_eff.root","READ"))
+        filesLP.append(TFile("JJ_"+s+"_"+categories[1]+"_yield.root","READ"))
+        filesHP.append(TFile("JJ_"+s+"_"+categories[0]+"_yield.root","READ"))
     
     for i,(fHP,fLP) in enumerate(zip(filesHP,filesLP)):
         print fLP.GetName()
         gHPLP = fLP.Get("yield")
         gHPHP = fHP.Get("yield")
-        fHPLP = gHPLP.GetFunction("func")
-        fHPHP = gHPHP.GetFunction("func")
+        #### rescale graphs to remove cross section from yield ####
+        for k in range(0,gHPHP.GetN()): gHPHP.GetY()[k] *= 1000.
+        for k in range(0,gHPLP.GetN()): gHPLP.GetY()[k] *= 1000.
+        
+        ftmpHPLP = gHPLP.GetFunction("func")
+        fHPLP = TF1("funcLP"+str(i),str(ftmpHPLP.GetExpFormula()).replace("func","")+"*1000.",ftmpHPLP.GetXmin(),ftmpHPLP.GetXmax())
+        for o in range(0,ftmpHPLP.GetNpar()): 
+            fHPLP.SetParameter(o,ftmpHPLP.GetParameter(o))
+        ftmpHPHP = gHPHP.GetFunction("func")
+        fHPHP = TF1("funcHP"+str(i),str(ftmpHPHP.GetExpFormula()).replace("func","")+"*1000.",ftmpHPHP.GetXmin(),ftmpHPHP.GetXmax())
+        for o in range(0,ftmpHPHP.GetNpar()): 
+            fHPHP.SetParameter(o,ftmpHPHP.GetParameter(o))
+            
+        
+        print ftmpHPLP.Eval(1200.)
+        print fHPLP.Eval(1200.)
+        ##print ftmpHPLP
+        #ftmpHPLP.SetParNames("ftmpHPLP")
+        #ftmpHPHP.SetName("ftmpHPHP")
+        #fHPLP = gHPLP.GetFunction("func")
+        #fHPHP = gHPHP.GetFunction("func")
         gHPLP.GetFunction("func").SetBit(rt.TF1.kNotDraw)
         gHPHP.GetFunction("func").SetBit(rt.TF1.kNotDraw)
         # gHPLP.SetMarkerColor(rt.TColor.GetColor(colors[i]))
         # gHPHP.SetMarkerColor(rt.TColor.GetColor(colors[i]))
-        beautify(fHPLP ,rt.TColor.GetColor(colors[i]),9,24)
+        beautify(fHPLP ,rt.TColor.GetColor(colors[i]),2,24)
         beautify(fHPHP ,rt.TColor.GetColor(colors[i]),1,8)
-        beautify(gHPLP ,rt.TColor.GetColor(colors[i]),9,24)
+        beautify(gHPLP ,rt.TColor.GetColor(colors[i]),2,24)
         beautify(gHPHP ,rt.TColor.GetColor(colors[i]),1,8)
         datasHP.append(gHPHP)
         datasLP.append(gHPLP)
         fitsHP.append(fHPHP)
         fitsLP.append(fHPLP)
         l.AddEntry(fHPHP,titles[i],"L")
-    l2.AddEntry(fitsHP[0],"HPHP","LP")    
-    l2.AddEntry(fitsLP[0],"HPLP","LP")    
-    fitsHP[0].GetXaxis().SetTitle("M_{X} (GeV)")
+    l2.AddEntry(fitsHP[0],categories[0],"LP")    
+    l2.AddEntry(fitsLP[0],categories[1],"LP")    
+    fitsHP[0].GetXaxis().SetTitle("m_{X} [GeV]")
     fitsHP[0].GetYaxis().SetTitle("Signal efficiency")
     fitsHP[0].GetYaxis().SetNdivisions(4,5,0)
-    fitsHP[0].GetXaxis().SetNdivisions(9,2,0)
-    fitsHP[0].GetYaxis().SetTitleOffset(0.97)
-    fitsHP[0].GetXaxis().SetTitleOffset(0.94)
-    fitsHP[0].GetXaxis().SetRangeUser(1126, 5500.)
+    fitsHP[0].GetXaxis().SetNdivisions(5,5,0)
+    fitsHP[0].GetYaxis().SetTitleOffset(1.05)
+    fitsHP[0].GetXaxis().SetTitleOffset(0.9)
+    fitsHP[0].GetXaxis().SetRangeUser(1126, 5550.)
     fitsHP[0].GetYaxis().SetRangeUser(0.0, 0.25)
     fitsHP[0].Draw("C")
     for i,(gHP,gLP) in enumerate(zip(datasHP,datasLP)): 
@@ -132,93 +156,142 @@ def doSignalEff():
         fitsHP[i].Draw("Csame")
         fitsLP[i].Draw("Csame")
     c.Update()
+    print fitsHP
+    print fitstmpHP
     l.Draw("same")
     l2.Draw("same")
-    cmslabel_sim_prelim(c,'sim',11)
-    c.Update()
-    c.SaveAs(path+"signalEff.png")
-    c.SaveAs(path+"signalEff.pdf")
-    c.SaveAs(path+"signalEff.C")
+    if prelim.find("prelim")!=-1:
+         cmslabel_sim_prelim(c,'sim',11)
+    else:
+         cmslabel_sim(c,'sim',11)
     
-def doJetMass(leg="l1"):
+    
+    c.Update()
+    c.SaveAs(path+"signalEff"+prelim+"_"+categories[0].replace("_HPHP","")+".png")
+    c.SaveAs(path+"signalEff"+prelim+"_"+categories[0].replace("_HPHP","")+".pdf")
+    c.SaveAs(path+"signalEff"+prelim+"_"+categories[0].replace("_HPHP","")+".C")
+    
+def doJetMass(leg,signals,titles,categories):
     gStyle.SetOptFit(0)
-    signals = ["ZprimeWW","BulkGWW","WprimeWZ","BulkGZZ"]
-    titles =  ["Z' #rightarrow WW","G_{B}#rightarrow WW","W' #rightarrow WZ","G_{B}#rightarrow ZZ"]
+    #signals = ["ZprimeWW","BulkGWW","WprimeWZ","BulkGZZ"]
+    #titles =  ["Z' #rightarrow WW","G_{B}#rightarrow WW","W' #rightarrow WZ","G_{B}#rightarrow ZZ"]
     # signals = ["BulkGWW","WprimeWZ","BulkGZZ"]
     # titles =  ["G_{B}#rightarrow WW","W' #rightarrow WZ","G_{B}#rightarrow ZZ"]
     filesHP=[]
     filesLP=[]
-
+    fHLP=0
+    fHHP=0
     for i,s in enumerate(signals):
-        filesLP.append(TFile("debug_JJ_"+s+"_MJ%s_HPLP.json.root"%leg,"READ"))
-        filesHP.append(TFile("debug_JJ_"+s+"_MJ%s_HPHP.json.root"%leg,"READ"))
-    
+        filesLP.append(TFile("debug_JJ_"+s+"_"+categories[1].split("_")[0]+"_MJ"+leg+"_"+categories[1].split("_")[1]+"_"+categories[1].split("_")[2]+".json.root","READ"))
+        filesHP.append(TFile("debug_JJ_"+s+"_"+categories[0].split("_")[0]+"_MJ"+leg+"_"+categories[0].split("_")[1]+"_"+categories[0].split("_")[2]+".json.root","READ"))
+        if filesHP[-1].IsZombie()==1:
+            filesLP[-1] =(TFile("debug_JJ_Vjet_"+s+"_"+categories[1].split("_")[0]+"_MJ"+leg+"_"+categories[1].split("_")[1]+"_"+categories[1].split("_")[2]+".json.root","READ"))
+            filesHP[-1] =(TFile("debug_JJ_Vjet_"+s+"_"+categories[0].split("_")[0]+"_MJ"+leg+"_"+categories[0].split("_")[1]+"_"+categories[0].split("_")[2]+".json.root","READ"))
+            fHLP = (TFile("debug_JJ_Hjet_"+s+"_"+categories[1].split("_")[0]+"_MJ"+leg+"_"+categories[1].split("_")[1]+"_"+categories[1].split("_")[2]+".json.root","READ"))
+            fHHP = (TFile("debug_JJ_Hjet_"+s+"_"+categories[0].split("_")[0]+"_MJ"+leg+"_"+categories[0].split("_")[1]+"_"+categories[0].split("_")[2]+".json.root","READ"))
+            
+            
+       
     vars = ["mean","sigma"]
     vars = ["mean","sigma","alpha","n","alpha2","n2"]
     for var in vars:
-        fitsHP=[]
-        fitsLP=[]
-        datasHP=[]
-        datasLP=[]
+           
+       fitsHP=[]
+       fitsLP=[]
+       datasHP=[]
+       datasLP=[]
         
-        c = getCanvas()
-        l = getLegend(0.7788945,0.723362,0.9974874,0.879833)
-        l2 = getLegend(0.7788945,0.1783217,0.9974874,0.2482517)
-        l3 = getLegend(0.7788945,0.1783217,0.9974874,0.2482517)
-        gStyle.SetOptStat(0)
-        gStyle.SetOptTitle(0)
+       c = getCanvas()
+       l = getLegend()#0.7788945,0.723362,0.9974874,0.879833)
+       l2 = getLegend(0.15,0.5783217,0.4974874,0.7482517)
+       l3 = getLegend(0.18,0.5783217,0.6974874,0.2482517)
+       gStyle.SetOptStat(0)
+       gStyle.SetOptTitle(0)
+       title = "Jet mass width "
+       if var == "mean": title="Jet mass mean"
+       if fHLP!=0 and fHHP!=0:
+           gHPLP = fHLP.Get(var+"H")
+           gHPHP = fHHP.Get(var+"H")
+           fHPLP = fHLP.Get(var+"H_func")
+           fHPHP = fHHP.Get(var+"H_func")
+           gHPLP.GetFunction(var+"H_func").SetBit(rt.TF1.kNotDraw)
+           gHPHP.GetFunction(var+"H_func").SetBit(rt.TF1.kNotDraw)
+       
+           beautify(fHPLP ,rt.TColor.GetColor(colors[4]),2,24)
+           beautify(fHPHP ,rt.TColor.GetColor(colors[4]),1,8)
+           beautify(gHPLP ,rt.TColor.GetColor(colors[4]),2,24)
+           beautify(gHPHP ,rt.TColor.GetColor(colors[4]),1,8)
+           datasHP.append(gHPHP)
+           datasLP.append(gHPLP)
+           fitsHP.append(fHPHP)
+           fitsLP.append(fHPLP)
+           #l.AddEntry(fHPHP,titles[i],"L")                    
         
-        for i,(fHP,fLP) in enumerate(zip(filesHP,filesLP)):
-            gHPLP = fLP.Get(var)
-            gHPHP = fHP.Get(var)
-            fHPLP = fLP.Get(var+"_func")
-            fHPHP = fHP.Get(var+"_func")
-            gHPLP.GetFunction(var+"_func").SetBit(rt.TF1.kNotDraw)
-            gHPHP.GetFunction(var+"_func").SetBit(rt.TF1.kNotDraw)
-
-            beautify(fHPLP ,rt.TColor.GetColor(colors[i]),9,24)
-            beautify(fHPHP ,rt.TColor.GetColor(colors[i]),1,8)
-            beautify(gHPLP ,rt.TColor.GetColor(colors[i]),9,24)
-            beautify(gHPHP ,rt.TColor.GetColor(colors[i]),1,8)
-            datasHP.append(gHPHP)
-            datasLP.append(gHPLP)
-            fitsHP.append(fHPHP)
-            fitsLP.append(fHPLP)
-            l.AddEntry(fHPHP,titles[i],"L")
-        l2.AddEntry(datasHP[0],"HPHP","LP")    
-        l2.AddEntry(datasLP[0],"HPLP","LP")    
-        datasHP[0].GetXaxis().SetTitle("M_{X} (GeV)")
-        datasHP[0].GetYaxis().SetTitle(var+" (GeV)")
-        datasHP[0].GetYaxis().SetNdivisions(4,5,0)
-        datasHP[0].GetXaxis().SetNdivisions(9,2,0)
-        datasHP[0].GetYaxis().SetTitleOffset(0.97)
-        datasHP[0].GetXaxis().SetTitleOffset(0.94)
-        datasHP[0].GetXaxis().SetRangeUser(1126, 5500.)
-        if var == "mean": datasHP[0].GetYaxis().SetRangeUser(70,110)
-        if var == "sigma": datasHP[0].GetYaxis().SetRangeUser(0,20)
-        if var == "alpha": datasHP[0].GetYaxis().SetRangeUser(0,5)
-        if var == "n": datasHP[0].GetYaxis().SetRangeUser(0,4)
-        if var == "alpha2": datasHP[0].GetYaxis().SetRangeUser(0,5)
-        if var == "n2": datasHP[0].GetYaxis().SetRangeUser(0,4)
-        datasHP[0].Draw("AP")
-        for i,(gHP,gLP) in enumerate(zip(datasHP,datasLP)): 
-            gLP.Draw("Psame")
-            gHP.Draw("Psame")
-            fitsHP[i].Draw("Csame")
-            fitsLP[i].Draw("Csame")
-        datasHP[0].GetXaxis().SetRangeUser(1126, 5500.)
-        l.Draw("same")
-        l2.Draw("same")
-        cmslabel_sim_prelim(c,'sim',11)
-        pt = getPavetext()
-        c.Update()
-        c.SaveAs(path+"Signal_mjet%s_"%leg+var+".png")
-        c.SaveAs(path+"Signal_mjet%s_"%leg+var+".pdf")
-        c.SaveAs(path+"Signal_mjet%s_"%leg+var+".C")
+       
+       for i,(fHP,fLP) in enumerate(zip(filesHP,filesLP)):
+           gHPLP = fLP.Get(var)
+           gHPHP = fHP.Get(var)
+           fHPLP = fLP.Get(var+"_func")
+           fHPHP = fHP.Get(var+"_func")
+           gHPLP.GetFunction(var+"_func").SetBit(rt.TF1.kNotDraw)
+           gHPHP.GetFunction(var+"_func").SetBit(rt.TF1.kNotDraw)
+       
+           beautify(fHPLP ,rt.TColor.GetColor(colors[i]),2,24)
+           beautify(fHPHP ,rt.TColor.GetColor(colors[i]),1,8)
+           beautify(gHPLP ,rt.TColor.GetColor(colors[i]),2,24)
+           beautify(gHPHP ,rt.TColor.GetColor(colors[i]),1,8)
+           datasHP.append(gHPHP)
+           datasLP.append(gHPLP)
+           fitsHP.append(fHPHP)
+           fitsLP.append(fHPLP)
+           l.AddEntry(fHPHP,titles[i],"L")
+       l2.AddEntry(datasHP[0],categories[0],"LP")    
+       l2.AddEntry(datasLP[0],categories[1],"LP")    
+       datasHP[0].GetXaxis().SetTitle("m_{X} [GeV]")
+       datasHP[0].GetYaxis().SetTitle(title+" [GeV]")
+       datasHP[0].GetYaxis().SetNdivisions(4,5,0)
+       datasHP[0].GetXaxis().SetNdivisions(5,5,0)
+       datasHP[0].GetYaxis().SetTitleOffset(1.05)
+       datasHP[0].GetXaxis().SetTitleOffset(0.9)
+       datasHP[0].GetXaxis().SetRangeUser(1126, 5500.)
+       datasHP[0].GetXaxis().SetLabelSize(0.05)
+       datasHP[0].GetXaxis().SetTitleSize(0.06)
+       datasHP[0].GetYaxis().SetLabelSize(0.05)
+       datasHP[0].GetYaxis().SetTitleSize(0.06)
+       if var == "mean": datasHP[0].GetYaxis().SetRangeUser(75,150); 
+       if var == "sigma": datasHP[0].GetYaxis().SetRangeUser(5,20.)
+       if var == "alpha": datasHP[0].GetYaxis().SetRangeUser(0,5)
+       if var == "n": datasHP[0].GetYaxis().SetRangeUser(0,4)
+       if var == "alpha2": datasHP[0].GetYaxis().SetRangeUser(0,5)
+       if var == "n2": datasHP[0].GetYaxis().SetRangeUser(0,4)
+       datasHP[0].Draw("AP")
+       for i,(gHP,gLP) in enumerate(zip(datasHP,datasLP)): 
+           gLP.Draw("Psame")
+           gHP.Draw("Psame")
+           fitsHP[i].Draw("Csame")
+           fitsLP[i].Draw("Csame")
+       datasHP[0].GetXaxis().SetRangeUser(1126, 5500.)
+       l.Draw("same")
+       l2.Draw("same")
+       if prelim.find("prelim")!=-1:
+           cmslabel_sim_prelim(c,'sim',11)
+       else:
+           cmslabel_sim(c,'sim',11)
+       pt = getPavetext()
+       c.Update()
+       c.SaveAs(path+"Signal_mjet%s_"%categories[0].replace("HPHP","")+var+prelim+".png")
+       c.SaveAs(path+"Signal_mjet%s_"%categories[0].replace("HPHP","")+var+prelim+".pdf")
+       c.SaveAs(path+"Signal_mjet%s_"%categories[0].replace("HPHP","")+var+prelim+".C")
+    
+    
+    
+    
+    
+    
     
 def doYield():
-    FHPLP = TFile("JJ_"+sys.argv[1]+"_HPLP_yield.root","READ")
-    FHPHP = TFile("JJ_"+sys.argv[1]+"_HPHP_yield.root","READ")
+    FHPLP = TFile("JJ_"+sys.argv[2]+"_HPLP_yield.root","READ")
+    FHPHP = TFile("JJ_"+sys.argv[2]+"_HPHP_yield.root","READ")
     
     vars = ["yield"]
     for var in vars:
@@ -253,11 +326,11 @@ def doYield():
         # fHPLP.Draw("sameL")
     #   fHPHP.Draw("sameL")
         model = "G_{bulk} #rightarrow WW"
-        if sys.argv[1].find("ZZ")!=-1:
+        if sys.argv[2].find("ZZ")!=-1:
             model = "G_{bulk} #rightarrow ZZ"
-        if sys.argv[1].find("WZ")!=-1:
+        if sys.argv[2].find("WZ")!=-1:
             model = "W' #rightarrow WZ"
-        if sys.argv[1].find("Zprime")!=-1:
+        if sys.argv[2].find("Zprime")!=-1:
             model = "Z' #rightarrow WW"
         text = TLatex()
         text.DrawLatex(3500,0.00020,model)
@@ -265,23 +338,26 @@ def doYield():
         cmslabel_sim(c,'2016',11)
         c.Update()
         #sleep(112600)
-        c.SaveAs(path+"signalFit/"+sys.argv[1]+"_Yield_"+var+"_fit.png")
+        c.SaveAs(path+"signalFit/"+sys.argv[2]+"_Yield_"+var+"_fit.png")
         
-def doMVV():
+def doMVV(signals,titles,year):
 
     vars = ["MEAN","SIGMA","ALPHA1","ALPHA2","N1","N2"]
     # vars = ["ALPHA2"]
     
     gStyle.SetOptFit(0)
-    signals = ["ZprimeWW","BulkGWW","WprimeWZ","BulkGZZ"]
-    titles =  ["Z' #rightarrow WW","G_{B}#rightarrow WW","W' #rightarrow WZ","G_{B}#rightarrow ZZ"]
+    #signals = ["ZprimeWW","BulkGWW","WprimeWZ","BulkGZZ"]
+    #titles =  ["Z' #rightarrow WW","G_{B}#rightarrow WW","W' #rightarrow WZ","G_{B}#rightarrow ZZ"]
     
     filesHP=[]
     # filesLP=[]
     
     for i,s in enumerate(signals):
         # filesLP.append(TFile("debug_JJ_"+s+"_MVV_jer.json.root","READ"))
-        filesHP.append(TFile("debug_JJ_"+s+"_MVV.json.root","READ"))
+        if TFile("debug_JJ_"+s+"_"+year+"_MVV.json.root","READ").IsZombie() ==1:
+            filesHP.append(TFile("debug_JJ_j1"+s+"_"+year+"_MVV.json.root","READ"))
+        else:
+            filesHP.append(TFile("debug_JJ_"+s+"_"+year+"_MVV.json.root","READ"))
     
     for var in vars:
         fitsHP=[]
@@ -290,7 +366,7 @@ def doMVV():
         datasLP=[]
         
         c = getCanvas()
-        l = getLegend(0.7788945,0.723362,0.9974874,0.879833)
+        l = getLegend()
         l2 = getLegend(0.7788945,0.1783217,0.9974874,0.2482517)
         gStyle.SetOptStat(0)
         gStyle.SetOptTitle(0)
@@ -315,11 +391,12 @@ def doMVV():
                 l.AddEntry(fHPHP,titles[i],"L")
         # l2.AddEntry(datasHP[0],"No JER","L")
  #        l2.AddEntry(datasLP[0],"JER","L")
-        fitsHP[0].GetXaxis().SetTitle("M_{X} (GeV)")
-        fitsHP[0].GetYaxis().SetTitle(var+" (GeV)")
+        fitsHP[0].GetXaxis().SetTitle("M_{X} [GeV]")
+        fitsHP[0].GetYaxis().SetTitle(var+" [GeV]")
         fitsHP[0].GetYaxis().SetNdivisions(4,5,0)
         fitsHP[0].GetXaxis().SetNdivisions(9,2,0)
         fitsHP[0].GetYaxis().SetTitleOffset(0.97)
+        fitsHP[0].GetYaxis().SetMaxDigits(2)
         fitsHP[0].GetXaxis().SetTitleOffset(0.94)
         fitsHP[0].GetXaxis().SetRangeUser(1126, 5500.)
         fitsHP[0].GetYaxis().SetRangeUser(-2., 3.)
@@ -345,13 +422,13 @@ def doMVV():
         cmslabel_sim_prelim(c,'sim',11)
         pt = getPavetext()
         c.Update()
-        c.SaveAs(path+"Signal_mVV_"+var+".png")
-        c.SaveAs(path+"Signal_mVV_"+var+".pdf")
-        c.SaveAs(path+"Signal_mVV_"+var+".C")
+        c.SaveAs(path+"Signal_mVV_"+var+"_"+year+".png")
+        c.SaveAs(path+"Signal_mVV_"+var+"_"+year+".pdf")
+        c.SaveAs(path+"Signal_mVV_"+var+"_"+year+".C")
         
 def doMJFit():
-    FHPLP = TFile("debug_JJ_"+sys.argv[1]+"_MJl1_HPHP.json.root","READ")
-    FHPHP = TFile("debug_JJ_"+sys.argv[1]+"_MJl1_HPHP.json.root","READ")
+    FHPLP = TFile("debug_JJ_"+sys.argv[2]+"_MJl1_HPHP.json.root","READ")
+    FHPHP = TFile("debug_JJ_"+sys.argv[2]+"_MJl1_HPHP.json.root","READ")
     
     vars = ["mean","sigma"]#,"alpha","n","f","alpha2","n2","slope"]
     #if sys.argv[1].find("Wprime")!=-1:
@@ -403,7 +480,7 @@ def doMJFit():
         l.Draw("same")
         cmslabel_sim(c,'2016',11)
         c.Update()
-        c.SaveAs(path+"signalFit/"+sys.argv[1]+"_MJ_"+var+"_fit.png")
+        c.SaveAs(path+"signalFit/"+sys.argv[2]+"_MJ_"+var+"_fit.png")
         #sleep(10)
         
 def doResolution():
@@ -715,8 +792,8 @@ def compSignalMVV():
     
     
     files = []
-    fHP  = TFile("massHISTOS_JJ_"+sys.argv[1]+"_MVV.root","READ")
-    fLP = TFile("massHISTOS_JJ_"+sys.argv[1]+"_MVV_jer.root","READ")
+    fHP  = TFile("massHISTOS_JJ_"+sys.argv[2]+"_MVV.root","READ")
+    fLP = TFile("massHISTOS_JJ_"+sys.argv[2]+"_MVV_jer.root","READ")
     files.append(fHP)
     files.append(fLP)
     
@@ -796,12 +873,19 @@ def compSignalMVV():
 #     c.SaveAs(path+"compareJER_MVVratio.png")
         
 if __name__ == '__main__':
-  
-  # doSignalEff()
-  # doJetMass("l1")
+  prelim = ""
+  signals = ["ZprimeWW","BulkGWW","WprimeWZ","BulkGZZ","ZprimeZH"]
+  titles =  ["Z' #rightarrow WW","G_{B}#rightarrow WW","W' #rightarrow WZ","G_{B}#rightarrow ZZ","Z' #rightarrow ZH"]
+  categories = ["2016_VV_HPHP","2016_VV_HPLP"]
+  doSignalEff(signals,titles,categories)
+  doJetMass("random",signals,titles,categories)
+  categories = ["2016_VH_HPHP","2016_VH_HPLP"]
+  doSignalEff(signals,titles,categories)
+  doMVV(signals,titles,"2016")
+  doJetMass("random",signals,titles,categories)
   # doJetMass("l2")
-  # doMJFit()
-  doMVV()
+  #doMJFit()
+  #doMVV()
   # doYield()
   # doResolution()
   # doKernelMVV()
