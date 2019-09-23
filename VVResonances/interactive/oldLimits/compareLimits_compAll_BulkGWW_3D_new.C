@@ -375,7 +375,7 @@ void compareLimits_compAll_BulkGWW_3D_new()
 
 
 
-   //New limits!
+   //New limits! VV inclu
    Double_t mean_fx3003[34] = {
      1200,
      1300,
@@ -478,11 +478,175 @@ void compareLimits_compAll_BulkGWW_3D_new()
    graph->Draw("l");
 
 
+   //New limits! VV+VH
+   Double_t mean_fx3004[16] = {
+     1200,
+     1300,
+     1400,
+     1500,
+     1600,
+     1700,
+     1800,
+     1900,
+     2000,
+     2100,
+     2200,
+     2300,
+     2400,
+     2500,
+     2600,
+     2700};
+   Double_t mean_fy3004[16] = {
+     0.0197706,
+     0.01452283,
+     0.01000572,
+     0.00804302,
+     0.007249113,
+     0.006641506,
+     0.005798479,
+     0.005045777,
+     0.004476008,
+     0.004179254,
+     0.003773617,
+     0.003395776,
+     0.00311959,
+     0.002904496,
+     0.002765947,
+     0.002560262};
 
+   graph = new TGraph(16,mean_fx3004,mean_fy3004); // ,mean_felx3003,mean_fehx3003,mean_fely3003,mean_fehy3003);                                                                                                                                                                
+   graph->SetName("meanVVVH");
+   graph->SetTitle("");
+   graph->SetFillStyle(1000);
+   graph->SetLineStyle(4);
+   graph->SetLineColor(4);
+   graph->SetLineWidth(2);
+   graph->SetMarkerStyle(20);
 
+   TH1F *Graph_mean3004 = new TH1F("Graph_mean3004","",100,1120,2500);
+   Graph_mean3004->SetMinimum(0.001952419);
+   Graph_mean3004->SetMaximum(0.01894219);
+   Graph_mean3004->SetDirectory(0);
+   Graph_mean3004->SetStats(0);
+   Graph_mean3004->SetLineStyle(0);
+   Graph_mean3004->SetMarkerStyle(20);
+   Graph_mean3004->GetXaxis()->SetLabelFont(42);
+   Graph_mean3004->GetXaxis()->SetLabelOffset(0.007);
+   Graph_mean3004->GetXaxis()->SetTitleOffset(1.1);
+   Graph_mean3004->GetXaxis()->SetTitleFont(42);
+   Graph_mean3004->GetYaxis()->SetLabelFont(42);
+   Graph_mean3004->GetYaxis()->SetLabelOffset(0.007);
+   Graph_mean3004->GetYaxis()->SetTitleOffset(1.25);
+   Graph_mean3004->GetYaxis()->SetTitleFont(42);
+   Graph_mean3004->GetZaxis()->SetLabelFont(42);
+   Graph_mean3004->GetZaxis()->SetLabelOffset(0.007);
+   Graph_mean3004->GetZaxis()->SetTitleFont(42);
+   graph->SetHistogram(Graph_mean3004);
+
+   graph->Draw("l");
+
+   //Limit VV
+   Double_t mean_fx3005[31] = {
+     1200,
+     1300,
+     1400,
+     1500,
+     1600,
+     1700,
+     1800,
+     1900,
+     2000,
+     2100,
+     2200,
+     2300,
+     2400,
+     2500,
+     2600,
+     2700,
+     2800,
+     2900,
+     3000,
+     3100,
+     3200,
+     3300,
+     3400,
+     3500,
+     3600,
+     3700,
+     3800,
+     3900,
+     4000,
+     4100,
+     4200};
+   Double_t mean_fy3005[31] = {
+     0.01619052,
+     0.01249083,
+     0.009148091,
+     0.007510555,
+     0.006585209,
+     0.005931552,
+     0.005172854,
+     0.004529612,
+     0.00402691,
+     0.003754964,
+     0.003475307,
+     0.003195404,
+     0.002952197,
+     0.002803567,
+     0.002716555,
+     0.00260823,
+     0.002537624,
+     0.002481027,
+     0.002392354,
+     0.002311616,
+     0.002202079,
+     0.00206337,
+     0.001908685,
+     0.001762985,
+     0.001606087,
+     0.001455909,
+     0.00135869,
+     0.001339438,
+     0.001409305,
+     0.001774815,
+     0.002273016};
+
+   graph = new TGraph(31,mean_fx3005,mean_fy3005); // ,mean_felx3003,mean_fehx3003,mean_fely3003,mean_fehy3003);                                                                                                                                                               
+                                                                                                                                                                                                                                                                                
+   graph->SetName("meanVV");
+   graph->SetTitle("");
+   graph->SetFillStyle(1000);
+   graph->SetLineStyle(6);
+   graph->SetLineColor(6);
+   graph->SetLineWidth(2);
+   graph->SetMarkerStyle(20);
+
+   TH1F *Graph_mean3005 = new TH1F("Graph_mean3005","",100,1120,2500);
+   Graph_mean3005->SetMinimum(0.001952419);
+   Graph_mean3005->SetMaximum(0.01894219);
+   Graph_mean3005->SetDirectory(0);
+   Graph_mean3005->SetStats(0);
+   Graph_mean3005->SetLineStyle(0);
+   Graph_mean3005->SetMarkerStyle(20);
+   Graph_mean3005->GetXaxis()->SetLabelFont(42);
+   Graph_mean3005->GetXaxis()->SetLabelOffset(0.007);
+   Graph_mean3005->GetXaxis()->SetTitleOffset(1.1);
+   Graph_mean3005->GetXaxis()->SetTitleFont(42);
+   Graph_mean3005->GetYaxis()->SetLabelFont(42);
+   Graph_mean3005->GetYaxis()->SetLabelOffset(0.007);
+   Graph_mean3005->GetYaxis()->SetTitleOffset(1.25);
+   Graph_mean3005->GetYaxis()->SetTitleFont(42);
+   Graph_mean3005->GetZaxis()->SetLabelFont(42);
+   Graph_mean3005->GetZaxis()->SetLabelOffset(0.007);
+   Graph_mean3005->GetZaxis()->SetTitleFont(42);
+   graph->SetHistogram(Graph_mean3005);
+
+   graph->Draw("l");
 
 
    
+
+
    TH1F *hframe_copy__2 = new TH1F("hframe_copy__2","",1000,1126,5300);
    hframe_copy__2->SetMinimum(0.0002);
    hframe_copy__2->SetMaximum(0.1);
@@ -551,6 +715,22 @@ void compareLimits_compAll_BulkGWW_3D_new()
    entry->SetLineStyle(5);
    entry->SetLineWidth(3);
    entry->SetMarkerColor(1);
+   entry->SetMarkerStyle(20);
+   entry->SetMarkerSize(1);
+   entry->SetTextFont(42);
+   entry=leg->AddEntry("meanVVVH"," AN-19-131 VV+VH, 35.9 fb^{-1}","L");
+   entry->SetLineColor(4);
+   entry->SetLineStyle(4);
+   entry->SetLineWidth(3);
+   entry->SetMarkerColor(3);
+   entry->SetMarkerStyle(20);
+   entry->SetMarkerSize(1);
+   entry->SetTextFont(42);
+   entry=leg->AddEntry("meanVV"," AN-19-131 VV, 35.9 fb^{-1}","L");
+   entry->SetLineColor(6);
+   entry->SetLineStyle(6);
+   entry->SetLineWidth(3);
+   entry->SetMarkerColor(3);
    entry->SetMarkerStyle(20);
    entry->SetMarkerSize(1);
    entry->SetTextFont(42);
