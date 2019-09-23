@@ -44,7 +44,15 @@ Current sample location with random sorting of jet1 and jet2
 Make the 3D templates. Several options can be specified to produce QCD, V+Jets or signal templates, normalization etc.
  
 ```
-python makeInputs.py
+ python makeInputs.py -p 2016 --run "signorm" --signal "ZprimeWW" --batch False 
+ python makeInputs.py -p 2016 --run "sigmvv" --signal "ZprimeWW" --batch False 
+ python makeInputs.py -p 2016 --run "sigmjet" --signal "ZprimeWW" --batch False 
+ python makeInputs.py -p 2016 --run "vjets" --batch False                                                                                                                                      
+ python makeInputs.py -p 2016 --run "qcdtemplates"
+ python makeInputs.py -p 2016 --run "qcdkernel"
+ python makeInputs.py -p 2016 --run "qcdnorm"
+ python makeInputs.py -p 2016 --run "data"
+ # python makeInputs.py -p 2016 --run "pseudo"
 ```
 
 Run closure test of signal fits:
