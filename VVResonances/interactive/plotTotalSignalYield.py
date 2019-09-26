@@ -427,6 +427,7 @@ def doAll(signal,legend,colorindex):
 
 def doAllOld(signal,legend,colorindex):
 
+#    directorypaper="results_QCD_pythia_signals_2016_DeepW_VVpaper_HPHP_HPLP/"
     directorypaper="results_QCD_pythia_signals_2016_tau21DDT_rho_VVpaper_HPHP_HPLP/"
 #    directoryVV="results_QCD_pythia_signals_2016_tau21DDT_rho_VV_HPHP_HPLP/"
 #    directoryVH="results_QCD_pythia_signals_2016_tau21DDT_rho_VH_HPHP_HPLP_LPHP/"
@@ -546,6 +547,129 @@ def doAllOld(signal,legend,colorindex):
     c1.SaveAs(name+".pdf" )
     c1.SaveAs(name+".C"   )
     c1.SaveAs(name+".root")
+
+def doAllOldCompare(signal,legend,colorindex):
+
+    directorypaperDeepW="results_QCD_pythia_signals_2016_DeepW_VVpaper_HPHP_HPLP/"
+    directorypaper="results_QCD_pythia_signals_2016_tau21DDT_rho_VVpaper_HPHP_HPLP/"
+#    directoryVV="results_QCD_pythia_signals_2016_tau21DDT_rho_VV_HPHP_HPLP/"
+#    directoryVH="results_QCD_pythia_signals_2016_tau21DDT_rho_VH_HPHP_HPLP_LPHP/"
+    purities=["VV_HPHP","VV_HPLP","VH_HPHP","VH_HPLP","VH_LPHP"]
+
+
+#    files = ["JJ_BulkGZZ_"+str(options.period)+"_"+str(purity1)+"_yield.root","JJ_WprimeWZ_"+str(options.period)+"_"+str(purity1)+"_yield.root","JJ_BulkGWW_"+str(options.period)+"_"+str(purity1)+"_yield.root","JJ_ZprimeWW_"+str(options.period)+"_"+str(purity1)+"_yield.root","JJ_ZprimeZH_"+str(options.period)+"_"+str(purity1)+"_yield.root"]
+#    legs = ["G_{bulk} #rightarrow ZZ","W' #rightarrow WZ","G_{bulk} #rightarrow WW","Z'#rightarrow WW","Z'#rightarrow ZH"]
+    c1,leg,pt = getCanvasPaper("c1")
+    c1.Draw()
+    gr=[]
+
+    tot,Mass = array( 'd' ), array( 'd' )
+    HPHP=[]
+    HPLP=[]
+#    tot=[]
+#    Mass=[]
+    r_file_HPHP = ROOT.TFile(directorypaperDeepW+"JJ_"+signal+"_"+str(options.period)+"_VV_HPLP_yield.root","READ")
+    gr_HPHP = r_file_HPHP.Get("yield")
+    print " get number of points ", gr_HPHP.GetN()
+    for i in range(gr_HPHP.GetN()) :
+      print gr_HPHP.GetY()[i]
+      gr_HPHP.GetY()[i] *= 1000
+      HPHP.append( gr_HPHP.GetY()[i])
+      Mass.append( gr_HPHP.GetX()[i])
+      print gr_HPHP.GetY()[i]
+
+    gr_HPHP.SetLineColor(ROOT.TColor.GetColor(colors[colorindex][3]))
+    gr_HPHP.SetLineStyle(2)
+    gr_HPHP.SetLineWidth(2)
+    gr_HPHP.SetMarkerColor(ROOT.TColor.GetColor(colors[colorindex][3]))
+    gr_HPHP.SetMarkerStyle(22)
+    gr_HPHP.GetYaxis().SetTitle("a.u.")
+    gr_HPHP.GetXaxis().SetTitle("m_{X} [GeV]")
+    gr_HPHP.GetYaxis().SetTitleOffset(1.3)
+    gr_HPHP.GetYaxis().SetNdivisions(4,5,0)
+    gr_HPHP.GetXaxis().SetNdivisions(3,5,0)
+    gr_HPHP.SetMinimum(0.)
+    gr_HPHP.SetMaximum(0.225)
+    gr_HPHP.GetXaxis().SetTitleSize(0.055)
+    gr_HPHP.GetYaxis().SetTitleSize(0.055)
+    gr_HPHP.GetYaxis().SetLabelSize(0.05)
+    gr_HPHP.GetXaxis().SetLabelSize(0.05)
+    ff = gr_HPHP.GetFunction("func")
+    gr_HPHP.Fit(ff)
+    ff.SetLineColor(0)
+    ff.SetLineWidth(0)
+
+    gr_HPHP.Draw("APL")
+
+    r_file_HPLP = ROOT.TFile(directorypaper+"JJ_"+signal+"_"+str(options.period)+"_VV_HPLP_yield.root","READ")
+    gr_HPLP = r_file_HPLP.Get("yield")
+    print " get number of points ", gr_HPLP.GetN()
+    for i in range(gr_HPLP.GetN()) :
+      print gr_HPLP.GetY()[i]
+      gr_HPLP.GetY()[i] *= 1000
+      HPLP.append(gr_HPLP.GetY()[i])
+      print gr_HPLP.GetY()[i]
+
+    gr_HPLP.SetLineColor(ROOT.TColor.GetColor(colors[colorindex][3]))
+    gr_HPLP.SetLineStyle(3)
+    gr_HPLP.SetLineWidth(2)
+    gr_HPLP.SetMarkerColor(ROOT.TColor.GetColor(colors[colorindex][3]))
+    gr_HPLP.SetMarkerStyle(23)
+    gr_HPLP.GetYaxis().SetTitle("a.u.")
+    gr_HPLP.GetXaxis().SetTitle("m_{X} [GeV]")
+    gr_HPLP.GetYaxis().SetTitleOffset(1.3)
+    gr_HPLP.GetYaxis().SetNdivisions(4,5,0)
+    gr_HPLP.GetXaxis().SetNdivisions(3,5,0)
+    gr_HPLP.SetMinimum(0.)
+    gr_HPLP.SetMaximum(0.225)
+    gr_HPLP.GetXaxis().SetTitleSize(0.055)
+    gr_HPLP.GetYaxis().SetTitleSize(0.055)
+    gr_HPLP.GetYaxis().SetLabelSize(0.05)
+    gr_HPLP.GetXaxis().SetLabelSize(0.05)
+    ff = gr_HPLP.GetFunction("func")
+    gr_HPLP.Fit(ff)
+    ff.SetLineColor(0)
+    ff.SetLineWidth(0)
+
+    gr_HPLP.Draw("PL")
+
+    for i in range(gr_HPHP.GetN()) :
+      tot.append( HPHP[i]+HPLP[i])
+      print tot[i]
+
+    gr_tot = ROOT.TGraph(gr_HPHP.GetN(),Mass,tot)
+    gr_tot.SetLineColor(ROOT.TColor.GetColor(colors[colorindex][3]))
+    gr_tot.SetLineStyle(1)
+    gr_tot.SetLineWidth(2)
+    gr_tot.SetMarkerColor(ROOT.TColor.GetColor(colors[colorindex][3]))
+    gr_tot.SetMarkerStyle(20)
+#    gr_tot.Draw("PL")
+
+ #   leg.AddEntry(gr_tot, "VV_tot", "LP")
+    leg.AddEntry(gr_HPLP, "tau21DDT", "LP")
+    leg.AddEntry(gr_HPHP, "DeepAK8 WvsQCD", "LP")
+    leg.Draw("same")
+
+    pt2 = ROOT.TPaveText(0.7,0.8,0.8,0.9,"NDC")
+    pt2.SetTextFont(42)
+    pt2.SetTextSize(0.05)
+
+    #pt2 = ROOT.TPaveText(0.16,0.62,0.63,0.76,"NDC")
+    #pt2.SetTextFont(42)
+    #pt2.SetTextSize(0.04)
+    pt2.SetTextAlign(12)
+    pt2.SetFillColor(0)
+    pt2.SetBorderSize(0)
+    pt2.SetFillStyle(0)
+    pt2.AddText(legend)
+    pt2.Draw()
+
+
+    name = path+"signalYelds_compareVVpaper_tau21DDT_DeepW_%s_%s_%s_%s"  %(options.var,options.period,options.name,signal)
+    c1.SaveAs(name+".png")
+    c1.SaveAs(name+".pdf" )
+    c1.SaveAs(name+".C"   )
+    c1.SaveAs(name+".root")
     
     # sleep(1000)
                 
@@ -559,5 +683,6 @@ if __name__ == '__main__':
       print i
       print signals[i]
       print legs[i]
-      doAllOld(signals[i],legs[i],i)
-      doAll(signals[i],legs[i],i)
+#      doAllOld(signals[i],legs[i],i)
+      doAllOldCompare(signals[i],legs[i],i)
+#      doAll(signals[i],legs[i],i)
