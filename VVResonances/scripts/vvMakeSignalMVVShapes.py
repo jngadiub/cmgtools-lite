@@ -118,9 +118,9 @@ samples={}
 graphs={'MEAN':ROOT.TGraphErrors(),'SIGMA':ROOT.TGraphErrors(),'ALPHA1':ROOT.TGraphErrors(),'N1':ROOT.TGraphErrors(),'ALPHA2':ROOT.TGraphErrors(),'N2':ROOT.TGraphErrors()}
 
 testcorr= False
-if options.sample.find("ZH")!=-1 or options.sample.find("WZ")!=-1:
+if options.sample.find("ZH")!=-1 or options.sample.find("Zh")!=-1 or options.sample.find("WZ")!=-1:
     testcorr = True
-
+print " ######### testcorr ",testcorr
 for filename in os.listdir(args[0]):
     if not (filename.find(options.sample)!=-1):
         continue
@@ -148,11 +148,11 @@ for filename in os.listdir(args[0]):
 N=0
 allgraphs = {}
 
-if options.sample.find("ZH")!=-1 or options.sample.find("WZ")!=-1:
+if options.sample.find("ZH")!=-1 or options.sample.find("Zh")!=-1 or options.sample.find("WZ")!=-1 or samples[mass].find("WH")!=-1 or samples[mass].find("Wh")!=-1:
     for mass in samples.keys():
-        if samples[mass].find("WH")!=-1:
+        if samples[mass].find("WH")!=-1 or samples[mass].find("Wh")!=-1:
             h = ROOT.TH2F("corr_mean_M"+str(mass),"corr_mean_M"+str(mass),2,array("f",[65,105,145]),2,array("f",[65,105,145]))
-        if samples[mass].find("ZH")!=-1:
+        if samples[mass].find("ZH")!=-1 or samples[mass].find("Zh")!=-1:
             h = ROOT.TH2F("corr_mean_M"+str(mass),"corr_mean_M"+str(mass),2,array("f",[85,105,145]),2,array("f",[85,105,145]))
         if samples[mass].find("WZ")!=-1:
             h = ROOT.TH2F("corr_mean_M"+str(mass),"corr_mean_M"+str(mass),2,array("f",[76,86,94]),2,array("f",[76,86,94]))
@@ -169,7 +169,7 @@ if options.sample.find("ZH")!=-1 or options.sample.find("WZ")!=-1:
         graph_sum_sigma = ROOT.TH2F("corr_sigma","corr_sigma",2,array("f",[55,85,215]),2,array("f",[55,85,215]))
     if options.sample.find("WH")!=-1:
         graph_sum_mean  = ROOT.TH2F("corr_mean","corr_mean",2,array("f",[65,105,145]),2,array("f",[65,105,145]))
-    if samples[mass].find("ZH")!=-1:
+    if samples[mass].find("ZH")!=-1 or samples[mass].find("Zh")!=-1 :
         graph_sum_mean = ROOT.TH2F("corr_mean","corr_mean",2,array("f",[85,105,145]),2,array("f",[85,105,145]))
     if samples[mass].find("WZ")!=-1:
         graph_sum_mean = ROOT.TH2F("corr_mean","corr_mean",2,array("f",[76,86,94]),2,array("f",[76,86,94]))
@@ -178,7 +178,7 @@ if options.sample.find("ZH")!=-1 or options.sample.find("WZ")!=-1:
     binsmjet = 80
     bins_all = [[5,25],[25,50]]
     binmidpoint = 25
-    if options.sample.find("WH")!=-1:
+    if options.sample.find("WH")!=-1 or options.sample.find("Wh")!=-1:
         bins_all = [[5,15],[15,50]]
         binmidpoint = 15
     if options.sample.find("WZ")!=-1:
@@ -272,15 +272,19 @@ for name,graph in graphs.iteritems():
     graph.Write(name)
  
 if testcorr==True:
+
+    print "############### testcorr ###############"
     for mass in allgraphs.keys():
         graph_sum_sigma.Add(allgraphs_sigma[mass])
         graph_sum_mean.Add(allgraphs[mass])
     graph_sum_sigma.Scale(1/float(N))
-    graph_sum_mean .Scale(1/float(N))
+    graph_sum_mean.Scale(1/float(N))
+    print "sum mean",  graph_sum_mean
+    print "sum sigma",  graph_sum_sigma
     graph_sum_sigma.Write()
-    graph_sum_mean .Write()
+    graph_sum_mean.Write()
     print graph_sum_mean.Integral()
-
+        
 F.Close()
 
 print 'wrote file '+options.output
