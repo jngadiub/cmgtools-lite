@@ -6,7 +6,7 @@ import os, sys, re, optparse,pickle,shutil,json
 ROOT.gROOT.SetBatch(True)
 
 def returnString(func,ftype):
-    if func.GetName().find("corr")!=-1:
+    if func.GetName().find("corr")!=-1 and func.GetName().find("sigma")==-1:
         st = "("+str(func.GetParameter(0))+" + ("+str(func.GetParameter(1))+")*MJ1 + ("+str(func.GetParameter(2))+")*MJ2  + ("+str(func.GetParameter(3))+")*MJ1*MJ2)"
         if func.GetName().find("sigma")!=-1:
             st = "("+str(func.GetParameter(0))+" + ("+str(func.GetParameter(1))+")*MJ1 + ("+str(func.GetParameter(2))+")*MJ2 )"
@@ -77,7 +77,7 @@ ff=ROOT.TFile("debug_"+options.output+".root","RECREATE")
 ff.cd()
 print graphStr
 for string in graphStr:
-    comps =string.split(':')      
+    comps =string.split(':')
     graph=rootFile.Get(comps[0])
     if comps[0].find("corr")==-1:
         if comps[1].find("pol")!=-1:
@@ -106,7 +106,7 @@ for string in graphStr:
         func = ROOT.TF2(comps[0]+"_func","[0] + [1]*x +[2] *y +[3]*x*y",55,215,55,215) # +[3]*x*y
         if comps[0].find("sigma")!=-1:
             func = ROOT.TF2(comps[0]+"_func","[0] + [1]*x +[2] *y ",55,215,55,215) # +[3]*x*y
-        
+    print "function ",func    
     if comps[0].find("corr")!=-1:
         print 'fit funciton '+func.GetName()
         graph.Fit(func,"","")
