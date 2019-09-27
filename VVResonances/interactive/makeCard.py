@@ -45,7 +45,7 @@ purities= ['VH_HPLP','VH_HPHP','VH_LPHP']
 #purities= ['VV_HPLP','VV_HPHP']
 #purities= ['VV_HPLP','VV_HPHP','VH_HPLP','VH_HPHP','VH_LPHP']
 #signals = ["BulkGWW", "BulkGZZ","ZprimeWW","WprimeWZ","VprimeWV","'ZprimeZH'"]
-signals = ["ZprimeZH"]
+signals = ["BulkGZZ"]
 
 Tools = DatacardTools(scales,scalesHiggs,vtag_pt_dependence,lumi_unc,vtag_unc,sf_qcd,pseudodata,outlabel)
 
@@ -64,10 +64,7 @@ for sig in signals:
       cardName='datacard_'+cat+'.txt'
       workspaceName='workspace_'+cat+outlabel+'.root'
 
-      if sig.find("VV")!=-1 or sig.find("WV")!=-1 :            
-        Tools.AddSignal(card,dataset,p,sig,resultsDir[dataset],ncontrib)
-      else:
-        Tools.AddSingleSignal(card,dataset,p,sig,resultsDir[dataset],ncontrib)                 
+      Tools.AddSignal(card,dataset,p,sig,resultsDir[dataset],ncontrib)
       ncontrib+=1
 
       if doVjets:
