@@ -26,9 +26,13 @@ class AllFunctions():
   rootFile=filename+"_MVV.root"
   fixPars = fixParsMVV["fixPars"]  
   cmd='vvMakeSignalMVVShapes.py -s "{template}" -c "{cut}"  -o "{rootFile}" -V "jj_LV_mass" --fix "{fixPars}"   -m {minMVV} -M {maxMVV} --minMX {minMX} --maxMX {maxMX} {samples} --addcut "{addcut}"'.format(template=template,cut=cut,rootFile=rootFile,minMVV=self.minMVV,maxMVV=self.maxMVV,minMX=self.minMX,maxMX=self.maxMX,fixPars=fixPars,samples=self.samples,addcut=addcuts)
+  print "########## Going to make MVV ######"
+  print cmd
   os.system(cmd)
   jsonFile=filename+"_MVV.json"
   cmd='vvMakeJSON.py  -o "{jsonFile}" -g {pols} -m {minMX} -M {maxMX} {rootFile}  '.format(jsonFile=jsonFile,rootFile=rootFile,minMX=self.minMX,maxMX=self.maxMX,pols=fixParsMVV["pol"])
+  print "########## Going to make json ######" 
+  print cmd
   os.system(cmd)
 
  def makeSignalShapesMJ(self,filename,template,leg,fixPars,addcuts="1"):
