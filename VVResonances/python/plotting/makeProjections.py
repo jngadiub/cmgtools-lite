@@ -59,7 +59,7 @@ def GetName(histname):
 
 def plotStack(backgrounds,xrange,yrange,zrange,projection,purity):
     c = getCanvas()
-    #leg = ROOT.TLegend(0.12,0.91,0.3,0.7)
+    #leg = ROOT.TLegend(0.15,0.91,0.3,0.7)
     leg = ROOT.TLegend(0.6,0.89,0.87,0.7)
     if projection == "z":
         leg = ROOT.TLegend(0.6,0.89,0.89,0.7)
@@ -478,9 +478,12 @@ if __name__=="__main__":
     ############## make stackplots of all backgrounds ####################
     purity = sys.argv[1] 
     year = sys.argv[2] 
-    f_Wjets  = ROOT.TFile("../../interactive/results_QCD_pythia_signals_2016_DeepW_VVpaper_HPHP_HPLP/JJ_"+str(year)+"_WJets_"+str(purity)+".root","READ")
-    f_Zjets  = ROOT.TFile("../../interactive/results_QCD_pythia_signals_2016_DeepW_VVpaper_HPHP_HPLP/JJ_"+str(year)+"_ZJets_"+str(purity)+".root","READ")
-    f_ttjets = ROOT.TFile("../../interactive/results_QCD_pythia_signals_2016_DeepW_VVpaper_HPHP_HPLP/JJ_"+str(year)+"_TTJets_"+str(purity)+".root","READ")
+#    f_Wjets  = ROOT.TFile("../../interactive/results_QCD_pythia_signals_2016_tau21DDT_rho_VH_HPHP_HPLP_LPHP/JJ_"+str(year)+"_WJets_"+str(purity)+".root","READ")
+#    f_Zjets  = ROOT.TFile("../../interactive/results_QCD_pythia_signals_2016_tau21DDT_rho_VH_HPHP_HPLP_LPHP/JJ_"+str(year)+"_ZJets_"+str(purity)+".root","READ")
+#    f_ttjets = ROOT.TFile("../../interactive/results_QCD_pythia_signals_2016_tau21DDT_rho_VH_HPHP_HPLP_LPHP/JJ_"+str(year)+"_TTJets_"+str(purity)+".root","READ")
+    f_Wjets  = ROOT.TFile("../../interactive/results_QCD_pythia_signals_2016_tau21DDT_rho_VV_HPHP_HPLP/JJ_"+str(year)+"_WJets_"+str(purity)+".root","READ")
+    f_Zjets  = ROOT.TFile("../../interactive/results_QCD_pythia_signals_2016_tau21DDT_rho_VV_HPHP_HPLP/JJ_"+str(year)+"_ZJets_"+str(purity)+".root","READ")
+    f_ttjets = ROOT.TFile("../../interactive/results_QCD_pythia_signals_2016_tau21DDT_rho_VV_HPHP_HPLP/JJ_"+str(year)+"_TTJets_"+str(purity)+".root","READ")
     
     #qcd = f_sample.Get("nonRes")
     Wjets = f_Wjets.Get("WJets")
