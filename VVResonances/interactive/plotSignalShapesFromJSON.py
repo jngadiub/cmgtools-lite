@@ -210,11 +210,6 @@ varBins = {'mVV':'[37,1000,5500]','mJ':'[80,55,215]'}
 #w.factory(options.var+varBins[options.var])
 #w.var(options.var).SetTitle(varName[options.var])
 colors= []
-#colors.append(["#f9c677","#f9d077","#f9f577","#ffd300","#f9fe77","#f9fe64","#f9fe43","#f9fe17"]*3)
-#colors.append(["#fee0d2","#fcbba1","#fc9272","#ef3b2c","#ef3b2c","#cb181d","#a50f15","#67000d"]*3) 
-#colors.append(["#e5f5e0","#c7e9c0","#a1d99b","#41ab5d","#41ab5d","#238b45","#006d2c","#00441b"]*3) 
-#colors.append(["#02fefe","#02e5fe","#02d7fe","#4292c6","#02b5fe","#02a8fe","#0282fe","#0300fc"]*3)  
-#colors.append(["#e6a3e1","#d987e6","#ce5ce0","#822391","#8526bd","#9b20e3","#a87eed","#8649eb"]*3)
 colors.append(["#000080","#0000CD","#0000FF","#3D59AB","#4169E1","#4876FF","#6495ED","#1E90FF","#63B8FF","#87CEFA","#C6E2FF"]*3)   
 colors.append(["#006400","#308014","#228B22","#32CD32","#00CD00","#00EE00","#00FF00","#7CCD7C","#7CFC00","#ADFF2F","#C0FF3E"]*3)   
 colors.append(["#CD8500","#CD950C","#EE9A00","#EEAD0E","#FFA500","#FFB90F","#FFC125","#EEC900","#FFD700","#FFEC8B","#FFF68F"]*3) 
@@ -283,7 +278,6 @@ def doSingle():
       c1.SaveAs(path+"signalShapes%s_%s.pdf" %(options.var, inFileName.rsplit(".", 1)[0]))
       c1.SaveAs(path+"signalShapes%s_%s.C" %(options.var, inFileName.rsplit(".", 1)[0]))
       c1.SaveAs(path+"signalShapes%s_%s.root" %(options.var, inFileName.rsplit(".", 1)[0]))
-  
 
 def doAll(category,jsons,legs):
     w=ROOT.RooWorkspace("w","w")
@@ -317,10 +311,7 @@ def doAll(category,jsons,legs):
         with open(options.indir+f) as jsonFile:
           j = json.load(jsonFile)
           for i, MH in enumerate(massPoints):  # mind that MH is evaluated below
-
-            print " i "+str(i)+" MH "+str(MH)+" j "+str(j)+" name " +str(name)
             if options.var == 'mVV': getMVVPdf(w,j,MH,name)
-
             else: 
                 if f.find("ZH")==-1:
                     print "no H boson in sample "
@@ -349,30 +340,6 @@ def doAll(category,jsons,legs):
             name = jsons[len(jsons)-ii-1].split("_")[1]
             leg[-1].AddEntry(frame[0].findObject(str(2000)+name),legs[len(jsons)-ii-1],"L")
 
-    '''
-    <<<<<<<<<<<<<<<<<<<<<<<<
-    for ii,f in enumerate(jsons):
-        print len(jsons)
-        print ii
-        print "json "+str(jsons[len(jsons)-ii-1])
-        name = jsons[len(jsons)-ii-1].split("_")[1]
-        leg.AddEntry(frame.findObject(str(1800)+name), legs[len(jsons)-ii-1], "L")
-    frame.GetYaxis().SetTitle("a.u.")
-    frame.GetYaxis().SetTitleOffset(1.3)
-    frame.GetYaxis().SetNdivisions(4,5,0)
-    frame.GetXaxis().SetNdivisions(3,5,0)
-    frame.SetMaximum(0.17)
-    frame.GetXaxis().SetTitleSize(0.055)
-    frame.GetYaxis().SetTitleSize(0.055)
-    frame.GetYaxis().SetLabelSize(0.05)
-    frame.GetXaxis().SetLabelSize(0.05)
-    if options.var == 'mVV':
-      frame.SetMaximum(0.3)
-      frame.GetXaxis().SetTitle("Dijet invariant mass [GeV]")
-    frame.Draw()
-    leg.Draw("same")
-    =======
-    '''
     for i in range(1,len(frame)+1):
         c1.cd(i)
         c1.cd(i).SetTickx()
