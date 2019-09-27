@@ -1278,51 +1278,7 @@ class Fitter(object):
         text = ROOT.TLatex()
         text.DrawLatexNDC(0.13,0.92,"#font[62]{CMS} #font[52]{Simulation}")
         self.c.SaveAs(outname.replace(".pdf","_nonRes.pdf"))
-        self.c.SaveAs(outname.replace(".pdf","_nonRes.root"))
-
-#test
-        self.c=ROOT.TCanvas("c_both","c_both")       
-        self.c.cd() 
-        self.c.SetFillColor(0)
-        self.c.SetBorderMode(0)
-        self.c.SetFrameFillStyle(0)
-        self.c.SetFrameBorderMode(0)
-        self.c.SetLeftMargin(0.13)
-        self.c.SetRightMargin(0.08)
-        self.c.SetTopMargin( 0.1 )
-        self.c.SetBottomMargin( 0.12 )
-   
-
-        l = ROOT.TLegend(0.5607383,0.6063123,0.9,0.8089701)
-        l.SetLineWidth(2)
-        l.SetBorderSize(0)
-        l.SetFillColor(0)
-        l.SetTextFont(42)
-        l.SetTextSize(0.04)
-        l.SetTextAlign(12)
-        #l.AddEntry(self.frame.findObject("fit"),'double CB','L')
-        l.AddEntry(self.frame.findObject("errorbars"),'MC uncertainty','F')
-        l.AddEntry(histos['Wjets'],'W+jets','F')
-        if 'Zjets' in histos.keys(): l.AddEntry(histos['Zjets'],'Z+jets','F')
-        if 'TTbar' in histos.keys(): l.AddEntry(histos['TTbar'],'t#bar{t}','F')
-        self.frame.Draw()
-        l.Draw()
-        histos['Wjets'].Add(histos_nonRes['Wjets'])
-        histos['Wjets'].Draw("histFsame")
-        if 'Zjets' in histos.keys():
-            histos['Zjets'].Add(histos_nonRes['Zjets'])
-            histos['Zjets'].Draw("histFsame")
-        if 'TTbar' in histos.keys():
-            histos['TTbar'].Add(histos_nonRes['TTbar'])
-            histos['TTbar'].Draw("histFsame")
-        self.frame.Draw("same")
-        l.Draw()
-        text = ROOT.TLatex()
-        text.DrawLatexNDC(0.13,0.92,"#font[62]{CMS} #font[52]{Simulation}")
-        self.c.SaveAs(outname)
-        self.c.SaveAs(outname.replace(".pdf","_both.pdf"))
-        self.c.SaveAs(outname.replace(".pdf","_both.root"))
-        
+        self.c.SaveAs(outname.replace(".pdf","_nonRes.root"))   
         
         
     def getFrame(self,model = "model",data="data",poi="x",xtitle='x',mass=1000):
