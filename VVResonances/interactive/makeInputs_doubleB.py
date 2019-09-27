@@ -93,12 +93,12 @@ catHtag['NP1'] = '(jj_l1_MassDecorrelatedDeepBoosted_ZHbbvsQCD<0.5)'
 catHtag['NP2'] = '(jj_l2_MassDecorrelatedDeepBoosted_ZHbbvsQCD<0.5)'
 '''
 print " ################     you are using MassIndependentDeepDoubleBvLJetTags:probHbb   !!!!!!! #############"
-catHtag['HP1'] = '(jj_l1_MassIndependentDeepDoubleBvLJetprobHbb_>0.91)' #T1
-catHtag['HP2'] = '(jj_l2_MassIndependentDeepDoubleBvLJetprobHbb>0.91)' #T1
-catHtag['LP1'] = '(jj_l1_MassIndependentDeepDoubleBvLJetprobHbb_>0.89&&jj_l1_MassIndependentDeepDoubleBvLJetprobHbb_<0.91)' #M2 & T1
-catHtag['LP2'] = '(jj_l2_MassIndependentDeepDoubleBvLJetprobHbb>0.89&&jj_l2_MassIndependentDeepDoubleBvLJetprobHbb<0.91)'
-catHtag['NP1'] = '(jj_l1_MassIndependentDeepDoubleBvLJetprobHbb_<0.89)'
-catHtag['NP2'] = '(jj_l2_MassIndependentDeepDoubleBvLJetprobHbb<0.89)'
+catHtag['HP1'] = '(jj_l1_MassIndependentDeepDoubleBvLJetprobHbb_>0.92)' #T2
+catHtag['HP2'] = '(jj_l2_MassIndependentDeepDoubleBvLJet_probHbb>0.92)' #T2
+catHtag['LP1'] = '(jj_l1_MassIndependentDeepDoubleBvLJetprobHbb_>0.7&&jj_l1_MassIndependentDeepDoubleBvLJetprobHbb_<0.92)' #L & T2
+catHtag['LP2'] = '(jj_l2_MassIndependentDeepDoubleBvLJet_probHbb>0.7&&jj_l2_MassIndependentDeepDoubleBvLJet_probHbb<0.92)'
+catHtag['NP1'] = '(jj_l1_MassIndependentDeepDoubleBvLJetprobHbb_<0.7)'
+catHtag['NP2'] = '(jj_l2_MassIndependentDeepDoubleBvLJet_probHbb<0.7)'
 
 
 cuts={}
@@ -150,6 +150,7 @@ cuts['resTT'] = '(jj_l1_mergedVTruth==1&&jj_l1_softDrop_mass>140&&jj_l1_softDrop
 #all categories
 #categories=['VH_HPHP','VH_HPLP','VH_LPHP','VV_HPHP','VV_HPLP']
 categories=['VH_HPLP']
+
 
 #list of signal samples --> nb, radion and vbf samples to be added
 BulkGravWWTemplate="BulkGravToWW_"
@@ -243,6 +244,7 @@ fixParsSig={"ZprimeZH":{
     "VV_HPLP": {"fixPars":"mean:91.5,n:1.83,n2:4.22,sigmaH:10.7,nH:130", "pol":"mean:pol0,sigma:pol5,alpha:pol5,n:pol0,alpha2:pol5,n2:pol0,meanH:pol4,sigmaH:pol0,alphaH:pol2,nH:pol3,alpha2H:pol3,n2H:pol4"}, 
     "VH_all": {"fixPars":"mean:91.5,n2:4.22,n:128,alphaH:0.51,nH:127","pol":"mean:pol0,sigma:pol5,alpha:pol5,n:pol0,alpha2:pol5,n2:pol0,meanH:pol5,sigmaH:pol7,alphaH:pol0,nH:pol3,alpha2H:pol3,n2H:pol4"}, 
     "VH_HPLP": {"fixPars":"mean:90.5,sigmaH:10,n:5,nH:5", "pol":"mean:pol0,sigma:pol5,alpha:pol5,n:pol0,alpha2:pol5,n2:pol3,meanH:pol5,sigmaH:pol6,alphaH:pol3,nH:pol3,alpha2H:pol5,n2H:pol4"},
+    "VH_LPHP": {"fixPars":"mean:90.5,sigmaH:10,n:5,nH:5", "pol":"mean:pol0,sigma:pol5,alpha:pol5,n:pol0,alpha2:pol5,n2:pol3,meanH:pol5,sigmaH:pol6,alphaH:pol3,nH:pol3,alpha2H:pol5,n2H:pol4"}, #irene
     "VV_HPHP": {"fixPars":"mean:90.9,alpha:1.1,n:1.83,n2:4.22,alphaH:0.5,nH:120", "pol":"mean:pol0,sigma:pol5,alpha:pol5,n:pol0,alpha2:pol5,n2:pol0,meanH:pol4,sigmaH:pol2,alphaH:pol0,nH:pol3,alpha2H:pol4,n2H:pol4"}, 
     "VH_HPHP": {"fixPars":"n:4.2,nH:132", "pol":"mean:pol3,sigma:pol5,alpha:pol5,n:pol0,alpha2:pol3,n2:pol3,meanH:pol5,sigmaH:pol6,alphaH:pol2,nH:pol0,alpha2H:pol3,n2H:pol4"} },
 "BulkGWW":{ "VV_HPLP": {"fixPars":"alpha:1.125,n:2,n2:2","pol":"mean:pol4,sigma:pol3,alpha:pol3,n:pol0,alpha2:pol3,n2:pol3"},
@@ -253,14 +255,17 @@ fixParsSig={"ZprimeZH":{
 "BulkGZZ":{"VV_HPLP":{"fixPars":"alpha:1.024,n:3.25","pol":"mean:pol4,sigma:pol3,alpha:pol0,n:pol0,alpha2:pol3,n2:pol4"},
            "VV_HPHP":{"fixPars":"n2:4.8,n:2.8","pol":"mean:pol5,sigma:pol5,alpha:pol5,n:pol0,alpha2:pol3,n2:pol0"},
            "VH_HPLP":{"fixPars":"alpha:1.024,n:3.25","pol":"mean:pol4,sigma:pol3,alpha:pol0,n:pol0,alpha2:pol3,n2:pol4"},
+           "VH_LPHP": {"fixPars":"alpha:1.125,n:2,n2:2","pol":"mean:pol4,sigma:pol3,alpha:pol3,n:pol0,alpha2:pol3,n2:pol3"}, #VH_LPHP irene
            "VH_HPHP":{"fixPars":"n:64","pol":"mean:pol3,sigma:pol5,alpha:pol5,n:pol0,alpha2:pol3,n2:pol3"}},
 "ZprimeWW":{"VV_HPLP": {"fixPars":"alpha:1.125","pol":"mean:pol5,sigma:pol5,alpha:pol0,n:pol3,alpha2:pol3,n2:pol3"},
             "VV_HPHP": {"fixPars":"alpha:1.083,n:3.5,n2:2.3","pol":"mean:pol5,sigma:pol4,alpha:pol0,n:pol0,alpha2:pol5,n2:pol0"},
             "VH_HPLP": {"fixPars":"n:5","pol":"mean:pol5,sigma:pol5,alpha:pol5,n:pol0,alpha2:pol5,n2:pol3"},
+            "VH_LPHP": {"fixPars":"alpha:1.125,n:2,n2:2","pol":"mean:pol4,sigma:pol3,alpha:pol3,n:pol0,alpha2:pol3,n2:pol3"}, #VH_LPHP irene
             "VH_HPHP": {"fixPars":"n:1.2,alpha:1.22", "pol":"mean:pol6,sigma:pol4,alpha:pol0,n:pol0,alpha2:pol5,n2:pol3"}},
 "WprimeWZ":{"VV_HPLP":{"fixPars":"n:2.3","pol":"mean:pol3,sigma:pol3,alpha:pol3,n:pol0,alpha2:pol3,n2:pol1"},
             "VV_HPHP":{"fixPars":"n:2,n2:2,alpha:1.505", "pol":"mean:pol3,sigma:pol3,alpha:pol3,n:pol0,alpha2:pol3,n2:pol1"},
             "VH_HPLP":{"fixPars":"n:2.3","pol":"mean:pol3,sigma:pol3,alpha:pol3,n:pol0,alpha2:pol3,n2:pol1"},
+            "VH_LPHP": {"fixPars":"alpha:1.125,n:2,n2:2","pol":"mean:pol4,sigma:pol3,alpha:pol3,n:pol0,alpha2:pol3,n2:pol3"}, #VH_LPHP irene
             "VH_HPHP":{"fixPars":"n:0.24,alpha:1.6", "pol":"mean:pol3,sigma:pol5,alpha:pol3,n:pol0,alpha2:pol3,n2:pol3"}}}
 
 
@@ -309,11 +314,13 @@ if options.run.find("all")!=-1 or options.run.find("sig")!=-1:
             #f.makeSignalShapesMVV("JJ_j2"+str(signal_inuse)+"_"+str(period),signaltemplate_inuse,fixParsSigMVV[signal_inuse])
         else:
             f.makeSignalShapesMVV("JJ_"+str(signal_inuse)+"_"+str(period),signaltemplate_inuse,fixParsSigMVV[signal_inuse])
+
     
 
     if options.run.find("all")!=-1 or options.run.find("norm")!=-1:
         print "fit signal norm "
-        #f.makeSignalYields("JJ_"+str(signal_inuse)+"_"+str(period),signaltemplate_inuse,xsec_inuse,{'VH_HPHP':HPSF*HPSF,'VH_HPLP':HPSF*LPSF,'VH_LPHP':HPSF*LPSF,'VH_LPLP':LPSF*LPSF,'VV_HPHP':HPSF*HPSF,'VV_HPLP':HPSF*LPSF,'VH_all':HPSF*HPSF+HPSF*LPSF})
+        f.makeSignalYields("JJ_"+str(signal_inuse)+"_"+str(period),signaltemplate_inuse,xsec_inuse,{'VH_HPHP':HPSF*HPSF,'VH_HPLP':HPSF*LPSF,'VH_LPHP':HPSF*LPSF,'VH_LPLP':LPSF*LPSF,'VV_HPHP':HPSF*HPSF,'VV_HPLP':HPSF*LPSF,'VV_LPLP':LPSF*LPSF})
+#        f.makeSignalYields("JJ_"+str(signal_inuse)+"_"+str(period),signaltemplate_inuse,xsec_inuse,{'VH_HPHP':HPSF*HPSF,'VH_HPLP':HPSF*LPSF,'VH_LPHP':HPSF*LPSF,'VH_LPLP':LPSF*LPSF,'VV_HPHP':HPSF*HPSF,'VV_HPLP':HPSF*LPSF,'VH_all':HPSF*HPSF+HPSF*LPSF})
         f.makeNormalizations(signal_inuse,"JJ_M2000_"+str(period),signaltemplate_inuse+"narrow_2000",0,cuts['nonres'],"nRes")
 
 if options.run.find("all")!=-1 or options.run.find("detector")!=-1:
@@ -340,6 +347,7 @@ if options.run.find("all")!=-1 or options.run.find("qcd")!=-1:
             f.makeBackgroundShapesMVVConditional("nonRes","JJ_"+str(period),nonResTemplate,'l2',cuts['nonres'],"2Dl2",wait)
             f.mergeBackgroundShapes("nonRes","JJ_"+str(period))
     if options.run.find("all")!=-1 or options.run.find("norm")!=-1:
+        f.mergeBackgroundShapes("nonRes","JJ_"+str(period))
         f.makeNormalizations("nonRes","JJ_"+str(period),nonResTemplate,0,cuts['nonres'],"nRes")
 
 if options.run.find("all")!=-1 or options.run.find("vjets")!=-1:
