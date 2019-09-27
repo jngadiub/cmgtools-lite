@@ -53,7 +53,6 @@ Make the 3D templates. Several options can be specified to produce QCD, V+Jets o
  python makeInputs.py -p 2016 --run "qcdnorm"
  python makeInputs.py -p 2016 --run "data"
  # python makeInputs.py -p 2016 --run "pseudo"
-
 ```
 
 Run closure test of signal fits:
