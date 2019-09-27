@@ -326,11 +326,11 @@ def doAll(category,jsons,legs):
                     print "no H boson in sample "
                     getMJPdf(w,j,MH,name)
                 if f.find("Vjet")!=-1:
-                    with open(f.replace("Vjet","Hjet")) as jsonFileH:
+                    with open(options.indir+f.replace("Vjet","Hjet")) as jsonFileH:
                         jH = json.load(jsonFileH)
                     getMJPdf(j,MH,name,jH)
                 if f.find("Hjet")!=-1:
-                    with open(f.replace("Hjet","Vjet")) as jsonFileV:
+                    with open(options.indir+f.replace("Hjet","Vjet")) as jsonFileV:
                         jV = json.load(jsonFileV)
                     getMJPdf(w,jV,MH,name,j)
   
@@ -424,37 +424,42 @@ def doAll(category,jsons,legs):
 
     if options.var == 'mJ': pt2.AddText(category)
     pt2.Draw()
-    if options.var =="mVV": category = "Vall"
+#    if options.var =="mVV": category = "Vall"
     if options.prelim=="1":
         cmslabel_sim_prelim(c1,'sim',11)
         c1.Update()
-        c1.SaveAs(path+"signalShapes_%s_%s_%s_All_%s_prelim.png"  %(options.var,category,options.period,options.name))
-        c1.SaveAs(path+"signalShapes_%s_%s_%s_All_%s_prelim.pdf"  %(options.var,category,options.period,options.name))
-        c1.SaveAs(path+"signalShapes_%s_%s_%s_All_%s_prelim.C"    %(options.var,category,options.period,options.name))
-        c1.SaveAs(path+"signalShapes_%s_%s_%s_All_%s_prelim.root" %(options.var,category,options.period,options.name))
+        c1.SaveAs(path+"signalShapes_%s_%s_%s_All_%s_prelim.png"  %(options.var,category,options.year,options.name))
+        c1.SaveAs(path+"signalShapes_%s_%s_%s_All_%s_prelim.pdf"  %(options.var,category,options.year,options.name))
+        c1.SaveAs(path+"signalShapes_%s_%s_%s_All_%s_prelim.C"    %(options.var,category,options.year,options.name))
+        c1.SaveAs(path+"signalShapes_%s_%s_%s_All_%s_prelim.root" %(options.var,category,options.year,options.name))
     else:
         cmslabel_sim(c1,'sim',11)
         c1.Update()
         
-        c1.SaveAs(path+"signalShapes_%s_%s_%s_All_%s.png"  %(options.var,category,options.period,options.name))
-        c1.SaveAs(path+"signalShapes_%s_%s_%s_All_%s.pdf"  %(options.var,category,options.period,options.name))
-        c1.SaveAs(path+"signalShapes_%s_%s_%s_All_%s.C"    %(options.var,category,options.period,options.name))
-        c1.SaveAs(path+"signalShapes_%s_%s_%s_All_%s.root" %(options.var,category,options.period,options.name))
+        c1.SaveAs(path+"signalShapes_%s_%s_%s_All_%s.png"  %(options.var,category,options.year,options.name))
+        c1.SaveAs(path+"signalShapes_%s_%s_%s_All_%s.pdf"  %(options.var,category,options.year,options.name))
+        c1.SaveAs(path+"signalShapes_%s_%s_%s_All_%s.C"    %(options.var,category,options.year,options.name))
+        c1.SaveAs(path+"signalShapes_%s_%s_%s_All_%s.root" %(options.var,category,options.year,options.name))
     
       
 if __name__ == '__main__':
     #doSingle()
+#    legs = ["G_{bulk} #rightarrow WW"]
     legs = ["G_{bulk} #rightarrow ZZ","W' #rightarrow WZ","G_{bulk} #rightarrow WW","Z'#rightarrow WW","Z' #rightarrow ZH"]
-    signals = ["BulkGZZ","WprimeWZ","BulkGWW","ZprimeWW"]
-    categories = ["VV_HPLP"]#,"VV_HPHP","VH_HPLP","VH_HPHP"]
+#    signals = ["BulkGWW"]
+    signals = ["BulkGZZ","WprimeWZ","BulkGWW","ZprimeWW","ZprimeZH"]
+    categories = ["VH_LPHP"] #,"VV_HPHP","VH_HPLP","VH_HPHP","VH_LPHP"]
+#    categories = ["VH_LPHP","VV_HPHP","VH_HPLP","VH_HPHP","VH_LPHP"]
     jsons=[]
     for category in categories:
         for s in signals:
-            if options.var =="mJ":
+            if options.var =="mJ" and s != "ZprimeZH":
                 jsons.append("JJ_"+s+"_2016_MJrandom_"+category+".json")
-            else: jsons.append("JJ_"+s+"_2016_MVV.json")
+            else:
+              if s != "ZprimeZH" and s != "WprimeWZ":  jsons.append("JJ_"+s+"_2016_MVV.json")
         if options.var=="mJ":
             jsons.append("JJ_Hjet_ZprimeZH_2016_MJrandom_"+category+".json")
         else:
-            jsons.append("JJ_j1ZprimeZH_2016_MVV.json")
+          jsons.append("JJ_j1"+s+"_2016_MVV.json")
+
         doAll(category,jsons,legs)
