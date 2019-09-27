@@ -1158,17 +1158,19 @@ class Fitter(object):
         color={'Wjets':ROOT.kRed,'Zjets':ROOT.kGreen,'TTbar':ROOT.kBlue}
         for key in histos.keys():
             print " key is "+str(key)
+            #not sure the following is the best fix but prevent crash if integral ==0 
             if histos[key].Integral() != 0:            
                 print "I am scaling the resonant with "+str(scales[key])+"/"+str(histos[key].Integral())+" = "+str(scales[key]/histos[key].Integral()) 
                 histos[key].Scale(scales[key]/histos[key].Integral())
+            else: print "####   integral = 0 for  "+histos[key]+" didn't scale it!!! "
             if histos_nonRes[key].Integral() != 0:            
                 print "I am scaling the non resonant with "+str(scales_nonRes[key])+"/"+str(histos_nonRes[key].Integral())+" = "+str(scales_nonRes[key]/histos_nonRes[key].Integral()) 
                 histos_nonRes[key].Scale(scales_nonRes[key]/histos_nonRes[key].Integral())
+            else: print "####   integral = 0 for  "+histos_nonRes[key]+" didn't scale it!!! "   
             histos[key].SetFillColor(color[key])
             histos_nonRes[key].SetFillColor(color[key])
             histos[key].SetLineColor(color[key])
             histos_nonRes[key].SetLineColor(color[key])
-
 
         
         if 'Zjets' in histos.keys():
