@@ -201,7 +201,7 @@ path = options.outdir
 purity  = options.category
 
 inFileName = options.file
-massPoints = [1200,1400,1600,1800,2000,2500,3000,3500,4000,4500]
+massPoints = [1200,1400,1600,1800,2000,2500,3000,3500,4000] #,4500]
 postfix = "Jet 1 "
 if options.leg == "l2" !=-1: postfix = "Jet 2 "
 varName = {'mVV':'Dijet invariant mass [GeV]','mJ':'%sJet mass [GeV]'%postfix}
@@ -324,8 +324,6 @@ def doAll(category,jsons,legs):
                     with open(options.indir+f.replace("Hjet","Vjet")) as jsonFileV:
                         jV = json.load(jsonFileV)
                     getMJPdf(w,jV,MH,name,j)
-  
-  
             w.pdf('signal_%d%s'%(MH,name)).plotOn(frame[-1], ROOT.RooFit.LineColor(ROOT.TColor.GetColor(colors[ii][i])),ROOT.RooFit.Name(str(MH)+name))#,ROOT.RooFit.Range(MH*0.8,1.2*MH))#ROOT.RooFit.Normalization(1, ROOT.RooAbsReal.RelativeExpected),
       
     if options.var == 'mVV': 
@@ -415,18 +413,19 @@ if __name__ == '__main__':
     legs = ["G_{bulk} #rightarrow ZZ","W' #rightarrow WZ","G_{bulk} #rightarrow WW","Z'#rightarrow WW","Z' #rightarrow ZH"]
 #    signals = ["BulkGWW"]
     signals = ["BulkGZZ","WprimeWZ","BulkGWW","ZprimeWW","ZprimeZH"]
-    categories = ["VH_LPHP"] #,"VV_HPHP","VH_HPLP","VH_HPHP","VH_LPHP"]
+    categories = ["VH_LPHP","VV_HPHP","VH_HPLP","VH_HPHP","VH_LPHP"]
 #    categories = ["VH_LPHP","VV_HPHP","VH_HPLP","VH_HPHP","VH_LPHP"]
-    jsons=[]
-    for category in categories:
-        for s in signals:
-            if options.var =="mJ" and s != "ZprimeZH":
-                jsons.append("JJ_"+s+"_2016_MJrandom_"+category+".json")
-            else:
-              if s != "ZprimeZH" and s != "WprimeWZ":  jsons.append("JJ_"+s+"_2016_MVV.json")
-        if options.var=="mJ":
-            jsons.append("JJ_Hjet_ZprimeZH_2016_MJrandom_"+category+".json")
-        else:
-          jsons.append("JJ_j1"+s+"_2016_MVV.json")
 
-        doAll(category,jsons,legs)
+    for category in categories:
+      jsons=[]
+      for s in signals:
+        print "################################     signal      "+s+"       #######################"
+        if options.var =="mJ":
+          if s != "ZprimeZH":
+            jsons.append("JJ_"+s+"_2016_MJrandom_"+category+".json")
+          else : jsons.append("JJ_Hjet_ZprimeZH_2016_MJrandom_"+category+".json")
+        if options.var =="mVV":
+          if s != "ZprimeZH" and s != "WprimeWZ":  jsons.append("JJ_"+s+"_2016_MVV.json")
+          else: jsons.append("JJ_j1"+s+"_2016_MVV.json")
+
+      doAll(category,jsons,legs)
