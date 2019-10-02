@@ -167,7 +167,7 @@ if options.sample.find("ZH")!=-1 or options.sample.find("Zh")!=-1 or options.sam
     graph_sum_sigma = ROOT.TH2F("corr_sigma","corr_sigma",2,array("f",[55,105,215]),2,array("f",[55,105,215]))
     if samples[mass].find("WZ")!=-1:
         graph_sum_sigma = ROOT.TH2F("corr_sigma","corr_sigma",2,array("f",[55,85,215]),2,array("f",[55,85,215]))
-    if options.sample.find("WH")!=-1:
+    if options.sample.find("WH")!=-1 or samples[mass].find("Wh")!=-1 :
         graph_sum_mean  = ROOT.TH2F("corr_mean","corr_mean",2,array("f",[65,105,145]),2,array("f",[65,105,145]))
     if samples[mass].find("ZH")!=-1 or samples[mass].find("Zh")!=-1 :
         graph_sum_mean = ROOT.TH2F("corr_mean","corr_mean",2,array("f",[85,105,145]),2,array("f",[85,105,145]))
