@@ -1149,24 +1149,19 @@ class Fitter(object):
     def drawVjets(self,outname,histos,histos_nonRes,scales,scales_nonRes,model="model",data="data",poi="x"):
         self.frame=self.w.var(poi).frame(ROOT.RooFit.Range(55,215))
         self.frame.SetTitle("")
-        self.frame.SetXTitle("m_{jet1} (GeV)")
-        if outname.find("l2")!=-1: self.frame.SetXTitle("m_{jet2} (GeV)")
+        if outname.find("l1")!=-1: self.frame.SetXTitle("m_{jet1} (GeV)")
+        elif outname.find("l2")!=-1: self.frame.SetXTitle("m_{jet2} (GeV)")
+	else: self.frame.SetXTitle("m_{jet} (GeV)")
         self.frame.SetYTitle("Arbitrary scale")
         self.frame.SetTitleOffset(1.1,"Y")
         self.frame.SetTitleSize(0.045,"X")
         self.frame.SetTitleSize(0.045,"Y")
         color={'Wjets':ROOT.kRed,'Zjets':ROOT.kGreen,'TTbar':ROOT.kBlue}
         for key in histos.keys():
-            print " key is "+str(key)
-            #not sure the following is the best fix but prevent crash if integral ==0 
-            if histos[key].Integral() != 0:            
-                print "I am scaling the resonant with "+str(scales[key])+"/"+str(histos[key].Integral())+" = "+str(scales[key]/histos[key].Integral()) 
-                histos[key].Scale(scales[key]/histos[key].Integral())
-            else: print "####   integral = 0 for  "+histos[key]+" didn't scale it!!! "
-            if histos_nonRes[key].Integral() != 0:            
-                print "I am scaling the non resonant with "+str(scales_nonRes[key])+"/"+str(histos_nonRes[key].Integral())+" = "+str(scales_nonRes[key]/histos_nonRes[key].Integral()) 
-                histos_nonRes[key].Scale(scales_nonRes[key]/histos_nonRes[key].Integral())
-            else: print "####   integral = 0 for  "+histos_nonRes[key]+" didn't scale it!!! "   
+            if histos[key].Integral()!=0: histos[key].Scale(scales[key]/histos[key].Integral())
+	    else: print "WARNING: histos",key,"has zero integral!"
+            if histos_nonRes[key].Integral()!=0: histos_nonRes[key].Scale(scales_nonRes[key]/histos_nonRes[key].Integral())
+	    else: "WARNING: histos_nonRes",key,"has zero integral!"
             histos[key].SetFillColor(color[key])
             histos_nonRes[key].SetFillColor(color[key])
             histos[key].SetLineColor(color[key])

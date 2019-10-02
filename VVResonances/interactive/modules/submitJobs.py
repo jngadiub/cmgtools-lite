@@ -351,7 +351,6 @@ def mirror(histo,histoNominal,name,dim=1):
     newHisto.SetName(name)
     intNominal=histoNominal.Integral()
     intUp = histo.Integral()
-    print intNominal,intUp
     if dim == 2:
 		for i in range(1,histo.GetNbinsX()+1):
 			for j in range(1,histo.GetNbinsY()+1):
@@ -362,7 +361,8 @@ def mirror(histo,histoNominal,name,dim=1):
 		for i in range(1,histo.GetNbinsX()+1):
 			up=histo.GetBinContent(i)/intUp
 			nominal=histoNominal.GetBinContent(i)/intNominal
-			newHisto.SetBinContent(i,histoNominal.GetBinContent(i)*nominal/up)	
+			if up!= 0: newHisto.SetBinContent(i,histoNominal.GetBinContent(i)*nominal/up)
+			else: newHisto.SetBinContent(i,0)  	
     return newHisto       
 
 def expandHisto(histo,suffix,binsMVV,binsMJ,minMVV,maxMVV,minMJ,maxMJ):

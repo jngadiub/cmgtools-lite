@@ -102,7 +102,7 @@ if len(pvars)==3:
             binsx.append(float(pmins[0])+i*(float(pmaxes[0])-float(pmins[0]))/int(pbins[0]))
         histo=data.drawTH3Binned(pvars[2]+":"+pvars[1]+":"+pvars[0],options.cut,"1",array('f',binsx),array('f',binsx),array('f',binning))
 
-F=ROOT.TFile(options.output,"UPDATE")
+F=ROOT.TFile(options.output,"RECREATE")
 F.cd()
 histo.Write(options.name)
 F.Close()

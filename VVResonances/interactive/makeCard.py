@@ -6,12 +6,14 @@ from CMGTools.VVResonances.statistics.DataCardMaker import DataCardMaker
 cmd='combineCards.py '
 
 sf_qcd = 1.0
+
 pseudodata = "Vjets" #"ZprimeZH"
-outlabel = "_VH_pseudoVjets"#"sigonly_ZprimeZH_M2000"
+outlabel = ""#"sigonly_ZprimeZH_M2000"
 
 datasets=['2016']#,'2017']
 
 doVjets=True
+
 resultsDir = {'2016':'results_2016','2017':'results_2017'}
 
 lumi = {'2016':35900,'2017':41367}
@@ -19,7 +21,6 @@ lumi_unc = {'2016':1.025,'2017':1.023}
 
 scales = {"2017" :[0.983,1.08], "2016":[1.014,1.086]}
 scalesHiggs = {"2017" :[1.,1.], "2016":[1.,1.]}
-
 
 #quick fix to add VH !!!
 vtag_unc = {'VV_HPHP':{},'VV_HPLP':{},'VV_LPLP':{},'VH_HPHP':{},'VH_HPLP':{},'VH_LPHP':{}}
@@ -41,10 +42,10 @@ vtag_unc['VV_LPLP'] = {'2016':'1.063','2017':'1.043'}
 vtag_pt_dependence = {'VV_HPHP':'((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))','VV_HPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))'}
 '''
 
-#purities= ['VH_HPLP']
-purities= ['VH_HPLP','VH_HPHP','VH_LPHP']
+
+#purities= ['VH_HPLP','VH_HPHP','VH_LPHP']
 #purities= ['VV_HPLP','VV_HPHP']
-#purities= ['VV_HPLP','VV_HPHP','VH_HPLP','VH_HPHP','VH_LPHP']
+purities= ['VV_HPLP','VV_HPHP','VH_HPLP','VH_HPHP','VH_LPHP']
 #signals = ["BulkGWW", "BulkGZZ","ZprimeWW","WprimeWZ","VprimeWV","'ZprimeZH'"]
 signals = ["BulkGWW"]
 
@@ -90,6 +91,7 @@ for sig in signals:
       rootFileData = resultsDir[dataset]+"/JJ_%s_nonRes_3D_%s.root"%(dataset,p) #use this only to prepare workspace for making pseudo data with vjets
       histName="histo"
       scaleData=lumi[dataset]
+      #if you run on real data or pseudodata    
 #      rootFileData = resultsDir[dataset]+"/JJ_"+p+".root" #commented to prepare workspace for making pseudo data with vjets
 #      histName="data"
 #      scaleData=1.0 #if you run on real data OR PSEUDODATA
@@ -125,6 +127,7 @@ for sig in signals:
       print t2wcmd
       os.system(t2wcmd)
     del card
+
 
     print "#####################################"
 

@@ -1,23 +1,3 @@
-#fit HPLP MC with HPLP kernel
-#python transferKernelNew.py -i results_2016/JJ_2016_nonRes_VV_HPLP.root --sample pythia --year 2016 -p z --pdfIn results_2016/JJ_2016_nonRes_3D_VV_HPLP.root 
-#python transferKernelNew.py -i results_2016/JJ_2016_nonRes_VV_HPLP.root --sample herwig --year 2016 -p z --pdfIn results_2016/JJ_2016_nonRes_3D_VV_HPLP.root 
-#python transferKernelNew.py -i results_2016/JJ_2016_nonRes_VV_HPLP.root --sample madgraph --year 2016 -p z --pdfIn results_2016/JJ_2016_nonRes_3D_VV_HPLP.root 
-#merge 1Dx2Dx2D HPLP kernels
-#python transferKernelNew.py -i results_2016/JJ_2016_nonRes_VV_HPLP.root --sample pythia --year 2016 -p z --pdfIn results_2016/JJ_2016_nonRes_3D_VV_HPLP.root --merge
-#results validation:
-#python Projections3DHisto.py --mc results_2016/JJ_2016_nonRes_VV_HPLP.root,nonRes -k save_new_shapes_2016_pythia_VV_HPLP_3D.root,histo -o control-plots-HPLP-pythia
-#python Projections3DHisto.py --mc results_2016/JJ_2016_nonRes_VV_HPLP_altshapeUp.root,nonRes -k save_new_shapes_2016_pythia_VV_HPLP_3D.root,histo -o control-plots-HPLP-herwig
-#python Projections3DHisto.py --mc results_2016/JJ_2016_nonRes_VV_HPLP_altshape2.root,nonRes -k save_new_shapes_2016_pythia_VV_HPLP_3D.root,histo -o control-plots-HPLP-madgraph
-#fit HPHP MC with post-fit HPLP kernel
-#python transferKernel.py -i results_2016/JJ_2016_nonRes_VV_HPHP.root --sample pythia --year 2016 -p z --pdfIn save_new_shapes_2016_pythia_VV_HPLP_3D.root
-#python transferKernel.py -i results_2016/JJ_2016_nonRes_VV_HPHP.root --sample herwig --year 2016 -p z --pdfIn save_new_shapes_2016_herwig_VV_HPLP_3D.root 
-#python transferKernel.py -i results_2016/JJ_2016_nonRes_VV_HPHP.root --sample madgraph --year 2016 -p z --pdfIn save_new_shapes_2016_madgraph_VV_HPLP_3D.root
-#merge 1Dx2Dx2D HPHP kernels
-#python transferKernelNew.py -i results_2016/JJ_2016_nonRes_VV_HPHP.root --sample madgraph --year 2016 -p z --pdfIn results_2016/JJ_2016_nonRes_3D_VV_HPLP.root --merge
-#results validation:
-#python Projections3DHisto_HPHP.py --mc results_2016/JJ_2016_nonRes_VV_HPHP.root,nonRes -k save_new_shapes_2016_pythia_VV_HPHP_3D.root,histo -o control-plots-HPHP-pythia
-#python Projections3DHisto_HPHP.py --mc results_2016/JJ_2016_nonRes_VV_HPHP_altshapeUp.root,nonRes -k save_new_shapes_2016_pythia_VV_HPHP_3D.root,histo -o control-plots-HPHP-herwig
-#python Projections3DHisto_HPHP.py --mc results_2016/JJ_2016_nonRes_VV_HPHP_altshape2.root,nonRes -k save_new_shapes_2016_pythia_VV_HPHP_3D.root,histo -o control-plots-HPHP-madgraph
 import ROOT
 ROOT.gROOT.SetBatch(True)
 import os, sys, re, optparse,pickle,shutil,json
@@ -236,6 +216,7 @@ def save_shape(final_shape,norm_nonres,pTools,sample="pythia"):
     histo_yz = ROOT.TH2F('histo_yz','histo_yz',len(pTools.yBinslowedge)-1,pTools.yBinslowedge,len(pTools.zBinslowedge)-1,pTools.zBinslowedge)
     histo_z = ROOT.TH1F('histo_z','histo_z',len(pTools.zBinslowedge)-1,pTools.zBinslowedge)
     print "Done creating out histos"
+
     lv = {}
     for xk, xv in pTools.xBins.iteritems():
         lv[xv] = {}
@@ -243,7 +224,7 @@ def save_shape(final_shape,norm_nonres,pTools,sample="pythia"):
           lv[xv][yv] = {}
           for zk,zv in pTools.zBins.iteritems():
             lv[xv][yv][zv] = 0
-
+  
     lv_xz = {}
     lv_yz = {}
     for xk, xv in pTools.xBins.iteritems():
@@ -392,7 +373,7 @@ def save_shape(final_shape,norm_nonres,pTools,sample="pythia"):
      os.system(cmd)
 
 def makeNonResCard():
- print " ############ options.pdfIn", options.pdfIn
+
  if options.pdfIn.find("VV_HPHP")!=-1: category_pdf = "VV_HPHP"
  elif options.pdfIn.find("VV_HPLP")!=-1: category_pdf = "VV_HPLP"
  elif options.pdfIn.find("VH_HPHP")!=-1: category_pdf = "VH_HPHP" 
@@ -402,6 +383,7 @@ def makeNonResCard():
 
  dataset = options.year
  sig = 'BulkGWW'
+ if 'VBF' in purity: sig = 'VBF_BulkGWW'
  
  lumi = {'2016':35900,'2017':41367}
  lumi_unc = {'2016':1.025,'2017':1.023}
@@ -412,16 +394,26 @@ def makeNonResCard():
  vtag_unc['VV_HPHP'] = {'2016':'1.232/0.792','2017':'1.269/0.763'}
  vtag_unc['VV_HPLP'] = {'2016':'0.882/1.12','2017':'0.866/1.136'}    
  vtag_unc['VV_LPLP'] = {'2016':'1.063','2017':'1.043'}
+
+ vtag_unc['VBF_VV_HPHP'] = {'2016':'1.232/0.792','2017':'1.269/0.763'}
+ vtag_unc['VBF_VV_HPLP'] = {'2016':'0.882/1.12','2017':'0.866/1.136'}
+ vtag_unc['VBF_VV_LPLP'] = {'2016':'1.063','2017':'1.043'}
+
+
  #this is a quick fix! these values are probably wrong!!
  vtag_unc['VH_HPHP'] = {'2016':'1.232/0.792','2017':'1.269/0.763'}
  vtag_unc['VH_HPLP'] = {'2016':'0.882/1.12','2017':'0.866/1.136'}    
  vtag_unc['VH_LPHP'] = {'2016':'1.063','2017':'1.043'}
 
+
  vtag_pt_dependence = {'VV_HPHP':'((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))','VV_HPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))','VV_LPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))','VH_HPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))','VH_LPHP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))','VH_HPHP':'((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))'} #irene added fakes  for a quick test!
 # vtag_pt_dependence = {'VV_HPHP':'((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))','VV_HPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))'}
+# vtag_pt_dependence = {'VV_HPHP':'((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))','VV_HPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))',
+                       'VBF_VV_HPHP':'((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))','VBF_VV_HPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))'}
 
  DTools = DatacardTools(scales,scalesHiggs,vtag_pt_dependence,lumi_unc,vtag_unc,1.0,"","")
  print '##########      PURITY      :', purity 
+
  cat='_'.join(['JJ',sig,purity,'13TeV_'+dataset])
  card=DataCardMaker('',purity,'13TeV_'+dataset,lumi[dataset],'JJ',cat)
  cardName='datacard_'+cat+'.txt'
@@ -430,7 +422,7 @@ def makeNonResCard():
 # DTools.AddSignal(card,dataset,purity,sig,'results_2016',0)
  print "Adding Signal"
  DTools.AddSignal(card,dataset,purity,sig,'results_%s'%options.year,0)
- print "Signal Added 1!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+ print "Signal Added !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
  hname = 'histo'
  if options.sample!='pythia': hname+=('_'+options.sample)
  fin = ROOT.TFile.Open(options.pdfIn)
@@ -439,13 +431,7 @@ def makeNonResCard():
   hname = 'histo'
  fin.Close() 
  print "adding shapes bkg"
-# card.addHistoShapeFromFile("nonRes",["MJ1","MJ2","MJJ"],options.pdfIn,hname,['PT:CMS_VV_JJ_nonRes_PT_'+category_pdf,'OPT:CMS_VV_JJ_nonRes_OPT_'+category_pdf,'OPT3:CMS_VV_JJ_nonRes_OPT3_'+category_pdf,'altshape:CMS_VV_JJ_nonRes_altshape_'+category_pdf,'altshape2:CMS_VV_JJ_nonRes_altshape2_'+category_pdf],False,0)
-# card.addHistoShapeFromFile("nonRes",["MJ1","MJ2","MJJ"],options.pdfIn,hname,['PT:CMS_VV_JJ_nonRes_PT_'+category_pdf,'OPT3:CMS_VV_JJ_nonRes_OPT3_'+category_pdf],False,0)
-# card.addHistoShapeFromFile("nonRes",["MJ1","MJ2","MJJ"],options.pdfIn,hname,['PT:CMS_VV_JJ_nonRes_PT_'+category_pdf,'OPTXY:CMS_VV_JJ_nonRes_OPTXY_'+category_pdf],False,0)
-# card.addHistoShapeFromFile("nonRes",["MJ1","MJ2","MJJ"],options.pdfIn,hname,['PT:CMS_VV_JJ_nonRes_PT_'+category_pdf],False,0)
-# card.addHistoShapeFromFile("nonRes",["MJ1","MJ2","MJJ"],options.pdfIn,hname,['OPTXY:CMS_VV_JJ_nonRes_OPTXY_'+category_pdf,'OPTZ:CMS_VV_JJ_nonRes_OPTZ_'+category_pdf,'OPT3:CMS_VV_JJ_nonRes_OPT3_'+category_pdf,'PTZ:CMS_VV_JJ_nonRes_PTZ_'+category_pdf],False,0) 
  card.addHistoShapeFromFile("nonRes",["MJ1","MJ2","MJJ"],options.pdfIn,hname,['OPTXY:CMS_VV_JJ_nonRes_OPTXY_'+category_pdf,'OPTZ:CMS_VV_JJ_nonRes_OPTZ_'+category_pdf,'OPT3:CMS_VV_JJ_nonRes_OPT3_'+category_pdf],False,0) 
-# card.addHistoShapeFromFile("nonRes",["MJ1","MJ2","MJJ"],options.pdfIn,hname,['PT:CMS_VV_JJ_nonRes_PT_'+category_pdf,'OPTXY:CMS_VV_JJ_nonRes_OPTXY_'+category_pdf,'OPTZ:CMS_VV_JJ_nonRes_OPTZ_'+category_pdf,'OPT3:CMS_VV_JJ_nonRes_OPT3_'+category_pdf],False,0) ,    
  print "adding yield"
  card.addFixedYieldFromFile("nonRes",1,options.input,"nonRes",1)
  print "adding data"
@@ -491,16 +477,22 @@ if __name__=="__main__":
      # if answer=='YES': 
      #  os.system('rm -rf %s'%options.output) 
      #  os.mkdir(options.output)     
-              
+
+     #################################################
+                              
      finMC = ROOT.TFile(options.input,"READ");
      hinMC = finMC.Get("nonRes");
-     if options.input.find("VV_HPHP")!=-1: purity = "VV_HPHP"
-     elif options.input.find("VV_HPLP")!=-1: purity = "VV_HPLP"
-     elif options.input.find("VH_HPHP")!=-1: purity = "VH_HPHP"
-     elif options.input.find("VH_HPLP")!=-1: purity = "VH_HPLP"
-     elif options.input.find("VH_LPHP")!=-1: purity = "VH_LPHP"
-     else: purity = "VV_LPLP"  
+     if options.input.find("HPHP")!=-1: purity = "HPHP"
+     elif options.input.find("HPLP")!=-1: purity = "HPLP"
+     elif options.input.find("LPHP")!=-1: purity = "LPHP"
+     else: purity = "LPLP" 
+     if 'VH' in purity: purity = 'VH_'+purity
+     else: purity = 'VV_'+purity
+     if options.input.find('VBF')!=-1: purity = 'VBF_'+purity    
      print "Using purity: " ,purity    
+     if options.merge:
+      merge_all()
+      sys.exit()       
 
      print " ########################       makeNonResCard      ###"
      w_name = makeNonResCard()
@@ -522,11 +514,15 @@ if __name__=="__main__":
      argset.add(MJ2);
      argset.add(MJ1);
 
+     data = workspace.data("data_obs")
+     data.Print()  
+     print
+     print "Observed number of events:",data.sumEntries()
+          
      #################################################
-     print " ########################       PostFitTools      ###"          
+     print " ########################       PostFitTools      ###"                         
      Tools = PostFitTools(hinMC,argset,options.xrange,options.yrange,options.zrange,purity+'_'+options.sample,options.output,data)
-     #xBins,xBinslowedge,xBinsWidth,yBins,yBinslowedge,yBinsWidth,zBins,zBinslowedge,zBinsWidth = Tools.getBins()
-
+     
      print "x bins:"
      print Tools.xBins
      print "x bins low edge:"
@@ -549,23 +545,10 @@ if __name__=="__main__":
      print Tools.zBinslowedge
      print "z bins width:"
      print Tools.zBinsWidth
-
-     #################################################
-     
-     if options.merge:
-      print "merging"
-      merge_all()
-      sys.exit()
                   
      #################################################                
      model = workspace.pdf("model_b") 
-
-     #del workspace
-     print "data ",     data.Print()     
-          
-     print
-     print "Observed number of events:",data.sumEntries()
-     
+                  
      args  = model.getComponents()
      print "model ",model.Print()
      print "args = model comp[onents ",args.Print()
@@ -634,10 +617,9 @@ if __name__=="__main__":
      norm_nonres[0] = (args["pdf_binJJ_"+purity+"_13TeV_%s_bonly"%options.year].getComponents())["n_exp_binJJ_"+purity+"_13TeV_%s_proc_nonRes"%options.year].getVal()
      norm_nonres[1] = (args["pdf_binJJ_"+purity+"_13TeV_%s_bonly"%options.year].getComponents())["n_exp_binJJ_"+purity+"_13TeV_%s_proc_nonRes"%options.year].getPropagatedError(fitresult)
      print "QCD normalization after fit",norm_nonres[0],"+/-",norm_nonres[1]
-                   
-     ################################################# 
+     #################################################     
      save_shape(pdf_nonres_shape_postfit,norm_nonres,Tools,options.sample)
-    
+
      #make projections onto MJJ axis
      if options.projection =="z": Tools.doZprojection2(allpdfsz,data,norm_nonres[0])
          
@@ -648,10 +630,7 @@ if __name__=="__main__":
      if options.projection =="y":  Tools.doYprojection2(allpdfsy,data,norm_nonres[0])
          
      if options.projection =="xyz":
-         Tools.doZprojection(allpdfsz,data,norm_nonres[0])
-         Tools.doXprojection(allpdfsx,data,norm_nonres[0])
-         Tools.doYprojection(allpdfsy,data,norm_nonres[0])
+         Tools.doZprojection2(allpdfsz,data,norm_nonres[0])
+         Tools.doXprojection2(allpdfsx,data,norm_nonres[0])
+         Tools.doYprojection2(allpdfsy,data,norm_nonres[0])
      
-     #################################################   
-
-

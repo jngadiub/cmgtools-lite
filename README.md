@@ -68,47 +68,18 @@ After producing the QCD background templetes, to improve the agreement between M
 The script expects to find the files in a directory called results_year.
 
 ```
-mkdir postfit_qcd #if you do not have it already
-python transferKernel.py -i results_2016/JJ_2016_nonRes_VV_HPLP.root --sample pythia --year 2016 -p z --pdfIn results_2016/JJ_2016_nonRes_3D_VV_HPLP.root
-python transferKernel.py -i results_2016/JJ_2016_nonRes_VV_HPLP.root --sample herwig --year 2016 -p z --pdfIn results_2016/JJ_2016_nonRes_3D_VV_HPLP.root 
-python transferKernel.py -i results_2016/JJ_2016_nonRes_VV_HPLP.root --sample madgraph --year 2016 -p z --pdfIn results_2016/JJ_2016_nonRes_3D_VV_HPLP.root
+./run_transferKernel.sh VV_HPLP VV_HPLP
 ```
 
-merge 1Dx2Dx2D HPLP kernels
+The same script can be used to extrapolate the templates from a high statistics category to a low statistics one. In the analysis this is done to extrapolate from
+HPLP to HPHP and from ggF/DY to VBF categories as follows:
 
 ```
-python transferKernel.py -i results_2016/JJ_2016_nonRes_VV_HPLP.root --sample pythia --year 2016 -p z --pdfIn results_2016/JJ_2016_nonRes_3D_VV_HPLP.root --merge
+./run_transferKernel.sh VV_HPLP VV_HPHP
+./run_transferKernel.sh VV_HPLP VBF_VV_HPLP
 ```
 
-Results validation:
-
-```
-python Projections3DHisto.py --mc results_2016/JJ_2016_nonRes_VV_HPLP.root,nonRes -k save_new_shapes_2016_pythia_VV_HPLP_3D.root,histo -o control-plots-HPLP-pythia
-python Projections3DHisto.py --mc results_2016/JJ_2016_nonRes_VV_HPLP_altshapeUp.root,nonRes -k save_new_shapes_2016_pythia_VV_HPLP_3D.root,histo -o control-plots-HPLP-herwig
-python Projections3DHisto.py --mc results_2016/JJ_2016_nonRes_VV_HPLP_altshape2.root,nonRes -k save_new_shapes_2016_pythia_VV_HPLP_3D.root,histo -o control-plots-HPLP-madgraph
-```
-
-fit HPHP MC with post-fit HPLP kernel
-
-```
-python transferKernel.py -i results_2016/JJ_2016_nonRes_VV_HPHP.root --sample pythia --year 2016 -p z --pdfIn save_new_shapes_2016_pythia_VV_HPLP_3D.root
-python transferKernel.py -i results_2016/JJ_2016_nonRes_VV_HPHP.root --sample herwig --year 2016 -p z --pdfIn save_new_shapes_2016_herwig_VV_HPLP_3D.root 
-python transferKernel.py -i results_2016/JJ_2016_nonRes_VV_HPHP.root --sample madgraph --year 2016 -p z --pdfIn save_new_shapes_2016_madgraph_VV_HPLP_3D.root
-```
-
-merge 1Dx2Dx2D HPHP kernels
-
-```
-python transferKernel.py -i results_2016/JJ_2016_nonRes_VV_HPHP.root --sample madgraph --year 2016 -p z --pdfIn results_2016/JJ_2016_nonRes_3D_VV_HPLP.root --merge
-```
-
-Results validation:
-
-```
-python Projections3DHisto_HPHP.py --mc results_2016/JJ_2016_nonRes_VV_HPHP.root,nonRes -k save_new_shapes_2016_pythia_VV_HPHP_3D.root,histo -o control-plots-HPHP-pythia
-python Projections3DHisto_HPHP.py --mc results_2016/JJ_2016_nonRes_VV_HPHP_altshapeUp.root,nonRes -k save_new_shapes_2016_pythia_VV_HPHP_3D.root,histo -o control-plots-HPHP-herwig
-python Projections3DHisto_HPHP.py --mc results_2016/JJ_2016_nonRes_VV_HPHP_altshape2.root,nonRes -k save_new_shapes_2016_pythia_VV_HPHP_3D.root,histo -o control-plots-HPHP-madgraph
-```
+The first argument is the input pdfs taken from the high statistics category; the second argument is the MC in the low statistics category to be fit.
 
 Create datacard and workspaces: in order to call the 'addParametricYieldHVTBR' function the signal name BulkGVV or VprimeWV should be used
 

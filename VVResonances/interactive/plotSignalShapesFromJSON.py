@@ -414,7 +414,6 @@ if __name__ == '__main__':
 #    signals = ["BulkGWW"]
     signals = ["BulkGZZ","WprimeWZ","BulkGWW","ZprimeWW","ZprimeZH"]
     categories = ["VH_LPHP","VV_HPHP","VH_HPLP","VH_HPHP","VH_LPHP"]
-#    categories = ["VH_LPHP","VV_HPHP","VH_HPLP","VH_HPHP","VH_LPHP"]
 
     for category in categories:
       jsons=[]
