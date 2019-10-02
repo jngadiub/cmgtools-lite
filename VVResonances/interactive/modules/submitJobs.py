@@ -1769,24 +1769,26 @@ def makePseudoDataVjets(input,kernel,mc,output,lumi,workspace,year,purity):
  ws_file.Close()
  ws.Print()
 
- model = ws.pdf('shapeBkg_Vjet_JJ_%s_13TeV_%i'%(purity,year))
+ modelWjets = ws.pdf('shapeBkg_Wjets_JJ_%s_13TeV_%i'%(purity,year))
+ modelZjets = ws.pdf('shapeBkg_Zjets_JJ_%s_13TeV_%i'%(purity,year))
  category = ws.obj("CMS_channel==CMS_channel::JJ_"+purity+"_13TeV_%i"%year)
 
  MJ1= ws.var("MJ1");
  MJ2= ws.var("MJ2");
  MJJ= ws.var("MJJ");
  args = ROOT.RooArgSet(MJ1,MJ2,MJJ)
- print "n_exp_binJJ_"+purity+"_13TeV_%i_proc_Vjet"%year
- o_norm_vjets = ws.obj("n_exp_binJJ_"+purity+"_13TeV_%i_proc_Vjet"%year)
- hout_vjets = ROOT.TH3F('vjets','vjets',len(xbins)-1,xbins,len(xbins)-1,xbins,len(zbins)-1,zbins)
+ ### Wjets
+ print "n_exp_binJJ_"+purity+"_13TeV_%i_proc_Wjets"%year
+ o_norm_wjets = ws.obj("n_exp_binJJ_"+purity+"_13TeV_%i_proc_Wjets"%year)
+ hout_wjets = ROOT.TH3F('wjets','wjets',len(xbins)-1,xbins,len(xbins)-1,xbins,len(zbins)-1,zbins)
  
- nEvents = o_norm_vjets.getVal()
- print "Expected V+jets events: ",nEvents
- vjets = model.generate(args,int(nEvents))
- if vjets!=None:
+ nEventsW = o_norm_wjets.getVal()
+ print "Expected W+jets events: ",nEventsW
+ wjets = modelWjets.generate(args,int(nEventsW))
+ if wjets!=None:
   #print signal.sumEntries()
-  for i in range(0,int(vjets.sumEntries())):
-   a = vjets.get(i)
+  for i in range(0,int(wjets.sumEntries())):
+   a = wjets.get(i)
    it = a.createIterator()
    var = it.Next()
    x=[]
@@ -1794,9 +1796,31 @@ def makePseudoDataVjets(input,kernel,mc,output,lumi,workspace,year,purity):
        x.append(var.getVal())
        var = it.Next()
    #print x
-   hout_vjets.Fill(x[0],x[1],x[2])
+   hout_wjets.Fill(x[0],x[1],x[2])
       
- hout.Add(hout_vjets)
+ hout.Add(hout_wjets)
+ ### Zjets
+ print "n_exp_binJJ_"+purity+"_13TeV_%i_proc_Zjets"%year
+ o_norm_zjets = ws.obj("n_exp_binJJ_"+purity+"_13TeV_%i_proc_Zjets"%year)
+ hout_zjets = ROOT.TH3F('zjets','zjets',len(xbins)-1,xbins,len(xbins)-1,xbins,len(zbins)-1,zbins)
+ 
+ nEventsZ = o_norm_zjets.getVal()
+ print "Expected Z+jets events: ",nEventsZ
+ zjets = modelZjets.generate(args,int(nEventsZ))
+ if zjets!=None:
+  #print signal.sumEntries()
+  for i in range(0,int(zjets.sumEntries())):
+   a = zjets.get(i)
+   it = a.createIterator()
+   var = it.Next()
+   x=[]
+   while var:
+       x.append(var.getVal())
+       var = it.Next()
+   #print x
+   hout_zjets.Fill(x[0],x[1],x[2])
+      
+ hout.Add(hout_zjets)
  
  fout.cd()
  hout.Write('data')
@@ -1809,7 +1833,8 @@ def makePseudoDataVjets(input,kernel,mc,output,lumi,workspace,year,purity):
  print "workspace", workspace
  print "year     ", year
  print "purity   ", purity
- print "Expected V+jets events: ",nEvents
+ print "Expected W+jets events: ",nEventsW
+ print "Expected Z+jets events: ",nEventsZ
  print "Expected QCD events: ",int(hmcin.Integral()*lumi)
  print "Writing histograms nonRes and data to file ", output
 
