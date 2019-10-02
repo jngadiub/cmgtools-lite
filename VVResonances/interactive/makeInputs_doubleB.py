@@ -7,8 +7,8 @@ from optparse import OptionParser
 # python makeInputs_doubleB.py -p 2016 --run "qcdkernel"
 # python makeInputs_doubleB.py -p 2016 --run "qcdnorm"
 # python makeInputs_doubleB.py -p 2016 --run "data"
-# python makeInputs_doubleB.py -p 2016 --run "pseudonovjets"
-# python makeInputs_doubleB.py -p 2016 --run "pseudovjets"                                                                                                                                                                                                                    
+# python makeInputs_doubleB.py -p 2016 --run "pseudoNOVJETS"
+# python makeInputs_doubleB.py -p 2016 --run "pseudoVJETS"                                                                                                                                                                                                                    
 
 parser = OptionParser()
 parser.add_option("-p","--period",dest="period",type="int",default=2016,help="run period")
@@ -151,7 +151,7 @@ cuts['resTT'] = '(jj_l1_mergedVTruth==1&&jj_l1_softDrop_mass>140&&jj_l1_softDrop
 
 #all categories
 #categories=['VH_HPHP','VH_HPLP','VH_LPHP','VV_HPHP','VV_HPLP']
-categories=['VV_HPHP']
+categories=['VV_HPLP','VV_HPHP']
 
 
 #list of signal samples --> nb, radion and vbf samples to be added
@@ -377,14 +377,14 @@ if options.run.find("all")!=-1 or options.run.find("vjets")!=-1:
 if options.run.find("all")!=-1 or options.run.find("data")!=-1:
     print " Do data "
     f.makeNormalizations("data","JJ_"+str(period),dataTemplate,1,'1',"normD") #run on data. Currently run on pseudodata only (below)
-if options.run.find("all")!=-1 or options.run.find("pseudonovjets")!=-1:
+if options.run.find("all")!=-1 or options.run.find("pseudoNOVJETS")!=-1:
     print " Do pseudodata without vjets"
     from modules.submitJobs import makePseudoData
     for p in categories: makePseudoData("JJ_"+str(period)+"_nonRes_%s.root"%p,"save_new_shapes_"+str(period)+"_pythia_%s_3D.root"%p,"pythia","JJ_PDnoVjets_%s.root"%p,lumi)
-if options.run.find("all")!=-1 or options.run.find("pseudovjets")!=-1:
+if options.run.find("all")!=-1 or options.run.find("pseudoVJETS")!=-1:
     print " Do pseudodata with vjets: DID YOU PRODUCE THE WORKSPACE BEFORE???"
     from modules.submitJobs import makePseudoDataVjets
-    for p in categories: makePseudoDataVjets("results_"+str(period)+"/JJ_"+str(period)+"_nonRes_%s.root"%p,"results_"+str(period)+"/save_new_shapes_"+str(period)+"_pythia_%s_3D.root"%p,"pythia","JJ_PDVjets_%s.root"%p,lumi,"workspace_JJ__13TeV_"+str(period)+".root",period,p)
+    for p in categories: makePseudoDataVjets("results_"+str(period)+"/JJ_"+str(period)+"_nonRes_%s.root"%p,"results_"+str(period)+"/save_new_shapes_"+str(period)+"_pythia_%s_3D.root"%p,"pythia","JJ_PDVjets_%s.root"%p,lumi,"workspace_JJ_BulkGWW__13TeV_"+str(period)+".root",period,p)
 
 
 
