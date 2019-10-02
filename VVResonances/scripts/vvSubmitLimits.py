@@ -18,7 +18,7 @@ def makeSubmitFileCondor(exe,jobname,jobflavour):
 
 
 parser = optparse.OptionParser()
-
+parser.add_option("-n","--name",dest="name",help="jobdir name",default='job')
 parser.add_option("-s","--step",dest="step",type=float,help="step for mass points",default=1000.0)
 parser.add_option("-m","--min",dest="min",type=float,help="minimum Mass point",default=1000.0)
 parser.add_option("-M","--max",dest="max",type=float,help="maximum Mass point",default=5000.0)
@@ -69,9 +69,12 @@ for i,m in enumerate(massPoints):
         os.system('sh submit_{i}.sh '.format(i=i))
     else:
      print "Use CONDOR!"
-     os.system('rm -rf job_{i} && mkdir job_{i}'.format(i=i))
-     os.system('mv submit_{i}.sh job_{i}/submit.sh'.format(i=i))
-     os.chdir('job_{i}'.format(i=i))
+     print 'rm -rf '+options.name+'_{i}'.format(i=i)
+     print 'mkdir '+options.name+'_{i}'.format(i=i)
+     os.system('rm -rf '+options.name+'_{i}'.format(i=i))
+     os.system('mkdir '+options.name+'_{i}'.format(i=i))
+     os.system('mv submit_{i}'.format(i=i)+'.sh '+options.name+'_{i}/submit.sh'.format(i=i))
+     os.chdir( options.name+'_{i}'.format(i=i))
      makeSubmitFileCondor('submit.sh'.format(i=i),"job",options.queue)
      os.system("condor_submit submit.sub")
      os.chdir('../')
