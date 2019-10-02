@@ -6,12 +6,12 @@ from CMGTools.VVResonances.statistics.DataCardMaker import DataCardMaker
 cmd='combineCards.py '
 
 sf_qcd = 1.0
-pseudodata = "noVjets" #"ZprimeZH"
-outlabel = ""#"sigonly_ZprimeZH_M2000"
+pseudodata = "Vjets" #"ZprimeZH"
+outlabel = "_VH_pseudoVjets"#"sigonly_ZprimeZH_M2000"
 
 datasets=['2016']#,'2017']
 
-doVjets=False
+doVjets=True
 resultsDir = {'2016':'results_2016','2017':'results_2017'}
 
 lumi = {'2016':35900,'2017':41367}
@@ -19,6 +19,7 @@ lumi_unc = {'2016':1.025,'2017':1.023}
 
 scales = {"2017" :[0.983,1.08], "2016":[1.014,1.086]}
 scalesHiggs = {"2017" :[1.,1.], "2016":[1.,1.]}
+
 
 #quick fix to add VH !!!
 vtag_unc = {'VV_HPHP':{},'VV_HPLP':{},'VV_LPLP':{},'VH_HPHP':{},'VH_HPLP':{},'VH_LPHP':{}}
@@ -38,14 +39,14 @@ vtag_unc['VV_HPLP'] = {'2016':'0.882/1.12','2017':'0.866/1.136'}
 vtag_unc['VV_LPLP'] = {'2016':'1.063','2017':'1.043'}
 
 vtag_pt_dependence = {'VV_HPHP':'((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))','VV_HPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))'}
-'''  
+'''
 
-#purities= ['VV_HPLP']
+#purities= ['VH_HPLP']
 purities= ['VH_HPLP','VH_HPHP','VH_LPHP']
 #purities= ['VV_HPLP','VV_HPHP']
 #purities= ['VV_HPLP','VV_HPHP','VH_HPLP','VH_HPHP','VH_LPHP']
 #signals = ["BulkGWW", "BulkGZZ","ZprimeWW","WprimeWZ","VprimeWV","'ZprimeZH'"]
-signals = ["BulkGZZ"]
+signals = ["BulkGWW"]
 
 Tools = DatacardTools(scales,scalesHiggs,vtag_pt_dependence,lumi_unc,vtag_unc,sf_qcd,pseudodata,outlabel)
 
@@ -61,7 +62,7 @@ for sig in signals:
       card=DataCardMaker('',p,'13TeV_'+dataset,lumi[dataset],'JJ',cat)
       cmd=cmd+" "+cat.replace('_%s'%sig,'')+'=datacard_'+cat+'.txt '
       cmd_combo=cmd_combo+" "+cat.replace('_%s'%sig,'')+'=datacard_'+cat+'.txt '
-      cardName='datacard_'+cat+'.txt'
+      cardName='datacard_'+cat+'.txt '
       workspaceName='workspace_'+cat+outlabel+'.root'
 
       Tools.AddSignal(card,dataset,p,sig,resultsDir[dataset],ncontrib)
@@ -86,13 +87,21 @@ for sig in signals:
       print "rootFileNorm ",rootFileNorm
       Tools.AddNonResBackground(card,dataset,p,rootFile3DPDF,rootFileNorm,ncontrib) 
 
-      rootFileData = resultsDir[dataset]+"/JJ_"+p+".root"
-      histName="data"
-      scaleData=1.0 #if you run on real data OR PSEUDODATA
+      rootFileData = resultsDir[dataset]+"/JJ_%s_nonRes_3D_%s.root"%(dataset,p) #use this only to prepare workspace for making pseudo data with vjets
+      histName="histo"
+      scaleData=lumi[dataset]
+#      rootFileData = resultsDir[dataset]+"/JJ_"+p+".root" #commented to prepare workspace for making pseudo data with vjets
+#      histName="data"
+#      scaleData=1.0 #if you run on real data OR PSEUDODATA
       if pseudodata=="noVjets":
         print "Using pseudodata without vjets"
         rootFileData = resultsDir[dataset]+"/JJ_PDnoVjets_"+p+".root"
         histName="datah"
+        scaleData=1.0
+      if pseudodata=="Vjets":
+        print "Using pseudodata with vjets"
+        rootFileData = resultsDir[dataset]+"/JJ_PDVjets_"+p+".root"
+        histName="data"
         scaleData=1.0
       if pseudodata=="ZprimeZH":
        rootFileData = resultsDir[dataset]+"/JJ_ZprimeZH_VH_all_M2000.root"
@@ -109,24 +118,29 @@ for sig in signals:
       Tools.AddNonResBackgroundSystematics(card,p)
         
       card.makeCard()
-      
+      print "card and workspace name are: "
+      print cardName
+      print workspaceName
       t2wcmd = "text2workspace.py %s -o %s"%(cardName,workspaceName)
       print t2wcmd
       os.system(t2wcmd)
     del card
 
-    #make combined 
-    print "#######     going to combine purity categories: ",purities    
-    combo_card = 'datacard_'+cat.replace("VV_HPHP","").replace("VV_HPLP","").replace("VV_LPLP","").replace("VH_HPHP","").replace("VH_HPLP","").replace("VH_LPHP","")+'.txt'
-    combo_workspace = 'workspace_'+cat.replace("VV_HPHP","").replace("VV_HPLP","").replace("VV_LPLP","").replace("VH_HPHP","").replace("VH_HPLP","").replace("VH_LPHP","")+'.root'
-    os.system('rm %s'%combo_card)
-    cmd_combo+=' >> %s'%combo_card
-    print cmd_combo
-    os.system(cmd_combo)
-    t2wcmd = "text2workspace.py %s -o %s"%(combo_card,combo_workspace)
-    print t2wcmd
-    os.system(t2wcmd)
     print "#####################################"
+
+    #make combined 
+    if len(purities)>1:
+      print "#######     going to combine purity categories: ",purities    
+      combo_card = cardName.replace("VV_HPHP","").replace("VV_HPLP","").replace("VV_LPLP","").replace("VH_HPHP","").replace("VH_HPLP","").replace("VH_LPHP","")
+      combo_workspace = workspaceName.replace("VV_HPHP","").replace("VV_HPLP","").replace("VV_LPLP","").replace("VH_HPHP","").replace("VH_HPLP","").replace("VH_LPHP","")
+      os.system('rm %s'%combo_card)
+      cmd_combo+=' >> %s'%combo_card
+      print cmd_combo
+      os.system(cmd_combo)
+      t2wcmd = "text2workspace.py %s -o %s"%(combo_card,combo_workspace)
+      print t2wcmd
+      os.system(t2wcmd)
+      print "#####################################"
 
   if len(datasets)>1:   
     #make combine 2016+2017 card
