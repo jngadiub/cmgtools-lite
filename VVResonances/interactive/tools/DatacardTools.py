@@ -67,7 +67,7 @@ class DatacardTools():
        card.addMJJSignalParametricShapeNOEXP("%s_Wqq1_c2"%sig,"MJ1" ,resultsDir+"/JJ_Vjet_%s_%s_MJrandom_%s.json"%(sig,dataset,category),{'CMS_scale_prunedj':1.},{'CMS_res_prunedj':1.},self.scales[dataset])
        card.addMJJSignalParametricShapeHiggs("%s_Wqq2_c2"%sig,"MJ2" ,resultsDir+"/JJ_Hjet_%s_%s_MJrandom_%s.json"%(sig,dataset,category),{'CMS_scale_prunedj':1.},{'CMS_res_prunedj':1.},self.scalesHiggs[dataset])
        card.conditionalProduct2("%s_c2"%sig,"%s_Wqq1_c2"%sig,"%s_Wqq2_c2"%sig,"%s_MVV_c2"%sig,"{MJ1,MJ2}")
-       card.sumSimple("%s"%sig,"%s_c1"%sig,"%s_c2"%sig,"0.5")
+       card.sumPdf("%s"%sig,"%s_c1"%sig,"%s_c2"%sig,"CMS_ratio_%s_"%sig+category)
        card.addParametricYieldWithUncertainty("%s"%sig,ncontrib,resultsDir+"/JJ_%s_%s_%s_yield.json"%(sig,dataset,category),1,'CMS_tau21_PtDependence',self.vtag_pt_dependence[category],1.0)
        
       if sig.find("WZ")!=-1:
@@ -80,7 +80,7 @@ class DatacardTools():
        card.addMJJSignalParametricShapeNOEXP("%s_Wqq1_c2"%sig,"MJ1" ,resultsDir+"/JJ_%s_%s_MJrandom_%s.json"%(sig,dataset,category),{'CMS_scale_prunedj':1.},{'CMS_res_prunedj':1.},self.scales[dataset])
        card.addMJJSignalParametricShapeNOEXP("%s_Wqq2_c2"%sig,"MJ2" ,resultsDir+"/JJ_%s_%s_MJrandom_%s.json"%(sig,dataset,category),{'CMS_scale_prunedj':1.},{'CMS_res_prunedj':1.},self.scales[dataset])
        card.conditionalProduct2("%s_c2"%sig,"%s_Wqq1_c2"%sig,"%s_Wqq2_c2"%sig,"%s_MVV_c2"%sig,"{MJ1,MJ2}")
-       card.sumSimple("%s"%sig,"%s_c1"%sig,"%s_c2"%sig,"0.5")
+       card.sumPdf("%s"%sig,"%s_c1"%sig,"%s_c2"%sig,"CMS_ratio_%s_"%sig+category)
        
        if self.pseudodata=="":
           card.addParametricYieldWithUncertainty("%s"%sig,ncontrib,resultsDir+"/JJ_%s_%s_%s_yield.json"%(sig,dataset,category),1,'CMS_tau21_PtDependence',self.vtag_pt_dependence[category],1.0)
