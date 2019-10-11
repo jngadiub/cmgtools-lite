@@ -7,12 +7,12 @@ cmd='combineCards.py '
 
 sf_qcd = 1.0
 
-pseudodata = "Vjets" #"ZprimeZH"
-outlabel = ""#"sigonly_ZprimeZH_M2000"
+pseudodata = "noVjets" #"ZprimeZH"
+outlabel = "test_sumPdf" #"sigonly_ZprimeZH_M2000"
 
 datasets=['2016']#,'2017']
 
-doVjets=True
+doVjets=False
 
 resultsDir = {'2016':'results_2016','2017':'results_2017'}
 
@@ -47,7 +47,7 @@ vtag_pt_dependence = {'VV_HPHP':'((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))
 #purities= ['VV_HPLP','VV_HPHP']
 purities= ['VV_HPLP','VV_HPHP','VH_HPLP','VH_HPHP','VH_LPHP']
 #signals = ["BulkGWW", "BulkGZZ","ZprimeWW","WprimeWZ","VprimeWV","'ZprimeZH'"]
-signals = ["BulkGWW"]
+signals = ["ZprimeZH"]
 
 Tools = DatacardTools(scales,scalesHiggs,vtag_pt_dependence,lumi_unc,vtag_unc,sf_qcd,pseudodata,outlabel)
 
