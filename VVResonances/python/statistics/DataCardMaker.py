@@ -360,17 +360,15 @@ class DataCardMaker:
         scaleSysts=[]
         resolutionSysts=[]
         for syst,factor in scale.iteritems():
-            if self.w.var(syst) != None: continue
-            self.w.factory(syst+"[0,-0.1,0.1]")
+            if self.w.var(syst) == None: self.w.factory(syst+"[0,-0.1,0.1]")
             scaleStr=scaleStr+"+{factor}*{syst}".format(factor=factor,syst=syst)
             scaleSysts.append(syst)
         for syst,factor in resolution.iteritems():
-            if self.w.var(syst) != None: continue
-            self.w.factory(syst+"[0,-0.5,0.5]")
+            print "resolution"
+            if self.w.var(syst) == None: self.w.factory(syst+"[0,-0.5,0.5]")
             resolutionStr=resolutionStr+"+{factor}*{syst}".format(factor=factor,syst=syst)
-
             resolutionSysts.append(syst)
-       
+        
         MJJ=variable            
         if self.w.var(MJJ) == None: self.w.factory(MJJ+"[0,1000]")
 
@@ -379,7 +377,6 @@ class DataCardMaker:
 
         SCALEVar="_".join(["mean",name,self.tag])
         self.w.factory("expr::{name}('({param}*{sc})*(1+{vv_syst})',MH,{vv_systs})".format(name=SCALEVar,param=info['mean'],sc=scales[0],vv_syst=scaleStr,vv_systs=','.join(scaleSysts)).replace("MH",varToReplace))
-
         
         SIGMAVar="_".join(["sigma",name,self.tag])
         self.w.factory("expr::{name}('({param}*{res})*(1+{vv_syst})',MH,{vv_systs})".format(name=SIGMAVar,param=info['sigma'],res=scales[1],vv_syst=resolutionStr,vv_systs=','.join(resolutionSysts)).replace("MH",varToReplace))
