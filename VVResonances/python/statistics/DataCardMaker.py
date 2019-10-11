@@ -364,7 +364,6 @@ class DataCardMaker:
             scaleStr=scaleStr+"+{factor}*{syst}".format(factor=factor,syst=syst)
             scaleSysts.append(syst)
         for syst,factor in resolution.iteritems():
-            print "resolution"
             if self.w.var(syst) == None: self.w.factory(syst+"[0,-0.5,0.5]")
             resolutionStr=resolutionStr+"+{factor}*{syst}".format(factor=factor,syst=syst)
             resolutionSysts.append(syst)
@@ -411,13 +410,11 @@ class DataCardMaker:
         scaleSysts=[]
         resolutionSysts=[]
         for syst,factor in scale.iteritems():
-            if self.w.var(syst) != None: continue
-            self.w.factory(syst+"[0,-0.1,0.1]")
+            if self.w.var(syst) == None: self.w.factory(syst+"[0,-0.1,0.1]")
             scaleStr=scaleStr+"+{factor}*{syst}".format(factor=factor,syst=syst)
             scaleSysts.append(syst)
         for syst,factor in resolution.iteritems():
-            if self.w.var(syst) != None: continue
-            self.w.factory(syst+"[0,-0.5,0.5]")
+            if self.w.var(syst) == None: self.w.factory(syst+"[0,-0.5,0.5]")
             resolutionStr=resolutionStr+"+{factor}*{syst}".format(factor=factor,syst=syst)
 
             resolutionSysts.append(syst)
@@ -464,13 +461,11 @@ class DataCardMaker:
         scaleSysts=[]
         resolutionSysts=[]
         for syst,factor in scale.iteritems():
-            #if self.w.var(syst) != None: continue
-            self.w.factory(syst+"[0,-0.1,0.1]")
+            if self.w.var(syst) == None: self.w.factory(syst+"[0,-0.1,0.1]")
             scaleStr=scaleStr+"+{factor}*{syst}".format(factor=factor,syst=syst)
             scaleSysts.append(syst)
         for syst,factor in resolution.iteritems():
-            #if self.w.var(syst) != None: continue
-            self.w.factory(syst+"[0,-0.5,0.5]")
+            if self.w.var(syst) == None: self.w.factory(syst+"[0,-0.5,0.5]")
             resolutionStr=resolutionStr+"+{factor}*{syst}".format(factor=factor,syst=syst)
             resolutionSysts.append(syst)
        

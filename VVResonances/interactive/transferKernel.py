@@ -373,7 +373,7 @@ def save_shape(final_shape,norm_nonres,pTools,sample="pythia"):
      os.system(cmd)
 
 def makeNonResCard():
-
+ print " ############ options.pdfIn", options.pdfIn
  if options.pdfIn.find("VV_HPHP")!=-1: category_pdf = "VV_HPHP"
  elif options.pdfIn.find("VV_HPLP")!=-1: category_pdf = "VV_HPLP"
  elif options.pdfIn.find("VH_HPHP")!=-1: category_pdf = "VH_HPHP" 

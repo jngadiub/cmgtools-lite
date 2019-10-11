@@ -1799,6 +1799,7 @@ def makePseudoDataVjets(input,kernel,mc,output,lumi,workspace,year,purity):
    hout_wjets.Fill(x[0],x[1],x[2])
       
  hout.Add(hout_wjets)
+
  ### Zjets
  print "n_exp_binJJ_"+purity+"_13TeV_%i_proc_Zjets"%year
  o_norm_zjets = ws.obj("n_exp_binJJ_"+purity+"_13TeV_%i_proc_Zjets"%year)
@@ -1810,7 +1811,7 @@ def makePseudoDataVjets(input,kernel,mc,output,lumi,workspace,year,purity):
  if zjets!=None:
   #print signal.sumEntries()
   for i in range(0,int(zjets.sumEntries())):
-   a = zjets.get(i)
+      a = zjets.get(i)
    it = a.createIterator()
    var = it.Next()
    x=[]

@@ -77,6 +77,21 @@ def getMJPdf(mvv_min,mvv_max,MH,postfix="",fixPars="1"):
 	function = ROOT.RooDoubleCB(pdfName, pdfName, var, mean, sigma, alpha, sign,  alpha2, sign2)  
 	return function,var,[mean,sigma,alpha,alpha2,sign,sign2]
 
+def chooseBin(sample,b,binmidpoint):
+    
+    if sample.find('WZ')!=-1 :
+        if b <= 55+2*binmidpoint : b = 80
+        if b > 55+2*binmidpoint: b = 90
+        return b
+    elif sample.find('ZH')!=-1 or sample.find('Zh')!=-1:
+        if b <= 55+binmidpoint*2 and b > 55: b = 90
+        if b > 55+binmidpoint*2: b = 120
+        return b
+    elif sample.find('WH')!=-1 or sample.find('Wh')!=-1:
+        if b <= 55+2*binmidpoint and b > 65: b = 80
+        if b > 55+2*binmidpoint: b = 90
+        return b
+    
 def dodCBFits(h1,mass,prefix,fixpars):
     
     func,var,params = getMJPdf(1126,5000,mass,options.sample,fixpars)
@@ -118,7 +133,8 @@ samples={}
 graphs={'MEAN':ROOT.TGraphErrors(),'SIGMA':ROOT.TGraphErrors(),'ALPHA1':ROOT.TGraphErrors(),'N1':ROOT.TGraphErrors(),'ALPHA2':ROOT.TGraphErrors(),'N2':ROOT.TGraphErrors()}
 
 testcorr= False
-if options.sample.find("ZH")!=-1 or options.sample.find("Zh")!=-1 or options.sample.find("WZ")!=-1:
+
+if options.sample.find("ZH")!=-1 or options.sample.find('Zh')!=-1 or options.sample.find("WZ")!=-1 or options.sample.find('WH')!=-1:
     testcorr = True
 print " ######### testcorr ",testcorr
 for filename in os.listdir(args[0]):
@@ -147,45 +163,54 @@ for filename in os.listdir(args[0]):
 #Now we have the samples: Sort the masses and run the fits
 N=0
 allgraphs = {}
-
-if options.sample.find("ZH")!=-1 or options.sample.find("Zh")!=-1 or options.sample.find("WZ")!=-1 or samples[mass].find("WH")!=-1 or samples[mass].find("Wh")!=-1:
+allgraphs_sigma = {}
+if (options.sample.find("H")!=-1 or options.sample.find("h")!=-1 or options.sample.find("WZ")!=-1):
     for mass in samples.keys():
-        if samples[mass].find("WH")!=-1 or samples[mass].find("Wh")!=-1:
-            h = ROOT.TH2F("corr_mean_M"+str(mass),"corr_mean_M"+str(mass),2,array("f",[65,105,145]),2,array("f",[65,105,145]))
-        if samples[mass].find("ZH")!=-1 or samples[mass].find("Zh")!=-1:
-            h = ROOT.TH2F("corr_mean_M"+str(mass),"corr_mean_M"+str(mass),2,array("f",[85,105,145]),2,array("f",[85,105,145]))
         if samples[mass].find("WZ")!=-1:
+            print 'histos for WZ signal'
             h = ROOT.TH2F("corr_mean_M"+str(mass),"corr_mean_M"+str(mass),2,array("f",[76,86,94]),2,array("f",[76,86,94]))
-        allgraphs[mass] = h
-    allgraphs_sigma = {}
-    for mass in samples.keys():
-        h = ROOT.TH2F("corr_sigma_M"+str(mass),"corr_sigma_M"+str(mass),2,array("f",[55,105,215]),2,array("f",[55,105,215]))
-        if samples[mass].find("WZ")!=-1:
-             h = ROOT.TH2F("corr_sigma_M"+str(mass),"corr_sigma_M"+str(mass),2,array("f",[55,85,215]),2,array("f",[55,85,215]))
-        allgraphs_sigma[mass] = h
+            hs = ROOT.TH2F("corr_sigma_M"+str(mass),"corr_sigma_M"+str(mass),2,array("f",[55,85,215]),2,array("f",[55,85,215]))
 
-    graph_sum_sigma = ROOT.TH2F("corr_sigma","corr_sigma",2,array("f",[55,105,215]),2,array("f",[55,105,215]))
+        elif samples[mass].find("WH")!=-1 or samples[mass].find("Wh")!=-1:
+            print 'histos for WH signal'
+            h = ROOT.TH2F("corr_mean_M"+str(mass),"corr_mean_M"+str(mass),2,array("f",[65,105,145]),2,array("f",[65,105,145]))
+            hs = ROOT.TH2F("corr_sigma_M"+str(mass),"corr_sigma_M"+str(mass),2,array("f",[55,105,215]),2,array("f",[55,105,215]))    
+        elif samples[mass].find("ZH")!=-1 or samples[mass].find("Zh")!=-1:
+            print 'histos for ZH signal'
+            h = ROOT.TH2F("corr_mean_M"+str(mass),"corr_mean_M"+str(mass),2,array("f",[85,105,145]),2,array("f",[85,105,145]))
+            hs = ROOT.TH2F("corr_sigma_M"+str(mass),"corr_sigma_M"+str(mass),2,array("f",[55,105,215]),2,array("f",[55,105,215]))    
+        
+        allgraphs[mass] = h
+        allgraphs_sigma[mass] = hs
+
     if samples[mass].find("WZ")!=-1:
+        print 'sigma histo for WZ'
         graph_sum_sigma = ROOT.TH2F("corr_sigma","corr_sigma",2,array("f",[55,85,215]),2,array("f",[55,85,215]))
-    if options.sample.find("WH")!=-1 or samples[mass].find("Wh")!=-1 :
-        graph_sum_mean  = ROOT.TH2F("corr_mean","corr_mean",2,array("f",[65,105,145]),2,array("f",[65,105,145]))
-    if samples[mass].find("ZH")!=-1 or samples[mass].find("Zh")!=-1 :
-        graph_sum_mean = ROOT.TH2F("corr_mean","corr_mean",2,array("f",[85,105,145]),2,array("f",[85,105,145]))
+    else:
+        print 'add sigma hist'
+        graph_sum_sigma = ROOT.TH2F("corr_sigma","corr_sigma",2,array("f",[55,105,215]),2,array("f",[55,105,215]))
+
     if samples[mass].find("WZ")!=-1:
+        print 'mean for WZ signal' 
         graph_sum_mean = ROOT.TH2F("corr_mean","corr_mean",2,array("f",[76,86,94]),2,array("f",[76,86,94]))
+    elif options.sample.find("WH")!=-1 or samples[mass].find("Wh")!=-1:
+        print 'mean for WH signal'
+        graph_sum_mean  = ROOT.TH2F("corr_mean","corr_mean",2,array("f",[65,105,145]),2,array("f",[65,105,145]))
+    elif samples[mass].find("ZH")!=-1 or samples[mass].find("Zh")!=-1:
+        print 'mean for ZH signal'
+        graph_sum_mean = ROOT.TH2F("corr_mean","corr_mean",2,array("f",[85,105,145]),2,array("f",[85,105,145]))
     minmjet = 55
     maxmjet = 215 
     binsmjet = 80
     bins_all = [[5,25],[25,50]]
     binmidpoint = 25
-    if options.sample.find("WH")!=-1 or options.sample.find("Wh")!=-1:
-        bins_all = [[5,15],[15,50]]
-        binmidpoint = 15
     if options.sample.find("WZ")!=-1:
         bins_all = [[5,15],[15,25]]
         binmidpoint = 15
-
-
+    elif options.sample.find("WH")!=-1 or options.sample.find("Wh")!=-1:
+        bins_all = [[5,15],[15,50]]
+        binmidpoint = 15
+    
 
 for mass in sorted(samples.keys()):
     print 'fitting',str(mass) 
@@ -226,14 +251,8 @@ for mass in sorted(samples.keys()):
             par = dodCBFits(ps[-1],mass,str(n+1),"1")
             b1 = proj.GetBinCenter(bins[0])+ (proj.GetBinCenter(bins[1])-proj.GetBinCenter(bins[0]))/2. 
             b2 = proj.GetBinCenter(bins2[0])+ (proj.GetBinCenter(bins2[1])-proj.GetBinCenter(bins2[0]))/2.
-            if b1 < 105 and b1 > 85: b1 = 90
-            if b2 < 105 and b2 > 85: b2 = 90
-            if b1 < 85 and b1 > 65: b1 = 80
-            if b2 < 85 and b2 > 65: b2 = 80
-            if b1 > 105: b1 = 120
-            if b2 > 105: b2 = 120
-            print "mean ratio "+str(par["MEAN"])+" / "+str(mean)
-            
+            b1 = chooseBin(options.sample,b1,binmidpoint)
+            b2 = chooseBin(options.sample,b2,binmidpoint)
             allgraphs[mass].Fill(b1 ,b2 , par['MEAN']/mean)
             allgraphs_sigma[mass].Fill(b1 ,b2 , par['SIGMA']/sigma)
             n+=1
@@ -282,11 +301,9 @@ if testcorr==True:
     print "sum mean",  graph_sum_mean
     print "sum sigma",  graph_sum_sigma
     graph_sum_sigma.Write()
-    graph_sum_mean.Write()
-    print graph_sum_mean.Integral()
-        
-F.Close()
+    graph_sum_mean .Write()
 
-print 'wrote file '+options.output
+
+F.Close()
 
             
