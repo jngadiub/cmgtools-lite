@@ -1811,7 +1811,7 @@ def makePseudoDataVjets(input,kernel,mc,output,lumi,workspace,year,purity):
  if zjets!=None:
   #print signal.sumEntries()
   for i in range(0,int(zjets.sumEntries())):
-      a = zjets.get(i)
+   a = zjets.get(i)
    it = a.createIterator()
    var = it.Next()
    x=[]
