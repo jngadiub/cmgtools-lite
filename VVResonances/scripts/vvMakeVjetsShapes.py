@@ -28,6 +28,7 @@ parser.add_option("-t","--triggerweight",dest="triggerW",action="store_true",hel
 
 
 (options,args) = parser.parse_args()
+
 samples={}
 lumi = args[1]
 print "luminosity is "+str(lumi)
@@ -153,7 +154,7 @@ for filename in os.listdir(args[0]):
             continue
     
         name = fname.split('_')[0]    
-        samples[name] = fname
+        samples[fname] = fname
 
         print 'found',filename
 
@@ -177,9 +178,6 @@ for name in samples.keys():
     if samples[name].find('W') != -1: corrFactor = options.corrFactorW
     plotters[-1].addCorrectionFactor(corrFactor,'flat')
     names.append(samples[name])
-
-
-
     
 print 'Fitting Mjet:' 
 
@@ -190,23 +188,31 @@ histos2D_nonRes={}
 histos2D_nonRes_l2={}
 
 for p in range(0,len(plotters)):
-     print "plotting "+str(p)
+
      key ="Wjets"
      if str(names[p]).find("ZJets")!=-1: key = "Zjets"
      if str(names[p]).find("TT")!=-1: key = "TTbar"
-     print "make histo for "+key
-     histos2D_nonRes [key] = plotters[p].drawTH2("jj_l1_softDrop_mass:jj_l2_softDrop_mass",options.cut+"*(jj_l1_mergedVTruth==0)*(jj_l1_softDrop_mass>55&&jj_l1_softDrop_mass<215)","1",80,55,215,80,55,215)
-     histos2D_nonRes [key].SetName(key+"_nonResl1")
+     print "make histo for "+names[p]
      
-     histos2D [key] = plotters[p].drawTH2("jj_l1_softDrop_mass:jj_l2_softDrop_mass",options.cut+"*(jj_l1_mergedVTruth==1)*(jj_l1_softDrop_mass>55&&jj_l1_softDrop_mass<215)","1",80,55,215,80,55,215)
-     histos2D [key].SetName(key+"_Resl1")
+     if not key in histos2D.keys():
+      histos2D_nonRes [key] = plotters[p].drawTH2("jj_l1_softDrop_mass:jj_l2_softDrop_mass",options.cut+"*(jj_l1_mergedVTruth==0)*(jj_l1_softDrop_mass>55&&jj_l1_softDrop_mass<215)","1",80,55,215,80,55,215)
+      histos2D_nonRes [key].SetName(key+"_nonResl1")
+     
+      histos2D [key] = plotters[p].drawTH2("jj_l1_softDrop_mass:jj_l2_softDrop_mass",options.cut+"*(jj_l1_mergedVTruth==1)*(jj_l1_softDrop_mass>55&&jj_l1_softDrop_mass<215)","1",80,55,215,80,55,215)
+      histos2D [key].SetName(key+"_Resl1")
       
-     histos2D_nonRes_l2 [key] = plotters[p].drawTH2("jj_l2_softDrop_mass:jj_l1_softDrop_mass",options.cut+"*(jj_l2_mergedVTruth==0)*(jj_l2_softDrop_mass>55&&jj_l2_softDrop_mass<215)","1",80,55,215,80,55,215)
-     histos2D_nonRes_l2 [key].SetName(key+"_nonResl2")
+      histos2D_nonRes_l2 [key] = plotters[p].drawTH2("jj_l2_softDrop_mass:jj_l1_softDrop_mass",options.cut+"*(jj_l2_mergedVTruth==0)*(jj_l2_softDrop_mass>55&&jj_l2_softDrop_mass<215)","1",80,55,215,80,55,215)
+      histos2D_nonRes_l2 [key].SetName(key+"_nonResl2")
      
-     histos2D_l2 [key] = plotters[p].drawTH2("jj_l2_softDrop_mass:jj_l1_softDrop_mass",options.cut+"*(jj_l2_mergedVTruth==1)*(jj_l2_softDrop_mass>55&&jj_l2_softDrop_mass<215)","1",80,55,215,80,55,215)
-     histos2D_l2 [key].SetName(key+"_Resl2")
-     
+      histos2D_l2 [key] = plotters[p].drawTH2("jj_l2_softDrop_mass:jj_l1_softDrop_mass",options.cut+"*(jj_l2_mergedVTruth==1)*(jj_l2_softDrop_mass>55&&jj_l2_softDrop_mass<215)","1",80,55,215,80,55,215)
+      histos2D_l2 [key].SetName(key+"_Resl2")
+     else:
+      histos2D_nonRes [key].Add(plotters[p].drawTH2("jj_l1_softDrop_mass:jj_l2_softDrop_mass",options.cut+"*(jj_l1_mergedVTruth==0)*(jj_l1_softDrop_mass>55&&jj_l1_softDrop_mass<215)","1",80,55,215,80,55,215))
+      histos2D [key].Add(plotters[p].drawTH2("jj_l1_softDrop_mass:jj_l2_softDrop_mass",options.cut+"*(jj_l1_mergedVTruth==1)*(jj_l1_softDrop_mass>55&&jj_l1_softDrop_mass<215)","1",80,55,215,80,55,215))
+      histos2D_nonRes_l2 [key].Add(plotters[p].drawTH2("jj_l2_softDrop_mass:jj_l1_softDrop_mass",options.cut+"*(jj_l2_mergedVTruth==0)*(jj_l2_softDrop_mass>55&&jj_l2_softDrop_mass<215)","1",80,55,215,80,55,215))
+      histos2D_l2 [key].Add(plotters[p].drawTH2("jj_l2_softDrop_mass:jj_l1_softDrop_mass",options.cut+"*(jj_l2_mergedVTruth==1)*(jj_l2_softDrop_mass>55&&jj_l2_softDrop_mass<215)","1",80,55,215,80,55,215))
+
+for key in histos2D.keys():      
      #add together the two legs to make the fit more stable
      histos2D[key].Add(histos2D_l2[key])
      histos2D_nonRes[key].Add(histos2D_nonRes_l2[key])
