@@ -6,7 +6,7 @@ import time
 from array import array
 import math
 import CMS_lumi
-ROOT.gErrorIgnoreLevel = ROOT.kWarning
+#ROOT.gErrorIgnoreLevel = ROOT.kWarning
 ROOT.gROOT.ProcessLine(".x tdrstyle.cc");
 
 #ROOT.gSystem.Load("Util_cxx.so")
@@ -57,7 +57,9 @@ if options.name.find("2017")!=-1: period = "2017"
 
 if options.label.find("sigonly")!=-1:
     doFit=False
-
+    print " ##################################################################################"
+    print " FITTING SWITCHED OFF "
+    print " ##################################################################################"
 
 def calculateChi2ForSig(hsig,pred,axis,logfile,label):
     if axis.find("z")!=-1:
@@ -359,7 +361,7 @@ def MakePlots(histos,hdata,hsig,axis,nBins,normsig = 1.,errors=None):
     scaling = 500.
     eff = 0.1
     if purity.find("HPHP") != -1:
-        scaling = 500.
+        scaling = 100.
         eff = 0.02
     
     if hsig:
@@ -1038,8 +1040,15 @@ def getChi2proj(histo_pdf,histo_data,minx=-1,maxx=-1):
 if __name__=="__main__":
      finMC = ROOT.TFile(options.input,"READ");
      hinMC = finMC.Get("nonRes");
-     print options.name
-     purity = options.name.split('_')[3]+"_"+ options.name.split('_')[4]
+#     print options.name
+#     purity = options.name.split('_')[3]+"_"+ options.name.split('_')[4]
+
+     print options.input
+     if options.input.find("VV_HPLP")!=-1: purity="VV_HPLP"
+     elif options.input.find("VV_HPHP")!=-1: purity="VV_HPHP"
+     elif options.input.find("VH_HPLP")!=-1: purity="VH_HPLP"
+     elif options.input.find("VH_HPHP")!=-1: purity="VH_HPHP"
+     elif options.input.find("VH_LPHP")!=-1: purity="VH_LPHP"
      print purity
      #if options.input.find("VV") !=-1: purity="VV_"+purity
      #elif options.input.find("VH") !=-1: purity="VH_"+purity
@@ -1115,6 +1124,7 @@ if __name__=="__main__":
      if options.addTop:
        print "Expected number of tt events:",(args[pdf1Name].getComponents())["n_exp_binJJ_"+purity+"_13TeV_"+period+"_proc_TThad"].getVal(),"("+period+")"
      if options.fitSignal:
+      print "fitting Signal"
       workspace.var("MH").setVal(options.signalMass)
       workspace.var("MH").setConstant(1)
       #workspace.var("r").setRange(0,1000)
@@ -1126,10 +1136,11 @@ if __name__=="__main__":
      #################################################
      print
      if doFit:
+        print "Fitting S+B"
         fitresult = model.fitTo(data_all,ROOT.RooFit.SumW2Error(not(options.data)),ROOT.RooFit.Minos(0),ROOT.RooFit.Verbose(0),ROOT.RooFit.Save(1),ROOT.RooFit.NumCPU(8))  
-        
+        print "Fitting b"
         fitresult_bkg_only = model_b.fitTo(data_all,ROOT.RooFit.SumW2Error(not(options.data)),ROOT.RooFit.Minos(0),ROOT.RooFit.Verbose(0),ROOT.RooFit.Save(1),ROOT.RooFit.NumCPU(8))  
-        
+        print "done fitting!!!!!!"
        
         
   
