@@ -219,7 +219,8 @@ def doJetMass(leg,signals,titles,categories):
                     if var == "mean": fits[s][c].GetYaxis().SetRangeUser(75,150);  
                     if var == "sigma": fits[s][c].GetYaxis().SetRangeUser(5,20.)
                     if var == "alpha": fits[s][c].GetYaxis().SetRangeUser(0,5)
-                    if var == "n": fits[s][c].GetYaxis().SetRangeUser(0,10)
+                    if var == "n": fits[s][c].GetYaxis().SetRangeUser(0,70)
+#                    if var == "n": fits[s][c].GetYaxis().SetRangeUser(0,10)
                     if var == "alpha2": fits[s][c].GetYaxis().SetRangeUser(0,5)                                                                                                                                                                                          
                     if var == "n2": fits[s][c].GetYaxis().SetRangeUser(0,10)
                     fits[s][c].Draw("C")                                                                                                                                                                                                                                
@@ -412,14 +413,15 @@ def doMVV(signals,titles,year):
             fitsHP[0].GetXaxis().SetRangeUser(1126, 5500.)
             fitsHP[0].GetYaxis().SetRangeUser(-2., 3.)
             if var.find("ALPHA1")!=-1: fitsHP[0].GetYaxis().SetRangeUser(0., 4.)
-            if var.find("ALPHA2")!=-1: fitsHP[0].GetYaxis().SetRangeUser(0., 6.)
+            if var.find("ALPHA2")!=-1: fitsHP[0].GetYaxis().SetRangeUser(0., 20.)
+#            if var.find("ALPHA2")!=-1: fitsHP[0].GetYaxis().SetRangeUser(0., 6.)
             if var.find("SIGMA")!=-1:  fitsHP[0].GetYaxis().SetRangeUser(0., 400.)
             if var.find("MEAN")!=-1:   fitsHP[0].GetYaxis().SetRangeUser(700., 7000)
-            if var.find("N1")!=-1:     fitsHP[0].GetYaxis().SetRangeUser(0., 200.)
-            if var.find("N2")!=-1:     fitsHP[0].GetYaxis().SetRangeUser(0., 200.)
+#            if var.find("N1")!=-1:     fitsHP[0].GetYaxis().SetRangeUser(0., 200.)
+            if var.find("N1")!=-1:     fitsHP[0].GetYaxis().SetRangeUser(0., 10.)
+            if var.find("N2")!=-1:     fitsHP[0].GetYaxis().SetRangeUser(0., 10.)
+#            if var.find("N2")!=-1:     fitsHP[0].GetYaxis().SetRangeUser(0., 200.)
             fitsHP[0].Draw("C")
-            if var.find("ALPHA1")!=-1: fitsHP[0].GetYaxis().SetRangeUser(0., 4.)
-            if var.find("ALPHA2")!=-1: fitsHP[0].GetYaxis().SetRangeUser(0., 6.)
             c.Update()
 #            for i,gHP in enumerate(datasHP): 
 #                if var.find("ALPHA1")!=-1: fitsHP[i].GetYaxis().SetRangeUser(0., 4.)
@@ -887,18 +889,19 @@ def compSignalMVV():
         
 if __name__ == '__main__':
   prelim = ""
-#  signals = ["ZprimeWW","BulkGWW","WprimeWZ","BulkGZZ","ZprimeZH"]
-#  titles =  ["Z' #rightarrow WW","G_{B}#rightarrow WW","W' #rightarrow WZ","G_{B}#rightarrow ZZ","Z' #rightarrow ZH"]
-  signals = ["ZprimeZH"]#,"BulkGWW"]
-  titles =  ["Z' #rightarrow ZH"]#,"G_{B}#rightarrow WW"]
+  signals = ["ZprimeWW","BulkGWW","WprimeWZ","BulkGZZ","ZprimeZH"]
+  titles =  ["Z' #rightarrow WW","G_{B}#rightarrow WW","W' #rightarrow WZ","G_{B}#rightarrow ZZ","Z' #rightarrow ZH"]
+#  signals = ["ZprimeZH"]#,"BulkGWW"]
+#  titles =  ["Z' #rightarrow ZH"]#,"G_{B}#rightarrow WW"]
 #  signals = ["BulkGWW"]
 #  titles =  ["G_{B}#rightarrow WW"]
-  categories = ["2016_VV_HPHP","2016_VV_HPLP","2016_VH_HPHP","2016_VH_HPLP","2016_VH_LPHP"]
+  categories = ["2016_VV_HPHP","2016_VV_HPLP","2016_VH_HPHP","2016_VH_LPHP"]
+#  categories = ["2016_VV_HPHP","2016_VV_HPLP","2016_VH_HPHP","2016_VH_HPLP","2016_VH_LPHP"]
 #  doSignalEff(signals,titles,categories)
 #  doJetMass("random",signals,titles,categories)
 #  categories = ["2016_VH_HPHP","2016_VH_HPLP","2016_VH_LPHP"]
-#  doSignalEff(signals,titles,categories)
-  doMVV(signals,titles,"2016")
+  doSignalEff(signals,titles,categories)
+#  doMVV(signals,titles,"2016")
 #  doJetMass("random",signals,titles,categories)
 
 
