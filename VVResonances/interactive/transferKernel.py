@@ -409,7 +409,7 @@ def makeNonResCard():
  vtag_pt_dependence = {'VV_HPHP':'((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))','VV_HPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))','VV_LPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))','VH_HPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))','VH_LPHP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))','VH_HPHP':'((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))'} #irene added fakes  for a quick test!
 # vtag_pt_dependence = {'VV_HPHP':'((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))','VV_HPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))'}
 # vtag_pt_dependence = {'VV_HPHP':'((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))','VV_HPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))',
-                       'VBF_VV_HPHP':'((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))','VBF_VV_HPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))'}
+#                       'VBF_VV_HPHP':'((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))','VBF_VV_HPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))'}
 
  DTools = DatacardTools(scales,scalesHiggs,vtag_pt_dependence,lumi_unc,vtag_unc,1.0,"","")
  print '##########      PURITY      :', purity 
@@ -482,12 +482,18 @@ if __name__=="__main__":
                               
      finMC = ROOT.TFile(options.input,"READ");
      hinMC = finMC.Get("nonRes");
-     if options.input.find("HPHP")!=-1: purity = "HPHP"
-     elif options.input.find("HPLP")!=-1: purity = "HPLP"
-     elif options.input.find("LPHP")!=-1: purity = "LPHP"
-     else: purity = "LPLP" 
-     if 'VH' in purity: purity = 'VH_'+purity
-     else: purity = 'VV_'+purity
+     if options.input.find("VH_HPHP")!=-1: purity = "VH_HPHP"
+     if options.input.find("VH_HPLP")!=-1: purity = "VH_HPLP"
+     if options.input.find("VH_LPHP")!=-1: purity = "VH_LPHP"
+     if options.input.find("VV_HPHP")!=-1: purity = "VV_HPHP"
+     elif options.input.find("VV_HPLP")!=-1: purity= "VV_HPLP"
+
+#     if options.input.find("HPHP")!=-1: purity = "HPHP"
+#     elif options.input.find("HPLP")!=-1: purity = "HPLP"
+#     elif options.input.find("LPHP")!=-1: purity = "LPHP"
+#     else: purity = "LPLP" 
+#     if 'VH' in purity: purity = 'VH_'+purity
+#     else: purity = 'VV_'+purity
      if options.input.find('VBF')!=-1: purity = 'VBF_'+purity    
      print "Using purity: " ,purity    
      if options.merge:
@@ -551,9 +557,9 @@ if __name__=="__main__":
                   
      args  = model.getComponents()
      print "model ",model.Print()
-     print "args = model comp[onents ",args.Print()
+     print "args = model components ",args.Print()
      pdfName = "pdf_binJJ_"+purity+"_13TeV_%s_bonly"%options.year
-
+     print "pdfName ",pdfName 
      print "Expected number of QCD events:",(args[pdfName].getComponents())["n_exp_binJJ_"+purity+"_13TeV_%s_proc_nonRes"%options.year].getVal()
     
      #################################################
