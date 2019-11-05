@@ -409,13 +409,15 @@ def doAll(category,jsons,legs):
       
 if __name__ == '__main__':
     #doSingle()
-#    legs = ["G_{bulk} #rightarrow WW"]
+    legs = ["G_{bulk} #rightarrow WW"]
 #    legs = ["G_{bulk} #rightarrow ZZ","W' #rightarrow WZ","G_{bulk} #rightarrow WW","Z'#rightarrow WW","Z' #rightarrow ZH"]
-    legs = ["Z' #rightarrow ZH"]
-#    signals = ["BulkGWW"]
+#    legs = ["Z' #rightarrow ZH"]
+    signals = ["BulkGWW"]
 #    signals = ["BulkGZZ","WprimeWZ","BulkGWW","ZprimeWW","ZprimeZH"]
-    signals = ["ZprimeZH"]
-    categories = ["VV_HPHP","VV_HPLP","VH_HPLP","VH_HPHP","VH_LPHP"]
+#    signals = ["ZprimeZH"]
+#    categories = ["VV_HPLP"]
+#    categories = ["VV_HPHP","VV_HPLP","VH_HPLP","VH_HPHP","VH_LPHP"]
+    categories = ["VV_HPHP","VV_HPLP","VH_HPHP","VH_LPHP"]
 
     for category in categories:
       jsons=[]
@@ -426,7 +428,8 @@ if __name__ == '__main__':
             jsons.append("JJ_"+s+"_2016_MJrandom_"+category+".json")
           else : jsons.append("JJ_Hjet_ZprimeZH_2016_MJrandom_"+category+".json")
         if options.var =="mVV":
-          if s != "ZprimeZH" and s != "WprimeWZ":  jsons.append("JJ_"+s+"_2016_MVV.json")
-          else: jsons.append("JJ_j1"+s+"_2016_MVV.json")
+#          if s != "ZprimeZH" and s != "WprimeWZ":  jsons.append("JJ_"+s+"_2016_MVV.json")
+#          else: jsons.append("JJ_j1"+s+"_2016_MVV.json")
+          jsons.append("JJ_"+s+"_2016_MVV.json")
 
       doAll(category,jsons,legs)
