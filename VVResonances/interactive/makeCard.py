@@ -8,7 +8,7 @@ cmd='combineCards.py '
 sf_qcd = 1.0
 
 pseudodata = "Vjets" #"ZprimeZH"
-outlabel = "doubleB" #"sigonly_ZprimeZH_M2000"
+outlabel = "_testZprime_pseudo20" #"sigonly_ZprimeZH_M2000"
 
 datasets=['2016']#,'2017']
 
@@ -35,10 +35,11 @@ vtag_unc['VH_LPHP'] = {'2016':'1.','2017':'1.'}
 
 vtag_pt_dependence = {'VV_HPHP':'((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))','VV_HPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))','VH_HPHP':'1','VH_HPLP':'1','VH_LPHP':'1'}
 
-purities= ['VV_HPLP','VV_HPHP'] #,'VH_HPLP','VH_HPHP','VH_LPHP']
+#purities= ['VV_HPLP','VV_HPHP'] #,'VH_HPLP','VH_HPHP','VH_LPHP']
+#purities= ['VV_HPLP','VV_HPHP','VH_HPHP','VH_LPHP']
 #purities= ['VV_HPLP','VV_HPHP','VH_HPLP','VH_HPHP','VH_LPHP']
 #purities= ['VH_HPLP','VH_HPHP','VH_LPHP']
-
+purities= ['VH_LPHP']
 #signals = ["BulkGWW", "BulkGZZ","ZprimeWW","WprimeWZ","VprimeWV","'ZprimeZH'"]
 signals = ["ZprimeZH"]
 
@@ -63,8 +64,8 @@ for sig in signals:
       ncontrib+=1
 
       if doVjets:
-        print "including W/Z jets in datacard"
-        rootFileMVV = resultsDir[dataset]+'/JJ_%s_WJets_MVV_'%dataset+p+'.root' 
+        print "##########################       including W/Z jets in datacard      ######################"
+        rootFileMVV = resultsDir[dataset]+'/JJ_%s_WJets_MVV_'%dataset+p+'.root'    
         rootFileNorm = resultsDir[dataset]+'/JJ_%s_WJets_%s.root'%(dataset,p)
         Tools.AddWResBackground(card,dataset,p,rootFileMVV,rootFileNorm,resultsDir[dataset],ncontrib)
         ncontrib+=1
@@ -82,14 +83,14 @@ for sig in signals:
 
       Tools.AddNonResBackground(card,dataset,p,rootFile3DPDF,rootFileNorm,ncontrib) 
 
-#      rootFileData = resultsDir[dataset]+"/JJ_%s_nonRes_3D_%s.root"%(dataset,p) #use this only to prepare workspace for making pseudo data with vjets
-#      histName="histo"
-#      scaleData=lumi[dataset]
+      rootFileData = resultsDir[dataset]+"/JJ_%s_nonRes_3D_%s.root"%(dataset,p) #use this only to prepare workspace for making pseudo data with vjets
+      histName="histo"
+      scaleData=lumi[dataset]
 
       #if you run on real data or pseudodata
-      rootFileData = resultsDir[dataset]+"/JJ_"+p+".root"
-      histName="data"
-      scaleData=1.0 
+#      rootFileData = resultsDir[dataset]+"/JJ_"+p+".root"
+#      histName="data"
+#      scaleData=1.0 
       if pseudodata=="noVjets":
         print "Using pseudodata without vjets"
         rootFileData = resultsDir[dataset]+"/JJ_PDnoVjets_"+p+".root"
