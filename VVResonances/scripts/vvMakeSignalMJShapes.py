@@ -68,7 +68,6 @@ for filename in os.listdir(args[0]):
     print 'found',filename,'mass',str(mass) 
     if filename.find('hbb')!=-1: isVH=True;
     if filename.find("HH")!=-1: isHH=True; 
-    
 
 
 leg = options.mvv.split('_')[1]
