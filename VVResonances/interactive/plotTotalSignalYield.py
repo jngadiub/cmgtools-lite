@@ -209,9 +209,10 @@ def doSingle():
 def doAll(signal,legend,colorindex):
 
 #    directorypaper="results_QCD_pythia_signals_2016_tau21DDT_rho_VVpaper_HPHP_HPLP/"
-    directoryVV="results_QCD_pythia_signals_2016_tau21DDT_rho_VV_HPHP_HPLP/"
-    directoryVH="results_QCD_pythia_signals_2016_tau21DDT_rho_VH_HPHP_HPLP_LPHP/"
-    purities=["VV_HPHP","VV_HPLP","VH_HPHP","VH_HPLP","VH_LPHP"]
+    directoryVV="doubleB_signalYield/VVVH_HPLP/"+options.name+"/"
+    directoryVH="doubleB_signalYield/VVVH_HPLP/"+options.name+"/"
+#    purities=["VV_HPHP","VV_HPLP","VH_HPHP","VH_HPLP","VH_LPHP"]
+    purities=["VV_HPHP","VV_HPLP","VH_HPHP","VH_LPHP"]
     c1,leg,pt = getCanvasPaper("c1")
     c1.Draw()
     gr=[]
@@ -220,7 +221,7 @@ def doAll(signal,legend,colorindex):
     VV_HPHP=[]
     VV_HPLP=[]
     VH_HPHP=[]
-    VH_HPLP=[]
+#    VH_HPLP=[]
     VH_LPHP=[]
 
     r_file_VV_HPHP = ROOT.TFile(directoryVV+"JJ_"+signal+"_"+str(options.period)+"_VV_HPHP_yield.root","READ")
@@ -321,6 +322,7 @@ def doAll(signal,legend,colorindex):
 
     gr_VH_HPHP.Draw("PL")
 
+    '''
     r_file_VH_HPLP = ROOT.TFile(directoryVH+"JJ_"+signal+"_"+str(options.period)+"_VH_HPLP_yield.root","READ")
     gr_VH_HPLP = r_file_VH_HPLP.Get("yield")
     print " get number of points ", gr_VH_HPLP.GetN()
@@ -352,7 +354,7 @@ def doAll(signal,legend,colorindex):
     ff.SetLineWidth(0)
 
     gr_VH_HPLP.Draw("PL")
-
+    '''
     r_file_VH_LPHP = ROOT.TFile(directoryVH+"JJ_"+signal+"_"+str(options.period)+"_VH_LPHP_yield.root","READ")
     gr_VH_LPHP = r_file_VH_LPHP.Get("yield")
     print " get number of points ", gr_VH_LPHP.GetN()
@@ -386,7 +388,8 @@ def doAll(signal,legend,colorindex):
     gr_VH_LPHP.Draw("PL")
 
     for i in range(gr_VV_HPHP.GetN()) :
-      tot.append( VV_HPHP[i]+VV_HPLP[i]+VH_HPHP[i]+VH_HPLP[i]+VH_LPHP[i])
+      #      tot.append( VV_HPHP[i]+VV_HPLP[i]+VH_HPHP[i]+VH_HPLP[i]+VH_LPHP[i])
+      tot.append( VV_HPHP[i]+VV_HPLP[i]+VH_HPHP[i]+VH_LPHP[i])
       print tot[i]
 
     gr_tot = ROOT.TGraph(gr_VV_HPHP.GetN(),Mass,tot)
@@ -400,7 +403,7 @@ def doAll(signal,legend,colorindex):
     leg.AddEntry(gr_tot, "VV+VH tot", "LP")
     leg.AddEntry(gr_VV_HPLP, "VV_HPLP", "LP")
     leg.AddEntry(gr_VV_HPHP, "VV_HPHP", "LP")
-    leg.AddEntry(gr_VH_HPLP, "VH_HPLP", "LP")
+#    leg.AddEntry(gr_VH_HPLP, "VH_HPLP", "LP")
     leg.AddEntry(gr_VH_LPHP, "VH_LPHP", "LP")
     leg.AddEntry(gr_VH_HPHP, "VH_HPHP", "LP")
     leg.Draw("same")
@@ -684,5 +687,5 @@ if __name__ == '__main__':
       print signals[i]
       print legs[i]
 #      doAllOld(signals[i],legs[i],i)
-      doAllOldCompare(signals[i],legs[i],i)
-#      doAll(signals[i],legs[i],i)
+#      doAllOldCompare(signals[i],legs[i],i)
+      doAll(signals[i],legs[i],i)
