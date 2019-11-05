@@ -469,7 +469,7 @@ class DataCardMaker:
             resolutionStr=resolutionStr+"+{factor}*{syst}".format(factor=factor,syst=syst)
             resolutionSysts.append(syst)
        
-        MJJ=variable            
+        MJJ=variable
         if self.w.var(MJJ) == None: self.w.factory(MJJ+"[0,1000]")
 
         SCALEVar="_".join(["mean",name,self.tag])
@@ -530,8 +530,12 @@ class DataCardMaker:
 	varset.Print()
 	varlist.Print()
         pdf=ROOT.RooHistPdf(pdfName,pdfName,varset,roohist,order)
-        if self.w.data(histName) == None: getattr(self.w,'import')(roohist,ROOT.RooFit.RenameVariable(histName,histName))
-        if self.w.pdf(pdfName) == None: getattr(self.w,'import')(pdf,ROOT.RooFit.RenameVariable(pdfName,pdfName))
+        if self.w.data(histName) == None: 
+            print "self.w.data(histName) == None for ",histName
+            getattr(self.w,'import')(roohist,ROOT.RooFit.RenameVariable(histName,histName))
+        if self.w.pdf(pdfName) == None: 
+            print "self.w.pdf(pdfName) == None for ",pdfName
+            getattr(self.w,'import')(pdf,ROOT.RooFit.RenameVariable(pdfName,pdfName))
         #Load SYstematics
         coeffList=ROOT.RooArgList()
         pdfList=ROOT.RooArgList(self.w.pdf(pdfName))
@@ -1378,6 +1382,7 @@ class DataCardMaker:
         self.w.factory("PROD::{name}({name1},{name2})".format(name=pdfName,name1=pdfName1,name2=pdfName2))
 
     def product3D(self,name,pdf1,pdf2,pdf3):
+        print "product3D "
         print self.tag
         pdfName="_".join([name,self.tag])
         pdfName1="_".join([pdf1,self.tag])
@@ -1388,7 +1393,7 @@ class DataCardMaker:
         print pdfName2
         print pdfName3
         self.w.factory("PROD::{name}({name1},{name2},{name3})".format(name=pdfName,name1=pdfName1,name2=pdfName2,name3=pdfName3))
-    
+        print "done product3D"
     
     def envelope(self,name,pdfs):
         catName = "envelope_"+name+"_"+self.tag
@@ -1578,10 +1583,16 @@ class DataCardMaker:
         self.addSystematic(nuisance,"lnN",{name:1+uncertainty})
 
     def addFixedYieldFromFile(self,name,ID,filename,histoName,constant=1.0):
-        pdfName="_".join([name,self.tag])
+        print " addFixedYieldFromFile ",filename
+        pdfName="_".join([name,self.tag])        
         f=ROOT.TFile(filename)
+        print "using histogram ",histoName
         histogram=f.Get(histoName)
+        print "integral ",histogram.Integral()
+        print "lumi ",self.luminosity
+        print "constant ",constant
         events=histogram.Integral()*self.luminosity*constant
+        print "events ",events
         self.contributions.append({'name':name,'pdf':pdfName,'ID':ID,'yield':events})
 
     def addYieldWithRateParameter(self,name,ID,paramName,formula,values):#jen        
