@@ -86,6 +86,7 @@ class DataCardMaker:
 
         pdfName="_".join([name,self.tag])
         vvMass = ROOT.RooDoubleCB(pdfName,pdfName,self.w.var(MVV),self.w.function(SCALEVar),self.w.function(SIGMAVar),self.w.function(ALPHA1Var),self.w.function(N1Var),self.w.function(ALPHA2Var),self.w.function(N2Var))
+        vvMass.setStringAttribute("CACHEPARAMINT",MVV+":MJ1:MJ2")
  	getattr(self.w,'import')(vvMass,ROOT.RooFit.RenameVariable(pdfName,pdfName))
         f.close()
 	
@@ -1762,6 +1763,7 @@ class DataCardMaker:
             self.w.var(p).setMin(mini)
             self.w.var(p).setMax(maxi)
             self.w.var(p).setBins(bins)
+            self.w.var(p).setBins(bins,"cache")
         dataHist=ROOT.RooDataHist(name,name,cList,histogram)
 
         getattr(self.w,'import')(dataHist,ROOT.RooFit.RenameVariable(name,name))
