@@ -299,10 +299,10 @@ fixParsSig={"ZprimeZH":{
 #fixParsSigMVV={"ZprimeZH":{"fixPars":"ALPHA2:2.42,N1:126.5", "pol":"MEAN:pol1,SIGMA:pol1,N1:pol0,ALPHA1:pol9,N2:pol3,ALPHA2:pol0"},"WprimeWZ":{"fixPars":"N1:7,N2:4","pol": "MEAN:pol1,SIGMA:pol3,N1:pol0,ALPHA1:pol7,N2:pol0,ALPHA2:pol5"},"BulkGWW":{"fixPars":"N1:1.61364,N2:4.6012","pol":"MEAN:pol1,SIGMA:pol6,ALPHA1:pol5,N1:pol0,ALPHA2:pol4,N2:pol0"},"BulkGZZ":{"fixPars":"N1:1.61364,N2:4.6012","pol":"MEAN:pol1,SIGMA:pol6,ALPHA1:pol5,N1:pol0,ALPHA2:pol4,N2:pol0"},"ZprimeWW":{"fixPars":"N1:1.61364,N2:4.6012","pol":"MEAN:pol1,SIGMA:pol6,ALPHA1:pol5,N1:pol0,ALPHA2:pol4,N2:pol0"}}
 
 fixParsSigMVV={"ZprimeZH":{"fixPars":"ALPHA2:2.42,N1:126.5", "pol":"MEAN:pol1,SIGMA:pol1,N1:pol0,ALPHA1:pol5,N2:pol3,ALPHA2:pol0,corr_mean:pol1,corr_sigma:pol1"},              
-"WprimeWZ":{"fixPars":"N1:7,N2:4","pol": "MEAN:pol1,SIGMA:pol3,N1:pol0,ALPHA1:pol7,N2:pol0,ALPHA2:pol5,corr_mean:pol1,corr_sigma:pol1"},
-"BulkGWW":{"fixPars":"N1:1.61364,N2:4.6012","pol":"MEAN:pol1,SIGMA:pol6,ALPHA1:pol5,N1:pol0,ALPHA2:pol4,N2:pol0"},
-"BulkGZZ":{"fixPars":"N1:1.61364,N2:4.6012","pol":"MEAN:pol1,SIGMA:pol6,ALPHA1:pol5,N1:pol0,ALPHA2:pol4,N2:pol0"},
-"ZprimeWW":{"fixPars":"N1:1.61364,N2:4.6012","pol":"MEAN:pol1,SIGMA:pol6,ALPHA1:pol5,N1:pol0,ALPHA2:pol4,N2:pol0"}}
+               "WprimeWZ":{"fixPars":"N1:7,N2:4","pol": "MEAN:pol1,SIGMA:pol3,N1:pol0,ALPHA1:pol7,N2:pol0,ALPHA2:pol5,corr_mean:pol1,corr_sigma:pol1"},
+               "BulkGWW":{"fixPars":"N1:1.61364,N2:4.6012","pol":"MEAN:pol1,SIGMA:pol6,ALPHA1:pol5,N1:pol0,ALPHA2:pol4,N2:pol0"},
+               "BulkGZZ":{"fixPars":"N1:1.61364,N2:4.6012","pol":"MEAN:pol1,SIGMA:pol6,ALPHA1:pol5,N1:pol0,ALPHA2:pol4,N2:pol0"},
+               "ZprimeWW":{"fixPars":"N1:1.61364,N2:4.6012","pol":"MEAN:pol1,SIGMA:pol6,ALPHA1:pol5,N1:pol0,ALPHA2:pol4,N2:pol0"}}
 
 
 if options.run.find("all")!=-1 or options.run.find("sig")!=-1:
@@ -327,12 +327,9 @@ if options.run.find("all")!=-1 or options.run.find("sig")!=-1:
     if options.run.find("all")!=-1 or options.run.find("mvv")!=-1:
         print "mjj fit for signal ",signal_inuse
         if signal_inuse.find("H")!=-1:
-            f.makeSignalShapesMVV("JJ_j1"+str(signal_inuse)+"_"+str(period),signaltemplate_inuse,fixParsSigMVV[signal_inuse],"jj_l1_softDrop_mass <= 150 && jj_l1_softDrop_mass > 105 && jj_l2_softDrop_mass <= 105 && jj_l2_softDrop_mass > 65 ")
-            f.makeSignalShapesMVV("JJ_j2"+str(signal_inuse)+"_"+str(period),signaltemplate_inuse,fixParsSigMVV[signal_inuse],"jj_l2_softDrop_mass <= 150 && jj_l2_softDrop_mass > 105 && jj_l1_softDrop_mass <= 105 && jj_l1_softDrop_mass > 65")
+            f.makeSignalShapesMVV("JJ_"+str(signal_inuse)+"_"+str(period),signaltemplate_inuse,fixParsSigMVV[signal_inuse],"( jj_l1_softDrop_mass <= 150 && jj_l1_softDrop_mass > 105 && jj_l2_softDrop_mass <= 105 && jj_l2_softDrop_mass > 65) || (jj_l2_softDrop_mass <= 150 && jj_l2_softDrop_mass > 105 && jj_l1_softDrop_mass <= 105 && jj_l1_softDrop_mass > 65) ")
         elif signal_inuse.find("WZ")!=-1:
-            f.makeSignalShapesMVV("JJ_j1"+str(signal_inuse)+"_"+str(period),signaltemplate_inuse,fixParsSigMVV[signal_inuse],"jj_l1_softDrop_mass <= 105 && jj_l1_softDrop_mass > 85 && jj_l2_softDrop_mass <= 85 && jj_l2_softDrop_mass >= 65 ")
-            f.makeSignalShapesMVV("JJ_j2"+str(signal_inuse)+"_"+str(period),signaltemplate_inuse,fixParsSigMVV[signal_inuse],"jj_l2_softDrop_mass <= 105 && jj_l2_softDrop_mass > 85 && jj_l1_softDrop_mass <= 85 && jj_l1_softDrop_mass >= 65")
-            
+            f.makeSignalShapesMVV("JJ_j1"+str(signal_inuse)+"_"+str(period),signaltemplate_inuse,fixParsSigMVV[signal_inuse],"(jj_l1_softDrop_mass <= 105 && jj_l1_softDrop_mass > 85 && jj_l2_softDrop_mass <= 85 && jj_l2_softDrop_mass >= 65) || (jj_l2_softDrop_mass <= 105 && jj_l2_softDrop_mass > 85 && jj_l1_softDrop_mass <= 85 && jj_l1_softDrop_mass >= 65)")
         else:
             f.makeSignalShapesMVV("JJ_"+str(signal_inuse)+"_"+str(period),signaltemplate_inuse,fixParsSigMVV[signal_inuse.replace('VBF_','')])
     
