@@ -124,6 +124,7 @@ parser.add_option("-r","--minMX",dest="minMX",type=float, help="smallest Mx to f
 parser.add_option("-R","--maxMX",dest="maxMX",type=float, help="largest Mx to fit " ,default=7000.0)
 parser.add_option("--binsMVV",dest="binsMVV",help="use special binning",default="")
 parser.add_option("-t","--triggerweight",dest="triggerW",action="store_true",help="Use trigger weights",default=False)
+parser.add_option("-C","--correlation",dest="correlation",help="if True, MVV mean and sigma of WZ or VH signals depends on jet mass",default=False)
 
 (options,args) = parser.parse_args()
 #define output dictionary
@@ -133,9 +134,9 @@ samples={}
 graphs={'MEAN':ROOT.TGraphErrors(),'SIGMA':ROOT.TGraphErrors(),'ALPHA1':ROOT.TGraphErrors(),'N1':ROOT.TGraphErrors(),'ALPHA2':ROOT.TGraphErrors(),'N2':ROOT.TGraphErrors()}
 
 testcorr= False
-
-if options.sample.find("ZH")!=-1 or options.sample.find('Zh')!=-1 or options.sample.find("WZ")!=-1 or options.sample.find('WH')!=-1:
+if options.sample.find("ZH")!=-1 or options.sample.find('Zh')!=-1 or options.sample.find("WZ")!=-1 or options.sample.find('WH')!=-1 and options.correlation==True:
     testcorr = True
+
 print " ######### testcorr ",testcorr
 for filename in os.listdir(args[0]):
     if not (filename.find(options.sample)!=-1):
@@ -164,52 +165,52 @@ for filename in os.listdir(args[0]):
 N=0
 allgraphs = {}
 allgraphs_sigma = {}
-if (options.sample.find("H")!=-1 or options.sample.find("h")!=-1 or options.sample.find("WZ")!=-1):
-    for mass in samples.keys():
-        if samples[mass].find("WZ")!=-1:
-            print 'histos for WZ signal'
-            h = ROOT.TH2F("corr_mean_M"+str(mass),"corr_mean_M"+str(mass),2,array("f",[76,86,94]),2,array("f",[76,86,94]))
-            hs = ROOT.TH2F("corr_sigma_M"+str(mass),"corr_sigma_M"+str(mass),2,array("f",[55,85,215]),2,array("f",[55,85,215]))
-
-        elif samples[mass].find("WH")!=-1 or samples[mass].find("Wh")!=-1:
-            print 'histos for WH signal'
-            h = ROOT.TH2F("corr_mean_M"+str(mass),"corr_mean_M"+str(mass),2,array("f",[65,105,145]),2,array("f",[65,105,145]))
-            hs = ROOT.TH2F("corr_sigma_M"+str(mass),"corr_sigma_M"+str(mass),2,array("f",[55,105,215]),2,array("f",[55,105,215]))    
-        elif samples[mass].find("ZH")!=-1 or samples[mass].find("Zh")!=-1:
-            print 'histos for ZH signal'
-            h = ROOT.TH2F("corr_mean_M"+str(mass),"corr_mean_M"+str(mass),2,array("f",[85,105,145]),2,array("f",[85,105,145]))
-            hs = ROOT.TH2F("corr_sigma_M"+str(mass),"corr_sigma_M"+str(mass),2,array("f",[55,105,215]),2,array("f",[55,105,215]))    
+if testcorr ==True:
+    if (options.sample.find("H")!=-1 or options.sample.find("h")!=-1 or options.sample.find("WZ")!=-1):
+        for mass in samples.keys():
+            if samples[mass].find("WZ")!=-1:
+                print 'histos for WZ signal'
+                h = ROOT.TH2F("corr_mean_M"+str(mass),"corr_mean_M"+str(mass),2,array("f",[76,86,94]),2,array("f",[76,86,94]))
+                hs = ROOT.TH2F("corr_sigma_M"+str(mass),"corr_sigma_M"+str(mass),2,array("f",[55,85,215]),2,array("f",[55,85,215]))
+            elif samples[mass].find("WH")!=-1 or samples[mass].find("Wh")!=-1:
+                print 'histos for WH signal'
+                h = ROOT.TH2F("corr_mean_M"+str(mass),"corr_mean_M"+str(mass),2,array("f",[65,105,145]),2,array("f",[65,105,145]))
+                hs = ROOT.TH2F("corr_sigma_M"+str(mass),"corr_sigma_M"+str(mass),2,array("f",[55,105,215]),2,array("f",[55,105,215]))    
+            elif samples[mass].find("ZH")!=-1 or samples[mass].find("Zh")!=-1:
+                print 'histos for ZH signal'
+                h = ROOT.TH2F("corr_mean_M"+str(mass),"corr_mean_M"+str(mass),2,array("f",[85,105,145]),2,array("f",[85,105,145]))
+                hs = ROOT.TH2F("corr_sigma_M"+str(mass),"corr_sigma_M"+str(mass),2,array("f",[55,105,215]),2,array("f",[55,105,215]))    
         
-        allgraphs[mass] = h
-        allgraphs_sigma[mass] = hs
+            allgraphs[mass] = h
+            allgraphs_sigma[mass] = hs
 
-    if samples[mass].find("WZ")!=-1:
-        print 'sigma histo for WZ'
-        graph_sum_sigma = ROOT.TH2F("corr_sigma","corr_sigma",2,array("f",[55,85,215]),2,array("f",[55,85,215]))
-    else:
-        print 'add sigma hist'
-        graph_sum_sigma = ROOT.TH2F("corr_sigma","corr_sigma",2,array("f",[55,105,215]),2,array("f",[55,105,215]))
-
-    if samples[mass].find("WZ")!=-1:
-        print 'mean for WZ signal' 
-        graph_sum_mean = ROOT.TH2F("corr_mean","corr_mean",2,array("f",[76,86,94]),2,array("f",[76,86,94]))
-    elif options.sample.find("WH")!=-1 or samples[mass].find("Wh")!=-1:
-        print 'mean for WH signal'
-        graph_sum_mean  = ROOT.TH2F("corr_mean","corr_mean",2,array("f",[65,105,145]),2,array("f",[65,105,145]))
-    elif samples[mass].find("ZH")!=-1 or samples[mass].find("Zh")!=-1:
-        print 'mean for ZH signal'
-        graph_sum_mean = ROOT.TH2F("corr_mean","corr_mean",2,array("f",[85,105,145]),2,array("f",[85,105,145]))
-    minmjet = 55
-    maxmjet = 215 
-    binsmjet = 80
-    bins_all = [[5,25],[25,50]]
-    binmidpoint = 25
-    if options.sample.find("WZ")!=-1:
-        bins_all = [[5,15],[15,25]]
-        binmidpoint = 15
-    elif options.sample.find("WH")!=-1 or options.sample.find("Wh")!=-1:
-        bins_all = [[5,15],[15,50]]
-        binmidpoint = 15
+        if samples[mass].find("WZ")!=-1:
+            print 'sigma histo for WZ'
+            graph_sum_sigma = ROOT.TH2F("corr_sigma","corr_sigma",2,array("f",[55,85,215]),2,array("f",[55,85,215]))
+        else:
+            print 'add sigma hist'
+            graph_sum_sigma = ROOT.TH2F("corr_sigma","corr_sigma",2,array("f",[55,105,215]),2,array("f",[55,105,215]))
+            
+        if samples[mass].find("WZ")!=-1:
+            print 'mean for WZ signal' 
+            graph_sum_mean = ROOT.TH2F("corr_mean","corr_mean",2,array("f",[76,86,94]),2,array("f",[76,86,94]))
+        elif options.sample.find("WH")!=-1 or samples[mass].find("Wh")!=-1:
+            print 'mean for WH signal'
+            graph_sum_mean  = ROOT.TH2F("corr_mean","corr_mean",2,array("f",[65,105,145]),2,array("f",[65,105,145]))
+        elif samples[mass].find("ZH")!=-1 or samples[mass].find("Zh")!=-1:
+            print 'mean for ZH signal'
+            graph_sum_mean = ROOT.TH2F("corr_mean","corr_mean",2,array("f",[85,105,145]),2,array("f",[85,105,145]))
+        minmjet = 55
+        maxmjet = 215 
+        binsmjet = 80
+        bins_all = [[5,25],[25,50]]
+        binmidpoint = 25
+        if options.sample.find("WZ")!=-1:
+            bins_all = [[5,15],[15,25]]
+            binmidpoint = 15
+        elif options.sample.find("WH")!=-1 or options.sample.find("Wh")!=-1:
+            bins_all = [[5,15],[15,50]]
+            binmidpoint = 15
     
 
 for mass in sorted(samples.keys()):
