@@ -29,16 +29,17 @@ parser.add_option("-f","--final",dest="final",type=int, default=1,help="Prelimin
 #    parser.add_option("-X","--maxMVV",dest="maxMVV",type=float,help="maximum MVV",default=13000.0)
 
 
-plotVV1D=True
+plotVV1D=False
 plotVV3D2016=False
 plotVV3D=False
-plotVV3D2016data=True
+plotVV3D2016data=False
 plotVV3D2016pseudodata=False
+
 
 (options,args) = parser.parse_args()
 #define output dictionary
 
-
+scaleBR = False
 
 setTDRStyle()
 
@@ -55,15 +56,24 @@ def getLegend(x1=0.650010112,y1=0.523362,x2=0.90202143,y2=0.8279833):
   return legend
 
 
-titleY = "#sigma x BR(G_{Bulk} #rightarrow WW) (pb)  "
-oname= "BulkGWW_VVVH_rebinningPseudo"  
+#titleY = "#sigma x BR(Z^{'} #rightarrow ZH) (pb)  "
+titleY = "#sigma (Z^{'} #rightarrow ZH) (pb)  "
+#titleY = "#sigma x BR(G_{Bulk} #rightarrow WW) (pb)  "
+oname= "ZprimeZH_VV_pseudo20"  
 #title = ["HPLP","HPHP","HPHP+HPLP","B2G-17-001"]
 #files = ["LIMITS_DDT_latest/WW/HPLP/Limits_BulkGWW_HPLP_13TeV.root","LIMITS_DDT_latest/WW/HPHP/Limits_BulkGWW_HPHP_13TeV.root","LIMITS_DDT_latest/WW/combined/Limits_BulkGWW_13TeV.root","limits_b2g17001/Limits_b2g17001_BulkGWW_13TeV.root"]
 
-title = ["2 GeV bins","4 GeV bins","8 GeV bins","16 GeV bins"]
+title = ["no MVV corr","no MVV corr, 2VV2VH","Jen Fix","Jen Fix, 2VV2VH"]
+#files = ["Limits_ZprimeZH_VVVH_nocorrMVV.root","Limits_ZprimeZH_VVVH_nocorrMVV_2VV2VH.root","Limits_ZprimeZH_VVVH_JenFix.root","Limits_ZprimeZH_VVVH_JenFix_2VV2VH.root"]
+files = ["results_2016_VV_VH_doubleB_HP0p92_LP0p7/Limits_ZprimeZH_VV_nocorrMVV.root","results_2016_2VV_2VH_doubleB_HP0p91_LP0p86/Limits_ZprimeZH_VV_nocorrMVV_2VV2VH.root","results_2016_VV_VH_doubleB_HP0p92_LP0p7/Limits_ZprimeZH_VV_JenFix_part.root","results_2016_2VV_2VH_doubleB_HP0p91_LP0p86/Limits_ZprimeZH_VV_JenFix_2VV2VH.root"]
+#files = ["results_2016_VV_VH_doubleB_HP0p92_LP0p7/Limits_ZprimeZH_VH_nocorrMVV.root","Limits_ZprimeZH_VH_nocorrMVV_2VV2VH.root","Limits_ZprimeZH_VH_JenFix.root","Limits_ZprimeZH_VH_JenFix_2VV2VH.root"]
+
+
+#title = ["2 GeV bins","4 GeV bins","8 GeV bins","16 GeV bins"]
 #files = ["results_2016_2VV_2VH_doubleB_HP0p91_LP0p86/Limits_BulkGWW_13TeV_2016_VV_2VV2VH.root","Limits_BulkGWW_VV_13TeV_2016_2VV2VH_pseudo40.root","Limits_BulkGWW_VV_13TeV_2016_2VV2VH_pseudo20.root","Limits_BulkGWW_VV_13TeV_2016_2VV2VH_pseudo10.root"]
 #files = ["results_2016_2VV_2VH_doubleB_HP0p91_LP0p86/Limits_BulkGWW_13TeV_2016_VH_2VV2VH.root","Limits_BulkGWW_VH_13TeV_2016_2VV2VH_pseudo40.root","Limits_BulkGWW_VH_13TeV_2016_2VV2VH_pseudo20.root","Limits_BulkGWW_VH_13TeV_2016_2VV2VH_pseudo10.root"]
-files = ["Limits_BulkGWW_VVVH_13TeV_2016_2VV2VH.root","Limits_BulkGWW_VVVH_13TeV_2016_2VV2VH_pseudo40.root","Limits_BulkGWW_VVVH_13TeV_2016_2VV2VH_pseudo20.root","Limits_BulkGWW_VVVH_13TeV_2016_2VV2VH_pseudo10.root"]
+#files = ["Limits_BulkGWW_VVVH_13TeV_2016_2VV2VH.root","Limits_BulkGWW_VVVH_13TeV_2016_2VV2VH_pseudo40.root","Limits_BulkGWW_VVVH_13TeV_2016_2VV2VH_pseudo20.root","Limits_BulkGWW_VVVH_13TeV_2016_2VV2VH_pseudo10.root"]
+
 
 
 
@@ -109,7 +119,7 @@ files = ["Limits_BulkGWW_VVVH_13TeV_2016_2VV2VH.root","Limits_BulkGWW_VVVH_13TeV
 #atlas_Wprime = [200, 12, 3.0, 1.5, 1.0, 0.79, 0.52, 0.42, 0.38]; atlas_Wprime = [x * 0.001 for x in atlas_Wprime]; print "atlas_Wprime",atlas_Wprime;
 #atlas_Zprime = [180,  9, 3.1, 1.7, 1.0, 0.71, 0.52, 0.40, 0.37]; atlas_Zprime = [x * 0.001 for x in atlas_Zprime]; print "atlas_Zprime",atlas_Zprime;
 
-x, y = array( 'd' ), array( 'd' )
+
 #vatlas_mps   = array("f",atlas_mps   )
  
 #if   oname.find("BulkGZZ")!=-1: lims  = array("f",atlas_BulkZZ)
@@ -117,22 +127,30 @@ x, y = array( 'd' ), array( 'd' )
 #elif oname.find("Zprime") !=-1: lims  = array("f",atlas_Zprime)
 #elif oname.find("Wprime") !=-1: lims  = array("f",atlas_Wprime)
 #atlas_lim = ROOT.TGraph( 9 , vatlas_mps, lims)
-fin = ROOT.TFile.Open("workspace_JJ_BulkGWW_VVVH_13TeV_2016_pseudo20_Andreas.root","READ")
-#fin = ROOT.TFile.Open("results_2016_2VV_2VH_doubleB_HP0p91_LP0p86/workspace_JJ_BulkGWW_VV_13TeV_2016_2VV2VH.root","READ")
-w = fin.Get("w")
+
 scaleLimits = {}
 masses = array('d',[i*100. for i in range(8,60)])
-for m in masses:
- scaleLimits[str(int(m))] =0.001 
- argset = ROOT.RooArgSet()
- MH=w.var("MH")
- argset.add(MH)
- MH.setVal(m)
 
- func = w.function('BulkGWW_JJ_VV_HPHP_13TeV_2016_sigma')
- scaleLimits[str(int(m))] = func.getVal(argset)
+if scaleBR:
+  x, y = array( 'd' ), array( 'd' )
+  fin = ROOT.TFile.Open("workspace_JJ_BulkGWW_VVVH_13TeV_2016_pseudo20_Andreas.root","READ")
+  #fin = ROOT.TFile.Open("results_2016_2VV_2VH_doubleB_HP0p91_LP0p86/workspace_JJ_BulkGWW_VV_13TeV_2016_2VV2VH.root","READ")
+  w = fin.Get("w")
 
 
+  for m in masses:
+    scaleLimits[str(int(m))] =0.001 
+    argset = ROOT.RooArgSet()
+    MH=w.var("MH")
+    argset.add(MH)
+    MH.setVal(m)
+
+    func = w.function('BulkGWW_JJ_VV_HPHP_13TeV_2016_sigma')
+    scaleLimits[str(int(m))] = func.getVal(argset)
+else:
+  for m in masses:
+    scaleLimits[str(int(m))] = 1.*0.001 #NB this is a quick fix for ZprimeZH!
+    #scaleLimits[str(int(m))] = 1.*0.001*0.584 #multiply by H BR
 leg = getLegend()
 leg.AddEntry(0,"Exp. limits","")
 leg.AddEntry(0,"","")
