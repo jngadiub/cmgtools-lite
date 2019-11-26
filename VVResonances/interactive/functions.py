@@ -20,14 +20,14 @@ class AllFunctions():
 
   self.printAllParameters()
   
- def makeSignalShapesMVV(self,filename,template,fixParsMVV,addcuts="1",doCorrelation=False):
+ def makeSignalShapesMVV(self,filename,template,fixParsMVV,addcuts="1"):
   #if 'VBF' in template: cut='*'.join([self.cuts['common_VBF'],self.cuts['acceptanceMJ'],addcuts])
   #else: cut='*'.join([self.cuts['common_VV'],self.cuts['acceptanceMJ'],addcuts])
   cut='*'.join([self.cuts['common'],self.cuts['acceptanceMJ'],addcuts])
   ##the parameters to be fixed should be optimized
   rootFile=filename+"_MVV.root"
   fixPars = fixParsMVV["fixPars"]  
-  cmd='vvMakeSignalMVVShapes.py -s "{template}" -c "{cut}"  -o "{rootFile}" -V "jj_LV_mass" --fix "{fixPars}"   -m {minMVV} -M {maxMVV} --minMX {minMX} --maxMX {maxMX} {samples} --addcut "{addcut}" -C "{correlation}"'.format(template=template,cut=cut,rootFile=rootFile,minMVV=self.minMVV,maxMVV=self.maxMVV,minMX=self.minMX,maxMX=self.maxMX,fixPars=fixPars,samples=self.samples,addcut=addcuts,correlation=doCorrelation)
+  cmd='vvMakeSignalMVVShapes.py -s "{template}" -c "{cut}"  -o "{rootFile}" -V "jj_LV_mass" --fix "{fixPars}"   -m {minMVV} -M {maxMVV} --minMX {minMX} --maxMX {maxMX} {samples} --addcut "{addcut}"'.format(template=template,cut=cut,rootFile=rootFile,minMVV=self.minMVV,maxMVV=self.maxMVV,minMX=self.minMX,maxMX=self.maxMX,fixPars=fixPars,samples=self.samples,addcut=addcuts)
   print "########## Going to make MVV ######"
   print cmd
   os.system(cmd)
