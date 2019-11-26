@@ -124,7 +124,6 @@ parser.add_option("-r","--minMX",dest="minMX",type=float, help="smallest Mx to f
 parser.add_option("-R","--maxMX",dest="maxMX",type=float, help="largest Mx to fit " ,default=7000.0)
 parser.add_option("--binsMVV",dest="binsMVV",help="use special binning",default="")
 parser.add_option("-t","--triggerweight",dest="triggerW",action="store_true",help="Use trigger weights",default=False)
-parser.add_option("-C","--correlation",dest="correlation",help="if True, MVV mean and sigma of WZ or VH signals depends on jet mass",default=False)
 
 (options,args) = parser.parse_args()
 #define output dictionary
@@ -134,7 +133,7 @@ samples={}
 graphs={'MEAN':ROOT.TGraphErrors(),'SIGMA':ROOT.TGraphErrors(),'ALPHA1':ROOT.TGraphErrors(),'N1':ROOT.TGraphErrors(),'ALPHA2':ROOT.TGraphErrors(),'N2':ROOT.TGraphErrors()}
 
 testcorr= False
-if options.sample.find("ZH")!=-1 or options.sample.find('Zh')!=-1 or options.sample.find("WZ")!=-1 or options.sample.find('WH')!=-1 and options.correlation==True:
+if options.sample.find("ZH")!=-1 or options.sample.find('Zh')!=-1 or options.sample.find("WZ")!=-1 or options.sample.find('WH')!=-1:
     testcorr = True
 
 print " ######### testcorr ",testcorr
