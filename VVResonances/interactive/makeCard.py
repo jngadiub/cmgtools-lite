@@ -8,7 +8,7 @@ cmd='combineCards.py '
 sf_qcd = 1.0
 
 pseudodata = "Vjets" #"ZprimeZH"
-outlabel = "_testZprime_pseudo20" #"sigonly_ZprimeZH_M2000"
+outlabel = "_pseudo80_Andreas_Hjet_product3D_JenFix" #"sigonly_ZprimeZH_M2000"
 
 datasets=['2016']#,'2017']
 
@@ -34,16 +34,17 @@ vtag_unc['VH_HPLP'] = {'2016':'1.','2017':'1.'}
 vtag_unc['VH_LPHP'] = {'2016':'1.','2017':'1.'}
 
 vtag_pt_dependence = {'VV_HPHP':'((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))','VV_HPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))','VH_HPHP':'1','VH_HPLP':'1','VH_LPHP':'1'}
-
+purities= ['VV_HPLP']
 #purities= ['VV_HPLP','VV_HPHP'] #,'VH_HPLP','VH_HPHP','VH_LPHP']
 #purities= ['VV_HPLP','VV_HPHP','VH_HPHP','VH_LPHP']
 #purities= ['VV_HPLP','VV_HPHP','VH_HPLP','VH_HPHP','VH_LPHP']
 #purities= ['VH_HPLP','VH_HPHP','VH_LPHP']
-purities= ['VH_LPHP']
+#purities= ['VH_LPHP',"VH_HPHP"]
 #signals = ["BulkGWW", "BulkGZZ","ZprimeWW","WprimeWZ","VprimeWV","'ZprimeZH'"]
 signals = ["ZprimeZH"]
 
-Tools = DatacardTools(scales,scalesHiggs,vtag_pt_dependence,lumi_unc,vtag_unc,sf_qcd,pseudodata,outlabel)
+doCorrelation = True 
+Tools = DatacardTools(scales,scalesHiggs,vtag_pt_dependence,lumi_unc,vtag_unc,sf_qcd,pseudodata,outlabel,doCorrelation)
 
 for sig in signals:
   cmd ="combineCards.py"
