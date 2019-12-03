@@ -30,16 +30,16 @@ parser.add_option("-f","--final",dest="final",type=int, default=1,help="Prelimin
 
 
 plotVV1D=False
-plotVV3D2016=False
+plotVV3D2016=True
 plotVV3D=False
 plotVV3D2016data=False
-plotVV3D2016pseudodata=False
+plotVV3D2016pseudodata=True
 
 
 (options,args) = parser.parse_args()
 #define output dictionary
 
-scaleBR = False
+scaleBR = True
 
 setTDRStyle()
 
@@ -57,15 +57,21 @@ def getLegend(x1=0.650010112,y1=0.523362,x2=0.90202143,y2=0.8279833):
 
 
 #titleY = "#sigma x BR(Z^{'} #rightarrow ZH) (pb)  "
-titleY = "#sigma (Z^{'} #rightarrow ZH) (pb)  "
-#titleY = "#sigma x BR(G_{Bulk} #rightarrow WW) (pb)  "
-oname= "ZprimeZH_VV_pseudo20"  
+#titleY = "#sigma (Z^{'} #rightarrow ZH) (pb)  "
+titleY = "#sigma x BR(G_{Bulk} #rightarrow WW) (pb)  "
+oname= "BulkG_VVVH_pseudo80_partialPossibilities"  
 #title = ["HPLP","HPHP","HPHP+HPLP","B2G-17-001"]
 #files = ["LIMITS_DDT_latest/WW/HPLP/Limits_BulkGWW_HPLP_13TeV.root","LIMITS_DDT_latest/WW/HPHP/Limits_BulkGWW_HPHP_13TeV.root","LIMITS_DDT_latest/WW/combined/Limits_BulkGWW_13TeV.root","limits_b2g17001/Limits_b2g17001_BulkGWW_13TeV.root"]
 
-title = ["no MVV corr","no MVV corr, 2VV2VH","Jen Fix","Jen Fix, 2VV2VH"]
+title = ["5 cat, loose H LP","2VV2VH, medium H LP"]
+#files = ["results_2016_VV_VH_doubleB_HP0p92_LP0p7/Limits_BulkGWW_VV_fixedVjest_noTT_13TeV_2016.root","results_2016_2VV_2VH_doubleB_HP0p91_LP0p86/Limits_BulkGWW_13TeV_2016_VV_2VV2VH.root"]
+#files = ["results_2016_VV_VH_doubleB_HP0p92_LP0p7/Limits_BulkGWW_VH_fixedVjest_noTT_13TeV_2016.root","results_2016_2VV_2VH_doubleB_HP0p91_LP0p86/Limits_BulkGWW_13TeV_2016_VH_2VV2VH.root"]
+files = ["results_2016_VV_VH_doubleB_HP0p92_LP0p7/Limits_BulkGWW_VVVH_fixedVjest_noTT_13TeV_2016.root","results_2016_2VV_2VH_doubleB_HP0p91_LP0p86/Limits_BulkGWW_VVVH_13TeV_2016_2VV2VH.root"]
+
+
+#title = ["no MVV corr","no MVV corr, 2VV2VH","Jen Fix","Jen Fix, 2VV2VH"]
 #files = ["Limits_ZprimeZH_VVVH_nocorrMVV.root","Limits_ZprimeZH_VVVH_nocorrMVV_2VV2VH.root","Limits_ZprimeZH_VVVH_JenFix.root","Limits_ZprimeZH_VVVH_JenFix_2VV2VH.root"]
-files = ["results_2016_VV_VH_doubleB_HP0p92_LP0p7/Limits_ZprimeZH_VV_nocorrMVV.root","results_2016_2VV_2VH_doubleB_HP0p91_LP0p86/Limits_ZprimeZH_VV_nocorrMVV_2VV2VH.root","results_2016_VV_VH_doubleB_HP0p92_LP0p7/Limits_ZprimeZH_VV_JenFix_part.root","results_2016_2VV_2VH_doubleB_HP0p91_LP0p86/Limits_ZprimeZH_VV_JenFix_2VV2VH.root"]
+#files = ["results_2016_VV_VH_doubleB_HP0p92_LP0p7/Limits_ZprimeZH_VV_nocorrMVV.root","results_2016_2VV_2VH_doubleB_HP0p91_LP0p86/Limits_ZprimeZH_VV_nocorrMVV_2VV2VH.root","results_2016_VV_VH_doubleB_HP0p92_LP0p7/Limits_ZprimeZH_VV_JenFix_part.root","results_2016_2VV_2VH_doubleB_HP0p91_LP0p86/Limits_ZprimeZH_VV_JenFix_2VV2VH.root"]
 #files = ["results_2016_VV_VH_doubleB_HP0p92_LP0p7/Limits_ZprimeZH_VH_nocorrMVV.root","Limits_ZprimeZH_VH_nocorrMVV_2VV2VH.root","Limits_ZprimeZH_VH_JenFix.root","Limits_ZprimeZH_VH_JenFix_2VV2VH.root"]
 
 
@@ -133,7 +139,7 @@ masses = array('d',[i*100. for i in range(8,60)])
 
 if scaleBR:
   x, y = array( 'd' ), array( 'd' )
-  fin = ROOT.TFile.Open("workspace_JJ_BulkGWW_VVVH_13TeV_2016_pseudo20_Andreas.root","READ")
+  fin = ROOT.TFile.Open("results_2016_VV_VH_doubleB_HP0p92_LP0p7/workspace_JJ_BulkGWW_VV_13TeV_2016_fixedVjest_noTT.root","READ")
   #fin = ROOT.TFile.Open("results_2016_2VV_2VH_doubleB_HP0p91_LP0p86/workspace_JJ_BulkGWW_VV_13TeV_2016_2VV2VH.root","READ")
   w = fin.Get("w")
 
