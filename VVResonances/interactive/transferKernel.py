@@ -411,7 +411,7 @@ def makeNonResCard():
 # vtag_pt_dependence = {'VV_HPHP':'((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))','VV_HPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))',
 #                       'VBF_VV_HPHP':'((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))','VBF_VV_HPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))'}
 
- DTools = DatacardTools(scales,scalesHiggs,vtag_pt_dependence,lumi_unc,vtag_unc,1.0,"","")
+ DTools = DatacardTools(scales,scalesHiggs,vtag_pt_dependence,lumi_unc,vtag_unc,1.0,"","",False)
  print '##########      PURITY      :', purity 
 
  cat='_'.join(['JJ',sig,purity,'13TeV_'+dataset])

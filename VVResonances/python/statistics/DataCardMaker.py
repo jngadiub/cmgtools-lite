@@ -30,7 +30,7 @@ class DataCardMaker:
         self.systematics.append({'name':name,'kind':kind,'values':values })
 
 
-    def addMVVSignalParametricShape(self,name,variable,jsonFile,scale ={},resolution={},doCorrelation=True):
+    def addMVVSignalParametricShape(self,name,variable,jsonFile,scale ={},resolution={},doCorrelation=False):
         self.w.factory("MH[2000]")
         self.w.var("MH").setConstant(1)
        

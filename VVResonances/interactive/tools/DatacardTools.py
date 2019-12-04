@@ -3,7 +3,7 @@ import sys, os
 
 class DatacardTools():
 
- def __init__(self,scales,scalesHiggs,vtag_pt_dependence,lumi_unc,vtag_unc,sfQCD,pseudodata,outlabel,doCorrelation):
+ def __init__(self,scales,scalesHiggs,vtag_pt_dependence,lumi_unc,vtag_unc,sfQCD,pseudodata,outlabel,doCorrelation=True):
   
   self.scales=scales
   self.vtag_pt_dependence=vtag_pt_dependence
