@@ -117,25 +117,23 @@ cuts['common'] = '((HLT_JJ)*(run>500) + (run<500))*(passed_METfilters&&passed_PV
 if sorting == 'random':
  print "Use random sorting!"
  print "current VV + VH"
- #cuts['VH_HPHP'] = '('+'('+'('+ '&&'.join([catVtag['HP1'],catHtag['HP2']])+')'+'||'+'('+'&&'.join([catHtag['HP1'],catHtag['HP2']]) +')'+')'+ '||' + '(' + '(' + '&&'.join([catVtag['HP2'],catHtag['HP1']]) +')'+ '||' +'(' + '&&'.join([catHtag['HP2'],catHtag['HP1']]) + ')' + ')' + ')' #anna                                                                                                                       
- #cuts['VH_HPLP'] = '(' + '('+  '&&'.join([catVtag['HP1'],catHtag['LP2']]) + ')' + '||' + '(' + '&&'.join([catVtag['HP2'],catHtag['LP1']]) + ')' + ')'
- #cuts['VH_LPHP'] = '('+ '('+  '&&'.join([catVtag['LP1'],catHtag['HP2']]) + ')' + '||' + '(' + '&&'.join([catVtag['LP2'],catHtag['HP1']]) + ')' + '||' + '(' + '&&'.join([catHtag['LP2'],catHtag['HP1']]) + ')'+'||'+ '(' + '&&'.join([catHtag['LP1'],catHtag['HP2']]) + ')'+')'
- #cuts['VH_LPLP'] = '('+'('+ '&&'.join([catVtag['LP1'],catHtag['LP2']]) + ')'+ '||' +'(' + '&&'.join([catVtag['LP2'],catHtag['LP1']]) + ')' + '||' + '(' + '&&'.join([catVtag['LP2'],catHtag['LP1']]) + ')' +'||' + '(' + '&&'.join([catHtag['LP2'],catHtag['LP1']]) + ')' + ')'
- #cuts['VH_all'] =  '('+  '||'.join([cuts['VH_HPHP'],cuts['VH_HPLP'],cuts['VH_LPHP'],cuts['VH_LPLP']]) + ')'
- #print " ################ VV orthogonal  VH CATEGORY ############"
- #cuts['VV_HPHP'] = '('+'!'+cuts['VH_all']+'&&'+'(' +  '&&'.join([catVtag['HP1'],catVtag['HP2']]) + ')' + ')'
- #cuts['VV_HPLP'] = '(' + '!' + cuts['VH_all'] + '&&' + '(' + '('+  '&&'.join([catVtag['HP1'],catVtag['LP2']]) + ')' + '||' + '(' + '&&'.join([catVtag['HP2'],catVtag['LP1']]) + ')' + ')' + ')'
-
- print "tau21 to VV, the old VH HPLP is now part of VV HPLP"
  cuts['VH_HPHP'] = '('+'('+'('+ '&&'.join([catVtag['HP1'],catHtag['HP2']])+')'+'||'+'('+'&&'.join([catHtag['HP1'],catHtag['HP2']]) +')'+')'+ '||' + '(' + '(' + '&&'.join([catVtag['HP2'],catHtag['HP1']]) +')'+ '||' +'(' + '&&'.join([catHtag['HP2'],catHtag['HP1']]) + ')' + ')' + ')' #anna                                                                                                                       
- #cuts['VH_HPLP'] = '(' + '('+  '&&'.join([catVtag['HP1'],catHtag['LP2']]) + ')' + '||' + '(' + '&&'.join([catVtag['HP2'],catHtag['LP1']]) + ')' + ')'
+ cuts['VH_HPLP'] = '(' + '('+  '&&'.join([catVtag['HP1'],catHtag['LP2']]) + ')' + '||' + '(' + '&&'.join([catVtag['HP2'],catHtag['LP1']]) + ')' + ')'
  cuts['VH_LPHP'] = '('+ '('+  '&&'.join([catVtag['LP1'],catHtag['HP2']]) + ')' + '||' + '(' + '&&'.join([catVtag['LP2'],catHtag['HP1']]) + ')' + '||' + '(' + '&&'.join([catHtag['LP2'],catHtag['HP1']]) + ')'+'||'+ '(' + '&&'.join([catHtag['LP1'],catHtag['HP2']]) + ')'+')'
  cuts['VH_LPLP'] = '('+'('+ '&&'.join([catVtag['LP1'],catHtag['LP2']]) + ')'+ '||' +'(' + '&&'.join([catVtag['LP2'],catHtag['LP1']]) + ')' + '||' + '(' + '&&'.join([catVtag['LP2'],catHtag['LP1']]) + ')' +'||' + '(' + '&&'.join([catHtag['LP2'],catHtag['LP1']]) + ')' + ')'
- #cuts['VH_all'] =  '('+  '||'.join([cuts['VH_HPHP'],cuts['VH_HPLP'],cuts['VH_LPHP'],cuts['VH_LPLP']]) + ')'
- cuts['VH_all'] =  '('+  '||'.join([cuts['VH_HPHP'],cuts['VH_LPHP'],cuts['VH_LPLP']]) + ')'
+ cuts['VH_all'] =  '('+  '||'.join([cuts['VH_HPHP'],cuts['VH_HPLP'],cuts['VH_LPHP'],cuts['VH_LPLP']]) + ')'
  print " ################ VV orthogonal  VH CATEGORY ############"
  cuts['VV_HPHP'] = '('+'!'+cuts['VH_all']+'&&'+'(' +  '&&'.join([catVtag['HP1'],catVtag['HP2']]) + ')' + ')'
- cuts['VV_HPLP'] = '(' + '!' + cuts['VH_all'] + '&&' + '(' + '('+  '&&'.join([catVtag['HP1'],catVtag['LP2']]) + ')' + '||' + '(' + '&&'.join([catVtag['HP2'],catVtag['LP1']]) + ')'+'||'+ '('+  '&&'.join([catVtag['HP1'],catHtag['LP2']]) + ')' + '||' + '(' + '&&'.join([catVtag['HP2'],catHtag['LP1']]) + ')' + ')' + ')'
+ cuts['VV_HPLP'] = '(' + '!' + cuts['VH_all'] + '&&' + '(' + '('+  '&&'.join([catVtag['HP1'],catVtag['LP2']]) + ')' + '||' + '(' + '&&'.join([catVtag['HP2'],catVtag['LP1']]) + ')' + ')' + ')'
+
+ #print "tau21 to VV, the old VH HPLP is now part of VV HPLP"
+ #cuts['VH_HPHP'] = '('+'('+'('+ '&&'.join([catVtag['HP1'],catHtag['HP2']])+')'+'||'+'('+'&&'.join([catHtag['HP1'],catHtag['HP2']]) +')'+')'+ '||' + '(' + '(' + '&&'.join([catVtag['HP2'],catHtag['HP1']]) +')'+ '||' +'(' + '&&'.join([catHtag['HP2'],catHtag['HP1']]) + ')' + ')' + ')' #anna                                                                                                                       
+ #cuts['VH_LPHP'] = '('+ '('+  '&&'.join([catVtag['LP1'],catHtag['HP2']]) + ')' + '||' + '(' + '&&'.join([catVtag['LP2'],catHtag['HP1']]) + ')' + '||' + '(' + '&&'.join([catHtag['LP2'],catHtag['HP1']]) + ')'+'||'+ '(' + '&&'.join([catHtag['LP1'],catHtag['HP2']]) + ')'+')'
+ #cuts['VH_LPLP'] = '('+'('+ '&&'.join([catVtag['LP1'],catHtag['LP2']]) + ')'+ '||' +'(' + '&&'.join([catVtag['LP2'],catHtag['LP1']]) + ')' + '||' + '(' + '&&'.join([catVtag['LP2'],catHtag['LP1']]) + ')' +'||' + '(' + '&&'.join([catHtag['LP2'],catHtag['LP1']]) + ')' + ')'
+ #cuts['VH_all'] =  '('+  '||'.join([cuts['VH_HPHP'],cuts['VH_LPHP'],cuts['VH_LPLP']]) + ')'
+ #print " ################ VV orthogonal  VH CATEGORY ############"
+ #cuts['VV_HPHP'] = '('+'!'+cuts['VH_all']+'&&'+'(' +  '&&'.join([catVtag['HP1'],catVtag['HP2']]) + ')' + ')'
+ #cuts['VV_HPLP'] = '(' + '!' + cuts['VH_all'] + '&&' + '(' + '('+  '&&'.join([catVtag['HP1'],catVtag['LP2']]) + ')' + '||' + '(' + '&&'.join([catVtag['HP2'],catVtag['LP1']]) + ')'+'||'+ '('+  '&&'.join([catVtag['HP1'],catHtag['LP2']]) + ')' + '||' + '(' + '&&'.join([catVtag['HP2'],catHtag['LP1']]) + ')' + ')' + ')'
 # print " ################ VV inclusive !! ! ############"
 # cuts['VV_HPHP'] = '(' +  '&&'.join([catVtag['HP1'],catVtag['HP2']]) + ')' 
 # cuts['VV_HPLP'] =  '(' + '('+  '&&'.join([catVtag['HP1'],catVtag['LP2']]) + ')' + '||' + '(' + '&&'.join([catVtag['HP2'],catVtag['LP1']]) + ')' + ')' 
@@ -166,11 +164,11 @@ cuts['res'] = '(jj_l1_mergedVTruth==1&&jj_l1_softDrop_mass>60&&jj_l1_softDrop_ma
 cuts['resTT'] = '(jj_l1_mergedVTruth==1&&jj_l1_softDrop_mass>140&&jj_l1_softDrop_mass<200)'
 
 #all categories
-#categories=['VH_HPHP','VH_HPLP','VH_LPHP','VV_HPHP','VV_HPLP'] #,'VBF_VV_HPHP','VBF_VV_HPLP']
+categories=['VH_HPHP','VH_HPLP','VH_LPHP','VV_HPHP','VV_HPLP'] #,'VBF_VV_HPHP','VBF_VV_HPLP']
 #categories=['VV_HPHP'] #,'VH_LPHP','VV_HPHP','VV_HPLP'] 
 
-categories=['VH_HPHP','VH_LPHP','VV_HPHP','VV_HPLP'] 
-#categories=['VV_HPHP','VV_HPLP']
+#categories=['VH_HPHP','VH_LPHP','VV_HPHP','VV_HPLP'] 
+#categories=['VH_LPHP'] #,'VV_HPLP']
                                                                                                                                                                                    
 #list of signal samples --> nb, radion and vbf samples to be added
 BulkGravWWTemplate="BulkGravToWW_"
@@ -283,14 +281,17 @@ fixParsSig={"ZprimeZH":{
 "BulkGZZ":{"VV_HPLP":{"fixPars":"alpha:1.024,n:3.25","pol":"mean:pol4,sigma:pol3,alpha:pol0,n:pol0,alpha2:pol3,n2:pol4"},
            "VV_HPHP":{"fixPars":"n2:4.8,n:2.8","pol":"mean:pol5,sigma:pol5,alpha:pol5,n:pol0,alpha2:pol3,n2:pol0"},
            "VH_HPLP":{"fixPars":"alpha:1.024,n:3.25","pol":"mean:pol4,sigma:pol3,alpha:pol0,n:pol0,alpha2:pol3,n2:pol4"},
+           "VH_LPHP":{"fixPars":"n:64","pol":"mean:pol3,sigma:pol5,alpha:pol5,n:pol0,alpha2:pol3,n2:pol3"}, #VH_LPHP irene ,
            "VH_HPHP":{"fixPars":"n:64","pol":"mean:pol3,sigma:pol5,alpha:pol5,n:pol0,alpha2:pol3,n2:pol3"}},
 "ZprimeWW":{"VV_HPLP": {"fixPars":"alpha:1.125","pol":"mean:pol5,sigma:pol5,alpha:pol0,n:pol3,alpha2:pol3,n2:pol3"},
             "VV_HPHP": {"fixPars":"alpha:1.083,n:3.5,n2:2.3","pol":"mean:pol5,sigma:pol4,alpha:pol0,n:pol0,alpha2:pol5,n2:pol0"},
             "VH_HPLP": {"fixPars":"n:5","pol":"mean:pol5,sigma:pol5,alpha:pol5,n:pol0,alpha2:pol5,n2:pol3"},
-            "VH_HPHP": {"fixPars":"n:1.2,alpha:1.22", "pol":"mean:pol6,sigma:pol4,alpha:pol0,n:pol0,alpha2:pol5,n2:pol3"}},
+            "VH_HPHP": {"fixPars":"n:1.2,alpha:1.22", "pol":"mean:pol6,sigma:pol4,alpha:pol0,n:pol0,alpha2:pol5,n2:pol3"},
+            "VH_LPHP": {"fixPars":"n:1.2,alpha:1.22", "pol":"mean:pol6,sigma:pol4,alpha:pol0,n:pol0,alpha2:pol5,n2:pol3"}},#VH_LPHP irene 
 "WprimeWZ":{"VV_HPLP":{"fixPars":"n:2.3","pol":"mean:pol3,sigma:pol3,alpha:pol3,n:pol0,alpha2:pol3,n2:pol1"},
             "VV_HPHP":{"fixPars":"n:2,n2:2,alpha:1.505", "pol":"mean:pol3,sigma:pol3,alpha:pol3,n:pol0,alpha2:pol3,n2:pol1"},
             "VH_HPLP":{"fixPars":"n:2.3","pol":"mean:pol3,sigma:pol3,alpha:pol3,n:pol0,alpha2:pol3,n2:pol1"},
+            "VH_LPHP":{"fixPars":"n:0.24,alpha:1.6", "pol":"mean:pol3,sigma:pol5,alpha:pol3,n:pol0,alpha2:pol3,n2:pol3"},#VH_LPHP irene 
             "VH_HPHP":{"fixPars":"n:0.24,alpha:1.6", "pol":"mean:pol3,sigma:pol5,alpha:pol3,n:pol0,alpha2:pol3,n2:pol3"}}}
 
 
@@ -329,7 +330,7 @@ if options.run.find("all")!=-1 or options.run.find("sig")!=-1:
         if signal_inuse.find("H")!=-1:
             f.makeSignalShapesMVV("JJ_"+str(signal_inuse)+"_"+str(period),signaltemplate_inuse,fixParsSigMVV[signal_inuse],"( jj_l1_softDrop_mass <= 150 && jj_l1_softDrop_mass > 105 && jj_l2_softDrop_mass <= 105 && jj_l2_softDrop_mass > 65) || (jj_l2_softDrop_mass <= 150 && jj_l2_softDrop_mass > 105 && jj_l1_softDrop_mass <= 105 && jj_l1_softDrop_mass > 65) ")
         elif signal_inuse.find("WZ")!=-1:
-            f.makeSignalShapesMVV("JJ_j1"+str(signal_inuse)+"_"+str(period),signaltemplate_inuse,fixParsSigMVV[signal_inuse],"(jj_l1_softDrop_mass <= 105 && jj_l1_softDrop_mass > 85 && jj_l2_softDrop_mass <= 85 && jj_l2_softDrop_mass >= 65) || (jj_l2_softDrop_mass <= 105 && jj_l2_softDrop_mass > 85 && jj_l1_softDrop_mass <= 85 && jj_l1_softDrop_mass >= 65)")
+            f.makeSignalShapesMVV("JJ_"+str(signal_inuse)+"_"+str(period),signaltemplate_inuse,fixParsSigMVV[signal_inuse],"(jj_l1_softDrop_mass <= 105 && jj_l1_softDrop_mass > 85 && jj_l2_softDrop_mass <= 85 && jj_l2_softDrop_mass >= 65) || (jj_l2_softDrop_mass <= 105 && jj_l2_softDrop_mass > 85 && jj_l1_softDrop_mass <= 85 && jj_l1_softDrop_mass >= 65)")
         else:
             f.makeSignalShapesMVV("JJ_"+str(signal_inuse)+"_"+str(period),signaltemplate_inuse,fixParsSigMVV[signal_inuse.replace('VBF_','')])
     
@@ -393,7 +394,7 @@ if options.run.find("all")!=-1 or options.run.find("pseudoNOVJETS")!=-1:
 if options.run.find("all")!=-1 or options.run.find("pseudoVJETS")!=-1:
     print " Do pseudodata with vjets: DID YOU PRODUCE THE WORKSPACE BEFORE???"
     from modules.submitJobs import makePseudoDataVjets
-    for p in categories: makePseudoDataVjets("results_"+str(period)+"/JJ_"+str(period)+"_nonRes_%s.root"%p,"results_"+str(period)+"/save_new_shapes_"+str(period)+"_pythia_%s_3D.root"%p,"pythia","JJ_PDVjets_%s.root"%p,lumi,"results_"+str(period)+"/workspace_JJ_BulkGWW_"+p+"_13TeV_"+str(period)+"_pseudoVjetsPrep_2VV2VH.root",period,p)
+    for p in categories: makePseudoDataVjets("results_"+str(period)+"/JJ_"+str(period)+"_nonRes_%s.root"%p,"results_"+str(period)+"/save_new_shapes_"+str(period)+"_pythia_%s_3D.root"%p,"pythia","JJ_PDVjets_%s.root"%p,lumi,"results_"+str(period)+"/workspace_JJ_BulkGWW_"+p+"_13TeV_"+str(period)+"_VjetsPrep_2VV2VH_doubleB_0p92_0p7.root",period,p)
 
 
 print " ########## I did everything I could! ###### "
