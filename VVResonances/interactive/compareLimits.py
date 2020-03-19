@@ -32,8 +32,8 @@ parser.add_option("-f","--final",dest="final",type=int, default=1,help="Prelimin
 plotVV1D=False
 plotVV3D2016=True
 plotVV3D=False
-plotVV3D2016data=False
-plotVV3D2016pseudodata=True
+plotVV3D2016data=False #True
+plotVV3D2016pseudodata=False #True
 
 
 (options,args) = parser.parse_args()
@@ -58,15 +58,57 @@ def getLegend(x1=0.650010112,y1=0.523362,x2=0.90202143,y2=0.8279833):
 
 #titleY = "#sigma x BR(Z^{'} #rightarrow ZH) (pb)  "
 #titleY = "#sigma (Z^{'} #rightarrow ZH) (pb)  "
+#oname= "ZprimeZH_VVVH_pseudo20_testvhlplp"
+#oname= "ZprimeZH_VV_pseudo20_testvhlplp"
+#oname= "ZprimeZH_pseudo20_tau21DDT_doubleB_0p91_0p86"
+#oname= "ZprimeZH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_VS_doubleB_0p91_0p86"
+
 titleY = "#sigma x BR(G_{Bulk} #rightarrow WW) (pb)  "
-oname= "BulkG_VVVH_pseudo80_partialPossibilities"  
+#oname= "BulkGWW_VVVH_testvhlplp"
+oname= "BulkGWW_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_VS_doubleB_0p91_0p86"
+#oname= "BulkGWW_VH_testvhlplp"
+#oname= "BulkGWW_tau21DDT_doubleB_0p91_0p86"
+
 #title = ["HPLP","HPHP","HPHP+HPLP","B2G-17-001"]
 #files = ["LIMITS_DDT_latest/WW/HPLP/Limits_BulkGWW_HPLP_13TeV.root","LIMITS_DDT_latest/WW/HPHP/Limits_BulkGWW_HPHP_13TeV.root","LIMITS_DDT_latest/WW/combined/Limits_BulkGWW_13TeV.root","limits_b2g17001/Limits_b2g17001_BulkGWW_13TeV.root"]
 
-title = ["5 cat, loose H LP","2VV2VH, medium H LP"]
-#files = ["results_2016_VV_VH_doubleB_HP0p92_LP0p7/Limits_BulkGWW_VV_fixedVjest_noTT_13TeV_2016.root","results_2016_2VV_2VH_doubleB_HP0p91_LP0p86/Limits_BulkGWW_13TeV_2016_VV_2VV2VH.root"]
-#files = ["results_2016_VV_VH_doubleB_HP0p92_LP0p7/Limits_BulkGWW_VH_fixedVjest_noTT_13TeV_2016.root","results_2016_2VV_2VH_doubleB_HP0p91_LP0p86/Limits_BulkGWW_13TeV_2016_VH_2VV2VH.root"]
-files = ["results_2016_VV_VH_doubleB_HP0p92_LP0p7/Limits_BulkGWW_VVVH_fixedVjest_noTT_13TeV_2016.root","results_2016_2VV_2VH_doubleB_HP0p91_LP0p86/Limits_BulkGWW_VVVH_13TeV_2016_2VV2VH.root"]
+title = ["VH DDT","VV DDT","VVVH DDT","VH doubleB","VV doubleB","VVVH doubleB"]
+files = ["results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_SDcorrMaps/Limits_BulkGWW_13TeV_2016_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT.root","results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_SDcorrMaps/Limits_BulkGWW_13TeV_2016_VV_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT.root","results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_SDcorrMaps/Limits_BulkGWW_13TeV_2016_VVVH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT.root","results_2016_VV_VH_doubleB_HP0p91_LP0p86_scheme2/Limits_BulkGWW_VH_13TeV_2016_scheme2_doubleB_0p91_0p86_pseudo80.root","results_2016_VV_VH_doubleB_HP0p91_LP0p86_scheme2/Limits_BulkGWW_VV_13TeV_2016_scheme2_doubleB_0p91_0p86_pseudo80.root","results_2016_VV_VH_doubleB_HP0p91_LP0p86_scheme2/Limits_BulkGWW_VVVH_13TeV_2016_scheme2_doubleB_0p91_0p86_pseudo80.root"]
+#files = ["results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_SDcorrMaps/Limits_ZprimeZH_13TeV_2016_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT.root","results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_SDcorrMaps/Limits_ZprimeZH_13TeV_2016_VV_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT.root","results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_SDcorrMaps/Limits_ZprimeZH_13TeV_2016_VVVH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT.root","results_2016_VV_VH_doubleB_HP0p91_LP0p86_scheme2/Limits_ZprimeZH_VH_13TeV_2016_scheme2_doubleB_0p91_0p86_pseudo80.root","results_2016_VV_VH_doubleB_HP0p91_LP0p86_scheme2/Limits_ZprimeZH_VV_13TeV_2016_scheme2_doubleB_0p91_0p86_pseudo80.root","results_2016_VV_VH_doubleB_HP0p91_LP0p86_scheme2/Limits_ZprimeZH_VVVH_13TeV_2016_scheme2_doubleB_0p91_0p86_pseudo80.root"]
+
+
+
+
+#title = ["VH","VV ","VVVH"]
+#files = ["results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_SDcorrMaps/Limits_BulkGWW_13TeV_2016_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT.root","results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_SDcorrMaps/Limits_BulkGWW_13TeV_2016_VV_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT.root","results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_SDcorrMaps/Limits_BulkGWW_13TeV_2016_VVVH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT.root"]
+#files = ["results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_SDcorrMaps/Limits_ZprimeZH_13TeV_2016_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT.root","results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_SDcorrMaps/Limits_ZprimeZH_13TeV_2016_VV_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT.root","results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_SDcorrMaps/Limits_ZprimeZH_13TeV_2016_VVVH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT.root"]
+
+#title = ["VH","VV","VVVH"]                                                                                                                                                                                                                                                  
+#files = ["results_2016_VV_VH_doubleB_HP0p91_LP0p86_novhlplp/Limits_ZprimeZH_VH_13TeV_2016_novhlplp_doubleB_HP0p91_LP0p86_pseudo20.root","results_2016_VV_VH_doubleB_HP0p91_LP0p86_novhlplp/Limits_ZprimeZH_VV_13TeV_2016_novhlplp_doubleB_HP0p91_LP0p86_pseudo20.root","results_2016_VV_VH_doubleB_HP0p91_LP0p86_novhlplp/Limits_ZprimeZH_VVVH_13TeV_2016_novhlplp_doubleB_HP0p91_LP0p86_pseudo20.root"]
+#files = ["results_2016_VV_VH_doubleB_HP0p91_LP0p86_novhlplp/Limits_BulkGWW_VH_13TeV_2016_novhlplp_doubleB_HP0p91_LP0p86.root","results_2016_VV_VH_doubleB_HP0p91_LP0p86_novhlplp/Limits_BulkGWW_VV_13TeV_2016_novhlplp_doubleB_HP0p91_LP0p86.root","results_2016_VV_VH_doubleB_HP0p91_LP0p86_novhlplp/Limits_BulkGWW_VVVH_13TeV_2016_novhlplp_doubleB_HP0p91_LP0p86.root"]
+
+
+
+#files = ["results_2016_VV_VH_doubleB_HP0p91_LP0p86/withoutVHLPLP/Limits_BulkGWW_VV_pseudo_5catHmed_13TeV_2016.root","results_2016_VV_VH_doubleB_HP0p91_LP0p86/Limits_BulkGWW_VV_13TeV_2016_withvhlplp_doubleB_HP0p91_LP0p86.root","results_2016_VV_VH_doubleB_HP0p91_LP0p86_novhlplp/Limits_BulkGWW_VV_13TeV_2016_novhlplp_doubleB_HP0p91_LP0p86.root"]
+#files = ["results_2016_VV_VH_doubleB_HP0p91_LP0p86/withoutVHLPLP/Limits_BulkGWW_VH_pseudo_5catHmed_13TeV_2016.root","results_2016_VV_VH_doubleB_HP0p91_LP0p86/Limits_BulkGWW_VH_13TeV_2016_withvhlplp_doubleB_HP0p91_LP0p86.root","results_2016_VV_VH_doubleB_HP0p91_LP0p86_novhlplp/Limits_BulkGWW_VH_13TeV_2016_novhlplp_doubleB_HP0p91_LP0p86.root"]
+#files = ["results_2016_VV_VH_doubleB_HP0p91_LP0p86/withoutVHLPLP/Limits_BulkGWW_VVVH_pseudo_5catHmed_13TeV_2016.root","results_2016_VV_VH_doubleB_HP0p91_LP0p86/Limits_BulkGWW_VVVH_13TeV_2016_withvhlplp_doubleB_HP0p91_LP0p86.root","results_2016_VV_VH_doubleB_HP0p91_LP0p86_novhlplp/Limits_BulkGWW_VVVH_13TeV_2016_novhlplp_doubleB_HP0p91_LP0p86.root"]
+
+#files = ["results_2016_VV_VH_doubleB_HP0p91_LP0p86/withoutVHLPLP/Limits_ZprimeZH_VVVH_pseudo20_5catHmed_13TeV_2016.root","results_2016_VV_VH_doubleB_HP0p91_LP0p86/Limits_ZprimeZH_VVVH_13TeV_2016_withvhlplp_doubleB_HP0p91_LP0p86_pseudo20.root","results_2016_VV_VH_doubleB_HP0p91_LP0p86_novhlplp/Limits_ZprimeZH_VVVH_13TeV_2016_novhlplp_doubleB_HP0p91_LP0p86_pseudo20.root"]
+#files = ["results_2016_VV_VH_doubleB_HP0p91_LP0p86/withoutVHLPLP/Limits_ZprimeZH_VH_pseudo20_5catHmed_13TeV_2016.root","results_2016_VV_VH_doubleB_HP0p91_LP0p86/Limits_ZprimeZH_VH_13TeV_2016_withvhlplp_doubleB_HP0p91_LP0p86_pseudo20.root","results_2016_VV_VH_doubleB_HP0p91_LP0p86_novhlplp/Limits_ZprimeZH_VH_13TeV_2016_novhlplp_doubleB_HP0p91_LP0p86_pseudo20.root"] 
+#files = ["results_2016_VV_VH_doubleB_HP0p91_LP0p86/withoutVHLPLP/Limits_ZprimeZH_VV_pseudo20_5catHmed_13TeV_2016.root","results_2016_VV_VH_doubleB_HP0p91_LP0p86/Limits_ZprimeZH_VV_13TeV_2016_withvhlplp_doubleB_HP0p91_LP0p86_pseudo20.root","results_2016_VV_VH_doubleB_HP0p91_LP0p86_novhlplp/Limits_ZprimeZH_VV_13TeV_2016_novhlplp_doubleB_HP0p91_LP0p86_pseudo20.root"] 
+
+
+#title = ["5 cat, loose H LP","5 cat, medium H LP","2VV2VH, medium H LP","2VV2VH,  loose H LP"]
+#files = ["results_2016_VV_VH_doubleB_HP0p92_LP0p7/Limits_BulkGWW_VV_fixedVjest_noTT_13TeV_2016.root","results_2016_VV_VH_doubleB_HP0p91_LP0p86/Limits_BulkGWW_VV_pseudo_5catHmed_13TeV_2016.root","results_2016_2VV_2VH_doubleB_HP0p91_LP0p86/Limits_BulkGWW_13TeV_2016_VV_2VV2VH.root","results_2016_2VV_2VH_doubleB_HP0p92_LP0p7/Limits_BulkGWW_VV_2VV2VH_13TeV_2016.root"]
+#files = ["results_2016_VV_VH_doubleB_HP0p92_LP0p7/Limits_BulkGWW_VH_fixedVjest_noTT_13TeV_2016.root","results_2016_VV_VH_doubleB_HP0p91_LP0p86/Limits_BulkGWW_VH_pseudo_5catHmed_13TeV_2016.root","results_2016_2VV_2VH_doubleB_HP0p91_LP0p86/Limits_BulkGWW_13TeV_2016_VH_2VV2VH.root","results_2016_2VV_2VH_doubleB_HP0p92_LP0p7/Limits_BulkGWW_VH_2VV2VH_13TeV_2016.root"]
+#files = ["results_2016_VV_VH_doubleB_HP0p92_LP0p7/Limits_BulkGWW_VVVH_fixedVjest_noTT_13TeV_2016.root","results_2016_VV_VH_doubleB_HP0p91_LP0p86/Limits_BulkGWW_VVVH_pseudo_5catHmed_13TeV_2016.root","results_2016_2VV_2VH_doubleB_HP0p91_LP0p86/Limits_BulkGWW_VVVH_13TeV_2016_2VV2VH.root","results_2016_2VV_2VH_doubleB_HP0p92_LP0p7/Limits_BulkGWW_VVVH_2VV2VH_13TeV_2016.root"]
+
+#files = ["results_2016_VV_VH_doubleB_HP0p92_LP0p7/Limits_ZprimeZH_VVVH_JenFix.root","results_2016_VV_VH_doubleB_HP0p91_LP0p86/Limits_ZprimeZH_VVVH_pseudo20_5catHmed_13TeV_2016.root","results_2016_2VV_2VH_doubleB_HP0p91_LP0p86/Limits_ZprimeZH_VVVH_JenFix_2VV2VH.root","results_2016_2VV_2VH_doubleB_HP0p92_LP0p7/Limits_ZprimeZH_VVVH_pseudo20_13TeV_2016.root"]                                  
+#files = ["results_2016_VV_VH_doubleB_HP0p92_LP0p7/Limits_ZprimeZH_VH_JenFix.root","results_2016_VV_VH_doubleB_HP0p91_LP0p86/Limits_ZprimeZH_VH_pseudo20_5catHmed_13TeV_2016.root","results_2016_2VV_2VH_doubleB_HP0p91_LP0p86/Limits_ZprimeZH_VH_JenFix_2VV2VH.root","results_2016_2VV_2VH_doubleB_HP0p92_LP0p7/Limits_ZprimeZH_VH_pseudo20_13TeV_2016.root"]                                  
+#files = ["results_2016_VV_VH_doubleB_HP0p92_LP0p7/Limits_ZprimeZH_VV_JenFix.root","results_2016_VV_VH_doubleB_HP0p91_LP0p86/Limits_ZprimeZH_VV_pseudo20_5catHmed_13TeV_2016.root","results_2016_2VV_2VH_doubleB_HP0p91_LP0p86/Limits_ZprimeZH_VV_JenFix_2VV2VH.root","results_2016_2VV_2VH_doubleB_HP0p92_LP0p7/Limits_ZprimeZH_VV_pseudo20_13TeV_2016.root"]                                  
+
+
+
 
 
 #title = ["no MVV corr","no MVV corr, 2VV2VH","Jen Fix","Jen Fix, 2VV2VH"]
@@ -379,7 +421,7 @@ VV3D16= ROOT.TGraph(41,np.array(MASSLONG),np.array(limits_b2g18_001_2016))
 VV3D16.SetName("VV3D16")
 VV3D16.SetTitle("");
 #VV3D16.SetFillColor(1);
-VV3D16.SetLineColor(436);
+VV3D16.SetLineColor(9);
 VV3D16.SetLineStyle(2);
 VV3D16.SetLineWidth(3);
 VV3D16.SetMarkerStyle(20);
@@ -568,8 +610,10 @@ frame.GetYaxis().SetTitleOffset(1.15)
 
 c.cd()
 frame.Draw()
-cols  = [42,46,49,1]*3
-tline = [10,9,1,2]*3
+cols  = [42,46,49,32,36,39]*3
+tline = [10,9,1,10,9,1]*3
+#cols  = [42,46,49,1]*3
+#tline = [10,9,1,2]*3
 
 if plotVV1D : VV16.Draw("Lsame")
 if plotVV3D2016 : VV3D16.Draw("Lsame")
