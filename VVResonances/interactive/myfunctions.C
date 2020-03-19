@@ -17,13 +17,17 @@ auto puppijjmass(const Double_t pt1, const Double_t eta1, const Double_t phi1, c
 };
 
 
-auto getWcut(const Double_t pt, const Double_t mass, TString filename = "testMaps/myDeepBoostedMap_0p10.root" ){
-  TString mapName = "DeepBoosted_WvsQCD_v_rho_v_pT_yx";
+//auto getWcut(const Double_t pt, const Double_t mass, TString filename = "testMapPt/myDeepBoostedMap_0p05rho.root", TString mapName = "DeepBoosted_WvsQCD_v_rho_v_pT_scaled_yx" ){
+  //auto getWcut(const Double_t pt, const Double_t mass, TString filename = "testMapPt_nominalonly/myDeepBoostedMap_0p05rho.root", TString mapName = "DeepBoosted_WvsQCD_v_rho_v_pT_yx" ){
+//auto getWcut(const Double_t pt, const Double_t mass, TString filename = "testMapPt/myDeepBoostedMap_0p95rho_smoothed.root", TString mapName = "DeepBoosted_WvsQCD_v_rho_v_pT_scaled_0p95_map_dijet" ){
+auto getWcut(const Double_t pt, const Double_t mass, TString filename = "testMapHT/myDeepBoostedMap_0p05rho.root", TString mapName = "DeepBoosted_WvsQCD_v_rho_v_pT_yx" ){
+//auto getWcut(const Double_t pt, const Double_t mass, TString filename = "mapTesting/testMaps_v3/myDeepBoostedMap_0p05rho.root", TString mapName = "DeepBoosted_WvsQCD_v_rho_v_pT_yx" ){
+  //  TString mapName = "DeepBoosted_WvsQCD_v_rho_v_pT_yx";
   TH2D *  map_WvsQCD = (TH2D*)gROOT->FindObject(mapName);
   if (map_WvsQCD == nullptr) {
     TFile file;
     file.Open(filename);
-    map_WvsQCD = (TH2D*)file.Get("DeepBoosted_WvsQCD_v_rho_v_pT_yx");
+    map_WvsQCD = (TH2D*)file.Get(mapName);
     map_WvsQCD->SetDirectory(0);
     file.Close();
   }
