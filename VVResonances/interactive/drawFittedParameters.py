@@ -938,37 +938,37 @@ def compSignalMVV():
         
 if __name__ == '__main__':
   prelim = ""
-  signals = ["ZprimeWW","BulkGWW","WprimeWZ","BulkGZZ","ZprimeZH"]
-  titles =  ["Z' #rightarrow WW","G_{B}#rightarrow WW","W' #rightarrow WZ","G_{B}#rightarrow ZZ","Z' #rightarrow ZH"]
-#  signals = ["ZprimeZH"]#,"BulkGWW"]
-#  titles =  ["Z' #rightarrow ZH"]#,"G_{B}#rightarrow WW"]
-#  signals = ["BulkGWW"]
-#  titles =  ["G_{B}#rightarrow WW"]
-  categories = ["2016_VV_HPHP","2016_VV_HPLP","2016_VH_HPHP","2016_VH_LPHP"]
-#  categories = ["2016_VV_HPHP","2016_VV_HPLP","2016_VH_HPHP","2016_VH_HPLP","2016_VH_LPHP"]
+#  signals = ["ZprimeWW","BulkGWW","WprimeWZ","BulkGZZ","ZprimeZH"]
+#  titles =  ["Z' #rightarrow WW","G_{B}#rightarrow WW","W' #rightarrow WZ","G_{B}#rightarrow ZZ","Z' #rightarrow ZH"]
+#  signals = ["ZprimeZH","BulkGWW"]
+#  titles =  ["Z' #rightarrow ZH","G_{B}#rightarrow WW"]
+  signals = ["BulkGWW"]
+  titles =  ["G_{B}#rightarrow WW"]
+  categories = ["2016_VV_HPHP","2016_VV_HPLP"] #,"2016_VH_HPHP","2016_VH_LPHP"]
+#  Categories = ["2016_VV_HPHP","2016_VV_HPLP","2016_VH_HPHP","2016_VH_HPLP","2016_VH_LPHP"]
 
   doSignalEff(signals,titles,categories)
   doMVV(signals,titles,"2016")
 
-  signals = ["ZprimeWW"] 
-  titles =  ["Z' #rightarrow WW"]
+#  signals = ["ZprimeWW"] 
+#  titles =  ["Z' #rightarrow WW"]
+#  doJetMass("random",signals,titles,categories)
+
+#  signals = ["BulkGWW"]
+#  titles =  ["G_{B}#rightarrow WW"]
   doJetMass("random",signals,titles,categories)
 
-  signals = ["BulkGWW"]
-  titles =  ["G_{B}#rightarrow WW"]
-  doJetMass("random",signals,titles,categories)
+#  signals = ["WprimeWZ"]
+#  titles =  ["W' #rightarrow WZ"]
+#  doJetMass("random",signals,titles,categories)
 
-  signals = ["WprimeWZ"]
-  titles =  ["W' #rightarrow WZ"]
-  doJetMass("random",signals,titles,categories)
+#  signals = ["BulkGZZ"]
+#  titles =  ["G_{B}#rightarrow ZZ"]
+#  doJetMass("random",signals,titles,categories)
 
-  signals = ["BulkGZZ"]
-  titles =  ["G_{B}#rightarrow ZZ"]
-  doJetMass("random",signals,titles,categories)
-
-  signals = ["ZprimeZH"]
-  titles =  ["Z' #rightarrow ZH"]
-  doJetMass("random",signals,titles,categories)
+#  signals = ["ZprimeZH"]
+#  titles =  ["Z' #rightarrow ZH"]
+#  doJetMass("random",signals,titles,categories)
 
 
 
