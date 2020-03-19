@@ -10,12 +10,12 @@ doPlots = False
 # map testing 
 doExternalMap = True
 
-doPlotsMJJ = True
+doPlotsMJJ = False
 doPlotsMJet = False
-doPlotsPT = False
+doPlotsPT = True
 
-extraLabel = "fixLumiWeight"
-mapDir = "testMaps_v4"
+extraLabel = "nominalMap_noBkup"
+mapDir = "testMapPt_nominalonly/"
 
 ######################
 
@@ -101,11 +101,11 @@ cuts['VV_HPLP'] = '(' +'('+'!'+cuts['VH_LPHP']+'&&!'+cuts['VH_HPHP']+'&&!'+cuts[
 ################### test external maps ################
 
 if doExternalMap:
- inputDir='2016trainingV2/' 
- percMin = ['no'] #,'0p02','0p05','0p10','0p10']
- percMax = ['no'] #,'0p05','0p10','0p20','0p15']
- #percMin = ['0p10'] #,'0p02','0p05','0p10','0p10']
- #percMax = ['0p10'] #,'0p05','0p10','0p20','0p15']
+ inputDir='2016trainingV2/noBkup/' 
+ #percMin = ['no'] #,'0p02','0p05','0p10','0p10']
+ #percMax = ['no'] #,'0p05','0p10','0p20','0p15']
+ percMin = ['0p05'] #,'0p02','0p05','0p10','0p10']
+ percMax = ['0p05'] #,'0p05','0p10','0p20','0p15']
   
  for i,p in enumerate(percMin):
  
@@ -126,8 +126,11 @@ if doExternalMap:
   print "Making histos for ",label
   if p != 'no':
    mapn= mapDir+"/myDeepBoostedMap_"+p+"rho.root"
+   print mapn
    mapf = ROOT.TFile.Open(mapn,'READ')
-   map_WvsQCD = mapf.Get("DeepBoosted_WvsQCD_v_rho_v_pT_yx");
+   print mapf
+   mapname =  "DeepBoosted_WvsQCD_v_rho_v_pT_yx"  #"DeepBoosted_WvsQCD_v_rho_v_pT_scaled_0p95_map_dijet" #"DeepBoosted_WvsQCD_v_rho_v_pT_scaled_yx" #"DeepBoosted_WvsQCD_v_rho_v_pT_yx"
+   map_WvsQCD = mapf.Get(mapname) 
    print type( map_WvsQCD )
    print "entries in  map_WvsQCD ",map_WvsQCD.GetEntries()
    ROOT.gROOT.GetListOfSpecials().Add(map_WvsQCD);
@@ -169,8 +172,8 @@ if doExternalMap:
    print label,hmass
    if htmp0:
     hmass.Add(htmp0)
-   
-  hmass.SaveAs('h_%s.root'%label) 
+  
+  hmass.SaveAs('h_%s_%s.root'%(label,extraLabel))  
 
 
 if doPlotsCut:
