@@ -64,7 +64,7 @@ class AllFunctions():
    #else: cut = "*".join([self.cuts[c],self.cuts['common_VV'],self.cuts['acceptance'],str(sfP[c])])
    cut = "*".join([self.cuts[c],self.cuts['common'],self.cuts['acceptance'],str(sfP[c])])
    yieldFile=filename+"_"+c+"_yield"
-   fnc = "pol7"
+   fnc = "pol3" #irene testing! before was pol7
    cmd='vvMakeSignalYields.py -s {template} -c "{cut}" -o {output} -V "jj_LV_mass" -m {minMVV} -M {maxMVV} -f {fnc} -b {BR} --minMX {minMX} --maxMX {maxMX} {samples} '.format(template=template, cut=cut, output=yieldFile,minMVV=self.minMVV,maxMVV=self.maxMVV,fnc=fnc,BR=branchingFraction,minMX=self.minMX,maxMX=self.maxMX,samples=self.samples)
    os.system(cmd)
 
@@ -103,11 +103,14 @@ class AllFunctions():
    
 #   if 'VBF' in c: cut='*'.join([self.cuts['common_VBF'],self.cuts[c.replace('VBF_','')],addCut,self.cuts['acceptanceGEN'],self.cuts['looseacceptanceMJ']])
 #   else: cut='*'.join([self.cuts['common_VV'],self.cuts[c],addCut,self.cuts['acceptanceGEN'],self.cuts['looseacceptanceMJ']])
-   cut='*'.join([self.cuts['common'],self.cuts[c],addCut,self.cuts['acceptanceGEN'],self.cuts['looseacceptanceMJ']])
+   cut='*'.join([self.cuts['common'],self.cuts[c],addCut,self.cuts['acceptanceGEN'],self.cuts['looseacceptanceMJ']]) 
+#   cut='*'.join([self.cuts['common'],addCut,self.cuts['acceptanceGEN'],self.cuts['looseacceptanceMJ']]) #irene removed category to make templates
    smp = pwd +"/"+self.samples
 
    if self.submitToBatch:
-    if name.find("Jets") == -1: template += ",QCD_Pt-,QCD_HT"
+    if name.find("Jets") == -1: template += ",QCD_Pt-,QCD_HT" 
+    #if name.find("Jets") == -1: template += ",QCD_HT" #irene because QCD HT not ready yet!!
+    #print " ***************    not doing QCD_HT & QCD_Pt- because not ready yet!! *************** "
     from modules.submitJobs import Make1DMVVTemplateWithKernels,merge1DMVVTemplate
     jobList, files = Make1DMVVTemplateWithKernels(rootFile,template,cut,resFile,self.binsMVV,self.minMVV,self.maxMVV,smp,jobname,wait,self.HCALbinsMVV) #,addOption) #irene
     if wait: merge1DMVVTemplate(jobList,files,jobname,c,self.binsMVV,self.minMVV,self.maxMVV,self.HCALbinsMVV,name,filename)
@@ -134,7 +137,8 @@ class AllFunctions():
    
 #   if 'VBF' in c: cut='*'.join([self.cuts['common_VBF'],self.cuts[c.replace('VBF_','')],addCut])#,cuts['acceptanceGEN'],cuts['looseacceptanceMJ']])
 #   else: cut='*'.join([self.cuts['common_VV'],self.cuts[c],addCut])#,cuts['acceptanceGEN'],cuts['looseacceptanceMJ']])
-   cut='*'.join([self.cuts['common'],self.cuts[c],addCut])#,cuts['acceptanceGEN'],cuts['looseacceptanceMJ']])
+#   cut='*'.join([self.cuts['common'],self.cuts[c],addCut])#,cuts['acceptanceGEN'],cuts['looseacceptanceMJ']])
+   cut='*'.join([self.cuts['common'],addCut])#,cuts['acceptanceGEN'],cuts['looseacceptanceMJ']]) #irene removed category to make templates    
    smp = pwd +"/"+self.samples 
  
    if self.submitToBatch:
@@ -196,6 +200,8 @@ class AllFunctions():
 
    if self.submitToBatch:
        if name.find("nonRes")!= -1: template += ",QCD_Pt-,QCD_HT"
+       ##if name.find("nonRes")!= -1: template += ",QCD_HT"
+       #print " ***************    not doing QCD_HT &  QCD_Pt- because not ready yet!! *************** "
        from modules.submitJobs import makeData,mergeData
        jobList, files = makeData(template,cut,rootFile,self.binsMVV,self.binsMJ,self.minMVV,self.maxMVV,self.minMJ,self.maxMJ,factors,name,data,jobname,sam,wait,self.HCALbinsMVV) #,addOption) #irene
        wait = True
