@@ -379,6 +379,8 @@ def makeNonResCard():
  elif options.pdfIn.find("VH_HPHP")!=-1: category_pdf = "VH_HPHP" 
  elif options.pdfIn.find("VH_HPLP")!=-1: category_pdf = "VH_HPLP"
  elif options.pdfIn.find("VH_LPHP")!=-1: category_pdf = "VH_LPHP"
+ elif options.pdfIn.find("VH_LPLP")!=-1: category_pdf = "VH_LPLP"
+ elif options.pdfIn.find("VV_extraLP")!=-1: category_pdf = "VV_extraLP"
  else: category_pdf = "VV_LPLP"  
 
  dataset = options.year
@@ -391,23 +393,26 @@ def makeNonResCard():
  scales = {"2017" :[0.983,1.08], "2016":[1.014,1.086]}
  scalesHiggs = {"2017" :[1.,1.], "2016":[1.,1.]}
 
- vtag_unc = {'VV_HPHP':{},'VV_HPLP':{},'VV_LPLP':{},'VH_HPHP':{},'VH_HPLP':{},'VH_LPHP':{} }
+ vtag_unc = {'VV_HPHP':{},'VV_HPLP':{},'VV_LPLP':{},'VH_HPHP':{},'VH_HPLP':{},'VH_LPHP':{}, 'VV_etraLP':{}}
  vtag_unc['VV_HPHP'] = {'2016':'1.232/0.792','2017':'1.269/0.763'}
  vtag_unc['VV_HPLP'] = {'2016':'0.882/1.12','2017':'0.866/1.136'}    
  vtag_unc['VV_LPLP'] = {'2016':'1.063','2017':'1.043'}
+ vtag_unc['VV_extraLP'] = {'2016':'1.063','2017':'1.043'}
 
  vtag_unc['VBF_VV_HPHP'] = {'2016':'1.232/0.792','2017':'1.269/0.763'}
  vtag_unc['VBF_VV_HPLP'] = {'2016':'0.882/1.12','2017':'0.866/1.136'}
  vtag_unc['VBF_VV_LPLP'] = {'2016':'1.063','2017':'1.043'}
 
 
- #this is a quick fix! these values are probably wrong!!
+ #this is a quick fix! these values are wrong!!
  vtag_unc['VH_HPHP'] = {'2016':'1.232/0.792','2017':'1.269/0.763'}
  vtag_unc['VH_HPLP'] = {'2016':'0.882/1.12','2017':'0.866/1.136'}    
  vtag_unc['VH_LPHP'] = {'2016':'1.063','2017':'1.043'}
+ vtag_unc['VH_LPLP'] = {'2016':'1.063','2017':'1.043'}
 
 
- vtag_pt_dependence = {'VV_HPHP':'((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))','VV_HPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))','VV_LPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))','VH_HPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))','VH_LPHP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))','VH_HPHP':'((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))'} #irene added fakes  for a quick test!
+
+ vtag_pt_dependence = {'VV_HPHP':'((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))','VV_HPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))','VV_LPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))','VH_HPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))','VH_LPHP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))','VH_HPHP':'((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))','VH_LPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))','VV_extraLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))'} #irene added fakes  for a quick test!
 # vtag_pt_dependence = {'VV_HPHP':'((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))','VV_HPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))'}
 # vtag_pt_dependence = {'VV_HPHP':'((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))','VV_HPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))',
 #                       'VBF_VV_HPHP':'((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))','VBF_VV_HPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))'}
@@ -433,6 +438,7 @@ def makeNonResCard():
  fin.Close() 
  print "adding shapes bkg"
  card.addHistoShapeFromFile("nonRes",["MJ1","MJ2","MJJ"],options.pdfIn,hname,['OPTXY:CMS_VV_JJ_nonRes_OPTXY_'+category_pdf,'OPTZ:CMS_VV_JJ_nonRes_OPTZ_'+category_pdf,'OPT3:CMS_VV_JJ_nonRes_OPT3_'+category_pdf],False,0) 
+ #card.addHistoShapeFromFile("nonRes",["MJ1","MJ2","MJJ"],options.pdfIn,hname,['PT:CMS_VV_JJ_nonRes_PT_'+category_pdf,'OPTXY:CMS_VV_JJ_nonRes_OPTXY_'+category_pdf,'OPTZ:CMS_VV_JJ_nonRes_OPTZ_'+category_pdf,'OPT3:CMS_VV_JJ_nonRes_OPT3_'+category_pdf],False,0) 
  print "adding yield"
  card.addFixedYieldFromFile("nonRes",1,options.input,"nonRes",1)
  print "adding data"
@@ -444,19 +450,20 @@ def makeNonResCard():
  print "norm"
  card.addSystematic("CMS_VV_JJ_nonRes_norm","lnN",{'nonRes':1.5}) 
  print "OPTZ"
- card.addSystematic("CMS_VV_JJ_nonRes_OPTZ_"+category_pdf,"param",[0.,2.]) #test for VH_LPHP 
-# card.addSystematic("CMS_VV_JJ_nonRes_OPTZ_"+category_pdf,"param",[0.0,1.]) 
+ card.addSystematic("CMS_VV_JJ_nonRes_OPTZ_"+category_pdf,"param",[0.,2.])
+ #card.addSystematic("CMS_VV_JJ_nonRes_OPTZ_"+category_pdf,"param",[1.,2.]) 
  #card.addSystematic("CMS_VV_JJ_nonRes_OPTZ_"+category_pdf,"param",[0.0,0.5])
  print "OPTXY"
- card.addSystematic("CMS_VV_JJ_nonRes_OPTXY_"+category_pdf,"param",[0.0,2.]) #test for VH_HPHP
-# card.addSystematic("CMS_VV_JJ_nonRes_OPTXY_"+category_pdf,"param",[0.0,1.]) #orig
+ card.addSystematic("CMS_VV_JJ_nonRes_OPTXY_"+category_pdf,"param",[0.0,2.]) 
+ #card.addSystematic("CMS_VV_JJ_nonRes_OPTXY_"+category_pdf,"param",[2.,2.]) 
 # card.addSystematic("CMS_VV_JJ_nonRes_OPTXY_"+category_pdf,"param",[0.0,0.5])
  print "OPT3"
 # card.addSystematic("CMS_VV_JJ_nonRes_OPT3_"+category_pdf,"param",[1.0,0.333]) #orig
-# card.addSystematic("CMS_VV_JJ_nonRes_OPT3_"+category_pdf,"param",[1.0,1.]) #good
- card.addSystematic("CMS_VV_JJ_nonRes_OPT3_"+category_pdf,"param",[1.0,1.]) #test for VH_HPHP  
+ card.addSystematic("CMS_VV_JJ_nonRes_OPT3_"+category_pdf,"param",[1.0,1.]) #good
+ #card.addSystematic("CMS_VV_JJ_nonRes_OPT3_"+category_pdf,"param",[1.7,2.]) #test 
  #card.addSystematic("CMS_VV_JJ_nonRes_OPT3_"+category_pdf,"param",[10.,20.])
-# print "PT"
+ #print "PT"
+ #card.addSystematic("CMS_VV_JJ_nonRes_PT_"+category_pdf,"param",[2.0,2.0]) #orig
 # card.addSystematic("CMS_VV_JJ_nonRes_PT_"+category_pdf,"param",[0.0,0.333]) #orig
 # print "PTZ"
 # card.addSystematic("CMS_VV_JJ_nonRes_PTZ_"+category_pdf,"param",[0.0,2.]) 
@@ -486,7 +493,10 @@ if __name__=="__main__":
      if options.input.find("VH_HPHP")!=-1: purity = "VH_HPHP"
      if options.input.find("VH_HPLP")!=-1: purity = "VH_HPLP"
      if options.input.find("VH_LPHP")!=-1: purity = "VH_LPHP"
+     if options.input.find("VH_LPLP")!=-1: purity = "VH_LPLP"
      if options.input.find("VV_HPHP")!=-1: purity = "VV_HPHP"
+     if options.input.find("VV_extraLP")!=-1: purity = "VV_extraLP"
+     if options.input.find("VV_LPLP")!=-1: purity = "VV_LPLP"
      elif options.input.find("VV_HPLP")!=-1: purity= "VV_HPLP"
 
 #     if options.input.find("HPHP")!=-1: purity = "HPHP"
