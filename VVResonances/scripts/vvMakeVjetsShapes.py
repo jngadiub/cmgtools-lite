@@ -28,7 +28,7 @@ parser.add_option("-t","--triggerweight",dest="triggerW",action="store_true",hel
 
 
 (options,args) = parser.parse_args()
-
+print "********************* fitting Vjets ********************"
 samples={}
 lumi = args[1]
 print "luminosity is "+str(lumi)
@@ -127,6 +127,7 @@ def getCanvas(name):
 
 ########################################3
 
+print " starting real fitting "
 label = options.output.split(".root")[0]
 t  = label.split("_")
 el=""
@@ -176,6 +177,7 @@ for name in samples.keys():
     corrFactor = options.corrFactorW
     if samples[name].find('Z') != -1: corrFactor = options.corrFactorZ
     if samples[name].find('W') != -1: corrFactor = options.corrFactorW
+    print "corrFactor ",corrFactor
     plotters[-1].addCorrectionFactor(corrFactor,'flat')
     names.append(samples[name])
     
@@ -186,31 +188,43 @@ histos2D_l2={}
 histos2D={}
 histos2D_nonRes={}
 histos2D_nonRes_l2={}
-
+print "options.cut ",options.cut
 for p in range(0,len(plotters)):
 
      key ="Wjets"
      if str(names[p]).find("ZJets")!=-1: key = "Zjets"
      if str(names[p]).find("TT")!=-1: key = "TTbar"
      print "make histo for "+names[p]
+
+
      
      if not key in histos2D.keys():
+      print "**** key ",key
+
       histos2D_nonRes [key] = plotters[p].drawTH2("jj_l1_softDrop_mass:jj_l2_softDrop_mass",options.cut+"*(jj_l1_mergedVTruth==0)*(jj_l1_softDrop_mass>55&&jj_l1_softDrop_mass<215)","1",80,55,215,80,55,215)
       histos2D_nonRes [key].SetName(key+"_nonResl1")
-     
+      print "histos2D_nonRes ",histos2D_nonRes [key].GetEntries()
+           
       histos2D [key] = plotters[p].drawTH2("jj_l1_softDrop_mass:jj_l2_softDrop_mass",options.cut+"*(jj_l1_mergedVTruth==1)*(jj_l1_softDrop_mass>55&&jj_l1_softDrop_mass<215)","1",80,55,215,80,55,215)
       histos2D [key].SetName(key+"_Resl1")
+      print "histos2D ",histos2D [key].GetEntries()
       
       histos2D_nonRes_l2 [key] = plotters[p].drawTH2("jj_l2_softDrop_mass:jj_l1_softDrop_mass",options.cut+"*(jj_l2_mergedVTruth==0)*(jj_l2_softDrop_mass>55&&jj_l2_softDrop_mass<215)","1",80,55,215,80,55,215)
       histos2D_nonRes_l2 [key].SetName(key+"_nonResl2")
+      print "histos2D_nonRes_l2 ",histos2D_nonRes_l2 [key].GetEntries()
      
       histos2D_l2 [key] = plotters[p].drawTH2("jj_l2_softDrop_mass:jj_l1_softDrop_mass",options.cut+"*(jj_l2_mergedVTruth==1)*(jj_l2_softDrop_mass>55&&jj_l2_softDrop_mass<215)","1",80,55,215,80,55,215)
       histos2D_l2 [key].SetName(key+"_Resl2")
+      print "histos2D_l2 ",histos2D_l2 [key].GetEntries()
      else:
       histos2D_nonRes [key].Add(plotters[p].drawTH2("jj_l1_softDrop_mass:jj_l2_softDrop_mass",options.cut+"*(jj_l1_mergedVTruth==0)*(jj_l1_softDrop_mass>55&&jj_l1_softDrop_mass<215)","1",80,55,215,80,55,215))
+      print "histos2D_nonRes ",histos2D_nonRes [key].GetEntries()
       histos2D [key].Add(plotters[p].drawTH2("jj_l1_softDrop_mass:jj_l2_softDrop_mass",options.cut+"*(jj_l1_mergedVTruth==1)*(jj_l1_softDrop_mass>55&&jj_l1_softDrop_mass<215)","1",80,55,215,80,55,215))
+      print "histos2D ",histos2D [key].GetEntries()
       histos2D_nonRes_l2 [key].Add(plotters[p].drawTH2("jj_l2_softDrop_mass:jj_l1_softDrop_mass",options.cut+"*(jj_l2_mergedVTruth==0)*(jj_l2_softDrop_mass>55&&jj_l2_softDrop_mass<215)","1",80,55,215,80,55,215))
+      print "histos2D_nonRes_l2 ",histos2D_nonRes_l2 [key].GetEntries()
       histos2D_l2 [key].Add(plotters[p].drawTH2("jj_l2_softDrop_mass:jj_l1_softDrop_mass",options.cut+"*(jj_l2_mergedVTruth==1)*(jj_l2_softDrop_mass>55&&jj_l2_softDrop_mass<215)","1",80,55,215,80,55,215))
+      print "histos2D_l2 ",histos2D_l2 [key].GetEntries()
 
 for key in histos2D.keys():      
      #add together the two legs to make the fit more stable
@@ -252,7 +266,7 @@ if options.output.find("LPHP")!=-1:purity = "LPHP"
 if options.output.find("VV")!=-1: purity = 'VV_'+purity
 else: purity = 'VH_'+purity
 
-
+print "start fitting"
 fitter=Fitter(['x'])
 fitter.jetResonanceVjets('model','x')
 
