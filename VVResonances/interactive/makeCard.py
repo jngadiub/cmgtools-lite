@@ -7,8 +7,9 @@ cmd='combineCards.py '
 
 sf_qcd = 1.0
 
-pseudodata = "Vjets" #"ZprimeZH"
-outlabel = "_pseudo_2VV2VH_doubleB_0p92_0p7" #"sigonly_ZprimeZH_M2000"
+#### to create the preparatory WS for pseudodata with Vjets: pseudodata = "" & doVjets=True 
+pseudodata = "Vjets"
+outlabel = "_VV_VH_scheme2_doubleB_0p91_0p86_pseudo80"
 
 datasets=['2016']#,'2017']
 
@@ -24,26 +25,27 @@ scalesHiggs = {"2017" :[1.,1.], "2016":[1.,1.]}
 
 
 #quick fix to add VH !!!
-vtag_unc = {'VV_HPHP':{},'VV_HPLP':{},'VV_LPLP':{},'VH_HPHP':{},'VH_HPLP':{},'VH_LPHP':{}}
+vtag_unc = {'VV_HPHP':{},'VV_HPLP':{},'VV_LPLP':{},'VH_HPHP':{},'VH_HPLP':{},'VH_LPHP':{},'VH_LPLP':{}}
 
 vtag_unc['VV_HPHP'] = {'2016':'1.232/0.792','2017':'1.269/0.763'}
 vtag_unc['VV_HPLP'] = {'2016':'0.882/1.12','2017':'0.866/1.136'}    
 vtag_unc['VV_LPLP'] = {'2016':'1.063','2017':'1.043'}
 vtag_unc['VH_HPHP'] = {'2016':'1.','2017':'1.'}
 vtag_unc['VH_HPLP'] = {'2016':'1.','2017':'1.'}
+vtag_unc['VH_LPLP'] = {'2016':'1.','2017':'1.'}
 vtag_unc['VH_LPHP'] = {'2016':'1.','2017':'1.'}
 
-vtag_pt_dependence = {'VV_HPHP':'((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))','VV_HPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))','VH_HPHP':'1','VH_HPLP':'1','VH_LPHP':'1'}
-#purities= ['VV_HPLP']
+vtag_pt_dependence = {'VV_HPHP':'((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))','VV_HPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))','VH_HPHP':'1','VH_HPLP':'1','VH_LPHP':'1','VH_LPLP':'1'}
 #purities= ['VV_HPLP','VV_HPHP'] #,'VH_HPLP','VH_HPHP','VH_LPHP']
-purities= ['VV_HPLP','VV_HPHP','VH_HPHP','VH_LPHP']
-#purities= ['VV_HPLP','VV_HPHP','VH_HPLP','VH_HPHP','VH_LPHP']
+#purities= ['VV_HPLP','VV_HPHP','VH_HPHP','VH_LPHP']
+purities= ['VV_HPLP','VV_HPHP','VH_HPLP','VH_HPHP','VH_LPHP']
 #purities= ['VH_HPLP','VH_HPHP','VH_LPHP']
 #purities= ['VH_LPHP',"VH_HPHP"]
 #signals = ["BulkGWW", "BulkGZZ","ZprimeWW","WprimeWZ","VprimeWV","'ZprimeZH'"]
 signals = ["ZprimeZH"]
+#signals = ["BulkGWW"]
 
-doCorrelation = True 
+doCorrelation = True
 Tools = DatacardTools(scales,scalesHiggs,vtag_pt_dependence,lumi_unc,vtag_unc,sf_qcd,pseudodata,outlabel,doCorrelation)
 
 for sig in signals:
@@ -77,14 +79,17 @@ for sig in signals:
         ncontrib+=1
 
       #rootFile3DPDF = resultsDir[dataset]+'/JJ_2016_nonRes_3D_VV_HPLP.root'
+      print "##########################       including QCD in datacard      ######################"
       rootFile3DPDF = resultsDir[dataset]+"/save_new_shapes_%s_pythia_"%dataset+p+"_3D.root"
       print "rootFile3DPDF ",rootFile3DPDF
       rootFileNorm = resultsDir[dataset]+"/JJ_%s_nonRes_"%dataset+p+".root"   
       print "rootFileNorm ",rootFileNorm
 
       Tools.AddNonResBackground(card,dataset,p,rootFile3DPDF,rootFileNorm,ncontrib) 
+      print "##########################       QCD added in datacard      ######################"
 
       rootFileData = resultsDir[dataset]+"/JJ_%s_nonRes_3D_%s.root"%(dataset,p) #use this only to prepare workspace for making pseudo data with vjets
+#      rootFileData = resultsDir[dataset]+"/JJ_%s_nonRes_3D_none.root"%(dataset) #use this only to prepare workspace for making pseudo data with vjets
       histName="histo"
       scaleData=lumi[dataset]
 
@@ -107,10 +112,13 @@ for sig in signals:
        histName="data_obs"
        scaleData=1.0
       Tools.AddData(card,rootFileData,histName,scaleData)
-      
+
+      print "##########################       data/pseudodata added in datacard      ######################"  
+       
       Tools.AddSigSystematics(card,sig,dataset,p,1)
       Tools.AddResBackgroundSystematics(card,p)
       Tools.AddNonResBackgroundSystematics(card,p)
+      print "##########################       systematics added in datacard      ######################"  
         
       card.makeCard()
       t2wcmd = "text2workspace.py %s -o %s"%(cardName,workspaceName)
@@ -123,8 +131,8 @@ for sig in signals:
     #make combined 
     if len(purities)>1:
       print "#######     going to combine purity categories: ",purities    
-      combo_card = cardName.replace("VV_HPHP","").replace("VV_HPLP","").replace("VV_LPLP","").replace("VH_HPHP","").replace("VH_HPLP","").replace("VH_LPHP","")
-      combo_workspace = workspaceName.replace("VV_HPHP","").replace("VV_HPLP","").replace("VV_LPLP","").replace("VH_HPHP","").replace("VH_HPLP","").replace("VH_LPHP","")
+      combo_card = cardName.replace("VV_HPHP","").replace("VV_HPLP","").replace("VV_LPLP","").replace("VH_HPHP","").replace("VH_HPLP","").replace("VH_LPHP","").replace("VH_LPLP","")
+      combo_workspace = workspaceName.replace("VV_HPHP","").replace("VV_HPLP","").replace("VV_LPLP","").replace("VH_HPHP","").replace("VH_HPLP","").replace("VH_LPHP","").replace("VH_LPLP","")
       os.system('rm %s'%combo_card)
       cmd_combo+=' >> %s'%combo_card
       print cmd_combo
