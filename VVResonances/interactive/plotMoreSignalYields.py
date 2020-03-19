@@ -206,8 +206,10 @@ def doSingle():
 '''  
 def doAll():
     purity1="VV_HPLP"
-    files = ["JJ_BulkGZZ_"+str(options.period)+"_"+str(purity1)+"_yield.root","JJ_WprimeWZ_"+str(options.period)+"_"+str(purity1)+"_yield.root","JJ_BulkGWW_"+str(options.period)+"_"+str(purity1)+"_yield.root","JJ_ZprimeWW_"+str(options.period)+"_"+str(purity1)+"_yield.root","JJ_ZprimeZH_"+str(options.period)+"_"+str(purity1)+"_yield.root"]
-    legs = ["G_{bulk} #rightarrow ZZ","W' #rightarrow WZ","G_{bulk} #rightarrow WW","Z'#rightarrow WW","Z'#rightarrow ZH"]
+    files = ["JJ_BulkGWW_"+str(options.period)+"_"+str(purity1)+"_yield.root"] 
+    legs = ["G_{bulk} #rightarrow WW"]
+#    files = ["JJ_BulkGZZ_"+str(options.period)+"_"+str(purity1)+"_yield.root","JJ_WprimeWZ_"+str(options.period)+"_"+str(purity1)+"_yield.root","JJ_BulkGWW_"+str(options.period)+"_"+str(purity1)+"_yield.root","JJ_ZprimeWW_"+str(options.period)+"_"+str(purity1)+"_yield.root","JJ_ZprimeZH_"+str(options.period)+"_"+str(purity1)+"_yield.root"]
+#    legs = ["G_{bulk} #rightarrow ZZ","W' #rightarrow WZ","G_{bulk} #rightarrow WW","Z'#rightarrow WW","Z'#rightarrow ZH"]
     c1,leg,pt = getCanvasPaper("c1")
     c1.Draw()
     gr=[]
@@ -239,29 +241,32 @@ def doAll():
       gr.GetYaxis().SetTitleSize(0.055)
       gr.GetYaxis().SetLabelSize(0.05)
       gr.GetXaxis().SetLabelSize(0.05)
-      ff = gr.GetFunction("func")
-      gr.Fit(ff)
-      ff.SetLineColor(0)
-      ff.SetLineStyle(2)
-      ff.SetLineWidth(0)
+#      ff = gr.GetFunction("func")
+#      gr.Fit(ff)
+#      ff.SetLineColor(0)
+#      ff.SetLineStyle(2)
+#      ff.SetLineWidth(0)
       #ff1000.Draw("same")
       leg.AddEntry(gr, legs[ii], "L")
       #    if options.var == 'mVV':gr.SetMaximum(0.45)
+      '''
       if ii == 0 :gr_gzz = gr #gr.Draw("AP")        
       elif ii == 1 :gr_w = gr #gr.Draw("AP")        
       if ii == 2 :gr_z = gr #gr.Draw("AP")        
       if ii == 3 :gr_gww = gr #gr.Draw("AP")        
       if ii == 4 :gr_zh = gr #gr.Draw("AP")        
-
-    gr_gzz.Draw("APL")
+      '''
+      gr_w = gr 
+#    gr_gzz.Draw("APL")
     gr_w.Draw("PL")
-    gr_z.Draw("PL")
-    gr_gww.Draw("PL")
-    gr_zh.Draw("PL")
+#    gr_z.Draw("PL")
+#    gr_gww.Draw("PL")
+#    gr_zh.Draw("PL")
     leg.Draw("same")
 
     purity2="VV_HPHP"
-    files = ["JJ_BulkGZZ_"+str(options.period)+"_"+str(purity2)+"_yield.root","JJ_WprimeWZ_"+str(options.period)+"_"+str(purity2)+"_yield.root","JJ_BulkGWW_"+str(options.period)+"_"+str(purity2)+"_yield.root","JJ_ZprimeWW_"+str(options.period)+"_"+str(purity2)+"_yield.root","JJ_ZprimeZH_"+str(options.period)+"_"+str(purity2)+"_yield.root"]
+    files = ["JJ_BulkGWW_"+str(options.period)+"_"+str(purity2)+"_yield.root"] 
+#    files = ["JJ_BulkGZZ_"+str(options.period)+"_"+str(purity2)+"_yield.root","JJ_WprimeWZ_"+str(options.period)+"_"+str(purity2)+"_yield.root","JJ_BulkGWW_"+str(options.period)+"_"+str(purity2)+"_yield.root","JJ_ZprimeWW_"+str(options.period)+"_"+str(purity2)+"_yield.root","JJ_ZprimeZH_"+str(options.period)+"_"+str(purity2)+"_yield.root"]
 
     for ii,f in enumerate(files):
       print f
@@ -290,27 +295,28 @@ def doAll():
       gr.SetLineColor(ROOT.TColor.GetColor(colors[ii][3]))
       gr.SetLineStyle(1)                                                                                                                                                                                                                                                      
       gr.SetLineWidth(2)                                                                                                                                                                                                                                                      
-      ff = gr.GetFunction("func")
-      gr.Fit(ff)
-      ff.SetLineColor(0)
+ #     ff = gr.GetFunction("func")
+ #     gr.Fit(ff)
+ #     ff.SetLineColor(0)
 #      ff.SetLineStyle(1)
-      ff.SetLineWidth(0)
+#      ff.SetLineWidth(0)
       #ff1000.Draw("same")
 #      leg.AddEntry(gr, legs[ii], "L")
       #    if options.var == 'mVV':gr.SetMaximum(0.45)
+      '''
       if ii == 0 :gr_gzz = gr #gr.Draw("AP")        
       elif ii == 1 :gr_w = gr #gr.Draw("AP")        
       if ii == 2 :gr_z = gr #gr.Draw("AP")        
       if ii == 3 :gr_gww = gr #gr.Draw("AP")        
       if ii == 4 :gr_zh = gr #gr.Draw("AP")        
+      '''
+      gr_w = gr 
 
-
-
-    gr_gzz.Draw("PL")
+#    gr_gzz.Draw("PL")
     gr_w.Draw("PL")
-    gr_z.Draw("PL")
-    gr_gww.Draw("PL")
-    gr_zh.Draw("PL")
+#    gr_z.Draw("PL")
+#    gr_gww.Draw("PL")
+#    gr_zh.Draw("PL")
 #    leg.Draw("same")
 
     
