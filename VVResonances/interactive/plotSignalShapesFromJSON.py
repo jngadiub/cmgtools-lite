@@ -411,15 +411,15 @@ def doAll(category,jsons,legs):
       
 if __name__ == '__main__':
     #doSingle()
-#    legs = ["G_{bulk} #rightarrow WW"]
-    legs = ["G_{bulk} #rightarrow ZZ","W' #rightarrow WZ","G_{bulk} #rightarrow WW","Z'#rightarrow WW","Z' #rightarrow ZH"]
+    legs = ["G_{bulk} #rightarrow WW"]
+#    legs = ["G_{bulk} #rightarrow ZZ","W' #rightarrow WZ","G_{bulk} #rightarrow WW","Z'#rightarrow WW","Z' #rightarrow ZH"]
 #    legs = ["Z' #rightarrow ZH"]
-#    signals = ["BulkGWW"]
-    signals = ["BulkGZZ","WprimeWZ","BulkGWW","ZprimeWW","ZprimeZH"]
+    signals = ["BulkGWW"]
+#    signals = ["BulkGZZ","WprimeWZ","BulkGWW","ZprimeWW","ZprimeZH"]
 #    signals = ["ZprimeZH"]
-#    categories = ["VV_HPLP"]
+    categories = ["VV_HPLP","VV_HPHP"]
 #    categories = ["VV_HPHP","VV_HPLP","VH_HPLP","VH_HPHP","VH_LPHP"]
-    categories = ["VV_HPHP","VV_HPLP","VH_HPHP","VH_LPHP"]
+#    categories = ["VV_HPHP","VV_HPLP","VH_HPHP","VH_LPHP"]
 
     for category in categories:
       jsons=[]
