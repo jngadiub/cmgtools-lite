@@ -354,8 +354,14 @@ def mirror(histo,histoNominal,name,dim=1):
     if dim == 2:
 		for i in range(1,histo.GetNbinsX()+1):
 			for j in range(1,histo.GetNbinsY()+1):
-				up=histo.GetBinContent(i,j)/intUp
-				nominal=histoNominal.GetBinContent(i,j)/intNominal
+                                if intUp !=0: up=histo.GetBinContent(i,j)/intUp
+                                else:
+                                    up=histo.GetBinContent(i,j)
+                                    print " ************* up hist not divided by intUp beacuse intUp =0 !!!!!! *******"
+				if intNominal !=0 :  nominal=histoNominal.GetBinContent(i,j)/intNominal
+                                else :
+                                    nominal=histoNominal.GetBinContent(i,j)
+                                    print " ************* nominal hist not divided by intNominal beacuse intNominal =0 !!!!!! *******"
 				if up != 0: newHisto.SetBinContent(i,j,histoNominal.GetBinContent(i,j)*nominal/up)
     else:
 		for i in range(1,histo.GetNbinsX()+1):
@@ -841,7 +847,8 @@ def merge1DMVVTemplate(jobList,files,jobname,purity,binsMVV,minMVV,maxMVV,HCALbi
 	if doPythia:
 		print "doing Pythia"
                 mvv_nominal.Write('mvv_nominal')
-		histo_nominal.Scale(1./histo_nominal.Integral())
+                if histo_nominal.Integral() !=0 : histo_nominal.Scale(1./histo_nominal.Integral())
+                else: print "************  histo_nominal.Integral() == 0 !!!!! Cannot scale!!! ************"
 		histo_nominal.Write('histo_nominal')
 			
 		print "Now pT"
