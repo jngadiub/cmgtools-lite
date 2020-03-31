@@ -39,8 +39,8 @@ class AllFunctions():
 
 
  def makeSignalShapesMJ(self,filename,template,leg,fixPars,addcuts="1"):
-
-  for c in self.categories:
+  # for now remove the category part from these fits -> left code in until we have green light from all 
+  #for c in self.categories:
   
    #if 'VBF' in c: cut='*'.join([self.cuts['common_VBF'],self.cuts[c.replace('VBF_','')],addcuts])
    #else: cut='*'.join([self.cuts['common_VV'],self.cuts[c],addcuts])
