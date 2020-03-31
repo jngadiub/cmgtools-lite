@@ -10,21 +10,25 @@ doPlots = False
 # map testing 
 doExternalMap = True
 
-doPlotsMJJ = False
+doPlotsMJJ = True
 doPlotsMJet = False
-doPlotsPT = True
+doPlotsPT = False
 
-extraLabel = "nominalMap_noBkup"
-mapDir = "testMapPt_nominalonly/"
+extraLabel = "Herwigbinned"
+mapDir = "testMapZHbb_Pt_nominalonly/"
 
 ######################
 
 doPlotsCut = False
 files = []
+filesHT = []
+filesHerwig = []
 filesZH = []
 filesWW = []
 for f in os.listdir('2016trainingV2'):
+ if 'QCD_Pt-' in f and '.root' in f: filesHerwig.append(f)
  if 'QCD_Pt_' in f and '.root' in f: files.append(f)
+ if 'QCD_HT' in f and '.root' in f: filesHT.append(f)
  if 'Bulk' in f and '.root' in f: filesWW.append(f)
  if 'Zprime' in f and '.root' in f: filesZH.append(f)
 
@@ -101,11 +105,11 @@ cuts['VV_HPLP'] = '(' +'('+'!'+cuts['VH_LPHP']+'&&!'+cuts['VH_HPHP']+'&&!'+cuts[
 ################### test external maps ################
 
 if doExternalMap:
- inputDir='2016trainingV2/noBkup/' 
- #percMin = ['no'] #,'0p02','0p05','0p10','0p10']
- #percMax = ['no'] #,'0p05','0p10','0p20','0p15']
- percMin = ['0p05'] #,'0p02','0p05','0p10','0p10']
- percMax = ['0p05'] #,'0p05','0p10','0p20','0p15']
+ inputDir='2016trainingV2/' 
+ percMin = ['no'] #,'0p02','0p05','0p10','0p10']
+ percMax = ['no'] #,'0p05','0p10','0p20','0p15']
+ #percMin = ['0p05'] #,'0p02','0p05','0p10','0p10']
+ #percMax = ['0p05'] #,'0p05','0p10','0p20','0p15']
   
  for i,p in enumerate(percMin):
  
@@ -135,15 +139,15 @@ if doExternalMap:
    print "entries in  map_WvsQCD ",map_WvsQCD.GetEntries()
    ROOT.gROOT.GetListOfSpecials().Add(map_WvsQCD);
   
-  for f in files:
+  for f in filesHerwig:
    print "   * File:",f
    tf = ROOT.TFile.Open(inputDir+f,'READ')
    tree = tf.AnalysisTree   
    fpck=open(inputDir+f.replace('.root','.pck'))
    dpck=pickle.load(fpck)
    weightinv = float(dpck['events'])
-   htmp0 = ROOT.gROOT.FindObject('htmp0')
-   if htmp0: htmp0.Delete()
+   htmp = ROOT.gROOT.FindObject('htmp')
+   if htmp: htmp.Delete()
    
    if p != 'no': 
     cutTagger = '(jj_l1_DeepBoosted_WvsQCD>getWcut(jj_l1_softDrop_pt,jj_l1_softDrop_mass))'   #,ROOT.gROOT.FindObject(map_WvsQCD)))' #.format(perc=p)
@@ -160,18 +164,18 @@ if doExternalMap:
    ROOT.gROOT.Macro("myfunctions.C")
    print "after"
    if doPlotsMJJ:
-    tree.Draw('jj_LV_mass>>htmp0(100,1000,6000)','(genWeight*xsec*puWeight*%.20f)*'%(lumi/weightinv)+cut,"goff")
-    #   tree.Draw('puppijjmass(jj_l1_softDrop_pt,jj_l1_softDrop_eta,jj_l1_softDrop_phi,jj_l1_softDrop_mass,jj_l2_softDrop_pt,jj_l2_softDrop_eta,jj_l2_softDrop_phi,jj_l2_softDrop_mass)>>htmp0(100,1000,6000)','(genWeight*xsec*puWeight*%.20f)*'%(lumi/weightinv)+cut,"goff")
+    tree.Draw('jj_LV_mass>>htmp(100,1000,6000)','(genWeight*xsec*puWeight*%.20f)*'%(lumi/weightinv)+cut,"goff")
+    #   tree.Draw('puppijjmass(jj_l1_softDrop_pt,jj_l1_softDrop_eta,jj_l1_softDrop_phi,jj_l1_softDrop_mass,jj_l2_softDrop_pt,jj_l2_softDrop_eta,jj_l2_softDrop_phi,jj_l2_softDrop_mass)>>htmp(100,1000,6000)','(genWeight*xsec*puWeight*%.20f)*'%(lumi/weightinv)+cut,"goff")
    if doPlotsPT:
-    #   tree.Draw('jj_l1_softDrop_pt>>htmp0(50,20,1500)','(genWeight*xsec*puWeight*%.20f)*'%(lumi/weightinv)+cut,"goff")
-    tree.Draw('jj_l1_softDrop_pt>>htmp0(100,200,4000)','(genWeight*xsec*puWeight*%.20f)*'%(lumi/weightinv)+cut,"goff")
+    #   tree.Draw('jj_l1_softDrop_pt>>htmp(50,20,1500)','(genWeight*xsec*puWeight*%.20f)*'%(lumi/weightinv)+cut,"goff")
+    tree.Draw('jj_l1_softDrop_pt>>htmp(100,200,4000)','(genWeight*xsec*puWeight*%.20f)*'%(lumi/weightinv)+cut,"goff")
    if doPlotsMJet:
-    tree.Draw('jj_l1_softDrop_mass>>htmp0(40,55,215)','(genWeight*xsec*puWeight*%.20f)*'%(lumi/weightinv)+cut,"goff")
+    tree.Draw('jj_l1_softDrop_mass>>htmp(40,55,215)','(genWeight*xsec*puWeight*%.20f)*'%(lumi/weightinv)+cut,"goff")
 
-   htmp0 = ROOT.gROOT.FindObject('htmp0')
+   htmp = ROOT.gROOT.FindObject('htmp')
    print label,hmass
-   if htmp0:
-    hmass.Add(htmp0)
+   if htmp:
+    hmass.Add(htmp)
   
   hmass.SaveAs('h_%s_%s.root'%(label,extraLabel))  
 
