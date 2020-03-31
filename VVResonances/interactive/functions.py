@@ -39,21 +39,29 @@ class AllFunctions():
 
 
  def makeSignalShapesMJ(self,filename,template,leg,fixPars,addcuts="1"):
-  # for now remove the category part from these fits -> left code in until we have green light from all 
-  #for c in self.categories:
+   # for now remove the category part from these fits -> left code in until we have green light from all
+   VBF=False
+   nominal=False
+   for c in self.categories:
+      if 'VBF' in c: VBF = True
+      else: nominal = True
   
-   #if 'VBF' in c: cut='*'.join([self.cuts['common_VBF'],self.cuts[c.replace('VBF_','')],addcuts])
-   #else: cut='*'.join([self.cuts['common_VV'],self.cuts[c],addcuts])
-   cut='*'.join([self.cuts['common'],self.cuts[c],addcuts])
-     
-   rootFile=filename+"_MJ"+leg+"_"+c+".root"   
-   cmd='vvMakeSignalMJShapes.py -s "{template}" -c "{cut}"  -o "{rootFile}" -V "jj_{leg}_softDrop_mass" -m {minMJ} -M {maxMJ} -f "{fixPars}" --minMX {minMX} --maxMX {maxMX} {samples} '.format(template=template,cut=cut,rootFile=rootFile,leg=leg,minMJ=self.minMJ,maxMJ=self.maxMJ,minMX=self.minMX,maxMX=self.maxMX,fixPars=fixPars[c]["fixPars"],samples=self.samples)
-#   cmd='vvMakeSignalMJShapes.py -s "{template}" -c "{cut}"  -o "{rootFile}" -V "jj_{leg}_softDrop_mass" -m {minMJ} -M {maxMJ} -f "{fixPars}" --minMX {minMX} --maxMX {maxMX} {samples} '.format(template=template,cut=cut,rootFile=rootFile,leg=leg,minMJ=self.minMJ,maxMJ=self.maxMJ,minMX=self.minMX,maxMX=self.maxMX,fixPars=fixPars[c.replace('VBF_','')]["fixPars"],samples=self.samples)
-   os.system(cmd)
-   
-   jsonFile=filename+"_MJ"+leg+"_"+c+".json"   
-   cmd='vvMakeJSON.py  -o "{jsonFile}" -g {pols} -m {minMX} -M {maxMX} {rootFile}  '.format(jsonFile=jsonFile,rootFile=rootFile,minMX=self.minMX,maxMX=self.maxMX,pols=fixPars[c.replace('VBF_','')]["pol"])
-   os.system(cmd)
+   cuts = []
+#   if VBF== True: cuts.append('*'.join([self.cuts['common_VBF'],addcuts]))
+#   if nominal == True: cuts.append('*'.join([self.cuts['common_VV'],addcuts]))
+   cuts.append('*'.join([self.cuts['common'],self.cuts[c],addcuts]))    
+
+   for cut in cuts: 
+    #rootFile=filename+"_MJ"+leg+"_"+c+".root"
+    rootFile=filename+"_MJ"+leg+"_NP.root" 
+    cmd='vvMakeSignalMJShapes.py -s "{template}" -c "{cut}"  -o "{rootFile}" -V "jj_{leg}_softDrop_mass" -m {minMJ} -M {maxMJ} -f "{fixPars}" --minMX {minMX} --maxMX {maxMX} {samples} '.format(template=template,cut=cut,rootFile=rootFile,leg=leg,minMJ=self.minMJ,maxMJ=self.maxMJ,minMX=self.minMX,maxMX=self.maxMX,fixPars=fixPars["NP"]["fixPars"],samples=self.samples)
+    os.system(cmd)
+    
+    #jsonFile=filename+"_MJ"+leg+"_"+c+".json"
+    jsonFile=filename+"_MJ"+leg+"_NP.json"
+    cmd='vvMakeJSON.py  -o "{jsonFile}" -g {pols} -m {minMX} -M {maxMX} {rootFile}  '.format(jsonFile=jsonFile,rootFile=rootFile,minMX=self.minMX,maxMX=self.maxMX,pols=fixPars["NP"]["pol"])
+    os.system(cmd)
+
 
  def makeSignalYields(self,filename,template,branchingFraction,sfP = {'HPHP':1.0,'HPLP':1.0,'LPLP':1.0}):
  
