@@ -9,7 +9,7 @@ sf_qcd = 1.0
 
 #### to create the preparatory WS for pseudodata with Vjets: pseudodata = "" & doVjets=True 
 pseudodata = "Vjets"
-outlabel = "_VV_VH_scheme2_doubleB_0p91_0p86_pseudo80"
+outlabel = "_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_nominalMaps_pseudo80"
 
 datasets=['2016']#,'2017']
 
@@ -42,8 +42,8 @@ purities= ['VV_HPLP','VV_HPHP','VH_HPLP','VH_HPHP','VH_LPHP']
 #purities= ['VH_HPLP','VH_HPHP','VH_LPHP']
 #purities= ['VH_LPHP',"VH_HPHP"]
 #signals = ["BulkGWW", "BulkGZZ","ZprimeWW","WprimeWZ","VprimeWV","'ZprimeZH'"]
-signals = ["ZprimeZH"]
-#signals = ["BulkGWW"]
+#signals = ["ZprimeZH"]
+signals = ["BulkGWW"]
 
 doCorrelation = True
 Tools = DatacardTools(scales,scalesHiggs,vtag_pt_dependence,lumi_unc,vtag_unc,sf_qcd,pseudodata,outlabel,doCorrelation)
@@ -88,8 +88,8 @@ for sig in signals:
       Tools.AddNonResBackground(card,dataset,p,rootFile3DPDF,rootFileNorm,ncontrib) 
       print "##########################       QCD added in datacard      ######################"
 
-      rootFileData = resultsDir[dataset]+"/JJ_%s_nonRes_3D_%s.root"%(dataset,p) #use this only to prepare workspace for making pseudo data with vjets
-#      rootFileData = resultsDir[dataset]+"/JJ_%s_nonRes_3D_none.root"%(dataset) #use this only to prepare workspace for making pseudo data with vjets
+#      rootFileData = resultsDir[dataset]+"/JJ_%s_nonRes_3D_%s.root"%(dataset,p) #use this only to prepare workspace for making pseudo data with vjets
+      rootFileData = resultsDir[dataset]+"/JJ_%s_nonRes_3D_none.root"%(dataset) #use this only to prepare workspace for making pseudo data with vjets
       histName="histo"
       scaleData=lumi[dataset]
 
