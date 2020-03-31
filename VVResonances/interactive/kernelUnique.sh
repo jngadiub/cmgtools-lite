@@ -1,9 +1,9 @@
 #!bin/bash
 
-name=2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_SDcorrMaps_OPT3_0and2_OPTXY0and2_OPTZ1and2_PTZ2and2 #OPT31and1_OPTXY2_OPTZ2
+name=2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_nominalMaps_OPT3_0and2_OPTXY0and2_OPTZ1and2_PTZ2and2 #OPT31and1_OPTXY2_OPTZ2
 postfitdir=postfit_qcd/${name}/
 mkdir $postfitdir
-cat=VH_HPHP
+cat=VH_LPHP
 #               pythia
 #HPLP
 python transferKernelUnique.py -i results_2016/JJ_2016_nonRes_${cat}.root --sample pythia --year 2016 -p x --pdfIn results_2016/JJ_2016_nonRes_3D_none.root | tee KernelTransf_2016_${cat}_pythia_x_${name}.out
