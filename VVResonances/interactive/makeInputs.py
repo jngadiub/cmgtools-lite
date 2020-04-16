@@ -151,10 +151,6 @@ ZresTemplate= "ZJetsToQQ_HT400to600,ZJetsToQQ_HT600to800,ZJetsToQQ_HT800toInf"
 resTemplate= "ZJetsToQQ_HT400to600,ZJetsToQQ_HT600to800,ZJetsToQQ_HT800toInf,WJetsToQQ_HT400to600,WJetsToQQ_HT600to800,WJetsToQQ_HT800toInf"
 
 
-if dijetBinning:
-    minMVV = float(dijetbins[0])
-    maxMVV = float(dijetbins[-1])
-    binsMVV= len(dijetbins)-1
       
 
 #do not change the order here, add at the end instead
