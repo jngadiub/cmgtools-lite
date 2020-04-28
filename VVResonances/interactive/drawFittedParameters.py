@@ -12,8 +12,11 @@ gROOT.SetBatch(True)
 path = sys.argv[1]
 cols = [46,30]
 colors = ["#4292c6","#41ab5d","#ef3b2c","#ffd300","#D02090","#fdae61","#abd9e9","#2c7bb6"]
-mstyle = [8,24,22,26,32]
-linestyle=[1,2,1,2,3]
+#mstyle = [8,24,22,26,32]
+#linestyle=[1,2,1,2,3]
+markerstyle = [1,4,8,10,20,25]
+linestyle = [1,2,3,4,5,6,7,8,9]
+mstyle = [8,4]
 
 def beautify(h1,color,linestyle=1,markerstyle=8):
     h1.SetLineColor(color)
@@ -60,7 +63,7 @@ def getCanvas(w=800,h=600):
  # references for T, B, L, R
  T = 0.08*H_ref
  B = 0.12*H_ref 
- L = 0.13*W_ref
+ L = 0.15*W_ref
  R = 0.04*W_ref
  cname = "c"
  canvas = TCanvas(cname,cname,50,50,W,H)
@@ -78,78 +81,74 @@ def getCanvas(w=800,h=600):
  return canvas
     
 
-def doSignalEff(signals,titles,categories):
+def doSignalEff(directory,signals,titles,categories,ymaxrange=[0.3,0.5,0.05,0.05,0.05,0.05,0.5,0.5,0.05,0.05,0.05,0.05]):
+  ky=-1
+  for category in categories:
+    ky+=1
     gStyle.SetOptFit(0)
-    sigN = len(signals)
-    catN = len(categories) 
-    fits = []
-    fitstmp = []
+    fitsHP=[]
+    fitstmpHP=[]
+    datasHP=[]
+   
     
-    canvas = getCanvas()
+    c = getCanvas()
+    l = getLegend()#0.7788945,0.723362,0.9974874,0.879833)
+    l2 = getLegend(0.17,0.5783217,0.4974874,0.7482517)
     gStyle.SetOptStat(0)
     gStyle.SetOptTitle(0)
     
-    files = []
-    g = []
-    ftmp = []
-    func = []
-    for s in xrange(sigN):
-        l = getLegend()#0.7788945,0.723362,0.9974874,0.879833)
-        l2 = getLegend(0.15,0.5783217,0.4974874,0.7482517)
-
-        files.append([])
-        g.append([])
-        ftmp.append([])
-        func.append([])
-        fits.append([])
- 
-        for c in xrange(catN):
-            files[s].append(TFile(path+"JJ_"+signals[s]+"_"+categories[c]+"_yield.root","READ"))
-            print files[s][c]
-            g[s].append(files[s][c].Get("yield"))
-            print g[s][c].GetN()
-            #### rescale graphs to remove cross section from yield ####                                                                                                                                                                                                       
-            for k in range(0,g[s][c].GetN()): 
-                g[s][c].GetY()[k] *= 1000.                                                                                                                                                                                                       
-                print g[s][c].GetY()[k]
-
-            ftmp[s].append(g[s][c].GetFunction("func"))
-            print ftmp[s][c].GetExpFormula()
-            func[s].append(TF1("func_"+signals[s]+"_"+categories[c],str(ftmp[s][c].GetExpFormula()).replace("func","")+"*1000.",ftmp[s][c].GetXmin(),ftmp[s][c].GetXmax()))  
-            print func[s][c]
-            for o in range(0,ftmp[s][c].GetNpar()):                                                                                                                                                                                                          
-                func[s][c].SetParameter(o,ftmp[s][c].GetParameter(o))                                                                                                                                                                                           
-            print ftmp[s][c].Eval(1200.)
-            print func[s][c].Eval(1200.)
-            g[s][c].GetFunction("func").SetBit(rt.TF1.kNotDraw)
-            beautify(func[s][c] ,rt.TColor.GetColor(colors[s]),linestyle[c],mstyle[c])
-            beautify(g[s][c] ,rt.TColor.GetColor(colors[s]),linestyle[c],mstyle[c])
-            fits[s].append(func[s][c])
-            l2.AddEntry(fits[s][c],categories[c],"LP")    
-            if c == 0: 
-                l.AddEntry(func[s][c],titles[s],"L")
-                fits[s][c].GetXaxis().SetTitle("m_{X} [GeV]")
-                fits[s][c].GetYaxis().SetTitle("Signal efficiency")
-                fits[s][c].GetYaxis().SetNdivisions(4,5,0)
-                fits[s][c].GetXaxis().SetNdivisions(5,5,0)
-                fits[s][c].GetYaxis().SetTitleOffset(1.05)
-                fits[s][c].GetXaxis().SetTitleOffset(0.9)
-                fits[s][c].GetXaxis().SetRangeUser(1126, 5550.)
-                fits[s][c].GetYaxis().SetRangeUser(0.0, 0.25)
-                fits[s][c].Draw("C")
-            l2.Draw("same")
-            g[s][c].Draw("Psame")
-            fits[s][c].Draw("Csame")
-            canvas.Update()
-            l.Draw("same")
-
-        print fits
-        print fitstmp
-        if prelim.find("prelim")!=-1:
-            cmslabel_sim_prelim(canvas,'sim',11)
-        else:
-            cmslabel_sim(canvas,'sim',11)
+    filesHP=[]
+  
+    for i,s in enumerate(signals):
+        filesHP.append(TFile(directory+"JJ_"+s+"_"+category+"_yield.root","READ"))
+        print 'open file '+directory+"JJ_"+s+"_"+category+"_yield.root"
     
+    for i,fHP in enumerate(filesHP):
+        gHPHP = fHP.Get("yield")
+        print gHPHP
+        #### rescale graphs to remove cross section from yield ####
+        for k in range(0,gHPHP.GetN()): gHPHP.GetY()[k] *= 1000.
+        
+        ftmpHPHP = gHPHP.GetFunction("func")
+        fHPHP = TF1("funcHP"+str(i),str(ftmpHPHP.GetExpFormula()).replace("func","")+"*1000.",ftmpHPHP.GetXmin(),ftmpHPHP.GetXmax())
+        for o in range(0,ftmpHPHP.GetNpar()): 
+            fHPHP.SetParameter(o,ftmpHPHP.GetParameter(o))
+    
+        gHPHP.GetFunction("func").SetBit(rt.TF1.kNotDraw)
+        beautify(fHPHP ,rt.TColor.GetColor(colors[i]),linestyle[i],markerstyle[i])
+        beautify(gHPHP ,rt.TColor.GetColor(colors[i]),linestyle[i],markerstyle[i])
+        datasHP.append(gHPHP)
+        fitsHP.append(fHPHP)
+        l.AddEntry(fHPHP,titles[i],"L")
+    l2.AddEntry(fitsHP[0],category,"LP")    
+    fitsHP[0].GetXaxis().SetTitle("m_{X} [GeV]")
+    fitsHP[0].GetYaxis().SetTitle("Signal efficiency")
+    fitsHP[0].GetYaxis().SetNdivisions(4,5,0)
+    fitsHP[0].GetXaxis().SetNdivisions(5,5,0)
+    fitsHP[0].GetYaxis().SetTitleOffset(1.15)
+    fitsHP[0].GetXaxis().SetTitleOffset(0.9)
+    fitsHP[0].GetXaxis().SetRangeUser(1126, 5550.)
+    fitsHP[0].GetYaxis().SetRangeUser(0.0, ymaxrange[ky])
+    fitsHP[0].Draw("C")
+    for i,(gHP) in enumerate(datasHP): 
+        gHP.Draw("Psame")
+        fitsHP[i].Draw("Csame")
+    c.Update()
+    l.Draw("same")
+    l2.Draw("same")
+    if prelim.find("prelim")!=-1:
+         cmslabel_sim_prelim(c,'sim',11)
+    else:
+         cmslabel_sim(c,'sim',11)
+    
+    
+    c.Update()
+    c.SaveAs(path+"signalEff"+prelim+"_"+category+".png")
+    c.SaveAs(path+"signalEff"+prelim+"_"+category+".pdf")
+    c.SaveAs(path+"signalEff"+prelim+"_"+category+".C")
+    print ky
+    print ymaxrange[ky]
+
     
         canvas.Update()
         name = path+"signalEff"+prelim+"_"+signals[s]
@@ -160,208 +159,127 @@ def doSignalEff(signals,titles,categories):
 def doJetMass(leg,signals,titles,categories):
     print signals
     gStyle.SetOptFit(0)
-    canvas = getCanvas()
+    #signals = ["ZprimeWW","BulkGWW","WprimeWZ","BulkGZZ"]
+    #titles =  ["Z' #rightarrow WW","G_{B}#rightarrow WW","W' #rightarrow WZ","G_{B}#rightarrow ZZ"]
+    # signals = ["BulkGWW","WprimeWZ","BulkGZZ"]
+    # titles =  ["G_{B}#rightarrow WW","W' #rightarrow WZ","G_{B}#rightarrow ZZ"]
+    filesHP=[]
+    filesLP=[]
+    fHLP=0
+    fHHP=0
+    for i,s in enumerate(signals):
+        if categories[0].find("NP")!=-1:
+             filesHP.append(TFile("debug_JJ_"+s+"_"+categories[0].split("_")[0]+"_MJ"+leg+"_"+categories[0].split("_")[1]+".json.root","READ"))
+        else:
+            filesHP.append(TFile("debug_JJ_"+s+"_"+categories[0].split("_")[0]+"_MJ"+leg+"_"+categories[0].split("_")[1]+"_"+categories[0].split("_")[2]+".json.root","READ"))
+        if filesHP[-1].IsZombie()==1:
+            if categories[0].find("NP")!=-1:
+                filesHP[-1] =(TFile("debug_JJ_Vjet_"+s+"_"+categories[0].split("_")[0]+"_MJ"+leg+"_"+categories[0].split("_")[1]+".json.root","READ"))
+                fHHP = (TFile("debug_JJ_Hjet_"+s+"_"+categories[0].split("_")[0]+"_MJ"+leg+"_"+categories[0].split("_")[1]+".json.root","READ"))
+            else:
+                filesHP[-1] =(TFile("debug_JJ_Vjet_"+s+"_"+categories[0].split("_")[0]+"_MJ"+leg+"_"+categories[0].split("_")[1]+"_"+categories[0].split("_")[2]+".json.root","READ"))
+                fHHP = (TFile("debug_JJ_Hjet_"+s+"_"+categories[0].split("_")[0]+"_MJ"+leg+"_"+categories[0].split("_")[1]+"_"+categories[0].split("_")[2]+".json.root","READ"))
+        if len(categories)>1:    
+            filesLP.append(TFile("debug_JJ_"+s+"_"+categories[1].split("_")[0]+"_MJ"+leg+"_"+categories[1].split("_")[1]+"_"+categories[1].split("_")[2]+".json.root","READ"))
+            filesLP[-1] =(TFile("debug_JJ_Vjet_"+s+"_"+categories[1].split("_")[0]+"_MJ"+leg+"_"+categories[1].split("_")[1]+"_"+categories[1].split("_")[2]+".json.root","READ"))      
+            fHLP = (TFile("debug_JJ_Hjet_"+s+"_"+categories[1].split("_")[0]+"_MJ"+leg+"_"+categories[1].split("_")[1]+"_"+categories[1].split("_")[2]+".json.root","READ"))        
+        else: fHLP = fHHP
+       
+    vars = ["mean","sigma"]
     vars = ["mean","sigma","alpha","n","alpha2","n2"]
     for var in vars:
-        title = "Jet "+var
-        if var == "mean": title="Jet mass mean"
+           
+       fitsHP=[]
+       fitsLP=[]
+       datasHP=[]
+       datasLP=[]
+        
+       c = getCanvas()
+       l = getLegend()#0.7788945,0.723362,0.9974874,0.879833)
+       l2 = getLegend(0.17,0.5783217,0.4974874,0.7482517)
+       l3 = getLegend(0.18,0.5783217,0.6974874,0.2482517)
+       gStyle.SetOptStat(0)
+       gStyle.SetOptTitle(0)
+       title = "Jet mass width "
+       if var == "mean": title="Jet mass mean"
+       if fHLP!=0 and fHHP!=0:
+           gHPLP = fHLP.Get(var+"H")
+           gHPHP = fHHP.Get(var+"H")
+           fHPLP = fHLP.Get(var+"H_func")
+           fHPHP = fHHP.Get(var+"H_func")
+           gHPLP.GetFunction(var+"H_func").SetBit(rt.TF1.kNotDraw)
+           gHPHP.GetFunction(var+"H_func").SetBit(rt.TF1.kNotDraw)
+       
+           beautify(fHPLP ,rt.TColor.GetColor(colors[4]),2,24)
+           beautify(fHPHP ,rt.TColor.GetColor(colors[4]),1,8)
+           beautify(gHPLP ,rt.TColor.GetColor(colors[4]),2,24)
+           beautify(gHPHP ,rt.TColor.GetColor(colors[4]),1,8)
+           datasHP.append(gHPHP)
+           datasLP.append(gHPLP)
+           fitsHP.append(fHPHP)
+           fitsLP.append(fHPLP)
+           #l.AddEntry(fHPHP,titles[i],"L")                    
+        
+       
+       if len(categories) == 1: filesLP = filesHP
+       for i,(fHP,fLP) in enumerate(zip(filesHP,filesLP)):
+           gHPLP = fLP.Get(var)
+           gHPHP = fHP.Get(var)
+           fHPLP = fLP.Get(var+"_func")
+           fHPHP = fHP.Get(var+"_func")
+           gHPLP.GetFunction(var+"_func").SetBit(rt.TF1.kNotDraw)
+           gHPHP.GetFunction(var+"_func").SetBit(rt.TF1.kNotDraw)
+       
+           beautify(fHPLP ,rt.TColor.GetColor(colors[i]),2,24)
+           beautify(fHPHP ,rt.TColor.GetColor(colors[i]),1,8)
+           beautify(gHPLP ,rt.TColor.GetColor(colors[i]),2,24)
+           beautify(gHPHP ,rt.TColor.GetColor(colors[i]),1,8)
+           datasHP.append(gHPHP)
+           datasLP.append(gHPLP)
+           fitsHP.append(fHPHP)
+           fitsLP.append(fHPLP)
+           l.AddEntry(fHPHP,titles[i],"L")
+       if len(categories) > 1: l2.AddEntry(datasHP[0],categories[0],"LP") 
+       if len(categories)>1: l2.AddEntry(datasLP[0],categories[1],"LP")    
+       datasHP[0].GetXaxis().SetTitle("m_{X} [GeV]")
+       datasHP[0].GetYaxis().SetTitle(title+" [GeV]")
+       datasHP[0].GetYaxis().SetNdivisions(4,5,0)
+       datasHP[0].GetXaxis().SetNdivisions(5,5,0)
+       datasHP[0].GetYaxis().SetTitleOffset(1.05)
+       datasHP[0].GetXaxis().SetTitleOffset(0.9)
+       datasHP[0].GetXaxis().SetRangeUser(1126, 5500.)
+       datasHP[0].GetXaxis().SetLabelSize(0.05)
+       datasHP[0].GetXaxis().SetTitleSize(0.06)
+       datasHP[0].GetYaxis().SetLabelSize(0.05)
+       datasHP[0].GetYaxis().SetTitleSize(0.06)
+       if var == "mean": datasHP[0].GetYaxis().SetRangeUser(75,150);  
+       if var == "sigma": datasHP[0].GetYaxis().SetRangeUser(5,20.);
+       if var == "alpha": datasHP[0].GetYaxis().SetRangeUser(0,5); datasHP[0].GetYaxis().SetTitle("alpha")
+       if var == "n": datasHP[0].GetYaxis().SetRangeUser(0,24); datasHP[0].GetYaxis().SetTitle("n")
+       if var == "alpha2": datasHP[0].GetYaxis().SetRangeUser(0,5); datasHP[0].GetYaxis().SetTitle("alpha2")
+       if var == "n2": datasHP[0].GetYaxis().SetRangeUser(0,20); datasHP[0].GetYaxis().SetTitle("n2")
+       datasHP[0].Draw("AP")
+       for i,(gHP,gLP) in enumerate(zip(datasHP,datasLP)): 
+           gLP.Draw("Psame")
+           gHP.Draw("Psame")
+           fitsHP[i].Draw("Csame")
+           fitsLP[i].Draw("Csame")
+       datasHP[0].GetXaxis().SetRangeUser(1126, 5500.)
+       l.Draw("same")
+       l2.Draw("same")
+       if prelim.find("prelim")!=-1:
+           cmslabel_sim_prelim(c,'sim',11)
+       else:
+           cmslabel_sim(c,'sim',11)
+       pt = getPavetext()
+       c.Update()
+       c.SaveAs(path+"Signal_mjet%s_"%categories[0].replace("HPHP","")+var+prelim+".png")
+       c.SaveAs(path+"Signal_mjet%s_"%categories[0].replace("HPHP","")+var+prelim+".pdf")
+       c.SaveAs(path+"Signal_mjet%s_"%categories[0].replace("HPHP","")+var+prelim+".C")
+    
+    
+    
 
-        filesVjet=[]
-
-        sigN = len(signals)
-        catN = len(categories)
-        g = []
-        func = []
-        fits=[]
-
-        for s in xrange(sigN):
-            print "signal ", signals[s]
-            l = getLegend()#0.7788945,0.723362,0.9974874,0.879833)
-            l2 = getLegend(0.15,0.5783217,0.4974874,0.7482517)
-            filesVjet.append([])
-            g.append([])
-            func.append([])
-            fits.append([])
-
-            for c in xrange(catN):
-                print "category ",categories[c] 
-                if signals[s].find("WH") !=-1 or signals[s].find("ZH") !=-1 :
-                    print "Vjet file ",signals[s]
-                    filesVjet[s].append(TFile(path+"debug_JJ_Vjet_"+signals[s]+"_"+categories[c].split("_")[0]+"_MJ"+leg+"_"+categories[c].split("_")[1]+"_"+categories[c].split("_")[2]+".json.root","READ")) 
-                else: 
-                    print "Vjet file ",signals[s]
-                    filesVjet[s].append(TFile(path+"debug_JJ_"+signals[s]+"_"+categories[c].split("_")[0]+"_MJ"+leg+"_"+categories[c].split("_")[1]+"_"+categories[c].split("_")[2]+".json.root","READ"))
-                                
-                canvas.cd()
-                g[s].append(filesVjet[s][c].Get(var))
-                func[s].append(filesVjet[s][c].Get(var+"_func"))
-                g[s][c].GetFunction(var+"_func").SetBit(rt.TF1.kNotDraw)
-                if sigN == 1:
-                    beautify(func[s][c],rt.TColor.GetColor(colors[c]),linestyle[c],mstyle[c])
-                    beautify(g[s][c] ,rt.TColor.GetColor(colors[c]),linestyle[c],mstyle[c])
-                else:
-                    beautify(func[s][c],rt.TColor.GetColor(colors[s]),linestyle[c],mstyle[c])
-                    beautify(g[s][c] ,rt.TColor.GetColor(colors[s]),linestyle[c],mstyle[c])
-                fits[s].append(func[s][c])
-                l2.AddEntry(fits[s][c],categories[c],"LP")                                                                                                                                                                                                              
-                if c==0:
-                    l.AddEntry(func[s][c],titles[s],"L")                                                                                                                                                                                                                  
-                    fits[s][c].GetXaxis().SetTitle("m_{X} [GeV]")                                                                                                                                                                                                        
-                    fits[s][c].GetYaxis().SetTitle(title+" [GeV]")                                                                                                                                                                                                      
-                    fits[s][c].GetYaxis().SetNdivisions(4,5,0)                                                                                                                                                                                                           
-                    fits[s][c].GetXaxis().SetNdivisions(5,5,0)                                                                                                                                                                                                           
-                    fits[s][c].GetYaxis().SetTitleOffset(1.05)                                                                                                                                                                                                           
-                    fits[s][c].GetXaxis().SetTitleOffset(0.9)                                                                                                                                                                                                           
-                    fits[s][c].GetXaxis().SetRangeUser(1126, 5500.)                                                                                                                                                                                                  
-                    fits[s][c].GetXaxis().SetLabelSize(0.05)                                                                                                                                                                                                             
-                    fits[s][c].GetXaxis().SetTitleSize(0.06)                                                                                                                                                                                                         
-                    fits[s][c].GetYaxis().SetLabelSize(0.05)                                                                                                                                                                                                        
-                    fits[s][c].GetYaxis().SetTitleSize(0.06)                                                                                                                                                                                                         
-                    if var == "mean": fits[s][c].GetYaxis().SetRangeUser(75,150);  
-                    if var == "sigma": fits[s][c].GetYaxis().SetRangeUser(5,20.)
-                    if var == "alpha": fits[s][c].GetYaxis().SetRangeUser(0,5)
-                    if var == "n": fits[s][c].GetYaxis().SetRangeUser(0,70)
-#                    if var == "n": fits[s][c].GetYaxis().SetRangeUser(0,10)
-                    if var == "alpha2": fits[s][c].GetYaxis().SetRangeUser(0,5)                                                                                                                                                                                          
-                    if var == "n2": fits[s][c].GetYaxis().SetRangeUser(0,10)
-                    fits[s][c].Draw("C")                                                                                                                                                                                                                                
-                g[s][c].Draw("Psame")                                                                                                                                                                                                                                   
-                fits[s][c].Draw("Csame")                                                                                                                                                                                                                            
-                fits[s][c].GetXaxis().SetRangeUser(1126, 5500.)
-                l.Draw("same")
-                l2.Draw("same")
-                if prelim.find("prelim")!=-1:
-                    cmslabel_sim_prelim(canvas,'sim',11)
-                else:
-                    cmslabel_sim(canvas,'sim',11)
-            pt = getPavetext()
-            name = path+"SignalV_mjet"+signals[s]+"_"+var+prelim
-            canvas.Update()
-            canvas.SaveAs(name+".png")
-            canvas.SaveAs(name+".pdf")
-            canvas.SaveAs(name+".C")
-                            
-    canvasH = getCanvas()
-    for var in vars:
-        title = "Jet "+var
-        if var == "mean": title="Jet mass mean"
-        filesHjet=[]
-        sigN = len(signals)
-        catN = len(categories)
-        gH = []
-        funcH = []
-        fitsH=[]
-
-        for s in xrange(sigN):
-            if signals[s].find("WH") !=-1 or signals[s].find("ZH") !=-1 :
-                print "signal ", signals[s]
-                lH = getLegend()#0.7788945,0.723362,0.9974874,0.879833)
-                l2H = getLegend(0.15,0.5783217,0.4974874,0.7482517)
-                filesHjet.append([])
-                gH.append([])
-                funcH.append([])
-                fitsH.append([])
-
-                for c in xrange(catN):
-                    print "category ",categories[c] 
-
-                    print "Hjet files ",signals[s]
-                    #print filesHjet[s]
-                    filesHjet[s].append(TFile(path+"debug_JJ_Hjet_"+signals[s]+"_"+categories[c].split("_")[0]+"_MJ"+leg+"_"+categories[c].split("_")[1]+"_"+categories[c].split("_")[2]+".json.root","READ"))
-#                    filesHjet.append(TFile(path+"debug_JJ_Hjet_"+signals[s]+"_"+categories[c].split("_")[0]+"_MJ"+leg+"_"+categories[c].split("_")[1]+"_"+categories[c].split("_")[2]+".json.root","READ"))
-                    #print filesHjet[s]
-                    
-#                    gH.append(filesHjet[c].Get(var+"H"))
-#                    funcH.append(filesHjet[c].Get(var+"H_func"))
-#                    gH[c].GetFunction(var+"H_func").SetBit(rt.TF1.kNotDraw)
-                    gH[s].append(filesHjet[s][c].Get(var+"H"))
-                    funcH[s].append(filesHjet[s][c].Get(var+"H_func"))
-                    gH[s][c].GetFunction(var+"H_func").SetBit(rt.TF1.kNotDraw)
-                    if sigN ==1:
-                        beautify(funcH[s][c],rt.TColor.GetColor(colors[c]),linestyle[c],mstyle[c])
-                        beautify(gH[s][c] ,rt.TColor.GetColor(colors[c]),linestyle[c],mstyle[c])
-#                        beautify(funcH[c],rt.TColor.GetColor(colors[c]),linestyle[c],mstyle[c])
-#                        beautify(gH[c] ,rt.TColor.GetColor(colors[c]),linestyle[c],mstyle[c])
-                    else:
-                        beautify(funcH[s][c],rt.TColor.GetColor(colors[s]),linestyle[c],mstyle[c])
-                        beautify(gH[s][c] ,rt.TColor.GetColor(colors[s]),linestyle[c],mstyle[c])
-#                        beautify(funcH[c],rt.TColor.GetColor(colors[s]),linestyle[c],mstyle[c])
-#                        beautify(gH[c] ,rt.TColor.GetColor(colors[s]),linestyle[c],mstyle[c])
-
-                    fitsH[s].append(funcH[s][c])
-                    l2H.AddEntry(fitsH[s][c],categories[c],"LP")                                                                                                                                                                                                              
-                    if c==0:
-                        lH.AddEntry(funcH[s][c],titles[s],"L")                                                                                                                                                                                                                 
-                        fitsH[s][c].GetXaxis().SetTitle("m_{X} [GeV]")                                                                                                                                                                                                        
-                        fitsH[s][c].GetYaxis().SetTitle(title+" [GeV]")                                                                                                                                                                                                      
-                        fitsH[s][c].GetYaxis().SetNdivisions(4,5,0)                                                                                                                                                                                                           
-                        fitsH[s][c].GetXaxis().SetNdivisions(5,5,0)                                                                                                                                                                                                           
-                        fitsH[s][c].GetYaxis().SetTitleOffset(1.05)                                                                                                                                                                                                           
-                        fitsH[s][c].GetXaxis().SetTitleOffset(0.9)                                                                                                                                                                                                           
-                        fitsH[s][c].GetXaxis().SetRangeUser(1126, 5500.)                                                                                                                                                                                                  
-                        fitsH[s][c].GetXaxis().SetLabelSize(0.05)                                                                                                                                                                                                             
-                        fitsH[s][c].GetXaxis().SetTitleSize(0.06)                                                                                                                                                                                                         
-                        fitsH[s][c].GetYaxis().SetLabelSize(0.05)                                                                                                                                                                                                        
-                        fitsH[s][c].GetYaxis().SetTitleSize(0.06)                                                                                                                                                                                                         
-                        if var == "mean": fitsH[s][c].GetYaxis().SetRangeUser(75,200);  
-                        if var == "sigma": fitsH[s][c].GetYaxis().SetRangeUser(5,20.)
-                        if var == "alpha": fitsH[s][c].GetYaxis().SetRangeUser(0,5)
-                        if var == "n": fitsH[s][c].GetYaxis().SetRangeUser(0,300)
-                        if var == "alpha2": fitsH[s][c].GetYaxis().SetRangeUser(0,20)
-                        if var == "n2": fitsH[s][c].GetYaxis().SetRangeUser(0,30)
-                        fitsH[s][c].Draw("C")                                                                                                                                                                                                                                
-                    
-                    lH.Draw("same")
-                    l2H.Draw("same")
-                    gH[s][c].Draw("Psame")                                                                                                                                                                                                                                   
-                    fitsH[s][c].Draw("Csame")                                                                                                                                                                                                                            
-                    fitsH[s][c].GetXaxis().SetRangeUser(1126, 5500.)
-                    if prelim.find("prelim")!=-1:
-                        cmslabel_sim_prelim(canvasH,'sim',11)
-                    else:
-                        cmslabel_sim(canvasH,'sim',11)
-                    '''
-                    fitsH.append(funcH[c])
-                    l2H.AddEntry(fitsH[c],categories[c],"LP")                                                                                                                                                                                                              
-                    if c==0:
-                        lH.AddEntry(funcH[c],titles[s],"L")                                                                                                                                                                                                                 
-                        fitsH[c].GetXaxis().SetTitle("m_{X} [GeV]")                                                                                                                                                                                                        
-                        fitsH[c].GetYaxis().SetTitle(title+" [GeV]")                                                                                                                                                                                                      
-                        fitsH[c].GetYaxis().SetNdivisions(4,5,0)                                                                                                                                                                                                           
-                        fitsH[c].GetXaxis().SetNdivisions(5,5,0)                                                                                                                                                                                                           
-                        fitsH[c].GetYaxis().SetTitleOffset(1.05)                                                                                                                                                                                                           
-                        fitsH[c].GetXaxis().SetTitleOffset(0.9)                                                                                                                                                                                                           
-                        fitsH[c].GetXaxis().SetRangeUser(1126, 5500.)                                                                                                                                                                                                  
-                        fitsH[c].GetXaxis().SetLabelSize(0.05)                                                                                                                                                                                                             
-                        fitsH[c].GetXaxis().SetTitleSize(0.06)                                                                                                                                                                                                         
-                        fitsH[c].GetYaxis().SetLabelSize(0.05)                                                                                                                                                                                                        
-                        fitsH[c].GetYaxis().SetTitleSize(0.06)                                                                                                                                                                                                         
-                        if var == "mean": fitsH[c].GetYaxis().SetRangeUser(75,200);  
-                        if var == "sigma": fitsH[c].GetYaxis().SetRangeUser(5,20.)
-                        if var == "alpha": fitsH[c].GetYaxis().SetRangeUser(0,5)
-                        if var == "n": fitsH[c].GetYaxis().SetRangeUser(0,300)
-                        if var == "alpha2": fitsH[c].GetYaxis().SetRangeUser(0,20)
-                        if var == "n2": fitsH[c].GetYaxis().SetRangeUser(0,30)
-                        fitsH[c].Draw("C")                                                                                                                                                                                                                                
-
-                    lH.Draw("same")
-                    l2H.Draw("same")
-                    gH[c].Draw("Psame")                                                                                                                                                                                                                                   
-                    fitsH[c].Draw("Csame")                                                                                                                                                                                                                            
-                    fitsH[c].GetXaxis().SetRangeUser(1126, 5500.)
-                    if prelim.find("prelim")!=-1:
-                        cmslabel_sim_prelim(canvasH,'sim',11)
-                    else:
-                        cmslabel_sim(canvasH,'sim',11)
-                    '''
-
-
-                pt = getPavetext()
-                name = path+"SignalH_mjet"+signals[s]+"_"+var+prelim
-                canvasH.Update()
-                canvasH.SaveAs(name+".png")
-                canvasH.SaveAs(name+".pdf")
-                canvasH.SaveAs(name+".C")
     
     
     
@@ -423,72 +341,71 @@ def doMVV(signals,titles,year):
     for var in variab:
         print "var ",var
         fitsHP=[]
-        gStyle.SetOptFit(0)
-        filesHP=[]
-        filesVjet=[]
-        sigN = len(signals)
-        gHPHP = []
-        fHPHP = []
-        for s in xrange(sigN):
-            print "signal ", signals[s]
-            #if TFile(path+"debug_JJ_"+signals[s]+"_"+year+"_MVV.json.root","READ").IsZombie() ==1:
-            #    filesHP.append(TFile(path+"debug_JJ_j1"+signals[s]+"_"+year+"_MVV.json.root","READ"))
-            #else:
-            filesHP.append(TFile(path+"debug_JJ_"+signals[s]+"_"+year+"_MVV.json.root","READ"))
-            print filesHP[s]    
-
-            c = getCanvas()
-            l = getLegend()
-            l2 = getLegend(0.7788945,0.1783217,0.9974874,0.2482517)
-            gStyle.SetOptStat(0)
-            gStyle.SetOptTitle(0)
-            print filesHP[s].Get(var)
-            gHPHP.append(filesHP[s].Get(var))
-            print "gHPHP ",gHPHP[s]
-            fHPHP.append(filesHP[s].Get(var+"_func"))
-            gHPHP[s].GetFunction(var+"_func").SetBit(rt.TF1.kNotDraw)
-            beautify(fHPHP[s],rt.TColor.GetColor(colors[s]),linestyle[s],mstyle[s])
-            beautify(gHPHP[s] ,rt.TColor.GetColor(colors[s]),1,8)
-            fitsHP.append(fHPHP[s])
-            l.AddEntry(fHPHP[s],titles[s],"L")
-            fitsHP[s].GetXaxis().SetTitle("M_{X} [GeV]")
-            fitsHP[s].GetYaxis().SetTitle(var+" [GeV]")
-            fitsHP[s].GetYaxis().SetNdivisions(4,5,0)
-            fitsHP[s].GetXaxis().SetNdivisions(9,2,0)
-            fitsHP[s].GetYaxis().SetTitleOffset(0.97)
-            fitsHP[s].GetYaxis().SetMaxDigits(3)
-            fitsHP[s].GetXaxis().SetTitleOffset(0.94)
-            fitsHP[s].GetXaxis().SetRangeUser(1126, 5500.)
-            fitsHP[s].GetYaxis().SetRangeUser(-2., 3.)
-            if var.find("ALPHA1")!=-1: fitsHP[s].GetYaxis().SetRangeUser(0., 4.)
-            if var.find("ALPHA2")!=-1: fitsHP[s].GetYaxis().SetRangeUser(0., 20.)
-#            if var.find("ALPHA2")!=-1: fitsHP[s].GetYaxis().SetRangeUser(0., 6.)
-            if var.find("SIGMA")!=-1:  fitsHP[s].GetYaxis().SetRangeUser(0., 400.)
-            if var.find("MEAN")!=-1:   fitsHP[s].GetYaxis().SetRangeUser(700., 7000)
-#            if var.find("N1")!=-1:     fitsHP[s].GetYaxis().SetRangeUser(0., 200.)
-            if var.find("N1")!=-1:     fitsHP[s].GetYaxis().SetRangeUser(0., 10.)
-            if var.find("N2")!=-1:     fitsHP[s].GetYaxis().SetRangeUser(0., 10.)
-#            if var.find("N2")!=-1:     fitsHP[s].GetYaxis().SetRangeUser(0., 200.)
-            fitsHP[s].Draw("C")
-            c.Update()
-#            for i,gHP in enumerate(datasHP): 
-#                if var.find("ALPHA1")!=-1: fitsHP[i].GetYaxis().SetRangeUser(0., 4.)
-#                if var.find("ALPHA2")!=-1: fitsHP[i].GetYaxis().SetRangeUser(0., 6.)
-#                # gLP.Draw("Psame")
-            gHPHP[s].Draw("Psame")
-            fitsHP[s].Draw("Csame")
-                # fitsLP[i].Draw("Csame")
-            l.Draw("same")
-            # l2.Draw("same")
-            cmslabel_sim_prelim(c,'sim',11)
-            pt = getPavetext()
-            c.Update()
-            #FIXMEEEE I WANT THE SIGNAL NAME TOO
-            name = path+"Signal_mVV_"+signals[s]+"_"+var+"_"+year
-            c.SaveAs(name+".png")
-            c.SaveAs(name+".pdf")
-            c.SaveAs(name+".C")
-            c.Delete()
+        fitsLP=[]
+        datasHP=[]
+        datasLP=[]
+        
+        c = getCanvas()
+        l = getLegend()
+        l2 = getLegend(0.7788945,0.1783217,0.9974874,0.2482517)
+        gStyle.SetOptStat(0)
+        gStyle.SetOptTitle(0)
+        
+        for i,fHP in enumerate(filesHP):
+                
+                # gHPLP = fLP.Get(var)
+                gHPHP = fHP.Get(var)
+                # fHPLP = fLP.Get(var+"_func")
+                fHPHP = fHP.Get(var+"_func")
+                # gHPLP.GetFunction(var+"_func").SetBit(rt.TF1.kNotDraw)
+                gHPHP.GetFunction(var+"_func").SetBit(rt.TF1.kNotDraw)
+                
+                # beautify(fHPLP ,rt.TColor.GetColor(colors[i]),9,1)
+                beautify(fHPHP ,rt.TColor.GetColor(colors[i]),1,8)
+                # beautify(gHPLP ,rt.TColor.GetColor(colors[i]),9,1)
+                beautify(gHPHP ,rt.TColor.GetColor(colors[i]),1,8)
+                datasHP.append(gHPHP)
+                # datasLP.append(gHPLP)
+                fitsHP.append(fHPHP)
+                # fitsLP.append(fHPLP)
+                l.AddEntry(fHPHP,titles[i],"L")
+        # l2.AddEntry(datasHP[0],"No JER","L")
+ #        l2.AddEntry(datasLP[0],"JER","L")
+        fitsHP[0].GetXaxis().SetTitle("M_{X} [GeV]")
+        fitsHP[0].GetYaxis().SetTitle(var+" [GeV]")
+        fitsHP[0].GetYaxis().SetNdivisions(4,5,0)
+        fitsHP[0].GetXaxis().SetNdivisions(9,2,0)
+        fitsHP[0].GetYaxis().SetTitleOffset(0.97)
+        fitsHP[0].GetYaxis().SetMaxDigits(2)
+        fitsHP[0].GetXaxis().SetTitleOffset(0.94)
+        fitsHP[0].GetXaxis().SetRangeUser(1126, 5500.)
+        fitsHP[0].GetYaxis().SetRangeUser(-2., 3.)
+        if var.find("ALPHA1")!=-1: fitsHP[0].GetYaxis().SetRangeUser(0., 4.)
+        if var.find("ALPHA2")!=-1: fitsHP[0].GetYaxis().SetRangeUser(0., 16.)
+        if var.find("SIGMA")!=-1:  fitsHP[0].GetYaxis().SetRangeUser(0., 400.)
+        if var.find("MEAN")!=-1:   fitsHP[0].GetYaxis().SetRangeUser(700., 8000)
+        if var.find("N1")!=-1:     fitsHP[0].GetYaxis().SetRangeUser(0., 15.)
+        if var.find("N2")!=-1:     fitsHP[0].GetYaxis().SetRangeUser(0., 10.)
+        fitsHP[0].Draw("C")
+        if var.find("ALPHA1")!=-1: fitsHP[0].GetYaxis().SetRangeUser(0., 4.)
+        if var.find("ALPHA2")!=-1: fitsHP[0].GetYaxis().SetRangeUser(0., 16.)
+        c.Update()
+        for i,gHP in enumerate(datasHP): 
+            if var.find("ALPHA1")!=-1: fitsHP[i].GetYaxis().SetRangeUser(0., 4.)
+            if var.find("ALPHA2")!=-1: fitsHP[i].GetYaxis().SetRangeUser(0., 20.)
+            # gLP.Draw("Psame")
+            gHP.Draw("Psame")
+            fitsHP[i].Draw("Csame")
+            # fitsLP[i].Draw("Csame")
+        l.Draw("same")
+        # l2.Draw("same")
+        cmslabel_sim_prelim(c,'sim',11)
+        pt = getPavetext()
+        c.Update()
+        c.SaveAs(path+"Signal_mVV_"+var+"_"+year+".png")
+        c.SaveAs(path+"Signal_mVV_"+var+"_"+year+".pdf")
+        c.SaveAs(path+"Signal_mVV_"+var+"_"+year+".C")
+        
 
 def doMJFit():
     FHPLP = TFile("debug_JJ_"+sys.argv[2]+"_MJl1_HPHP.json.root","READ")
@@ -938,14 +855,17 @@ def compSignalMVV():
         
 if __name__ == '__main__':
   prelim = ""
+
 #  signals = ["ZprimeWW","BulkGWW","WprimeWZ","BulkGZZ","ZprimeZH"]
 #  titles =  ["Z' #rightarrow WW","G_{B}#rightarrow WW","W' #rightarrow WZ","G_{B}#rightarrow ZZ","Z' #rightarrow ZH"]
 #  signals = ["ZprimeZH","BulkGWW"]
 #  titles =  ["Z' #rightarrow ZH","G_{B}#rightarrow WW"]
   signals = ["BulkGWW"]
   titles =  ["G_{B}#rightarrow WW"]
-  categories = ["2016_VV_HPHP","2016_VV_HPLP"] #,"2016_VH_HPHP","2016_VH_LPHP"]
-#  Categories = ["2016_VV_HPHP","2016_VV_HPLP","2016_VH_HPHP","2016_VH_HPLP","2016_VH_LPHP"]
+  categories = ["2016_NP"]
+  doJetMass("random",signals,titles,categories)
+#  categories = ["2016_VV_HPHP","2016_VV_HPLP"] #,"2016_VH_HPHP","2016_VH_LPHP"]
+  categories = ["2016_VV_HPHP","2016_VV_HPLP","2016_VH_HPHP","2016_VH_HPLP","2016_VH_LPHP"]
 
   doSignalEff(signals,titles,categories)
   doMVV(signals,titles,"2016")
@@ -956,11 +876,11 @@ if __name__ == '__main__':
 
 #  signals = ["BulkGWW"]
 #  titles =  ["G_{B}#rightarrow WW"]
-  doJetMass("random",signals,titles,categories)
+#  doJetMass("random",signals,titles,categories)
 
 #  signals = ["WprimeWZ"]
 #  titles =  ["W' #rightarrow WZ"]
-#  doJetMass("random",signals,titles,categories)
+#  
 
 #  signals = ["BulkGZZ"]
 #  titles =  ["G_{B}#rightarrow ZZ"]
@@ -982,3 +902,18 @@ if __name__ == '__main__':
     #compKernelMVV()
     # doKernel2D()
     # compSignalMVV()
+
+ # signals = ["ZprimeWW","BulkGWW","WprimeWZ","BulkGZZ","ZprimeZH","WprimeWH"]
+ # titles =  ["Z' #rightarrow WW","G_{B}#rightarrow WW","W' #rightarrow WZ","G_{B}#rightarrow ZZ","Z' #rightarrow ZH","W' #rightarrow WH"]
+
+  #doSignalEff(signals,titles,categories)
+  #doJetMass("random",signals,titles,categories)
+  #doMVV(signals,titles,"2016")
+  #categories = ["2016_VH_HPHP","2016_VH_HPLP","2016_VH_LPHP","2016_VV_HPHP","2016_VV_HPLP"]
+  #doSignalEff(sys.argv[1],signals,titles,categories,[0.3,0.03,0.06,0.2,0.05])
+  
+  
+  
+  
+  
+
