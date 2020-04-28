@@ -1,6 +1,8 @@
 from functions import *
 from optparse import OptionParser
-from cuts import cuts, HPSF16, HPSF17, LPSF16, LPSF17, dijetbins, HCALbinsMVVSignal, minMJ,maxMJ,binsMJ, minMVV, maxMVV, binsMVV, minMX, maxMX, catVtag, catHtag
+#from cuts import cuts, HPSF16, HPSF17, LPSF16, LPSF17, dijetbins, HCALbinsMVVSignal, minMJ,maxMJ,binsMJ, minMVV, maxMVV, binsMVV, minMX, maxMX, catVtag, catHtag
+import cuts
+
 ## import cuts of the analysis from separate file
 
 # python makeInputs.py -p 2016 --run "detector" --batch False
@@ -28,6 +30,10 @@ parser.add_option("--signal",dest="signal",default="BGWW",help="which signal do 
 
 print options
 
+
+ctx  = cuts.cuts("init_VV_VH.json",int(options.period),options.sorting+"dijetbins")
+if options.binning==False: ctx  = cuts.cuts("init_VV_VH.json",int(options.period),options.sorting)
+
 period = options.period
 # NB to use the DDT decorrelation method, the ntuples in /eos/cms/store/cmst3/group/exovv/VVtuple/FullRun2VVVHNtuple/deepAK8V2/ should be used
 samples= str(period)+"trainingV2/" #for V+jets we use 2017 samples also for 2016 because the 2016 ones are buggy
@@ -41,75 +47,12 @@ runParallel   = True #Set to true if you want to run all kernels in parallel! Th
 dijetBinning = options.binning
 useTriggerWeights = options.trigg
 
-#scale factors to be updated!
-HPSF = HPSF16
-LPSF = LPSF16
-if period == 2017:
-    HPSF = HPSF17
-    LPSF = LPSF17
+
     
 addOption = ""
 if useTriggerWeights: 
     addOption = "-t"
     
-if dijetBinning:
-    HCALbinsMVV  =" --binsMVV "
-    HCALbinsMVV += ','.join(str(e) for e in dijetbins)
-else:
-    HCALbinsMVV=""
-    HCALbinsMVVSignal=""
-
-if period == 2018:
-    lumi = 59690. #to be checked! https://twiki.cern.ch/twiki/bin/view/CMS/PdmV2018Analysis
-if period == 2017:
-    lumi = 41367.    
-elif period == 2016:
-    lumi = 35900.
-
-
-#signal regions
-if sorting == 'random':
- print "Use random sorting!"
- print "ortoghonal VV + VH"
- catsAll = {}
-
- #at least one H tag HP (+ one V/H tag HP)                                                                                                                                                                                           
- catsAll['VH_HPHP'] = '('+'&&'.join([catVtag['HP1'],catHtag['HP2']])+')'
- catsAll['HV_HPHP'] = '('+'&&'.join([catHtag['HP1'],catVtag['HP2']])+')'
- catsAll['HH_HPHP'] = '('+'&&'.join([catHtag['HP1'],catHtag['HP2']])+')'
- cuts['VH_HPHP'] = '('+'||'.join([catsAll['VH_HPHP'],catsAll['HV_HPHP'],catsAll['HH_HPHP']])+')'
- 
- # two V tag HP                                                                                                                                                                                                                             
- cuts['VV_HPHP'] = '('+'!'+cuts['VH_HPHP']+'&&'+'(' +  '&&'.join([catVtag['HP1'],catVtag['HP2']]) + ')' + ')'
-
- #at least one H-tag HP (+one V OR H-tag LP)                                                                                                                                                                                                
- catsAll['VH_LPHP'] = '('+'&&'.join([catVtag['LP1'],catHtag['HP2']])+')'
- catsAll['HV_HPLP'] = '('+'&&'.join([catHtag['HP1'],catVtag['LP2']])+')'
- catsAll['HH_HPLP'] = '('+'&&'.join([catHtag['HP1'],catHtag['LP2']])+')'
- catsAll['HH_LPHP'] = '('+'&&'.join([catHtag['LP1'],catHtag['HP2']])+')'
- cuts['VH_LPHP'] = '('+'('+'!'+cuts['VH_HPHP']+'&&!'+cuts['VV_HPHP']+')&&('+'||'.join([catsAll['VH_LPHP'],catsAll['HV_HPLP'],catsAll['HH_HPLP'],catsAll['HH_LPHP']])+')'+')'
-
- #at least one V-tag HP (+ one H-tag LP)                                  
- catsAll['VH_HPLP'] = '('+'&&'.join([catVtag['HP1'],catHtag['LP2']])+')'
- catsAll['HV_LPHP'] = '('+'&&'.join([catHtag['LP1'],catVtag['HP2']])+')'
- cuts['VH_HPLP'] = '('+'('+'!'+cuts['VH_LPHP']+'&&!'+cuts['VH_HPHP']+'&&!'+cuts['VV_HPHP']+')&&('+'||'.join([catsAll['VH_HPLP'],catsAll['HV_LPHP']])+')'+')'
-
- cuts['VH_all'] =  '('+  '||'.join([cuts['VH_HPHP'],cuts['VH_LPHP'],cuts['VH_HPLP']]) + ')'
-
- cuts['VV_HPLP'] = '(' +'('+'!'+cuts['VH_all']+') &&' + '(' + '('+  '&&'.join([catVtag['HP1'],catVtag['LP2']]) + ')' + '||' + '(' + '&&'.join([catVtag['HP2'],catVtag['LP1']]) + ')' + ')' + ')'
-
-else:
- print "Use b-tagging sorting"
- cuts['VH_HPHP'] = '('+  '&&'.join([catHtag['HP1'],catVtag['HP2']]) + ')'
- cuts['VH_HPLP'] = '('+  '&&'.join([catHtag['HP1'],catVtag['LP2']]) + ')'
- cuts['VH_LPHP'] = '('+  '&&'.join([catHtag['LP1'],catVtag['HP2']]) + ')'
- cuts['VH_LPLP'] = '('+  '&&'.join([catHtag['LP1'],catVtag['LP2']]) + ')'
- cuts['VH_all'] =  '('+  '||'.join([cuts['VH_HPHP'],cuts['VH_HPLP'],cuts['VH_LPHP'],cuts['VH_LPLP']]) + ')'
- cuts['VV_HPHP'] = '(' + '!' + cuts['VH_all'] + '&&' + '(' + '&&'.join([catVtag['HP1'],catVtag['HP2']]) + ')' + ')'
- cuts['VV_HPLP'] = '(' + '!' + cuts['VH_all'] + '&&' + '(' + '('+  '&&'.join([catVtag['HP1'],catVtag['LP2']]) + ')' + '||' + '(' + '&&'.join([catVtag['HP2'],catVtag['LP1']]) + ')' + ')' + ')'
-
-
-
 #all categories
 #categories=['VV_HPLP'] #,'VBF_VV_HPHP','VBF_VV_HPLP']
 #categories=['VH_HPHP','VH_HPLP','VH_LPHP','VV_HPHP','VV_HPLP'] #,'VBF_VV_HPHP','VBF_VV_HPLP']
@@ -154,7 +97,7 @@ resTemplate= "ZJetsToQQ_HT400to600,ZJetsToQQ_HT600to800,ZJetsToQQ_HT800toInf,WJe
       
 
 #do not change the order here, add at the end instead
-parameters = [cuts,minMVV,maxMVV,minMX,maxMX,binsMVV,HCALbinsMVV,samples,categories,minMJ,maxMJ,binsMJ,lumi,submitToBatch]   
+parameters = [ctx.cuts,ctx.minMVV,ctx.maxMVV,ctx.minMX,ctx.maxMX,ctx.binsMVV,ctx.HCALbinsMVV,samples,categories,ctx.minMJ,ctx.maxMJ,ctx.binsMJ,ctx.lumi,submitToBatch]   
 f = AllFunctions(parameters)
 
 
@@ -193,6 +136,7 @@ if options.run.find("all")!=-1 or options.run.find("sig")!=-1:
         sys.exit()
 
 
+<<<<<<< HEAD
 fixParsSig={"ZprimeZH":{
     "VV_HPLP": {"fixPars":"mean:91.5,n:1.83,n2:4.22,sigmaH:10.7,nH:130", "pol":"mean:pol0,sigma:pol5,alpha:pol5,n:pol0,alpha2:pol5,n2:pol0,meanH:pol4,sigmaH:pol0,alphaH:pol2,nH:pol3,alpha2H:pol3,n2H:pol4"}, 
     "VH_all": {"fixPars":"mean:91.5,n2:4.22,n:128,alphaH:0.51,nH:127","pol":"mean:pol0,sigma:pol5,alpha:pol5,n:pol0,alpha2:pol5,n2:pol0,meanH:pol5,sigmaH:pol7,alphaH:pol0,nH:pol3,alpha2H:pol3,n2H:pol4"}, 
@@ -235,6 +179,13 @@ fixParsSigMVV={
                "BulkGWW":{"fixPars":"N1:1.61364,N2:4.6012","pol":"MEAN:pol1,SIGMA:pol6,ALPHA1:pol5,N1:pol0,ALPHA2:pol4,N2:pol0"},
                "BulkGZZ":{"fixPars":"N1:1.61364,N2:4.6012","pol":"MEAN:pol1,SIGMA:pol6,ALPHA1:pol5,N1:pol0,ALPHA2:pol4,N2:pol0"},
                "ZprimeWW":{"fixPars":"N1:1.61364,N2:4.6012","pol":"MEAN:pol1,SIGMA:pol6,ALPHA1:pol5,N1:pol0,ALPHA2:pol4,N2:pol0"}}
+=======
+fixParsSig=ctx.fixParsSig
+
+
+
+fixParsSigMVV=ctx.fixParsSigMVV
+>>>>>>> 8f40f2a5... added cuts in json file hopefully making changing those values everywhere easier
 
 
 if options.run.find("all")!=-1 or options.run.find("sig")!=-1:
@@ -268,9 +219,15 @@ if options.run.find("all")!=-1 or options.run.find("sig")!=-1:
 
     if options.run.find("all")!=-1 or options.run.find("norm")!=-1:
         print "fit signal norm "
+<<<<<<< HEAD
         f.makeSignalYields("JJ_"+str(signal_inuse)+"_"+str(period),signaltemplate_inuse,xsec_inuse,{'VH_HPHP':HPSF*HPSF,'VH_HPLP':HPSF*LPSF,'VH_LPHP':HPSF*LPSF,'VH_LPLP':LPSF*LPSF,'VV_HPHP':HPSF*HPSF,'VV_HPLP':HPSF*LPSF,'VH_all':HPSF*HPSF+HPSF*LPSF})
         #f.makeNormalizations("sigonly_M2000","JJ_"+str(period)+"_"+str(signal_inuse),signaltemplate_inuse+"narrow_2000",0,cuts['nonres'],"sig")
         #f.makeNormalizations("sigonly_M4000","JJ_"+str(period)+"_"+str(signal_inuse),signaltemplate_inuse+"narrow_4000",0,cuts['nonres'],"sig")
+=======
+        f.makeSignalYields("JJ_"+str(signal_inuse)+"_"+str(period),signaltemplate_inuse,xsec_inuse,{'VH_HPHP':ctx.HPSF*ctx.HPSF,'VH_HPLP':ctx.HPSF*ctx.LPSF,'VH_LPHP':ctx.HPSF*ctx.LPSF,'VH_LPLP':ctx.LPSF*ctx.LPSF,'VV_HPHP':ctx.HPSF*ctx.HPSF,'VV_HPLP':ctx.HPSF*ctx.LPSF,'VH_all':ctx.HPSF*ctx.HPSF+ctx.HPSF*ctx.LPSF})
+        f.makeNormalizations("sigonly_M2000","JJ_"+str(period)+"_"+str(signal_inuse),signaltemplate_inuse+"narrow_2000",0,cuts['nonres'],"sig")
+        f.makeNormalizations("sigonly_M4000","JJ_"+str(period)+"_"+str(signal_inuse),signaltemplate_inuse+"narrow_4000",0,cuts['nonres'],"sig")
+>>>>>>> 8f40f2a5... added cuts in json file hopefully making changing those values everywhere easier
 
 if options.run.find("all")!=-1 or options.run.find("detector")!=-1:
     print "make Detector response"
