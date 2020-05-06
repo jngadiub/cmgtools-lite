@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#o!/usr/bin/env python
 
 import ROOT
 import optparse
@@ -30,16 +30,17 @@ parser.add_option("-f","--final",dest="final",type=int, default=1,help="Prelimin
 
 
 plotVV1D=False
-plotVV3D2016=True
+plotVV3D2016= False
 plotVV3D=False
 plotVV3D2016data=False #True
-plotVV3D2016pseudodata=False #True
+plotVV3D2016pseudodata=False
+plotVH2016=True
 
 
 (options,args) = parser.parse_args()
 #define output dictionary
 
-scaleBR = True
+scaleBR = False
 
 setTDRStyle()
 
@@ -57,24 +58,33 @@ def getLegend(x1=0.650010112,y1=0.523362,x2=0.90202143,y2=0.8279833):
 
 
 #titleY = "#sigma x BR(Z^{'} #rightarrow ZH) (pb)  "
-#titleY = "#sigma (Z^{'} #rightarrow ZH) (pb)  "
+titleY = "#sigma (Z^{'} #rightarrow ZH) (pb)  "
 #oname= "ZprimeZH_VVVH_pseudo20_testvhlplp"
 #oname= "ZprimeZH_VV_pseudo20_testvhlplp"
 #oname= "ZprimeZH_pseudo20_tau21DDT_doubleB_0p91_0p86"
-#oname= "ZprimeZH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_VS_doubleB_0p91_0p86"
+oname= "ZprimeZH_scheme2_deepAK8_VVVH_optimizations_noBR"
 
-titleY = "#sigma x BR(G_{Bulk} #rightarrow WW) (pb)  "
+#titleY = "#sigma x BR(G_{Bulk} #rightarrow WW) (pb)  "
 #oname= "BulkGWW_VVVH_testvhlplp"
-oname= "BulkGWW_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_VS_doubleB_0p91_0p86"
+#oname= "BulkGWW_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_VS_doubleB_0p91_0p86"
 #oname= "BulkGWW_VH_testvhlplp"
 #oname= "BulkGWW_tau21DDT_doubleB_0p91_0p86"
+#oname= "BulkGWW_scheme2_deepAK8_VVVH_optimizations"
 
 #title = ["HPLP","HPHP","HPHP+HPLP","B2G-17-001"]
 #files = ["LIMITS_DDT_latest/WW/HPLP/Limits_BulkGWW_HPLP_13TeV.root","LIMITS_DDT_latest/WW/HPHP/Limits_BulkGWW_HPHP_13TeV.root","LIMITS_DDT_latest/WW/combined/Limits_BulkGWW_13TeV.root","limits_b2g17001/Limits_b2g17001_BulkGWW_13TeV.root"]
 
-title = ["VH DDT","VV DDT","VVVH DDT","VH doubleB","VV doubleB","VVVH doubleB"]
-files = ["results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_SDcorrMaps/Limits_BulkGWW_13TeV_2016_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT.root","results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_SDcorrMaps/Limits_BulkGWW_13TeV_2016_VV_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT.root","results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_SDcorrMaps/Limits_BulkGWW_13TeV_2016_VVVH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT.root","results_2016_VV_VH_doubleB_HP0p91_LP0p86_scheme2/Limits_BulkGWW_VH_13TeV_2016_scheme2_doubleB_0p91_0p86_pseudo80.root","results_2016_VV_VH_doubleB_HP0p91_LP0p86_scheme2/Limits_BulkGWW_VV_13TeV_2016_scheme2_doubleB_0p91_0p86_pseudo80.root","results_2016_VV_VH_doubleB_HP0p91_LP0p86_scheme2/Limits_BulkGWW_VVVH_13TeV_2016_scheme2_doubleB_0p91_0p86_pseudo80.root"]
-#files = ["results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_SDcorrMaps/Limits_ZprimeZH_13TeV_2016_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT.root","results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_SDcorrMaps/Limits_ZprimeZH_13TeV_2016_VV_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT.root","results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_SDcorrMaps/Limits_ZprimeZH_13TeV_2016_VVVH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT.root","results_2016_VV_VH_doubleB_HP0p91_LP0p86_scheme2/Limits_ZprimeZH_VH_13TeV_2016_scheme2_doubleB_0p91_0p86_pseudo80.root","results_2016_VV_VH_doubleB_HP0p91_LP0p86_scheme2/Limits_ZprimeZH_VV_13TeV_2016_scheme2_doubleB_0p91_0p86_pseudo80.root","results_2016_VV_VH_doubleB_HP0p91_LP0p86_scheme2/Limits_ZprimeZH_VVVH_13TeV_2016_scheme2_doubleB_0p91_0p86_pseudo80.root"]
+
+title = ["tau_{21}^{DDT}+doubleB","deepAK8: W 5%, ZH 2%"]
+#title = ["tau_{21}^{DDT}+doubleB","deepAK8: W 5%, ZH 5%","deepAK8: W 5%, ZH 2%"]
+files = ["results_2016_VV_VH_doubleB_HP0p91_LP0p86_scheme2/Limits_ZprimeZH_VVVH_13TeV_2016_scheme2_doubleB_0p91_0p86_pseudo80.root","results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_nominalMap/Limits_ZprimeZH_13TeV_2016_VVVH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_pseudo40.root"]
+#files = ["results_2016_VV_VH_doubleB_HP0p91_LP0p86_scheme2/Limits_BulkGWW_VVVH_13TeV_2016_scheme2_doubleB_0p91_0p86_pseudo80.root","results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_nominalMap/Limits_BulkGWW_13TeV_2016_VVVH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT.root"]
+#files = ["results_2016_VV_VH_doubleB_HP0p91_LP0p86_scheme2/Limits_BulkGWW_VVVH_13TeV_2016_scheme2_doubleB_0p91_0p86_pseudo80.root","results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p05_0p10_DDT_defaultMap/Limits_BulkGWW_13TeV_2016_VVVH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p05_0p10_DDT.root","results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_nominalMap/Limits_BulkGWW_13TeV_2016_VVVH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT.root"]
+#files = ["results_2016_VV_VH_doubleB_HP0p91_LP0p86_scheme2/Limits_ZprimeZH_VVVH_13TeV_2016_scheme2_doubleB_0p91_0p86_pseudo80.root","results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p05_0p10_DDT_defaultMap/Limits_ZprimeZH_13TeV_2016_VVVH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p05_0p10_DDT.root","results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_nominalMap/Limits_ZprimeZH_13TeV_2016_VVVH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_pseudo40.root"]
+
+#title = ["VH DDT","VV DDT","VVVH DDT","VH doubleB","VV doubleB","VVVH doubleB"]
+#files = ["results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_nominalMap/Limits_BulkGWW_13TeV_2016_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT.root","results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_nominalMap/Limits_BulkGWW_13TeV_2016_VV_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT.root","results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_nominalMap/Limits_BulkGWW_13TeV_2016_VVVH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT.root","results_2016_VV_VH_doubleB_HP0p91_LP0p86_scheme2/Limits_BulkGWW_VH_13TeV_2016_scheme2_doubleB_0p91_0p86_pseudo80.root","results_2016_VV_VH_doubleB_HP0p91_LP0p86_scheme2/Limits_BulkGWW_VV_13TeV_2016_scheme2_doubleB_0p91_0p86_pseudo80.root","results_2016_VV_VH_doubleB_HP0p91_LP0p86_scheme2/Limits_BulkGWW_VVVH_13TeV_2016_scheme2_doubleB_0p91_0p86_pseudo80.root"]
+#files = ["results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_nominalMap/Limits_ZprimeZH_13TeV_2016_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_pseudo40.root","results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_nominalMap/Limits_ZprimeZH_13TeV_2016_VV_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_pseudo40.root","results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_nominalMap/Limits_ZprimeZH_13TeV_2016_VVVH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_pseudo40.root","results_2016_VV_VH_doubleB_HP0p91_LP0p86_scheme2/Limits_ZprimeZH_VH_13TeV_2016_scheme2_doubleB_0p91_0p86_pseudo80.root","results_2016_VV_VH_doubleB_HP0p91_LP0p86_scheme2/Limits_ZprimeZH_VV_13TeV_2016_scheme2_doubleB_0p91_0p86_pseudo80.root","results_2016_VV_VH_doubleB_HP0p91_LP0p86_scheme2/Limits_ZprimeZH_VVVH_13TeV_2016_scheme2_doubleB_0p91_0p86_pseudo80.root"]
 
 
 
@@ -181,7 +191,7 @@ masses = array('d',[i*100. for i in range(8,60)])
 
 if scaleBR:
   x, y = array( 'd' ), array( 'd' )
-  fin = ROOT.TFile.Open("results_2016_VV_VH_doubleB_HP0p92_LP0p7/workspace_JJ_BulkGWW_VV_13TeV_2016_fixedVjest_noTT.root","READ")
+  fin = ROOT.TFile.Open("results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_nominalMap/workspace_JJ_BulkGWW_VV_13TeV_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_nominalMaps_fullStats_pseudo80.root","READ")
   #fin = ROOT.TFile.Open("results_2016_2VV_2VH_doubleB_HP0p91_LP0p86/workspace_JJ_BulkGWW_VV_13TeV_2016_2VV2VH.root","READ")
   w = fin.Get("w")
 
@@ -197,8 +207,9 @@ if scaleBR:
     scaleLimits[str(int(m))] = func.getVal(argset)
 else:
   for m in masses:
-    scaleLimits[str(int(m))] = 1.*0.001 #NB this is a quick fix for ZprimeZH!
-    #scaleLimits[str(int(m))] = 1.*0.001*0.584 #multiply by H BR
+    #scaleLimits[str(int(m))] = 1.*0.001 #NB this is a quick fix for ZprimeZH!
+    scaleLimits[str(int(m))] = 1.*0.001*0.584 #multiply by H BR
+
 leg = getLegend()
 leg.AddEntry(0,"Exp. limits","")
 leg.AddEntry(0,"","")
@@ -565,6 +576,20 @@ VVinclu3D2016pseudo.SetMarkerStyle(20);
 if plotVV3D2016pseudodata: leg.AddEntry(VVinclu3D2016pseudo,"VV inclu pseudodata 2016","L")
 
 
+MASSSHORT=[1500.,2000.,4000.]
+limits_VH_2016=[0.03,0.005,0.001]
+VH2016=ROOT.TGraph(3,np.array(MASSSHORT),np.array(limits_VH_2016))
+VH2016.SetName("VH2016")
+VH2016.SetTitle("");
+#VH2016.SetFillColor(1);                                                                                                                                                                                                         
+VH2016.SetLineColor(427);
+VH2016.SetLineStyle(5);
+VH2016.SetLineWidth(3);
+VH2016.SetMarkerStyle(20);
+if plotVH2016: leg.AddEntry(VH2016,"B2G-17-002","L")
+
+
+
 
 #plotting information
 H_ref = 600; 
@@ -610,8 +635,10 @@ frame.GetYaxis().SetTitleOffset(1.15)
 
 c.cd()
 frame.Draw()
-cols  = [42,46,49,32,36,39]*3
-tline = [10,9,1,10,9,1]*3
+#cols  = [42,46,49,32,36,39]*3
+#tline = [10,9,1,10,9,1]*3
+cols  = [42,49,32,36,39]*3
+tline = [10,1,10,9,1]*3
 #cols  = [42,46,49,1]*3
 #tline = [10,9,1,2]*3
 
@@ -620,6 +647,7 @@ if plotVV3D2016 : VV3D16.Draw("Lsame")
 if plotVV3D: VV3D.Draw("Lsame")
 if plotVV3D2016data: VVinclu3D2016.Draw("Lsame")
 if plotVV3D2016pseudodata: VVinclu3D2016pseudo.Draw("Lsame")
+if plotVH2016: VH2016.Draw("Lsame")
 
 for i,g in enumerate(tgraphs):
 	g.SetLineStyle(tline[i])
