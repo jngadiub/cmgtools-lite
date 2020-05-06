@@ -72,7 +72,7 @@ class AllFunctions():
    #else: cut = "*".join([self.cuts[c],self.cuts['common_VV'],self.cuts['acceptance'],str(sfP[c])])
    cut = "*".join([self.cuts[c],self.cuts['common'],self.cuts['acceptance'],str(sfP[c])])
    yieldFile=filename+"_"+c+"_yield"
-   fnc = "pol3" #irene testing! before was pol7
+   fnc = "pol7" #"pol3" #irene testing! before was pol7
    cmd='vvMakeSignalYields.py -s {template} -c "{cut}" -o {output} -V "jj_LV_mass" -m {minMVV} -M {maxMVV} -f {fnc} -b {BR} --minMX {minMX} --maxMX {maxMX} {samples} '.format(template=template, cut=cut, output=yieldFile,minMVV=self.minMVV,maxMVV=self.maxMVV,fnc=fnc,BR=branchingFraction,minMX=self.minMX,maxMX=self.maxMX,samples=self.samples)
    os.system(cmd)
 
@@ -145,8 +145,8 @@ class AllFunctions():
    
 #   if 'VBF' in c: cut='*'.join([self.cuts['common_VBF'],self.cuts[c.replace('VBF_','')],addCut])#,cuts['acceptanceGEN'],cuts['looseacceptanceMJ']])
 #   else: cut='*'.join([self.cuts['common_VV'],self.cuts[c],addCut])#,cuts['acceptanceGEN'],cuts['looseacceptanceMJ']])
-#   cut='*'.join([self.cuts['common'],self.cuts[c],addCut])#,cuts['acceptanceGEN'],cuts['looseacceptanceMJ']])
-   cut='*'.join([self.cuts['common'],addCut])#,cuts['acceptanceGEN'],cuts['looseacceptanceMJ']]) #irene removed category to make templates    
+   cut='*'.join([self.cuts['common'],self.cuts[c],addCut])#,cuts['acceptanceGEN'],cuts['looseacceptanceMJ']])
+#   cut='*'.join([self.cuts['common'],addCut])#,cuts['acceptanceGEN'],cuts['looseacceptanceMJ']]) #irene removed category to make templates    
    smp = pwd +"/"+self.samples 
  
    if self.submitToBatch:
