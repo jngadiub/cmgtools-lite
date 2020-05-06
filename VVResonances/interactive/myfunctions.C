@@ -17,14 +17,15 @@ auto puppijjmass(const Double_t pt1, const Double_t eta1, const Double_t phi1, c
 };
 
 
-
-auto getZHcut(const Double_t pt, const Double_t mass, TString filename = "testMapZHbb_Pt_nominalonly_bin/myDeepBoostedMap_0p02rho.root", TString mapName = "DeepBoosted_ZHbbvsQCD_v_rho_v_pT_sclaed_yx" ){
-//auto getZHcut(const Double_t pt, const Double_t mass, TString filename = "testMapZHbb_Pt_nominalonly_2/myDeepBoostedMap_0p02rho.root", TString mapName = "DeepBoosted_ZHbbvsQCD_v_rho_v_pT_yx_0p02" ){
-  //auto getZHcut(const Double_t pt, const Double_t mass, TString filename = "testMapZHbb_Pt_nominalonly_2/myDeepBoostedMap_0p10rho.root", TString mapName = "DeepBoosted_ZHbbvsQCD_v_rho_v_pT_yx_0p10" ){
-//auto getZHcut(const Double_t pt, const Double_t mass, TString filename = "testMapZHbb_Pt_nominalonly_2/myDeepBoostedMap_0p98rho_smoothed.root", TString mapName = "DeepBoosted_ZHbbvsQCD_v_rho_v_pT_0p98_map_dijet" ){
-//auto getZHcut(const Double_t pt, const Double_t mass, TString filename = "testMapZHbb_Pt_nominalonly_bin/myDeepBoostedMap_0p98rho_smoothed.root", TString mapName = "DeepBoosted_ZHbbvsQCD_v_rho_v_pT_sclaed_0p98_map_dijet" ){
-//auto getWcut(const Double_t pt, const Double_t mass, TString filename = "testMapHT/myDeepBoostedMap_0p05rho.root", TString mapName = "DeepBoosted_WvsQCD_v_rho_v_pT_yx" ){
-//auto getWcut(const Double_t pt, const Double_t mass, TString filename = "mapTesting/testMaps_v3/myDeepBoostedMap_0p05rho.root", TString mapName = "DeepBoosted_WvsQCD_v_rho_v_pT_yx" ){
+//auto getZHcut(const Double_t pt, const Double_t mass, TString filename = "testMapZH_finepTaround500_Pt_2016/myDeepBoostedMap_0p10rho.root", TString mapName = "DeepBoosted_ZHbbvsQCD_v_rho_v_pT_sclaed_yx" ){
+//auto getZHcut(const Double_t pt, const Double_t mass, TString filename = "testMapZH_fineBinning_Pt_2017/myDeepBoostedMap_0p02rho.root", TString mapName = "DeepBoosted_ZHbbvsQCD_v_rho_v_pT_sclaed_yx_0p02" ){
+//auto getZHcut(const Double_t pt, const Double_t mass, TString filename = "testMapZH_fineBinning_Pt_2018/myDeepBoostedMap_0p02rho.root", TString mapName = "DeepBoosted_ZHbbvsQCD_v_rho_v_pT_sclaed_yx_0p02" ){
+//auto getZHcut(const Double_t pt, const Double_t mass, TString filename = "testMapZH_fineBinning_Pt_2016/myDeepBoostedMap_0p02rho.root", TString mapName = "DeepBoosted_ZHbbvsQCD_v_rho_v_pT_sclaed_yx_0p02" ){
+//auto getZHcut(const Double_t pt, const Double_t mass, TString filename = "testMapZH_fineBinning_Pt_2017/myDeepBoostedMap_0p10rho.root", TString mapName = "DeepBoosted_ZHbbvsQCD_v_rho_v_pT_sclaed_yx_0p10" ){
+//auto getZHcut(const Double_t pt, const Double_t mass, TString filename = "testMapZH_fineBinning_Pt_2018/myDeepBoostedMap_0p10rho.root", TString mapName = "DeepBoosted_ZHbbvsQCD_v_rho_v_pT_sclaed_yx_0p10" ){
+//auto getZHcut(const Double_t pt, const Double_t mass, TString filename = "testMapZH_fineBinning_Pt_2016-2017-2018/myDeepBoostedMap_0p10rho.root", TString mapName = "DeepBoosted_ZHbbvsQCD_v_rho_v_pT_sclaed_yx_0p10" ){
+auto getZHcut(const Double_t pt, const Double_t mass, TString filename = "testMapZH_fineBinning_Pt_2016-2017-2018/myDeepBoostedMap_0p02rho.root", TString mapName = "DeepBoosted_ZHbbvsQCD_v_rho_v_pT_sclaed_yx_0p02" ){
+//auto getZHcut(const Double_t pt, const Double_t mass, TString filename = "testMapZH_fineBinning_Pt_2016/myDeepBoostedMap_0p10rho.root", TString mapName = "DeepBoosted_ZHbbvsQCD_v_rho_v_pT_sclaed_yx_0p10" ){
   //  TString mapName = "DeepBoosted_WvsQCD_v_rho_v_pT_yx";
   TH2D *  map_WvsQCD = (TH2D*)gROOT->FindObject(mapName);
   if (map_WvsQCD == nullptr) {
@@ -62,9 +63,14 @@ auto getZHcut(const Double_t pt, const Double_t mass, TString filename = "testMa
 
 };
 
-//auto getZHcut2(const Double_t pt, const Double_t mass, TString filename = "testMapZHbb_Pt_nominalonly_2/myDeepBoostedMap_0p02rho.root", TString mapName = "DeepBoosted_ZHbbvsQCD_v_rho_v_pT_yx_0p02" ){
-//auto getZHcut2(const Double_t pt, const Double_t mass, TString filename = "testMapZHbb_Pt_nominalonly_2/myDeepBoostedMap_0p20rho.root", TString mapName = "DeepBoosted_ZHbbvsQCD_v_rho_v_pT_yx_0p20" ){
-auto getZHcut2(const Double_t pt, const Double_t mass, TString filename = "testMapZHbb_Pt_nominalonly_2/myDeepBoostedMap_0p10rho.root", TString mapName = "DeepBoosted_ZHbbvsQCD_v_rho_v_pT_yx_0p10" ){
+
+
+
+//auto getZHcut2(const Double_t pt, const Double_t mass, TString filename = "testMapZH_fineBinning_Pt_2017/myDeepBoostedMap_0p10rho.root", TString mapName = "DeepBoosted_ZHbbvsQCD_v_rho_v_pT_sclaed_yx_0p10" ){
+auto getZHcut2(const Double_t pt, const Double_t mass, TString filename = "testMapZH_fineBinning_Pt_2016/myDeepBoostedMap_0p10rho.root", TString mapName = "DeepBoosted_ZHbbvsQCD_v_rho_v_pT_sclaed_yx_0p10" ){
+  //auto getZHcut2(const Double_t pt, const Double_t mass, TString filename = "testMapZH_fineBinning_Pt_2018/myDeepBoostedMap_0p10rho.root", TString mapName = "DeepBoosted_ZHbbvsQCD_v_rho_v_pT_sclaed_yx_0p10" ){
+//auto getZHcut2(const Double_t pt, const Double_t mass, TString filename = "testMapZH_fineBinning_Pt_2016-2017-2018/myDeepBoostedMap_0p02rho.root", TString mapName = "DeepBoosted_ZHbbvsQCD_v_rho_v_pT_sclaed_yx_0p02" ){
+//auto getZHcut2(const Double_t pt, const Double_t mass, TString filename = "testMapZH_fineBinning_Pt_2016-2017-2018/myDeepBoostedMap_0p10rho.root", TString mapName = "DeepBoosted_ZHbbvsQCD_v_rho_v_pT_sclaed_yx_0p10" ){
   TH2D *  map_WvsQCD = (TH2D*)gROOT->FindObject(mapName);
   if (map_WvsQCD == nullptr) {
     TFile file;
@@ -105,14 +111,16 @@ auto getZHcut2(const Double_t pt, const Double_t mass, TString filename = "testM
 
 
 
-
-//auto getWcut(const Double_t pt, const Double_t mass, TString filename = "testMapPt/myDeepBoostedMap_0p05rho.root", TString mapName = "DeepBoosted_WvsQCD_v_rho_v_pT_scaled_yx" ){
-//auto getWcut(const Double_t pt, const Double_t mass, TString filename = "testMapW_Pt_nominalonly_2/myDeepBoostedMap_0p05rho.root", TString mapName = "DeepBoosted_WvsQCD_v_rho_v_pT_yx" ){
-// auto getWcut(const Double_t pt, const Double_t mass, TString filename = "testMapW_Pt_nominalonly_2/myDeepBoostedMap_0p05rho.root", TString mapName = "DeepBoosted_WvsQCD_v_rho_v_pT_yx_0p05" ){
-auto getWcut(const Double_t pt, const Double_t mass, TString filename = "testMapW_Pt_nominalonly_2/myDeepBoostedMap_0p10rho.root", TString mapName = "DeepBoosted_WvsQCD_v_rho_v_pT_yx_0p10" ){
-//auto getWcut(const Double_t pt, const Double_t mass, TString filename = "testMapPt/myDeepBoostedMap_0p95rho_smoothed.root", TString mapName = "DeepBoosted_WvsQCD_v_rho_v_pT_scaled_0p95_map_dijet" ){
-//auto getWcut(const Double_t pt, const Double_t mass, TString filename = "testMapHT/myDeepBoostedMap_0p05rho.root", TString mapName = "DeepBoosted_WvsQCD_v_rho_v_pT_yx" ){
-//auto getWcut(const Double_t pt, const Double_t mass, TString filename = "mapTesting/testMaps_v3/myDeepBoostedMap_0p05rho.root", TString mapName = "DeepBoosted_WvsQCD_v_rho_v_pT_yx" ){
+//auto getWcut(const Double_t pt, const Double_t mass, TString filename = "testMapW_finepTaround500_Pt_2016/myDeepBoostedMap_0p10rho.root", TString mapName = "DeepBoosted_WvsQCD_v_rho_v_pT_scaled_yx" ){
+//auto getWcut(const Double_t pt, const Double_t mass, TString filename = "testMapTau21_fineBinning_Pt_2016/myDeepBoostedMap_0p05rho.root", TString mapName = "tau21_v_rho_v_pT_yx" ){
+//auto getWcut(const Double_t pt, const Double_t mass, TString filename = "testMapW_fineBinning_Pt_2016/myDeepBoostedMap_0p05rho.root", TString mapName = "DeepBoosted_WvsQCD_v_rho_v_pT_scaled_yx_0p05" ){
+//auto getWcut(const Double_t pt, const Double_t mass, TString filename = "testMapW_fineBinning_Pt_2017/myDeepBoostedMap_0p05rho.root", TString mapName = "DeepBoosted_WvsQCD_v_rho_v_pT_scaled_yx_0p05" ){
+//auto getWcut(const Double_t pt, const Double_t mass, TString filename = "testMapW_fineBinning_Pt_2018/myDeepBoostedMap_0p05rho.root", TString mapName = "DeepBoosted_WvsQCD_v_rho_v_pT_scaled_yx_0p05" ){
+//auto getWcut(const Double_t pt, const Double_t mass, TString filename = "testMapW_fineBinning_Pt_2016/myDeepBoostedMap_0p10rho.root", TString mapName = "DeepBoosted_WvsQCD_v_rho_v_pT_scaled_yx_0p10" ){
+//auto getWcut(const Double_t pt, const Double_t mass, TString filename = "testMapW_fineBinning_Pt_2017/myDeepBoostedMap_0p10rho.root", TString mapName = "DeepBoosted_WvsQCD_v_rho_v_pT_scaled_yx_0p10" ){
+//auto getWcut(const Double_t pt, const Double_t mass, TString filename = "testMapW_fineBinning_Pt_2018/myDeepBoostedMap_0p10rho.root", TString mapName = "DeepBoosted_WvsQCD_v_rho_v_pT_scaled_yx_0p10" ){
+//auto getWcut(const Double_t pt, const Double_t mass, TString filename = "testMapW_fineBinning_Pt_2016-2017-2018/myDeepBoostedMap_0p10rho.root", TString mapName = "DeepBoosted_WvsQCD_v_rho_v_pT_scaled_yx_0p10" ){
+auto getWcut(const Double_t pt, const Double_t mass, TString filename = "testMapW_fineBinning_Pt_2016-2017-2018/myDeepBoostedMap_0p05rho.root", TString mapName = "DeepBoosted_WvsQCD_v_rho_v_pT_scaled_yx_0p05" ){
   //  TString mapName = "DeepBoosted_WvsQCD_v_rho_v_pT_yx";
   TH2D *  map_WvsQCD = (TH2D*)gROOT->FindObject(mapName);
   if (map_WvsQCD == nullptr) {
@@ -150,13 +158,10 @@ auto getWcut(const Double_t pt, const Double_t mass, TString filename = "testMap
 
 };
 
-//auto getWcut2(const Double_t pt, const Double_t mass, TString filename = "testMapW_Pt_nominalonly_2/myDeepBoostedMap_0p05rho.root", TString mapName = "DeepBoosted_WvsQCD_v_rho_v_pT_yx_0p05" ){
-  // auto getWcut2(const Double_t pt, const Double_t mass, TString filename = "testMapW_Pt_nominalonly_2/myDeepBoostedMap_0p10rho.root", TString mapName = "DeepBoosted_WvsQCD_v_rho_v_pT_yx_0p10" ){
-auto getWcut2(const Double_t pt, const Double_t mass, TString filename = "testMapW_Pt_nominalonly_2/myDeepBoostedMap_0p20rho.root", TString mapName = "DeepBoosted_WvsQCD_v_rho_v_pT_yx_0p20" ){
-//auto getWcut(const Double_t pt, const Double_t mass, TString filename = "testMapPt/myDeepBoostedMap_0p95rho_smoothed.root", TString mapName = "DeepBoosted_WvsQCD_v_rho_v_pT_scaled_0p95_map_dijet" ){
-//auto getWcut(const Double_t pt, const Double_t mass, TString filename = "testMapHT/myDeepBoostedMap_0p05rho.root", TString mapName = "DeepBoosted_WvsQCD_v_rho_v_pT_yx" ){
-//auto getWcut(const Double_t pt, const Double_t mass, TString filename = "mapTesting/testMaps_v3/myDeepBoostedMap_0p05rho.root", TString mapName = "DeepBoosted_WvsQCD_v_rho_v_pT_yx" ){
-  //  TString mapName = "DeepBoosted_WvsQCD_v_rho_v_pT_yx";
+//auto getWcut2(const Double_t pt, const Double_t mass, TString filename = "testMapW_fineBinning_Pt_2016-2017-2018/myDeepBoostedMap_0p10rho.root", TString mapName = "DeepBoosted_WvsQCD_v_rho_v_pT_scaled_yx_0p10" ){
+//auto getWcut2(const Double_t pt, const Double_t mass, TString filename = "testMapW_fineBinning_Pt_2018/myDeepBoostedMap_0p10rho.root", TString mapName = "DeepBoosted_WvsQCD_v_rho_v_pT_scaled_yx_0p10" ){
+//auto getWcut2(const Double_t pt, const Double_t mass, TString filename = "testMapW_fineBinning_Pt_2017/myDeepBoostedMap_0p10rho.root", TString mapName = "DeepBoosted_WvsQCD_v_rho_v_pT_scaled_yx_0p10" ){
+auto getWcut2(const Double_t pt, const Double_t mass, TString filename = "testMapW_fineBinning_Pt_2016/myDeepBoostedMap_0p10rho.root", TString mapName = "DeepBoosted_WvsQCD_v_rho_v_pT_scaled_yx_0p10" ){
   TH2D *  map_WvsQCD = (TH2D*)gROOT->FindObject(mapName);
   if (map_WvsQCD == nullptr) {
     TFile file;
