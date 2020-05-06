@@ -149,11 +149,12 @@ w=ROOT.RooWorkspace("w","w")
 w.factory(options.var+varBins[options.var])
 w.var(options.var).SetTitle(varName[options.var])
 colors= []
-#colors.append(["#f9c677","#f9d077","#f9f577","#ffd300","#f9fe77","#f9fe64","#f9fe43","#f9fe17"]*3)
+colors.append(["#f9c677","#f9d077","#f9f577","#ffd300","#f9fe77","#f9fe64","#f9fe43","#f9fe17"]*3)
 colors.append(["#fee0d2","#fcbba1","#fc9272","#ef3b2c","#ef3b2c","#cb181d","#a50f15","#67000d"]*3) 
 colors.append(["#e5f5e0","#c7e9c0","#a1d99b","#41ab5d","#41ab5d","#238b45","#006d2c","#00441b"]*3) 
 colors.append(["#02fefe","#02e5fe","#02d7fe","#4292c6","#02b5fe","#02a8fe","#0282fe","#0300fc"]*3)  
 colors.append(["#e6a3e1","#d987e6","#ce5ce0","#822391","#8526bd","#9b20e3","#a87eed","#8649eb"]*3)  
+colors.append(["#f9c677","#f9d077","#f9f577","#ffd300","#f9fe77","#f9fe64","#f9fe43","#f9fe17"]*3)
 
 '''
 def doSingle():
@@ -210,8 +211,8 @@ def doAll(signal,legend,colorindex):
 #    directorypaper="results_QCD_pythia_signals_2016_tau21DDT_rho_VVpaper_HPHP_HPLP/"
 #    directoryVV="doubleB_signalYield/VVVH_HPLP/"+options.name+"/"
 #    directoryVH="doubleB_signalYield/VVVH_HPLP/"+options.name+"/"
-    directoryVV="results_2016/"
-    directoryVH="results_2016/"
+    directoryVV="debugSensitivityBulkGWW/VVVH/"
+    directoryVH="debugSensitivityBulkGWW/VVVH/"
     purities=["VV_HPHP","VV_HPLP","VH_HPHP","VH_HPLP","VH_LPHP"]
 #    purities=["VV_HPHP","VV_HPLP","VH_HPHP","VH_LPHP"]
     c1,leg,pt = getCanvasPaper("c1")
@@ -690,7 +691,7 @@ def doAllTestVHLPLP(signal,legend,colorindex):
 def doAllOld(signal,legend,colorindex):
 
 #    directorypaper="results_QCD_pythia_signals_2016_DeepW_VVpaper_HPHP_HPLP/"
-    directorypaper="results_2016_VVpaper_deepAK8_W_0p02_0p10_bruteForce_newDetPar_newMaps/"
+    directorypaper="debugSensitivityBulkGWW/VVinclu/"
 #    directoryVV="results_QCD_pythia_signals_2016_tau21DDT_rho_VV_HPHP_HPLP/"
 #    directoryVH="results_QCD_pythia_signals_2016_tau21DDT_rho_VH_HPHP_HPLP_LPHP/"
     purities=["VV_HPHP","VV_HPLP"] #,"VH_HPHP","VH_HPLP","VH_LPHP"]
@@ -938,19 +939,23 @@ def doAllOldCompare(signal,legend,colorindex):
                 
 if __name__ == '__main__':
 #    doSingle() #NB: some fix would be needed here!
-#    signals = ["BulkGZZ","WprimeWZ","BulkGWW","ZprimeWW","ZprimeZH"]
-#    legs = ["G_{bulk} #rightarrow ZZ","W' #rightarrow WZ","G_{bulk} #rightarrow WW","Z'#rightarrow WW","Z'#rightarrow ZH"]                                                                                                                                                     
-    signals = ["BulkGWW","ZprimeZH"]
-    legs = ["G_{bulk} #rightarrow WW","Z'#rightarrow ZH"]                                                                                                                                                     
+#    signals = ["BulkGZZ","WprimeWZ","BulkGWW","ZprimeWW","ZprimeZH","WprimeWH"]
+#    legs = ["G_{bulk} #rightarrow ZZ","W' #rightarrow WZ","G_{bulk} #rightarrow WW","Z'#rightarrow WW","Z'#rightarrow ZH","W'#rightarrow WH"]                                               
+#    signals = ["BulkGWW","ZprimeZH"]
+#    legs = ["G_{bulk} #rightarrow WW","Z'#rightarrow ZH"]                                                                                                                                                     
 #    signals = ["ZprimeZH"]
 #    legs = ["Z'#rightarrow ZH"]                                                                                                                                                     
+
+
+    signals = ["BulkGWW"] 
+    legs = ["G_{bulk} #rightarrow WW"] 
     
     for i in range(len(signals)):
 #    for i in range(1):
       print i
       print signals[i]
       print legs[i]
-#      doAllOld(signals[i],legs[i],i)
+      doAllOld(signals[i],legs[i],i)
 #      doAllOldCompare(signals[i],legs[i],i)
-      doAll(signals[i],legs[i],i)
+#      doAll(signals[i],legs[i],i)
 #      doAllTestVHLPLP(signals[i],legs[i],i)
