@@ -1,8 +1,8 @@
 #!bin/bash
 
 basedir=results_2016/
-categories=("VV_HPHP") # "VV_HPLP" "VH_HPHP" "VH_LPHP" "VH_HPLP") # "VH_LPLP")
-#categories=("VV_HPHP" "VV_HPLP" "VH_HPHP" "VH_LPHP" "VH_HPLP") # "VH_LPLP")
+#categories=("VV_HPHP") # "VV_HPLP" "VH_HPHP" "VH_LPHP" "VH_HPLP") # "VH_LPLP")
+categories=("VV_HPHP" "VV_HPLP" "VH_HPHP" "VH_LPHP" "VH_HPLP") # "VH_LPLP")
 
 #dir20=${basedir}pseudo20/
 #echo $dir20
