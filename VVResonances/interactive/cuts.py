@@ -15,7 +15,7 @@ maxMJ=215.0
 binsMJ=80
 
 
-minMVV=1126.0
+minMVV=838.0
 maxMVV=7600.0
 
 binsMVV=100
@@ -85,7 +85,7 @@ cuts['resTT'] = '(jj_l1_mergedVTruth==1&&jj_l1_softDrop_mass>140&&jj_l1_softDrop
 cuts['acceptance']= "(jj_LV_mass>{minMVV}&&jj_LV_mass<{maxMVV}&&jj_l1_softDrop_mass>{minMJ}&&jj_l1_softDrop_mass<{maxMJ}&&jj_l2_softDrop_mass>{minMJ}&&jj_l2_softDrop_mass<{maxMJ})".format(minMVV=minMVV,maxMVV=maxMVV,minMJ=minMJ,maxMJ=maxMJ)
 cuts['acceptanceMJ']= "(jj_l1_softDrop_mass>{minMJ}&&jj_l1_softDrop_mass<{maxMJ}&&jj_l2_softDrop_mass>{minMJ}&&jj_l2_softDrop_mass<{maxMJ})".format(minMJ=minMJ,maxMJ=maxMJ)
 cuts['acceptanceMVV'] = "(jj_LV_mass>{minMVV}&&jj_LV_mass<{maxMVV})".format(minMVV=minMVV,maxMVV=maxMVV)
-cuts['acceptanceGEN']='(jj_l1_gen_softDrop_mass>{minGenMJ}&&jj_l2_gen_softDrop_mass>{minGenMJ}&jj_l1_gen_softDrop_mass<{maxGenMJ}&&jj_l2_gen_softDrop_mass<{maxGenMJ}&&jj_gen_partialMass>{minGenMVV}&&jj_gen_partialMass<{maxGenMVV}&&TMath::Log(jj_l1_gen_softDrop_mass**2/jj_l1_gen_pt**2)<-1.5&&TMath::Log(jj_l2_gen_softDrop_mass**2/jj_l2_gen_pt**2)<-1.5)'.format(minGenMVV=minGenMVV,maxGenMVV=maxGenMVV,minGenMJ=minGenMJ,maxGenMJ=maxGenMJ)
+cuts['acceptanceGEN']='(jj_l1_gen_softDrop_mass>{minGenMJ}&&jj_l2_gen_softDrop_mass>{minGenMJ}&&jj_l1_gen_softDrop_mass<{maxGenMJ}&&jj_l2_gen_softDrop_mass<{maxGenMJ}&&jj_gen_partialMass>{minGenMVV}&&jj_gen_partialMass<{maxGenMVV}&&TMath::Log(jj_l1_gen_softDrop_mass**2/jj_l1_gen_pt**2)<-1.5&&TMath::Log(jj_l2_gen_softDrop_mass**2/jj_l2_gen_pt**2)<-1.5)'.format(minGenMVV=minGenMVV,maxGenMVV=maxGenMVV,minGenMJ=minGenMJ,maxGenMJ=maxGenMJ)
 cuts['looseacceptanceMJ']= "(jj_l1_softDrop_mass>35&&jj_l1_softDrop_mass<300&&jj_l2_softDrop_mass>35&&jj_l2_softDrop_mass<300)"
 
 
