@@ -30,17 +30,17 @@ parser.add_option("-f","--final",dest="final",type=int, default=1,help="Prelimin
 
 
 plotVV1D=False
-plotVV3D2016= False
+plotVV3D2016= True
 plotVV3D=False
 plotVV3D2016data=False #True
-plotVV3D2016pseudodata=False
-plotVH2016=True
+plotVV3D2016pseudodata=True
+plotVH2016=False
 
 
 (options,args) = parser.parse_args()
 #define output dictionary
 
-scaleBR = False
+scaleBR = True
 
 setTDRStyle()
 
@@ -58,26 +58,29 @@ def getLegend(x1=0.650010112,y1=0.523362,x2=0.90202143,y2=0.8279833):
 
 
 #titleY = "#sigma x BR(Z^{'} #rightarrow ZH) (pb)  "
-titleY = "#sigma (Z^{'} #rightarrow ZH) (pb)  "
+#titleY = "#sigma (Z^{'} #rightarrow ZH) (pb)  "
 #oname= "ZprimeZH_VVVH_pseudo20_testvhlplp"
 #oname= "ZprimeZH_VV_pseudo20_testvhlplp"
 #oname= "ZprimeZH_pseudo20_tau21DDT_doubleB_0p91_0p86"
-oname= "ZprimeZH_scheme2_deepAK8_VVVH_optimizations_noBR"
+#oname= "ZprimeZH_scheme2_deepAK8_VVVH_optimizations_noBR"
 
-#titleY = "#sigma x BR(G_{Bulk} #rightarrow WW) (pb)  "
+titleY = "#sigma x BR(G_{Bulk} #rightarrow WW) (pb)  "
 #oname= "BulkGWW_VVVH_testvhlplp"
 #oname= "BulkGWW_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_VS_doubleB_0p91_0p86"
 #oname= "BulkGWW_VH_testvhlplp"
 #oname= "BulkGWW_tau21DDT_doubleB_0p91_0p86"
 #oname= "BulkGWW_scheme2_deepAK8_VVVH_optimizations"
-
+oname= "BulkGWW_VV_inclu_vs_VVVHtau21doubleB"
 #title = ["HPLP","HPHP","HPHP+HPLP","B2G-17-001"]
 #files = ["LIMITS_DDT_latest/WW/HPLP/Limits_BulkGWW_HPLP_13TeV.root","LIMITS_DDT_latest/WW/HPHP/Limits_BulkGWW_HPHP_13TeV.root","LIMITS_DDT_latest/WW/combined/Limits_BulkGWW_13TeV.root","limits_b2g17001/Limits_b2g17001_BulkGWW_13TeV.root"]
 
+title = ["tau21DDT","tau21DDT+doubleB","tau21DDT+doubleB newtemplaptes"] 
+files=["debugSensitivityBulkGWW/VVinclu/Limits_VVinclu_tau21.root","results_2016_VV_VH_doubleB_HP0p91_LP0p86_scheme2/Limits_BulkGWW_13TeV_2016_VVVHscheme2_tau21_doubleB.root","debugSensitivityBulkGWW/VVVH/Limits_BulkGWW_VVVH_tau21_doubleB_newTemplates.root"]
 
-title = ["tau_{21}^{DDT}+doubleB","deepAK8: W 5%, ZH 2%"]
+
+#title = ["tau_{21}^{DDT}+doubleB","deepAK8: W 5%, ZH 2%"]
 #title = ["tau_{21}^{DDT}+doubleB","deepAK8: W 5%, ZH 5%","deepAK8: W 5%, ZH 2%"]
-files = ["results_2016_VV_VH_doubleB_HP0p91_LP0p86_scheme2/Limits_ZprimeZH_VVVH_13TeV_2016_scheme2_doubleB_0p91_0p86_pseudo80.root","results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_nominalMap/Limits_ZprimeZH_13TeV_2016_VVVH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_pseudo40.root"]
+#files = ["results_2016_VV_VH_doubleB_HP0p91_LP0p86_scheme2/Limits_ZprimeZH_VVVH_13TeV_2016_scheme2_doubleB_0p91_0p86_pseudo80.root","results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_nominalMap/Limits_ZprimeZH_13TeV_2016_VVVH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_pseudo40.root"]
 #files = ["results_2016_VV_VH_doubleB_HP0p91_LP0p86_scheme2/Limits_BulkGWW_VVVH_13TeV_2016_scheme2_doubleB_0p91_0p86_pseudo80.root","results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_nominalMap/Limits_BulkGWW_13TeV_2016_VVVH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT.root"]
 #files = ["results_2016_VV_VH_doubleB_HP0p91_LP0p86_scheme2/Limits_BulkGWW_VVVH_13TeV_2016_scheme2_doubleB_0p91_0p86_pseudo80.root","results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p05_0p10_DDT_defaultMap/Limits_BulkGWW_13TeV_2016_VVVH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p05_0p10_DDT.root","results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_nominalMap/Limits_BulkGWW_13TeV_2016_VVVH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT.root"]
 #files = ["results_2016_VV_VH_doubleB_HP0p91_LP0p86_scheme2/Limits_ZprimeZH_VVVH_13TeV_2016_scheme2_doubleB_0p91_0p86_pseudo80.root","results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p05_0p10_DDT_defaultMap/Limits_ZprimeZH_13TeV_2016_VVVH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p05_0p10_DDT.root","results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_nominalMap/Limits_ZprimeZH_13TeV_2016_VVVH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_pseudo40.root"]
