@@ -516,7 +516,7 @@ class PostFitTools():
     zrange = self.zrange
     if self.xrange == '0,-1': xrange = '55,215'
     if self.yrange == '0,-1': yrange = '55,215'
-    if self.zrange == '0,-1': zrange = '1126,5500'
+    if self.zrange == '0,-1': zrange = '1126,7600' #'1126,5500'
     if axis=='z':
      htitle = "Z-Proj. x : "+self.xrange+" y : "+self.yrange
      xtitle = "m_{jj} [GeV]"
