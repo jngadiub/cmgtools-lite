@@ -331,7 +331,7 @@ for i in range(1,len(xbinMin)):
 cz = get_canvas("cz")
 cz.SetLogy()
 cz.cd()
-hz[0].SetMinimum(1E-06)
+hz[0].SetMinimum(1E-09)
 hz[0].SetMaximum(10.0)
 for i in range(len(xbinMin)):
  hz[i].Draw("HISTsame")

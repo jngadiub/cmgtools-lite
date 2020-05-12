@@ -468,7 +468,7 @@ czSyst.SetLogy()
 
 #hz[4].SetLineColor(rt.kBlack)
 #hz[4].Scale(1./0.001)
-hz[0].SetMinimum(1E-06)
+hz[0].SetMinimum(1E-011)
 hz[0].SetMaximum(10.0)
 hz[0].Draw("HIST")
 hz_PTUp.Draw("HISTsame")
