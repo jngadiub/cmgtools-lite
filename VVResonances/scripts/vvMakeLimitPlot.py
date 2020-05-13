@@ -34,7 +34,7 @@ parser.add_option("--HVTworkspace","--HVTworkspace",dest="HVTworkspace",default=
 
 (options,args) = parser.parse_args()
 #define output dictionary
-
+filename=options.output+"_"+options.sig+"_"+options.name
 setTDRStyle()
 
 masses = array('d',[i*100. for i in range(8,60)])
@@ -204,7 +204,7 @@ for event in limit:
     
     if not (event.mh in data.keys()):
         data[event.mh]={}
-
+    print "event.mh ",event.mh
     lim = event.limit*scaleLimits[str(int(event.mh))]
     if event.quantileExpected<0:            
         data[event.mh]['obs']=lim
@@ -213,6 +213,9 @@ for event in limit:
     if event.quantileExpected>0.15 and event.quantileExpected<0.17:            
         data[event.mh]['-1sigma']=lim
     if event.quantileExpected>0.49 and event.quantileExpected<0.51:            
+        print "event.limit ",event.limit
+        print "scaleLimits[str(int(event.mh))] ",scaleLimits[str(int(event.mh))]
+        print "lim ",lim
         data[event.mh]['exp']=lim
     if event.quantileExpected>0.83 and event.quantileExpected<0.85:            
         data[event.mh]['+1sigma']=lim
@@ -244,6 +247,8 @@ line_minus2.SetName("line_minus2")
 
 
 N=0
+my_data_file = open(filename+'.txt', 'w')
+my_data_file.write('mass limit\n')
 for mass,info in data.iteritems():
     print 'Setting mass',mass,info
 
@@ -255,6 +260,10 @@ for mass,info in data.iteritems():
         continue    
     
     mean.SetPoint(N,mass,info['exp'])    
+    print "################# LIMIT ##################"
+    print "mass ",mass
+    print "exp ",info['exp']
+    my_data_file.write(str(mass)+" "+str(info['exp'])+'\n')
     band68.SetPoint(N,mass,info['exp'])
     band95.SetPoint(N,mass,info['exp'])
     line_plus1.SetPoint(N,mass,info['+1sigma'])
@@ -267,7 +276,7 @@ for mass,info in data.iteritems():
     band95.SetPointError(N,0.0,0.0,info['exp']-info['-2sigma'],info['+2sigma']-info['exp'])
     N=N+1
 
-
+my_data_file.close()
 mean.Sort()
 band68.Sort()
 band95.Sort()
@@ -474,7 +483,7 @@ c.RedrawAxis()
 
 if options.blind==0:
     bandObs.Draw("PLsame")
-filename=options.output+"_"+options.sig+"_"+options.name
+
 c.SaveAs(filename+".png")    
 c.SaveAs(filename+".pdf")    
 c.SaveAs(filename+".C")    
