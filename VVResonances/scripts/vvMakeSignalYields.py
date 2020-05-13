@@ -38,6 +38,9 @@ yieldgraph=ROOT.TGraphErrors()
 for filename in os.listdir(args[0]):
     if not (filename.find(options.sample)!=-1):
         continue
+    if filename.find(".")==-1:
+        print "in "+str(filename)+"the separator . was not found. -> continue!"
+        continue
     if filename.find("VBF")!=-1 and options.sample.find("VBF")==-1:
         continue
 
