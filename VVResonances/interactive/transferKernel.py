@@ -70,7 +70,8 @@ def mirror(histo,histoNominal,name,dim=1):
 		for i in range(1,histo.GetNbinsX()+1):
 			up=histo.GetBinContent(i)/intUp
 			nominal=histoNominal.GetBinContent(i)/intNominal
-			newHisto.SetBinContent(i,histoNominal.GetBinContent(i)*nominal/up)	
+			if up!=0: newHisto.SetBinContent(i,histoNominal.GetBinContent(i)*nominal/up)	
+                        else: newHisto.SetBinContent(i,histoNominal.GetBinContent(i)*nominal)
     return newHisto       
 
 def expandHisto(histo,suffix,binsMVV,binsMJ,minMVV,maxMVV,minMJ,maxMJ):
