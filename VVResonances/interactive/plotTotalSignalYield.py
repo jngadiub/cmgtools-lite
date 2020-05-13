@@ -154,7 +154,7 @@ colors.append(["#fee0d2","#fcbba1","#fc9272","#ef3b2c","#ef3b2c","#cb181d","#a50
 colors.append(["#e5f5e0","#c7e9c0","#a1d99b","#41ab5d","#41ab5d","#238b45","#006d2c","#00441b"]*3) 
 colors.append(["#02fefe","#02e5fe","#02d7fe","#4292c6","#02b5fe","#02a8fe","#0282fe","#0300fc"]*3)  
 colors.append(["#e6a3e1","#d987e6","#ce5ce0","#822391","#8526bd","#9b20e3","#a87eed","#8649eb"]*3)  
-colors.append(["#f9c677","#f9d077","#f9f577","#ffd300","#f9fe77","#f9fe64","#f9fe43","#f9fe17"]*3)
+colors.append(["#45444B","#6B6974","#807D8D","#8F8BA2","#A39EBB","#AEA7D1","#B2A9E2","#B2A6F5"]*3)
 
 '''
 def doSingle():
@@ -211,8 +211,8 @@ def doAll(signal,legend,colorindex):
 #    directorypaper="results_QCD_pythia_signals_2016_tau21DDT_rho_VVpaper_HPHP_HPLP/"
 #    directoryVV="doubleB_signalYield/VVVH_HPLP/"+options.name+"/"
 #    directoryVH="doubleB_signalYield/VVVH_HPLP/"+options.name+"/"
-    directoryVV="debugSensitivityBulkGWW/VVVH/"
-    directoryVH="debugSensitivityBulkGWW/VVVH/"
+    directoryVV="results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_defaultMap_spikeKiller/"
+    directoryVH="results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_defaultMap_spikeKiller/"
     purities=["VV_HPHP","VV_HPLP","VH_HPHP","VH_HPLP","VH_LPHP"]
 #    purities=["VV_HPHP","VV_HPLP","VH_HPHP","VH_LPHP"]
     c1,leg,pt = getCanvasPaper("c1")
@@ -939,23 +939,23 @@ def doAllOldCompare(signal,legend,colorindex):
                 
 if __name__ == '__main__':
 #    doSingle() #NB: some fix would be needed here!
-#    signals = ["BulkGZZ","WprimeWZ","BulkGWW","ZprimeWW","ZprimeZH","WprimeWH"]
-#    legs = ["G_{bulk} #rightarrow ZZ","W' #rightarrow WZ","G_{bulk} #rightarrow WW","Z'#rightarrow WW","Z'#rightarrow ZH","W'#rightarrow WH"]                                               
+    signals = ["BulkGZZ","WprimeWZ","BulkGWW","ZprimeWW","ZprimeZH","WprimeWH"]
+    legs = ["G_{bulk} #rightarrow ZZ","W' #rightarrow WZ","G_{bulk} #rightarrow WW","Z'#rightarrow WW","Z'#rightarrow ZH","W'#rightarrow WH"]                                               
 #    signals = ["BulkGWW","ZprimeZH"]
 #    legs = ["G_{bulk} #rightarrow WW","Z'#rightarrow ZH"]                                                                                                                                                     
 #    signals = ["ZprimeZH"]
 #    legs = ["Z'#rightarrow ZH"]                                                                                                                                                     
 
 
-    signals = ["BulkGWW"] 
-    legs = ["G_{bulk} #rightarrow WW"] 
+#    signals = ["BulkGWW"] 
+#    legs = ["G_{bulk} #rightarrow WW"] 
     
     for i in range(len(signals)):
 #    for i in range(1):
       print i
       print signals[i]
       print legs[i]
-      doAllOld(signals[i],legs[i],i)
+#      doAllOld(signals[i],legs[i],i)
 #      doAllOldCompare(signals[i],legs[i],i)
-#      doAll(signals[i],legs[i],i)
+      doAll(signals[i],legs[i],i)
 #      doAllTestVHLPLP(signals[i],legs[i],i)
