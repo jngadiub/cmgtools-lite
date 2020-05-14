@@ -111,13 +111,13 @@ class AllFunctions():
    
 #   if 'VBF' in c: cut='*'.join([self.cuts['common_VBF'],self.cuts[c.replace('VBF_','')],addCut,self.cuts['acceptanceGEN'],self.cuts['looseacceptanceMJ']])
 #   else: cut='*'.join([self.cuts['common_VV'],self.cuts[c],addCut,self.cuts['acceptanceGEN'],self.cuts['looseacceptanceMJ']])
-   cut='*'.join([self.cuts['common'],self.cuts[c],addCut,self.cuts['acceptanceGEN'],self.cuts['looseacceptanceMJ']]) 
-#   cut='*'.join([self.cuts['common'],addCut,self.cuts['acceptanceGEN'],self.cuts['looseacceptanceMJ']]) #irene removed category to make templates
+#   cut='*'.join([self.cuts['common'],self.cuts[c],addCut,self.cuts['acceptanceGEN'],self.cuts['looseacceptanceMJ']]) 
+   cut='*'.join([self.cuts['common'],addCut,self.cuts['acceptanceGEN'],self.cuts['looseacceptanceMJ']]) #irene removed category to make templates
    smp = pwd +"/"+self.samples
 
    if self.submitToBatch:
     if name.find("Jets") == -1: template += ",QCD_Pt-,QCD_HT" 
-    #if name.find("Jets") == -1: template += ",QCD_HT" #irene because QCD HT not ready yet!!
+    #if name.find("Jets") == -1: template += ",QCD_HT" #irene because QCD Pt- should go without spike killer!!
     #print " ***************    not doing QCD_HT & QCD_Pt- because not ready yet!! *************** "
     from modules.submitJobs import Make1DMVVTemplateWithKernels,merge1DMVVTemplate
     jobList, files = Make1DMVVTemplateWithKernels(rootFile,template,cut,resFile,self.binsMVV,self.minMVV,self.maxMVV,smp,jobname,wait,self.HCALbinsMVV) #,addOption) #irene
@@ -145,12 +145,13 @@ class AllFunctions():
    
 #   if 'VBF' in c: cut='*'.join([self.cuts['common_VBF'],self.cuts[c.replace('VBF_','')],addCut])#,cuts['acceptanceGEN'],cuts['looseacceptanceMJ']])
 #   else: cut='*'.join([self.cuts['common_VV'],self.cuts[c],addCut])#,cuts['acceptanceGEN'],cuts['looseacceptanceMJ']])
-   cut='*'.join([self.cuts['common'],self.cuts[c],addCut])#,cuts['acceptanceGEN'],cuts['looseacceptanceMJ']])
-#   cut='*'.join([self.cuts['common'],addCut])#,cuts['acceptanceGEN'],cuts['looseacceptanceMJ']]) #irene removed category to make templates    
+#   cut='*'.join([self.cuts['common'],self.cuts[c],addCut])#,cuts['acceptanceGEN'],cuts['looseacceptanceMJ']])
+   cut='*'.join([self.cuts['common'],addCut])#,cuts['acceptanceGEN'],cuts['looseacceptanceMJ']]) #irene removed category to make templates    
    smp = pwd +"/"+self.samples 
  
    if self.submitToBatch:
     if name.find("VJets")== -1: template += ",QCD_Pt-,QCD_HT"
+    #if name.find("VJets")== -1: template += ",QCD_HT"  #irene because QCD Pt- should go without spike killer!! 
     from modules.submitJobs import Make2DTemplateWithKernels,merge2DTemplate
     jobList, files = Make2DTemplateWithKernels(rootFile,template,cut,leg,self.binsMVV,self.minMVV,self.maxMVV,resFile,self.binsMJ,self.minMJ,self.maxMJ,smp,jobname,wait,self.HCALbinsMVV) #,addOption) #irene
     if wait: merge2DTemplate(jobList,files,jobname,c,leg,self.binsMVV,self.binsMJ,self.minMVV,self.maxMVV,self.minMJ,self.maxMJ,self.HCALbinsMVV,name,filename)
@@ -208,7 +209,7 @@ class AllFunctions():
 
    if self.submitToBatch:
        if name.find("nonRes")!= -1: template += ",QCD_Pt-,QCD_HT"
-       ##if name.find("nonRes")!= -1: template += ",QCD_HT"
+       #if name.find("nonRes")!= -1: template += ",QCD_HT"  #irene because QCD Pt- should go without spike killer!! 
        #print " ***************    not doing QCD_HT &  QCD_Pt- because not ready yet!! *************** "
        from modules.submitJobs import makeData,mergeData
        jobList, files = makeData(template,cut,rootFile,self.binsMVV,self.binsMJ,self.minMVV,self.maxMVV,self.minMJ,self.maxMJ,factors,name,data,jobname,sam,wait,self.HCALbinsMVV) #,addOption) #irene
