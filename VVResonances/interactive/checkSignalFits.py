@@ -123,7 +123,6 @@ def truncate(binning,mmin,mmax):
     
 
 if __name__=="__main__":
-    print "WTF"
     x=1100
     y=1000
     if options.mvv.find("l1")!=-1 or options.mvv.find("l2")!=-1:
@@ -134,7 +133,6 @@ if __name__=="__main__":
     xvar = 'x'
     #if options.sample.find("Wprime")!=-1:
     #    shapes = ['meanW','sigmaW','alphaW','n','f','alphaW2','meanZ','sigmaZ','alphaZ','alphaZ2']
-    print "WTF 2"
         
     if options.mvv.find("LV_mass")!=-1:
         shapes = ["MEAN","SIGMA","ALPHA1","N1","ALPHA2","N2"]
@@ -143,8 +141,6 @@ if __name__=="__main__":
     label="G_{bulk} #rightarrow WW"
     if options.sample.find("Zprime")!=-1:
         label = "Z' #rightarrow WW"
-        print "WTF 3"
-    
         if options.sample.find("ZH")!=-1 or options.sample.find("Zh")!=-1:label = "Z' #rightarrow ZH"
     if options.sample.find("Wprime")!=-1:
         label = "W' #rightarrow WZ"
@@ -152,30 +148,23 @@ if __name__=="__main__":
     if options.sample.find("Bulk")!=-1 and options.sample.find("ZZ")!=-1:
         label="G_{bulk} #rightarrow ZZ"
 
-
-    
     for filename in os.listdir(args[0]):
-#        print filename
+        #print filename
         if not (filename.find(options.sample)!=-1):
-#            print "NOT FOUND"
             continue
     #found sample. get the mass
-        print "filename ",filename
         fnameParts=filename.split('.')
         fname=fnameParts[0]
-        print "fname ",fname
         ext=fnameParts[1]
-        print "ext ",ext
         if ext.find("root") ==-1:
             continue
         print filename
-        print "WTF 4"
-    
         if fname.split('_')[-1] == "HT600toInf":
             mass = 1001
         else:
             mass = float(fname.split('_')[-1])
         #if mass < options.minMX or mass > options.maxMX: continue	
+
 
         print "mass ",mass    
         if mass <=1000:
@@ -190,8 +179,6 @@ if __name__=="__main__":
 
     leg = options.mvv.split('_')[1]
 
-    print "WTF 5"
-
     #Now we have the samples: Sort the masses and make histograms
     
     h={}
@@ -199,6 +186,7 @@ if __name__=="__main__":
     frames=[]
     tmp = []
     N=0
+
     print "fitResults  "
     print options.fitResults
     fitfiles = (options.fitResults).split(',')
@@ -209,10 +197,7 @@ if __name__=="__main__":
     histos = []
     print samples.keys()
     print options.mvv
-    print "WTF 6"
     for mass in sorted(samples.keys()):
-        print "WTF 7"
-
         print mass
         c = ROOT.TCanvas("c","c",600,600)
         c.SetTickx()

@@ -1,6 +1,7 @@
 from tools.DatacardTools import *
 import sys,os
 import ROOT
+import json
 ROOT.gSystem.Load("libHiggsAnalysisCombinedLimit")
 from CMGTools.VVResonances.statistics.DataCardMaker import DataCardMaker
 cmd='combineCards.py '
@@ -21,7 +22,7 @@ lumi = {'2016':35900,'2017':41367}
 lumi_unc = {'2016':1.025,'2017':1.023}
 
 scales = {"2017" :[0.983,1.08], "2016":[1.014,1.086]}
-scalesHiggs = {"2017" :[1.,1.], "2016":[1.,1.]}
+scalesHiggs = {"2017" :[0.983,1.08], "2016":[1.014,1.086]}
 
 
 #quick fix to add VH !!!
@@ -45,7 +46,7 @@ purities= ['VV_HPLP','VV_HPHP','VH_HPLP','VH_HPHP','VH_LPHP']
 #signals = ["ZprimeZH"]
 signals = ["BulkGWW"]
 
-doCorrelation = True
+doCorrelation = False
 Tools = DatacardTools(scales,scalesHiggs,vtag_pt_dependence,lumi_unc,vtag_unc,sf_qcd,pseudodata,outlabel,doCorrelation)
 
 for sig in signals:
@@ -88,6 +89,7 @@ for sig in signals:
       Tools.AddNonResBackground(card,dataset,p,rootFile3DPDF,rootFileNorm,ncontrib) 
       print "##########################       QCD added in datacard      ######################"
 
+
 #      rootFileData = resultsDir[dataset]+"/JJ_%s_nonRes_3D_%s.root"%(dataset,p) #use this only to prepare workspace for making pseudo data with vjets
       rootFileData = resultsDir[dataset]+"/JJ_%s_nonRes_3D_none.root"%(dataset) #use this only to prepare workspace for making pseudo data with vjets
       histName="histo"
@@ -97,6 +99,7 @@ for sig in signals:
 #      rootFileData = resultsDir[dataset]+"/JJ_"+p+".root"
 #      histName="data"
 #      scaleData=1.0 
+
       if pseudodata=="noVjets":
         print "Using pseudodata without vjets"
         rootFileData = resultsDir[dataset]+"/JJ_PDnoVjets_"+p+".root"
@@ -108,7 +111,7 @@ for sig in signals:
         histName="data"
         scaleData=1.0
       if pseudodata==sig:
-       rootFileData = resultsDir[dataset]+"/JJ_"+sig+"_"+p+"_M"+outlabel.split("_M")[1]+".root"
+       rootFileData = resultsDir[dataset]+"/JJ_"+sig+"_VH_all_M"+outlabel.split("_M")[1]+".root"
        histName="data_obs"
        scaleData=1.0
       Tools.AddData(card,rootFileData,histName,scaleData)
@@ -118,7 +121,11 @@ for sig in signals:
       Tools.AddSigSystematics(card,sig,dataset,p,1)
       Tools.AddResBackgroundSystematics(card,p)
       Tools.AddNonResBackgroundSystematics(card,p)
+      Tools.AddTaggingSystematics(card,sig,dataset,p,resultsDir[dataset]+'/migrationunc.json')
       print "##########################       systematics added in datacard      ######################"  
+
+
+
         
       card.makeCard()
       t2wcmd = "text2workspace.py %s -o %s"%(cardName,workspaceName)

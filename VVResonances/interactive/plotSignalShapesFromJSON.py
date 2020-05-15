@@ -413,6 +413,7 @@ def doAll(category,jsons,legs):
       
 if __name__ == '__main__':
     #doSingle()
+
 #    legs = ["G_{bulk} #rightarrow WW"]
     legs = ["G_{bulk} #rightarrow ZZ","W' #rightarrow WZ","G_{bulk} #rightarrow WW","Z'#rightarrow WW","Z' #rightarrow ZH","W' #rightarrow WH"]
 #    legs = ["Z' #rightarrow ZH"]
