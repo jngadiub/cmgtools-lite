@@ -140,24 +140,24 @@ class myTree:
             self.jj_l2_mergedZbbTruth.ri = event.jj_l2_mergedZbbTruth
             self.category[:7] = cat 
             # this depends now on the actual cuts in the analysis!!
-            if event.jj_l1_DeepBoosted_ZHbbvsQCD > event.jj_l1_DeepBoosted_ZHbbvsQCD__0p02:
+            if event.jj_l1_DeepBoosted_ZHbbvsQCD > event.jj_l1_DeepBoosted_ZHbbvsQCD__0p02_default_16:
                 self.jj_l1_jetTag[:6] = 'HPHtag'
-            elif event.jj_l1_DeepBoosted_WvsQCD>event.jj_l1_DeepBoosted_WvsQCD__0p05:
+            elif event.jj_l1_DeepBoosted_WvsQCD>event.jj_l1_DeepBoosted_WvsQCD__0p05_default_16:
                 self.jj_l1_jetTag[:6] = 'HPVtag'
-            elif event.jj_l1_DeepBoosted_ZHbbvsQCD > event.jj_l1_DeepBoosted_ZHbbvsQCD__0p10:
+            elif event.jj_l1_DeepBoosted_ZHbbvsQCD > event.jj_l1_DeepBoosted_ZHbbvsQCD__0p10_default_16:
                 self.jj_l1_jetTag[:6] = 'LPHtag'
-            elif event.jj_l1_DeepBoosted_WvsQCD>event.jj_l1_DeepBoosted_WvsQCD__0p10:
+            elif event.jj_l1_DeepBoosted_WvsQCD>event.jj_l1_DeepBoosted_WvsQCD__0p10_default_16:
                 self.jj_l1_jetTag[:6] = 'LPVtag'
             else:
                 self.jj_l1_jetTag[:6] = 'Notag'
                 
-            if event.jj_l2_DeepBoosted_ZHbbvsQCD > event.jj_l2_DeepBoosted_ZHbbvsQCD__0p02:
+            if event.jj_l2_DeepBoosted_ZHbbvsQCD > event.jj_l2_DeepBoosted_ZHbbvsQCD__0p02_default_16:
                 self.jj_l2_jetTag[:6] = 'HPHtag'
-            elif event.jj_l2_DeepBoosted_WvsQCD>event.jj_l2_DeepBoosted_WvsQCD__0p05:
+            elif event.jj_l2_DeepBoosted_WvsQCD>event.jj_l2_DeepBoosted_WvsQCD__0p05_default_16:
                 self.jj_l2_jetTag[:6] = 'HPVtag'
-            elif event.jj_l2_DeepBoosted_ZHbbvsQCD > event.jj_l2_DeepBoosted_ZHbbvsQCD__0p10:
+            elif event.jj_l2_DeepBoosted_ZHbbvsQCD > event.jj_l2_DeepBoosted_ZHbbvsQCD__0p10_default_16:
                 self.jj_l2_jetTag[:6] = 'LPHtag'
-            elif event.jj_l2_DeepBoosted_WvsQCD>event.jj_l2_DeepBoosted_WvsQCD__0p10:
+            elif event.jj_l2_DeepBoosted_WvsQCD>event.jj_l2_DeepBoosted_WvsQCD__0p10_default_16:
                 self.jj_l2_jetTag[:6] = 'LPVtag'
             else:
                 self.jj_l2_jetTag[:6] = 'Notag'    
