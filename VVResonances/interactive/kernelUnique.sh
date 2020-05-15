@@ -1,9 +1,10 @@
 #!bin/bash
-indir=testSpikekiller/
-name=2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_defaultMaps_widermjj_testspikekiller_OPT3_0and2_OPTXY0and2_OPTZ1and2_PTZ2and2 #OPT31and1_OPTXY2_OPTZ2
+indir=results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_defaultMap_widermjj_nospikekiller/
+name=2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_defaultMaps_widermjj_nospikekiller_OPT3_0and2_OPTXY0and2_OPTZ1and2_PTZ2and2 #OPT31and1_OPTXY2_OPTZ2
 postfitdir=postfit_qcd/${name}/
 mkdir $postfitdir
 categories=('VH_LPHP' 'VH_HPHP' 'VH_HPLP' 'VV_HPLP' 'VV_HPHP')
+
 for cat in ${categories[*]}; do
     #               pythia
     python transferKernelUnique.py -i ${indir}JJ_2016_nonRes_${cat}.root --sample pythia --year 2016 -p x --pdfIn ${indir}JJ_2016_nonRes_3D_none.root | tee KernelTransf_2016_${cat}_pythia_x_${name}.out
