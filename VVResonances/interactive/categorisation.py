@@ -28,7 +28,13 @@ def getSamplelist(directory,signal):
     samples =[]
     for filename in os.listdir(directory):
       if filename.find(signal)!=-1 and filename.find('root')!=-1:
-        samples.append(directory+filename)
+          print filename 
+          if filename.find("VBF")!=-1 and signal.find("VBF")==-1:              
+            print "will continue"
+            continue
+          else:
+            print "will append"
+            samples.append(directory+filename)
     return samples
 
 
