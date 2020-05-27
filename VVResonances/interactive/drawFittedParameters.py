@@ -207,8 +207,8 @@ def doJetMass(leg,signals,titles,categories):
            gHPHP = fHHP.Get(var+"H")
            fHPLP = fHLP.Get(var+"H_func")
            fHPHP = fHHP.Get(var+"H_func")
-           gHPLP.GetFunction(var+"H_func").SetBit(rt.TF1.kNotDraw)
-           gHPHP.GetFunction(var+"H_func").SetBit(rt.TF1.kNotDraw)
+           #gHPLP.GetFunction(var+"H_func").SetBit(rt.TF1.kNotDraw)
+           #gHPHP.GetFunction(var+"H_func").SetBit(rt.TF1.kNotDraw)
        
            beautify(fHPLP ,rt.TColor.GetColor(colors[4]),2,24)
            beautify(fHPHP ,rt.TColor.GetColor(colors[4]),1,8)
@@ -227,8 +227,8 @@ def doJetMass(leg,signals,titles,categories):
            gHPHP = fHP.Get(var)
            fHPLP = fLP.Get(var+"_func")
            fHPHP = fHP.Get(var+"_func")
-           gHPLP.GetFunction(var+"_func").SetBit(rt.TF1.kNotDraw)
-           gHPHP.GetFunction(var+"_func").SetBit(rt.TF1.kNotDraw)
+           #gHPLP.GetFunction(var+"_func").SetBit(rt.TF1.kNotDraw)
+           #gHPHP.GetFunction(var+"_func").SetBit(rt.TF1.kNotDraw)
        
            beautify(fHPLP ,rt.TColor.GetColor(colors[i]),2,24)
            beautify(fHPHP ,rt.TColor.GetColor(colors[i]),1,8)
@@ -337,9 +337,24 @@ def doYield():
         
 def doMVV(signals,titles,year):
 
-    variab = ["MEAN","SIGMA","ALPHA1","ALPHA2","N1","N2"]
-    for var in variab:
-        print "var ",var
+#    variab = ["MEAN","SIGMA","ALPHA1","ALPHA2","N1","N2"]
+#    for var in variab:
+#        print "var ",var
+
+    vars = ["MEAN","SIGMA","ALPHA1","ALPHA2","N1","N2"]
+    gStyle.SetOptFit(0)
+    filesHP=[]
+    # filesLP=[]
+    
+    for i,s in enumerate(signals):
+        # filesLP.append(TFile("debug_JJ_"+s+"_MVV_jer.json.root","READ"))
+        if TFile("debug_JJ_"+s+"_"+year+"_MVV.json.root","READ").IsZombie() ==1:
+            filesHP.append(TFile("debug_JJ_j1"+s+"_"+year+"_MVV.json.root","READ"))
+        else:
+            filesHP.append(TFile("debug_JJ_"+s+"_"+year+"_MVV.json.root","READ"))
+    
+    for var in vars:
+>>>>>>> 84fe9c1c... changed signal interpolation from using polinomials to using splines
         fitsHP=[]
         fitsLP=[]
         datasHP=[]
@@ -358,7 +373,7 @@ def doMVV(signals,titles,year):
                 # fHPLP = fLP.Get(var+"_func")
                 fHPHP = fHP.Get(var+"_func")
                 # gHPLP.GetFunction(var+"_func").SetBit(rt.TF1.kNotDraw)
-                gHPHP.GetFunction(var+"_func").SetBit(rt.TF1.kNotDraw)
+                #gHPHP.GetFunction(var+"_func").SetBit(rt.TF1.kNotDraw)
                 
                 # beautify(fHPLP ,rt.TColor.GetColor(colors[i]),9,1)
                 beautify(fHPHP ,rt.TColor.GetColor(colors[i]),1,8)
@@ -371,31 +386,28 @@ def doMVV(signals,titles,year):
                 l.AddEntry(fHPHP,titles[i],"L")
         # l2.AddEntry(datasHP[0],"No JER","L")
  #        l2.AddEntry(datasLP[0],"JER","L")
-        fitsHP[0].GetXaxis().SetTitle("M_{X} [GeV]")
-        fitsHP[0].GetYaxis().SetTitle(var+" [GeV]")
-        fitsHP[0].GetYaxis().SetNdivisions(4,5,0)
-        fitsHP[0].GetXaxis().SetNdivisions(9,2,0)
-        fitsHP[0].GetYaxis().SetTitleOffset(0.97)
-        fitsHP[0].GetYaxis().SetMaxDigits(2)
-        fitsHP[0].GetXaxis().SetTitleOffset(0.94)
-        fitsHP[0].GetXaxis().SetRangeUser(1126, 5500.)
-        fitsHP[0].GetYaxis().SetRangeUser(-2., 3.)
-        if var.find("ALPHA1")!=-1: fitsHP[0].GetYaxis().SetRangeUser(0., 4.)
-        if var.find("ALPHA2")!=-1: fitsHP[0].GetYaxis().SetRangeUser(0., 16.)
-        if var.find("SIGMA")!=-1:  fitsHP[0].GetYaxis().SetRangeUser(0., 400.)
-        if var.find("MEAN")!=-1:   fitsHP[0].GetYaxis().SetRangeUser(700., 8000)
-        if var.find("N1")!=-1:     fitsHP[0].GetYaxis().SetRangeUser(0., 15.)
-        if var.find("N2")!=-1:     fitsHP[0].GetYaxis().SetRangeUser(0., 10.)
-        fitsHP[0].Draw("C")
-        if var.find("ALPHA1")!=-1: fitsHP[0].GetYaxis().SetRangeUser(0., 4.)
-        if var.find("ALPHA2")!=-1: fitsHP[0].GetYaxis().SetRangeUser(0., 16.)
+        datasHP[0].GetXaxis().SetTitle("M_{X} [GeV]")
+        datasHP[0].GetYaxis().SetTitle(var+" [GeV]")
+        datasHP[0].GetYaxis().SetNdivisions(4,5,0)
+        datasHP[0].GetXaxis().SetNdivisions(9,2,0)
+        datasHP[0].GetYaxis().SetTitleOffset(0.97)
+        datasHP[0].GetYaxis().SetMaxDigits(2)
+        datasHP[0].GetXaxis().SetTitleOffset(0.94)
+        datasHP[0].GetXaxis().SetRangeUser(1126, 5500.)
+        datasHP[0].GetYaxis().SetRangeUser(-2., 3.)
+        if var.find("ALPHA1")!=-1: datasHP[0].GetYaxis().SetRangeUser(0., 4.)
+        if var.find("ALPHA2")!=-1: datasHP[0].GetYaxis().SetRangeUser(0., 20.)
+        if var.find("SIGMA")!=-1:  datasHP[0].GetYaxis().SetRangeUser(0., 400.)
+        if var.find("MEAN")!=-1:   datasHP[0].GetYaxis().SetRangeUser(700., 8000)
+        if var.find("N1")!=-1:     datasHP[0].GetYaxis().SetRangeUser(0., 15.)
+        if var.find("N2")!=-1:     datasHP[0].GetYaxis().SetRangeUser(0., 10.)
+        datasHP[0].Draw("PA")
+        print datasHP[0].Eval(1200.)
         c.Update()
-        for i,gHP in enumerate(datasHP): 
-            if var.find("ALPHA1")!=-1: fitsHP[i].GetYaxis().SetRangeUser(0., 4.)
-            if var.find("ALPHA2")!=-1: fitsHP[i].GetYaxis().SetRangeUser(0., 20.)
+        for i,gHP in enumerate(fitsHP): 
             # gLP.Draw("Psame")
-            gHP.Draw("Psame")
-            fitsHP[i].Draw("Csame")
+            gHP.Draw("lsame")
+            datasHP[i].Draw("Psame")
             # fitsLP[i].Draw("Csame")
         l.Draw("same")
         # l2.Draw("same")
@@ -823,35 +835,7 @@ def compSignalMVV():
     c.SaveAs(path+"compareJER_MVV.png")
     
     
-    
-    # # histsHP[0].GetXaxis().SetRangeUser(1126,5200)
-#     c = getCanvas(1600,600)
-#     c.Divide(2,5)
-#     legs = []
-#     for i,(m,hp,lp) in enumerate(zip(masses,histsHP,histsLP)):
-#         hp.Scale(1./hp.Integral())
-#         lp.Scale(1./lp.Integral())
-#         hp.Divide(lp)
-#         hp.SetMarkerColor(1)
-#         hp.GetXaxis().SetRangeUser(m*0.80,m*1.2)
-#         hp.GetYaxis().SetRangeUser(0,2)
-#         hp.GetYaxis().SetNdivisions(3,0,0)
-#         hp.GetXaxis().SetTitle("M = %i GeV"%m)
-#         hp.GetYaxis().SetTitle("HP/LP")
-#         hp.GetYaxis().SetTitleSize(0.7)
-#         hp.GetYaxis().SetLabelSize(0.16)
-#
-#         hp.GetXaxis().SetTitleSize(0.7)
-#         c.cd(i+1)
-#         hp.Draw("M")
-#         l = getLegend(0.80010112,0.723362,0.90202143,0.879833)
-#         l.SetName("l%i"%m)
-#         l.SetTextSize(0.2)
-#         l.AddEntry(hp   ,"%i"%m,"LEP")
-#         l.Draw("same")
-#         legs.append(l)
-#
-#     c.SaveAs(path+"compareJER_MVVratio.png")
+  
         
 if __name__ == '__main__':
   prelim = ""
@@ -869,6 +853,7 @@ if __name__ == '__main__':
 
   doSignalEff(signals,titles,categories)
   doMVV(signals,titles,"2016")
+
 
 #  signals = ["ZprimeWW"] 
 #  titles =  ["Z' #rightarrow WW"]
@@ -909,6 +894,7 @@ if __name__ == '__main__':
   #doSignalEff(signals,titles,categories)
   #doJetMass("random",signals,titles,categories)
   #doMVV(signals,titles,"2016")
+
   #categories = ["2016_VH_HPHP","2016_VH_HPLP","2016_VH_LPHP","2016_VV_HPHP","2016_VV_HPLP"]
   #doSignalEff(sys.argv[1],signals,titles,categories,[0.3,0.03,0.06,0.2,0.05])
   
