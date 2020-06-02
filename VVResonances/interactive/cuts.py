@@ -14,15 +14,9 @@ minMJ=55.0
 maxMJ=215.0
 binsMJ=80
 
-<<<<<<< HEAD
 widerMVV= True
 minMVV=838.0
-maxMVV=5500.0
-=======
-widerMVV=False
-minMVV=838.00
 maxMVV=6000.0
->>>>>>> 6972aff988174f4ceb202afe6c6fcba1f6d184e0
 if widerMVV: maxMVV=7600.0
 
 binsMVV=100
@@ -31,7 +25,7 @@ minMX=1200.0
 maxMX=6000.0    
 
 #gen level cuts for templates    
-minGenMJ=20.
+minGenMJ=0. #20.
 maxGenMJ=300.
 minGenMVV=800.0
 maxGenMVV=6000.0
