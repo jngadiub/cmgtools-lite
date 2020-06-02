@@ -473,7 +473,7 @@ def reSubmit(jobdir,resubmit,jobname):
 			 os.chdir("../..")
  return jobs
 
-def merge2DDetectorParam(resFile,binsxStr,jobname,template="QCD_Pt_"):
+def merge2DDetectorParam(jobList,files,resFile,binsxStr,jobname,template="QCD_Pt_"):
     
     print "Merging 2D detector parametrization"
 
@@ -483,8 +483,36 @@ def merge2DDetectorParam(resFile,binsxStr,jobname,template="QCD_Pt_"):
     print "outdir "+str(outdir)
     print "jobdir "+str(jobdir)
    
+    print "Jobs to merge :   " ,jobList
+    print "Files ran over:   " ,files
+
+    resubmit, jobsPerSample,exit_flag = getJobs(files,jobList,outdir,"")
+    
+    if exit_flag:
+         submit = raw_input("The following files are missing: %s. Do you  want to resubmit the jobs to the batch system before merging? [y/n] "%resubmit)
+         if submit == 'y' or submit=='Y':
+             print "Resubmitting jobs:"
+             jobs = reSubmit(jobdir,resubmit,jobname)
+             waitForBatchJobs(jobname,len(resubmit),len(resubmit), userName, timeCheck)
+             resubmit, jobsPerSample,exit_flag = getJobs(files,jobList,outdir,purity)
+             if exit_flag: 
+                 print "Job crashed again! Please resubmit manually before attempting to merge again"
+                 for j in jobs: print j 
+                 sys.exit()
+         else:
+             submit = raw_input("Some files are missing. [y] == Exit without merging, [n] == continue ? ")
+             if submit == 'y' or submit=='Y':
+                 print "Exit without merging!"
+                 sys.exit()
+             else:
+                 print "Continuing merge!"
+    
+
+
     filelist = os.listdir('./res'+jobname+'/')
     print "filelist "+str(filelist)
+
+
 
     pythia_files = []
     herwig_files = []

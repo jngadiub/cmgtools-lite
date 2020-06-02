@@ -75,18 +75,17 @@ class AllFunctions():
    cmd='vvMakeSignalYields.py -s {template} -c "{cut}" -o {output} -V "jj_LV_mass" -m {minMVV} -M {maxMVV} -f {fnc} -b {BR} --minMX {minMX} --maxMX {maxMX} {samples} '.format(template=template, cut=cut, output=yieldFile,minMVV=self.minMVV,maxMVV=self.maxMVV,fnc=fnc,BR=branchingFraction,minMX=self.minMX,maxMX=self.maxMX,samples=self.samples)
    os.system(cmd)
 
- def makeDetectorResponse(self,name,filename,template,addCut="1",jobName="DetPar"):
+ def makeDetectorResponse(self,name,filename,template,addCut="1",jobName="DetPar",wait=True):
  
    cut='*'.join([self.cuts['common'],addCut,self.cuts['acceptanceGEN'],self.cuts['looseacceptanceMJ']])
    resFile=filename+"_"+name+"_detectorResponse.root"	    
    print "Saving detector resolution to file: " ,resFile
-   bins = "200,250,300,350,400,450,500,600,700,800,900,1000,1200,1500,1800,2200,2600,3000,3400,3800,5000"#4200,4600,5000,7000"#TODO: The last three bins are empty, remove next iteration!
+   #bins = "200,250,300,350,400,450,500,600,700,800,900,1000,1200,1500,1800,2200,2600,3000,3400,3800,5000"#4200,4600,5000,7000"#TODO: The last three bins are empty, remove next iteration!
+   bins = "200,250,300,350,400,450,500,600,700,800,900,1000,1200,1500,1800,2200,2600,3000,5000"#4200,4600,5000,7000"#TODO: The last three bins are empty, remove next iteration!
    if self.submitToBatch:
     from modules.submitJobs import Make2DDetectorParam,merge2DDetectorParam 
     jobList, files = Make2DDetectorParam(resFile,template,cut,self.samples,jobName,bins)
-    jobList = []
-    files = []
-    merge2DDetectorParam(resFile,bins,jobName,template)
+    if wait: merge2DDetectorParam(jobList,files,resFile,bins,jobName,template)
    else:
     cmd='vvMake2DDetectorParam.py  -o "{rootFile}" -s "{template}" -c "{cut}"  -v "jj_LV_mass,jj_l1_softDrop_mass"  -g "jj_gen_partialMass,jj_l1_gen_softDrop_mass,jj_l1_gen_pt"  -b {bins}   {samples}'.format(rootFile=resFile,template=template,cut=cut,minMVV=self.minMVV,maxMVV=self.maxMVV,tag=name,bins=bins,samples=self.samples)
     os.system(cmd)
