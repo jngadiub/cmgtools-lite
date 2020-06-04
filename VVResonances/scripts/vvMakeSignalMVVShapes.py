@@ -89,7 +89,7 @@ def chooseBin(sample,b,binmidpoint):
         return b
     elif sample.find('WH')!=-1 or sample.find('Wh')!=-1:
         if b <= 55+2*binmidpoint and b > 65: b = 80
-        if b > 55+2*binmidpoint: b = 90
+        if b > 55+2*binmidpoint: b = 120
         return b
     
 def dodCBFits(h1,mass,prefix,fixpars):
@@ -211,6 +211,7 @@ if testcorr ==True:
         elif options.sample.find("WH")!=-1 or options.sample.find("Wh")!=-1:
             bins_all = [[5,15],[15,50]]
             binmidpoint = 15
+            print bins_all
     
 
 for mass in sorted(samples.keys()):
@@ -304,6 +305,13 @@ if testcorr==True:
     print "sum sigma",  graph_sum_sigma
     graph_sum_sigma.Write()
     graph_sum_mean .Write()
+    tmp = graph_sum_mean
+    print "whats in mean?"
+    for x in range(1,tmp.GetXaxis().GetNbins()+1):
+        for y in range(1,tmp.GetXaxis().GetNbins()+1):
+            print x
+            print y
+            print tmp.GetBinContent(x,y)
 
 
 F.Close()
