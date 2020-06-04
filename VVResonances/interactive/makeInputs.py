@@ -3,7 +3,7 @@ from optparse import OptionParser
 from cuts import cuts, HPSF16, HPSF17, LPSF16, LPSF17, dijetbins, HCALbinsMVVSignal, minMJ,maxMJ,binsMJ, minMVV, maxMVV, binsMVV, minMX, maxMX, catVtag, catHtag
 ## import cuts of the analysis from separate file
 
-# python makeInputs.py -p 2016 --run "detector"
+# python makeInputs.py -p 2016 --run "detector" --batch False
 # python makeInputs.py -p 2016 --run "signorm" --signal "ZprimeWW" --batch False 
 # python makeInputs.py -p 2016 --run "tt" --batch False 
 # python makeInputs.py -p 2016 --run "vjets" --batch False                                                                                                                                      
@@ -111,10 +111,10 @@ else:
 
 
 #all categories
-#categories=['VH_HPHP','VV_HPHP'] #,'VBF_VV_HPHP','VBF_VV_HPLP']
-categories=['VH_HPHP','VH_HPLP','VH_LPHP','VV_HPHP','VV_HPLP'] #,'VBF_VV_HPHP','VBF_VV_HPLP']
+#categories=['VV_HPLP'] #,'VBF_VV_HPHP','VBF_VV_HPLP']
+#categories=['VH_HPHP','VH_HPLP','VH_LPHP','VV_HPHP','VV_HPLP'] #,'VBF_VV_HPHP','VBF_VV_HPLP']
 #categories=['NP']
-#categories = ['none']
+categories = ['none']
                                                                                                                                                                                    
 #list of signal samples --> nb, radion and vbf samples to be added
 BulkGravWWTemplate="BulkGravToWW_"
