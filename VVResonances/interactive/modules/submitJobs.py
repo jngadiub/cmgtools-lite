@@ -138,7 +138,8 @@ def Make2DDetectorParam(rootFile,template,cut,samples,jobname="DetPar",bins="200
     print "cut      = %s" %cut       
     print "samples  = %s" %samples   
     print "jobname  = %s" %jobname 
-    
+    print "bins     = %s" %bins
+
     if leg == "l1": cmd='vvMake2DDetectorParam.py  -c "{cut}"  -v "jj_LV_mass,jj_l1_softDrop_mass"  -g "jj_gen_partialMass,jj_l1_gen_softDrop_mass,jj_l1_gen_pt"  -b {bins}   {infolder}'.format(rootFile=rootFile,samples=template,cut=cut,bins=bins,infolder=samples)
     if leg == "l2": cmd='vvMake2DDetectorParam.py  -c "{cut}"  -v "jj_LV_mass,jj_l2_softDrop_mass"  -g "jj_gen_partialMass,jj_l2_gen_softDrop_mass,jj_l2_gen_pt"  -b {bins}   {infolder}'.format(rootFile=rootFile,samples=template,cut=cut,bins=bins,infolder=samples)
     OutputFileNames = rootFile.replace(".root","") # base of the output file name, they will be saved in res directory
