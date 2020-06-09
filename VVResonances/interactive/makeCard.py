@@ -10,7 +10,7 @@ sf_qcd = 1.0
 
 #### to create the preparatory WS for pseudodata with Vjets: pseudodata = "" & doVjets=True 
 pseudodata = "Vjets"
-outlabel = "_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_nominalMaps_pseudo80"
+outlabel = "_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_nominalMaps_MigrUnc_TestVjets"
 
 datasets=['2016']#,'2017']
 
@@ -37,9 +37,9 @@ vtag_unc['VH_LPLP'] = {'2016':'1.','2017':'1.'}
 vtag_unc['VH_LPHP'] = {'2016':'1.','2017':'1.'}
 
 vtag_pt_dependence = {'VV_HPHP':'((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))','VV_HPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))','VH_HPHP':'1','VH_HPLP':'1','VH_LPHP':'1','VH_LPLP':'1'}
-#purities= ['VV_HPLP','VV_HPHP'] #,'VH_HPLP','VH_HPHP','VH_LPHP']
+purities= ['VV_HPLP'] #,'VV_HPHP'] #,'VH_HPLP','VH_HPHP','VH_LPHP']
 #purities= ['VV_HPLP','VV_HPHP','VH_HPHP','VH_LPHP']
-purities= ['VV_HPLP','VV_HPHP','VH_HPLP','VH_HPHP','VH_LPHP']
+#purities= ['VV_HPLP','VV_HPHP','VH_HPLP','VH_HPHP','VH_LPHP']
 #purities= ['VH_HPLP','VH_HPHP','VH_LPHP']
 #purities= ['VH_LPHP',"VH_HPHP"]
 #signals = ["BulkGWW", "BulkGZZ","ZprimeWW","WprimeWZ","VprimeWV","'ZprimeZH'"]

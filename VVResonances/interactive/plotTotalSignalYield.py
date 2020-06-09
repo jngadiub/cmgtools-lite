@@ -691,7 +691,7 @@ def doAllTestVHLPLP(signal,legend,colorindex):
 def doAllOld(signal,legend,colorindex):
 
 #    directorypaper="results_QCD_pythia_signals_2016_DeepW_VVpaper_HPHP_HPLP/"
-    directorypaper="debugSensitivityBulkGWW/VVinclu/"
+    directorypaper="results_2016_VVinclu_deepAK8WDDT/"
 #    directoryVV="results_QCD_pythia_signals_2016_tau21DDT_rho_VV_HPHP_HPLP/"
 #    directoryVH="results_QCD_pythia_signals_2016_tau21DDT_rho_VH_HPHP_HPLP_LPHP/"
     purities=["VV_HPHP","VV_HPLP"] #,"VH_HPHP","VH_HPLP","VH_LPHP"]
@@ -939,23 +939,23 @@ def doAllOldCompare(signal,legend,colorindex):
                 
 if __name__ == '__main__':
 #    doSingle() #NB: some fix would be needed here!
-    signals = ["BulkGZZ","WprimeWZ","BulkGWW","ZprimeWW","ZprimeZH","WprimeWH"]
-    legs = ["G_{bulk} #rightarrow ZZ","W' #rightarrow WZ","G_{bulk} #rightarrow WW","Z'#rightarrow WW","Z'#rightarrow ZH","W'#rightarrow WH"]                                               
+#    signals = ["BulkGZZ","WprimeWZ","BulkGWW","ZprimeWW","ZprimeZH","WprimeWH"]
+#    legs = ["G_{bulk} #rightarrow ZZ","W' #rightarrow WZ","G_{bulk} #rightarrow WW","Z'#rightarrow WW","Z'#rightarrow ZH","W'#rightarrow WH"]                                               
 #    signals = ["BulkGWW","ZprimeZH"]
 #    legs = ["G_{bulk} #rightarrow WW","Z'#rightarrow ZH"]                                                                                                                                                     
 #    signals = ["ZprimeZH"]
 #    legs = ["Z'#rightarrow ZH"]                                                                                                                                                     
 
 
-#    signals = ["BulkGWW"] 
-#    legs = ["G_{bulk} #rightarrow WW"] 
+    signals = ["BulkGWW"] 
+    legs = ["G_{bulk} #rightarrow WW"] 
     
     for i in range(len(signals)):
 #    for i in range(1):
       print i
       print signals[i]
       print legs[i]
-#      doAllOld(signals[i],legs[i],i)
+      doAllOld(signals[i],legs[i],i)
 #      doAllOldCompare(signals[i],legs[i],i)
-      doAll(signals[i],legs[i],i)
+#      doAll(signals[i],legs[i],i)
 #      doAllTestVHLPLP(signals[i],legs[i],i)
