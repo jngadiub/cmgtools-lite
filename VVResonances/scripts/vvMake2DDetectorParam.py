@@ -41,7 +41,7 @@ for filename in os.listdir(args[0]):
             if fname.find("QCD_Pt_") !=-1 or fname.find("QCD_HT") !=-1:
                 print "going to apply spikekiller for ",fname
                 dataPlotters[-1].addCorrectionFactor('b_spikekiller','tree')
-                      
+
 data=MergedPlotter(dataPlotters)
 
 binsxStr=options.binsx.split(',')
@@ -69,9 +69,16 @@ gaussian=ROOT.TF1("gaussian","gaus",0.5,1.5)
 f=ROOT.TFile(options.output,"RECREATE")
 f.cd()
 
-superHX=data.drawTH2Binned(variables[0]+'/'+genVariables[0]+':'+genVariables[2],options.cut,"1",binsx,binsz_x) #mvv
-superHY=data.drawTH2Binned(variables[1]+'/'+genVariables[1]+':'+genVariables[2],options.cut,"1",binsx,binsz_y) #mjet
+superHX=data.drawTH2Binned(variables[0]+'/'+genVariables[0]+':'+genVariables[3],options.cut,"1",binsx,binsz_x) #mvv
+superHX_l2=data.drawTH2Binned(variables[0]+'/'+genVariables[0]+':'+genVariables[4],options.cut,"1",binsx,binsz_x) #mvv
+superHY=data.drawTH2Binned(variables[1]+'/'+genVariables[1]+':'+genVariables[3],options.cut,"1",binsx,binsz_y) #mjet
+superHY_l2=data.drawTH2Binned(variables[2]+'/'+genVariables[2]+':'+genVariables[4],options.cut,"1",binsx,binsz_y) #mjet
 
+superHX.Add(superHX_l2)
+print " Added mvv hists"
+superHY.Add(superHY_l2)
+print " Added mjet hists"
+print "########## mvv ###############"
 for bin in range(1,superHX.GetNbinsX()+1):
    tmp=superHX.ProjectionY("q",bin,bin)
    if bin==1: 
@@ -109,6 +116,8 @@ for bin in range(1,superHX.GetNbinsX()+1):
    scalexHisto.SetBinError  (bin,tmpmeanErr)
    resxHisto.SetBinContent  (bin,tmpwidth)
    resxHisto.SetBinError    (bin,tmpwidthErr)
+
+print "########## mjet ###############"
 for bin in range(1,superHY.GetNbinsX()+1): 
    tmp=superHY.ProjectionY("q",bin,bin)
    if bin==1:
