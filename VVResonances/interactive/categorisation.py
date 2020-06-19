@@ -31,7 +31,6 @@ def getSamplelist(directory,signal):
         if filename.find("VBF")!=-1 and signal.find("VBF")==-1: continue  
         samples.append(directory+filename)
     print samples
-
     return samples
 
 

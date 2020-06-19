@@ -20,9 +20,13 @@ def returnString(func):
 def getBinning(binsMVV,minx,maxx,bins):
     l=[]
     if binsMVV=="":
+        print " do this"
+        print binsMVV
         for i in range(0,bins+1):
             l.append(minx + i* (maxx - minx)/bins)
     else:
+        print "dot that"
+        print binsMVV
         s = binsMVV.split(",")
         for w in s:
             l.append(int(w))
@@ -134,7 +138,6 @@ graphs={'MEAN':ROOT.TGraphErrors(),'SIGMA':ROOT.TGraphErrors(),'ALPHA1':ROOT.TGr
 
 testcorr= False
 if options.sample.find("ZH")!=-1 or options.sample.find('Zh')!=-1 or options.sample.find("WZ")!=-1 or options.sample.find('WH')!=-1 or options.sample.find('Wh')!=-1:
-
     testcorr = True
 
 print " ######### testcorr ",testcorr
@@ -184,22 +187,22 @@ if testcorr ==True:
             allgraphs[mass] = h
             allgraphs_sigma[mass] = hs
 
-        if samples[mass].find("WZ")!=-1:
-            print 'sigma histo for WZ'
-            graph_sum_sigma = ROOT.TH2F("corr_sigma","corr_sigma",2,array("f",[55,85,215]),2,array("f",[55,85,215]))
-        else:
-            print 'add sigma hist'
-            graph_sum_sigma = ROOT.TH2F("corr_sigma","corr_sigma",2,array("f",[55,105,215]),2,array("f",[55,105,215]))
-            
-        if samples[mass].find("WZ")!=-1:
-            print 'mean for WZ signal' 
-            graph_sum_mean = ROOT.TH2F("corr_mean","corr_mean",2,array("f",[76,86,94]),2,array("f",[76,86,94]))
-        elif options.sample.find("WH")!=-1 or samples[mass].find("Wh")!=-1:
-            print 'mean for WH signal'
-            graph_sum_mean  = ROOT.TH2F("corr_mean","corr_mean",2,array("f",[65,105,145]),2,array("f",[65,105,145]))
-        elif samples[mass].find("ZH")!=-1 or samples[mass].find("Zh")!=-1:
-            print 'mean for ZH signal'
-            graph_sum_mean = ROOT.TH2F("corr_mean","corr_mean",2,array("f",[85,105,145]),2,array("f",[85,105,145]))
+            if samples[mass].find("WZ")!=-1:
+                print 'sigma histo for WZ'
+                graph_sum_sigma = ROOT.TH2F("corr_sigma","corr_sigma",2,array("f",[55,85,215]),2,array("f",[55,85,215]))
+            else:
+                print 'add sigma hist'
+                graph_sum_sigma = ROOT.TH2F("corr_sigma","corr_sigma",2,array("f",[55,105,215]),2,array("f",[55,105,215]))
+                
+            if samples[mass].find("WZ")!=-1:
+                print 'mean for WZ signal' 
+                graph_sum_mean = ROOT.TH2F("corr_mean","corr_mean",2,array("f",[76,86,94]),2,array("f",[76,86,94]))
+            elif options.sample.find("WH")!=-1 or samples[mass].find("Wh")!=-1:
+                print 'mean for WH signal'
+                graph_sum_mean  = ROOT.TH2F("corr_mean","corr_mean",2,array("f",[65,105,145]),2,array("f",[65,105,145]))
+            elif samples[mass].find("ZH")!=-1 or samples[mass].find("Zh")!=-1:
+                print 'mean for ZH signal'
+                graph_sum_mean = ROOT.TH2F("corr_mean","corr_mean",2,array("f",[85,105,145]),2,array("f",[85,105,145]))
         minmjet = 55
         maxmjet = 215 
         binsmjet = 80
@@ -212,7 +215,6 @@ if testcorr ==True:
             bins_all = [[5,15],[15,50]]
             binmidpoint = 15
             print bins_all
-    
 
 for mass in sorted(samples.keys()):
     print 'fitting',str(mass) 
@@ -229,7 +231,12 @@ for mass in sorted(samples.keys()):
     fitter.w.var("MH").setVal(mass)
 
     extra_extra_cut = "&& (jj_LV_mass>%f&&jj_LV_mass<%f)"%(0.8*mass,1.1*mass)
-    binning= truncate(getBinning(options.binsMVV,options.minMX,options.maxMX,500),0.80*mass,1.2*mass)    
+    binning= truncate(getBinning(options.binsMVV,min(options.minMX,options.min),options.maxMX,500),0.80*mass,1.2*mass)    
+    
+    print "----------------------------------------"
+    print binning
+    print "-----------------------------------------------"
+
     
     histo = plotter.drawTH1Binned(options.mvv,options.cut+extra_extra_cut,"1",binning)
     fitter.importBinnedData(histo,['MVV'],'data')
@@ -274,7 +281,7 @@ for mass in sorted(samples.keys()):
              fitter.w.var(parVal[0]).setVal(float(parVal[1]))
              fitter.w.var(parVal[0]).setConstant(1)
 
-#    fitter.importBinnedData(histo,['MVV'],'data')
+    fitter.importBinnedData(histo,['MVV'],'data')
     fitter.fit('model','data',[ROOT.RooFit.SumW2Error(0),ROOT.RooFit.Save()])
     fitter.fit('model','data',[ROOT.RooFit.SumW2Error(0),ROOT.RooFit.Minos(1),ROOT.RooFit.Save()])
     
@@ -315,4 +322,8 @@ if testcorr==True:
 
 
 F.Close()
-            
+
+print "binsMVV"
+print options.binsMVV
+print "binsM"           
+

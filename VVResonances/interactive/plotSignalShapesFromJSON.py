@@ -147,8 +147,6 @@ varBins = {'mVV':'[37,1000,5500]','mJ':'[80,55,215]'}
 #w.factory(options.var+varBins[options.var])
 #w.var(options.var).SetTitle(varName[options.var])
 colors= []
-
-
 colors.append(["#000080","#0000CD","#0000FF","#3D59AB","#4169E1","#4876FF","#6495ED","#1E90FF","#63B8FF","#87CEFA","#C6E2FF"]*4)   
 colors.append(["#006400","#308014","#228B22","#32CD32","#00CD00","#00EE00","#00FF00","#7CCD7C","#7CFC00","#ADFF2F","#C0FF3E"]*4)   
 colors.append(["#CD8500","#CD950C","#EE9A00","#EEAD0E","#FFA500","#FFB90F","#FFC125","#EEC900","#FFD700","#FFEC8B","#FFF68F"]*4) 
@@ -360,8 +358,6 @@ def doAll(category,jsons,legs):
       
 if __name__ == '__main__':
     #doSingle()
-
-
 #    legs = ["G_{bulk} #rightarrow WW"]
     legs = ["G_{bulk} #rightarrow ZZ","W' #rightarrow WZ","G_{bulk} #rightarrow WW","Z'#rightarrow WW","Z' #rightarrow ZH","W' #rightarrow WH"]
 #    legs = ["Z' #rightarrow ZH"]
@@ -374,6 +370,7 @@ if __name__ == '__main__':
 
 #    legs = ["G_{bulk} #rightarrow ZZ","W' #rightarrow WZ","G_{bulk} #rightarrow WW","Z'#rightarrow WW","Z' #rightarrow ZH","W' #rightarrow WH"]
 #    signals = ["BulkGZZ","WprimeWZ","BulkGWW","ZprimeWW","ZprimeZH","WprimeWH"]
+
     categories = options.category.split(',')
     for category in categories:
       jsons=[]

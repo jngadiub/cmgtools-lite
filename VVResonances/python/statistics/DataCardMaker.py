@@ -433,6 +433,8 @@ class DataCardMaker:
             resolutionStr=resolutionStr+"+{factor}*{syst}".format(factor=factor,syst=syst)
             resolutionSysts.append(syst)
        
+        
+       
         MJJ=variable            
         if self.w.var(MJJ) == None: self.w.factory(MJJ+"[0,1000]")
 

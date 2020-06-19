@@ -116,7 +116,6 @@ def doSignalEff(directory,signals,titles,categories,ymaxrange=[0.3,0.5,0.05,0.05
             fHPHP = TF1("funcHP"+str(i),str(ftmpHPHP.GetExpFormula()).replace("func","")+"*1000.",ftmpHPHP.GetXmin(),ftmpHPHP.GetXmax())
             for o in range(0,ftmpHPHP.GetNpar()): 
                 fHPHP.SetParameter(o,ftmpHPHP.GetParameter(o))
-        
         else: fHPHP = gHPHP
         
         beautify(fHPHP ,rt.TColor.GetColor(colors[i]),linestyle[i],markerstyle[i])
@@ -388,7 +387,8 @@ def doMVV(signals,titles,year):
         if var.find("SIGMA")!=-1:  datasHP[0].GetYaxis().SetRangeUser(0., 400.)
         if var.find("MEAN")!=-1:   datasHP[0].GetYaxis().SetRangeUser(700., 8000)
         if var.find("N1")!=-1:     datasHP[0].GetYaxis().SetRangeUser(0., 15.)
-        if var.find("N2")!=-1:     datasHP[0].GetYaxis().SetRangeUser(0., 10.)
+        if var.find("N2")!=-1:     datasHP[0].GetYaxis().SetRangeUser(0., 150.)
+
         datasHP[0].Draw("PA")
         print datasHP[0].Eval(1200.)
         c.Update()
@@ -833,10 +833,9 @@ if __name__ == '__main__':
 #  titles =  ["Z' #rightarrow ZH","G_{B}#rightarrow WW"]
   signals = ["BulkGWW"]
   titles =  ["G_{B}#rightarrow WW"]
-  signals =["ZprimeWW","BulkGWW","WprimeWZ","BulkGZZ","ZprimeZH","WprimeWH"]
-  titles =  ["Z' #rightarrow WW","G_{B}#rightarrow WW","W' #rightarrow WZ","G_{B}#rightarrow ZZ","Z' #rightarrow ZH","W' #rightarrow WH"]
   categories = ["2016_NP"]
   doJetMass("random",signals,titles,categories)
+
 #  categories = ["2016_VV_HPHP","2016_VV_HPLP"] #,"2016_VH_HPHP","2016_VH_LPHP"]
   categories = ["2016_VV_HPHP","2016_VV_HPLP","2016_VH_HPHP","2016_VH_HPLP","2016_VH_LPHP"]
 
@@ -847,10 +846,4 @@ if __name__ == '__main__':
 
   categories = ["2016_VH_HPHP","2016_VH_HPLP","2016_VH_LPHP","2016_VV_HPHP","2016_VV_HPLP"]
   doSignalEff(sys.argv[1],signals,titles,categories,[0.3,0.03,0.06,0.2,0.05])
-
-  
-  
-  
-  
-  
 

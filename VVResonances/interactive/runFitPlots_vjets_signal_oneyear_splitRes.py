@@ -63,12 +63,6 @@ period = "2016"
 if options.name.find("2017")!=-1: period = "2017"
 
 
-if options.label.find("sigonly")!=-1:
-    doFit=False
-    print " ##################################################################################"
-    print " FITTING SWITCHED OFF "
-    print " ##################################################################################"
-
 def calculateChi2ForSig(hsig,pred,axis,logfile,label):
     if axis.find("z")!=-1:
         #logfile.open("testChi2.log","rw")
@@ -1078,7 +1072,6 @@ def getChi2proj(histo_pdf,histo_data,minx=-1,maxx=-1):
 if __name__=="__main__":
      finMC = ROOT.TFile(options.input,"READ");
      hinMC = finMC.Get("nonRes");
-
 
      print options.input
      if options.input.find("VV_HPLP")!=-1: purity="VV_HPLP"

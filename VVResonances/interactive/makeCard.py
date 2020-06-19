@@ -41,6 +41,8 @@ if outlabel.find("sigonly")!=-1 or outlabel.find("Vjetsonly")!=-1: sf_qcd = 0.00
 
 resultsDir = {'2016':'results_2016','2017':'results_2017'}
 
+
+
 # vtag uncertainty is added through the migrationunc.json file 
 # all other uncertainties and SF from one place: defined in init_VV_VH.json imported via the class defined in cuts.py
 ctx16 = cuts.cuts("init_VV_VH.json",2016,"dijetbins_random")
@@ -52,6 +54,9 @@ lumi_unc = {'2016':ctx16.lumi_unc,'2017':ctx17.lumi_unc, '2018':ctx18.lumi_unc}
 
 #scales = {"2017" :[ctx17.W_HPmassscale,ctx17.W_LPmassscale], "2016":[ctx16.W_HPmassscale,ctx16.W_LPmassscale], "2018":[ctx18.W_HPmassscale,ctx18.W_LPmassscale]}
 #scalesHiggs = {"2017" :[ctx17.H_HPmassscale,ctx17.H_LPmassscale], "2016":[ctx16.H_HPmassscale,ctx16.H_LPmassscale], "2018":[ctx18.H_HPmassscale,ctx18.H_LPmassscale]}
+
+scales = {"2017" :[1,1], "2016":[1,1], "2018":[1,1]}
+scalesHiggs = {"2017" :[1,1], "2016":[1,1], "2018":[1,1]}
 
 #quick fix to add VH !!!
 vtag_pt_dependence = {"2016" : ctx16.vtag_pt_dependence,"2017" : ctx17.vtag_pt_dependence,"2018" : ctx18.vtag_pt_dependence}

@@ -19,12 +19,10 @@ class cuts():
     H_LPmassscale = 1.
     H_HPmassscale = 1.
                                                   
-                                                  
-                                                  
     minMJ = 0.                                    
     maxMJ = 0.                                    
     binsMJ = 0.                                   
-    
+  
     minMVV = 0.0
     maxMVV = 0.0
     binsMVV = 0.
@@ -45,6 +43,15 @@ class cuts():
     
     WPHPl1Wtag = ""
     WPLPl1Wtag = ""
+
+
+
+    minGenMJ = 1.
+    maxGenMJ = 1.
+    minGenMVV = 1.
+    maxGenMVV = 1.
+
+
 
     WPHPl1Htag = ""
     WPLPl1Htag = ""
@@ -71,7 +78,7 @@ class cuts():
     cuts={}
     
     
-    def __init__(self,jsonfile,year,options):
+    def __init__(self,jsonfile,year,options,widerMVV=False):
         
         with open(jsonfile) as json_file:
                      
@@ -86,8 +93,16 @@ class cuts():
             self.maxMVV = data["ranges_and_binning"]["maxMVV"]
             self.binsMVV = data["ranges_and_binning"]["binsMVV"]
             
+            self.minGenMJ = data["ranges_and_binning"]["minGenMJ"]
+            self.maxGenMJ = data["ranges_and_binning"]["maxGenMJ"]
+            self.minGenMVV = data["ranges_and_binning"]["minGenMVV"]
+            self.maxGenMVV = data["ranges_and_binning"]["maxGenMVV"]
+            
             self.minMX = data["ranges_and_binning"]["minMX"]
             self.maxMX = data["ranges_and_binning"]["maxMX"]
+            if widerMVV==True:
+                self.maxMVV = data["ranges_and_binning"]["widerMVV_maxMVV"]
+                self.maxGenMVV = data["ranges_and_binning"]["widerMVV_maxGenMVV"]
             
             ## load SF for the different years 
             if year==2016:
@@ -159,6 +174,11 @@ class cuts():
                 self.cuts[sel] = self.cuts[sel].replace("maxMJ",str(self.maxMJ))
                 self.cuts[sel] = self.cuts[sel].replace("minMVV",str(self.minMVV))
                 self.cuts[sel] = self.cuts[sel].replace("maxMVV",str(self.maxMVV))
+                
+                self.cuts[sel] = self.cuts[sel].replace("minGenMJ",str(self.minGenMJ))
+                self.cuts[sel] = self.cuts[sel].replace("maxGenMJ",str(self.maxGenMJ))
+                self.cuts[sel] = self.cuts[sel].replace("minGenMVV",str(self.minGenMVV))
+                self.cuts[sel] = self.cuts[sel].replace("maxGenMVV",str(self.maxGenMVV))
             if options.find('dijetbins')!=-1:
                 print "use dijet binning! "
                 alldijetbins =  data["ranges_and_binning"]["dijetbins"]
@@ -227,6 +247,7 @@ class cuts():
 
 
 
+
 if __name__ == "__main__":
     c = cuts("init_VV_VH.json",2016,"dijetbins_random")
     print c.HPSF_vtag
@@ -249,4 +270,3 @@ if __name__ == "__main__":
     
     print c.fixParsSig["ZprimeWW"]['NP']
     print c.minMX
-
