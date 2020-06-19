@@ -249,6 +249,7 @@ def Make1DMVVTemplateWithKernels(rootFile,template,cut,resFile,binsMVV,minMVV,ma
     print "maxMVV   = %i" %maxMVV    
     print "samples  = %s" %samples   
     print "jobName  = %s" %jobName 
+    print "samples  = %s",%samples
     print
     minEv, maxEv, NumberOfJobs, files = getEvents(template,samples) 
     print "Submitting %i number of jobs "  ,NumberOfJobs
