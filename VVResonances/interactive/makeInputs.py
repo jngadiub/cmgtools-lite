@@ -36,8 +36,10 @@ if options.binning==False: ctx  = cuts.cuts("init_VV_VH.json",int(options.period
 
 period = options.period
 # NB to use the DDT decorrelation method, the ntuples in /eos/cms/store/cmst3/group/exovv/VVtuple/FullRun2VVVHNtuple/deepAK8V2/ should be used
-samples= str(period)+"trainingV2/" #for V+jets we use 2017 samples also for 2016 because the 2016 ones are buggy
+#samples= str(period)+"trainingV2/" #for V+jets we use 2017 samples also for 2016 because the 2016 ones are buggy
 #samples= str(period)+"/" #for V+jets we use 2017 samples also for 2016 because the 2016 ones are buggy
+samples="deepAK8V2/"+period
+if period=="201678": samples="deepAK8V2/201?/"
 
 sorting = options.sorting
 
@@ -54,9 +56,6 @@ if useTriggerWeights:
     addOption = "-t"
     
 #all categories
-categories=["VH_HPHP","VH_HPLP","VH_LPHP","VV_HPHP","VV_HPLP"]
-categories=["VH_HPHP","VH_HPLP","VH_LPHP","VV_HPHP","VV_HPLP"]
-categories=["VH_HPHP","VH_HPLP","VH_LPHP","VV_HPHP","VV_HPLP"]
 #categories = ['none']
 categories=["VH_HPHP","VH_HPLP","VH_LPHP","VV_HPHP","VV_HPLP"]
                                                                                                                                                                                    
@@ -189,8 +188,8 @@ if options.run.find("all")!=-1 or options.run.find("qcd")!=-1:
         if options.run.find("all")!=-1 or options.run.find("templates")!=-1:
             wait = False
             f.makeBackgroundShapesMVVKernel("nonRes","JJ_"+str(period),nonResTemplate,ctx.cuts['nonres'],"1D",wait)
-            f.makeBackgroundShapesMVVConditional("nonRes","JJ_"+str(period),nonResTemplate,'l1',ctx.cuts['nonres'],"2Dl1",wait)
-            f.makeBackgroundShapesMVVConditional("nonRes","JJ_"+str(period),nonResTemplate,'l2',ctx.cuts['nonres'],"2Dl2",wait)
+            #f.makeBackgroundShapesMVVConditional("nonRes","JJ_"+str(period),nonResTemplate,'l1',ctx.cuts['nonres'],"2Dl1",wait)
+            #f.makeBackgroundShapesMVVConditional("nonRes","JJ_"+str(period),nonResTemplate,'l2',ctx.cuts['nonres'],"2Dl2",wait)
             print "Exiting system! When all jobs are finished, please run mergeKernelJobs below"
             sys.exit()
         elif options.run.find("all")!=-1 or options.run.find("kernel")!=-1:
