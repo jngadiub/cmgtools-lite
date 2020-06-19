@@ -16,6 +16,7 @@ ROOT.gStyle.SetOptFit(0)
 
 parser = optparse.OptionParser()
 parser.add_option("-o","--output",dest="output",help="Output",default='')
+parser.add_option("-p","--period",dest="period",help="run period",default=2016)
 parser.add_option("-r","--res",dest="res",help="res",default='')
 parser.add_option("-H","--resHisto",dest="resHisto",help="res",default='')
 parser.add_option("-s","--samples",dest="samples",default='',help="Type of sample")
@@ -84,7 +85,7 @@ def smoothTail1D(proj):
     
     beginFitX = 2100#1500
     endX = 2800
-    if period == "2016" or options.output.find("HPHP")!=-1:
+    if options.output.find("HPHP")!=-1: #irene removed if on 2016 period as Vjets are from 2017 or 2018
         beginFitX=1100
         endX = 1500
     expo=ROOT.TF1("expo","[0]*(1-x/13000.)^[1]/(x/13000)^[2]",2000,8000)
@@ -118,9 +119,10 @@ weights_ = options.weights.split(',')
 random=ROOT.TRandom3(101082)
 
 sampleTypes=options.samples.split(',')
-period = "2016"
-if options.samples.find("HT800")!=-1:
-    period = "2017"
+#period = "2016"
+#if options.samples.find("HT800")!=-1:
+#    period = "2017"
+period=options.period
 
 stack = ROOT.THStack("stack","")
 Wjets = False
@@ -128,7 +130,10 @@ Zjets = False
 print "Creating datasets for samples: " ,sampleTypes
 dataPlotters=[]
 dataPlottersNW=[]
+print "ditectory ",args[0]
+print "directory list ",os.listdir(args[0])
 for filename in os.listdir(args[0]):
+    print "filename ",filename
     for sampleType in sampleTypes:
         if filename.find(sampleType)!=-1:
             fnameParts=filename.split('.')
