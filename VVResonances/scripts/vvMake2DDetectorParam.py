@@ -46,23 +46,11 @@ resyHisto=ROOT.TH1F("resyHisto","resHisto",len(binsx)-1,array('d',binsx))
 variables=options.vars.split(',')
 genVariables=options.genVars.split(',')
 
+doBothLegs = False
+if len(variables)==3 and len(genVariables)==5: doBothLegs = True
+
 gaussian=ROOT.TF1("gaussian","gaus",0.5,1.5)
 
-'''
-ctx18 = cuts.cuts("init_VV_VH.json","2018","dijetbins_random")
-print " 2018 done "
-ctx16 = cuts.cuts("init_VV_VH.json","2016","dijetbins_random")
-print " 2016 done "
-ctx17 = cuts.cuts("init_VV_VH.json","2017","dijetbins_random")
-
-
-lumis = {'2016':ctx16.lumi,'2017':ctx17.lumi, '2018':ctx18.lumi}
-
-print "lumis ",lumis
-print "lumi 2016 ",lumis['2016']
-
-#print "lumi 0 ",mylumi['2016']
-'''
 
 superHX= None
 superHX_l2= None
@@ -105,33 +93,37 @@ for folder in folders:
     if len(folders) ==1: luminosity = "1."
     if superHX==None:
         print "create superHX"    
-        superHX=data.drawTH2Binned(variables[0]+'/'+genVariables[0]+':'+genVariables[3],options.cut,luminosity,binsx,binsz_x) #mvv
+        superHX=data.drawTH2Binned(variables[0]+'/'+genVariables[0]+':'+genVariables[2],options.cut,luminosity,binsx,binsz_x) #mvv
         print "created superHX ",superHX
     else: 
         print "Add to superHX"
-        superHX.Add(data.drawTH2Binned(variables[0]+'/'+genVariables[0]+':'+genVariables[3],options.cut,luminosity,binsx,binsz_x)) 
-    #if superHX_l2 == None:
-    #    superHX_l2=data.drawTH2Binned(variables[0]+'/'+genVariables[0]+':'+genVariables[4],options.cut,luminosity,binsx,binsz_x) #mvv
-    #else:
-    #    superHX_l2.Add(data.drawTH2Binned(variables[0]+'/'+genVariables[0]+':'+genVariables[4],options.cut,luminosity,binsx,binsz_x))
+        superHX.Add(data.drawTH2Binned(variables[0]+'/'+genVariables[0]+':'+genVariables[2],options.cut,luminosity,binsx,binsz_x)) 
     if superHY == None:  
-        superHY=data.drawTH2Binned(variables[1]+'/'+genVariables[1]+':'+genVariables[3],options.cut,luminosity,binsx,binsz_y) #mjet
+        superHY=data.drawTH2Binned(variables[1]+'/'+genVariables[1]+':'+genVariables[2],options.cut,luminosity,binsx,binsz_y) #mjet
     else:
-        superHY.Add(data.drawTH2Binned(variables[1]+'/'+genVariables[1]+':'+genVariables[3],options.cut,luminosity,binsx,binsz_y))
-    #if superHY_l2 == None: 
-    #    superHY_l2=data.drawTH2Binned(variables[2]+'/'+genVariables[2]+':'+genVariables[4],options.cut,luminosity,binsx,binsz_y) #mjet
-    #lse:  superHY_l2.Add(data.drawTH2Binned(variables[2]+'/'+genVariables[2]+':'+genVariables[4],options.cut,luminosity,binsx,binsz_y))
+        superHY.Add(data.drawTH2Binned(variables[1]+'/'+genVariables[1]+':'+genVariables[2],options.cut,luminosity,binsx,binsz_y))    
+    if doBothLegs == True:
+        if superHX_l2 == None:
+            superHX_l2=data.drawTH2Binned(variables[0]+'/'+genVariables[0]+':'+genVariables[4],options.cut,luminosity,binsx,binsz_x) #mvv
+        else:
+            superHX_l2.Add(data.drawTH2Binned(variables[0]+'/'+genVariables[0]+':'+genVariables[4],options.cut,luminosity,binsx,binsz_x))
+        if superHY_l2 == None: 
+            superHY_l2=data.drawTH2Binned(variables[2]+'/'+genVariables[3]+':'+genVariables[4],options.cut,luminosity,binsx,binsz_y) #mjet
+        else:  superHY_l2.Add(data.drawTH2Binned(variables[2]+'/'+genVariables[3]+':'+genVariables[4],options.cut,luminosity,binsx,binsz_y))
     print " done with folder ",folder
 
 print " all folders done"
 
+if doBothLegs == True:
+    superHX.Add(superHX_l2)
+    print " Added mvv hists"
+    superHY.Add(superHY_l2)
+    print " Added mjet hists"
+
+
 f=ROOT.TFile(options.output,"RECREATE")
 f.cd()
    
-#superHX.Add(superHX_l2)
-#print " Added mvv hists"
-#superHY.Add(superHY_l2)
-#print " Added mjet hists"
 
 print "########## mvv ###############"
 for bin in range(1,superHX.GetNbinsX()+1):
