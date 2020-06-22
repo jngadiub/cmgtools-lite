@@ -80,6 +80,12 @@ class AllFunctions():
    cut='*'.join([self.cuts['common'],addCut,self.cuts['acceptanceGEN'],self.cuts['looseacceptanceMJ']])
    resFile=filename+"_"+name+"_detectorResponse.root"	    
    print "Saving detector resolution to file: " ,resFile
+   #lumistring=[]
+   #print self.lumi
+   #sortlumi=sorted(self.lumi.keys())
+   #print sortlumi
+   #for year,lum in sortlumi.items(): lumistring.append(lum)
+   #print "lumistring ",lumistring
    #bins = "200,250,300,350,400,450,500,600,700,800,900,1000,1200,1500,1800,2200,2600,3000,3400,3800,5000"#4200,4600,5000,7000"#TODO: The last three bins are empty, remove next iteration!
    bins = "200,250,300,350,400,450,500,600,700,800,900,1000,1200,1500,1800,2200,2600,3000,5000"#4200,4600,5000,7000"#TODO: The last three bins are empty, remove next iteration!
    if self.submitToBatch:
@@ -87,8 +93,8 @@ class AllFunctions():
     jobList, files = Make2DDetectorParam(resFile,template,cut,self.samples,jobName,bins)
     if wait: merge2DDetectorParam(jobList,files,resFile,bins,jobName,template)
    else:
-    #cmd='vvMake2DDetectorParam.py  -o "{rootFile}" -s "{template}" -c "{cut}"  -v "jj_LV_mass,jj_l1_softDrop_mass"  -g "jj_gen_partialMass,jj_l1_gen_softDrop_mass,jj_l1_gen_pt"  -b {bins}   {samples}'.format(rootFile=resFile,template=template,cut=cut,minMVV=self.minMVV,maxMVV=self.maxMVV,tag=name,bins=bins,samples=self.samples)
-    cmd='vvMake2DDetectorParam.py  -o "{rootFile}" -s "{template}" -c "{cut}"  -v "jj_LV_mass,jj_l1_softDrop_mass,jj_l2_softDrop_mass"  -g "jj_gen_partialMass,jj_l1_gen_softDrop_mass,jj_l2_gen_softDrop_mass,jj_l1_gen_pt,jj_l2_gen_pt"  -b {bins}   {samples}'.format(rootFile=resFile,template=template,cut=cut,minMVV=self.minMVV,maxMVV=self.maxMVV,tag=name,bins=bins,samples=self.samples)
+    cmd='vvMake2DDetectorParam.py  -o "{rootFile}" -s "{template}" -c "{cut}"  -v "jj_LV_mass,jj_l1_softDrop_mass,jj_l2_softDrop_mass"  -g "jj_gen_partialMass,jj_l1_gen_softDrop_mass,jj_l2_gen_softDrop_mass,jj_l1_gen_pt,jj_l2_gen_pt"  -b {bins} -d  {samples} '.format(rootFile=resFile,template=template,cut=cut,minMVV=self.minMVV,maxMVV=self.maxMVV,tag=name,bins=bins,samples=self.samples) #,lumi=lumistring)
+    print cmd
     os.system(cmd)
    
    print "Done with ",resFile
