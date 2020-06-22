@@ -56,10 +56,12 @@
     "dijetbins" : [1,3,6,10,16,23,31,40,50,61,74,88,103,119,137,156,176,197,220,244,270,296,325,354,386,419,453,489,526,565,606,649,693,740,788,838,890,944,1000,1058,1126,1181,1246,1313,1383,1455,1530,1607,1687,1770,1856,1945,2037,2132,2231,2332,2438,2546,2659,2775,2895,3019,3147,3279,3416,3558,3704,3854,4010,4171,4337,4509,4686,4869,5058,5253,5455,5663,5877,6099,6328,6564,6808,7060,7320,7589]
     },
     
+
     "W_tag_unc_HP" : {"2016": 0.21 , "2017": 0.25 , "2018": 0.25  },
     "W_tag_unc_LP" : {"2016": 0.11, "2017": 0.13 , "2018": 0.13 },
     "H_tag_unc_HP" : {"2016": 0.21 , "2017": 0.25 , "2018": 0.25 },
     "H_tag_unc_LP" : {"2016": 0.11, "2017": 0.13 , "2018": 0.13  },
+ 
     "vtag_pt_dependence16" : {"VV_HPHP":"((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))","VV_HPLP":"((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))","VH_HPHP":"1","VH_HPLP":"1","VH_LPHP":"1"},
     "vtag_pt_dependence17" : {"VV_HPHP":"((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))","VV_HPLP":"((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))","VH_HPHP":"1","VH_HPLP":"1","VH_LPHP":"1"},
     "vtag_pt_dependence18" : {"VV_HPHP":"((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))","VV_HPLP":"((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))","VH_HPHP":"1","VH_HPLP":"1","VH_LPHP":"1"},
@@ -74,6 +76,8 @@
    "l2Wtag17" : "jj_l2_DeepBoosted_WvsQCD__XX_default_17",
    "l1Wtag18" : "jj_l1_DeepBoosted_WvsQCD__XX_default_18",
    "l2Wtag18" : "jj_l2_DeepBoosted_WvsQCD__XX_default_18",
+   "l1Wtag161718" : "jj_l1_DeepBoosted_WvsQCD__XX_default_161718",
+   "l2Wtag161718" : "jj_l2_DeepBoosted_WvsQCD__XX_default_161718",
     
     
     
@@ -85,6 +89,8 @@
     "l2Htag17" : "jj_l1_DeepBoosted_ZHbbvsQCD__XX_default_17",
     "l1Htag18" : "jj_l1_DeepBoosted_ZHbbvsQCD__XX_default_18",
     "l2Htag18" : "jj_l1_DeepBoosted_ZHbbvsQCD__XX_default_18",
+    "l1Htag161718" : "jj_l1_DeepBoosted_ZHbbvsQCD__XX_default_161718",
+    "l2Htag161718" : "jj_l1_DeepBoosted_ZHbbvsQCD__XX_default_161718",
     
     "WP_HP_Wtag16" : "0p05",
     "WP_HP_Wtag17" : "0p05",
@@ -92,14 +98,19 @@
     "WP_LP_Wtag16" : "0p10",
     "WP_LP_Wtag17" : "0p10",
     "WP_LP_Wtag18" : "0p10",
-    
+
+    "WP_HP_Wtag161718" : "0p05",
+    "WP_LP_Wtag161718" : "0p10",
     
     "WP_HP_Htag16" : "0p02",
     "WP_HP_Htag17" : "0p02",
     "WP_HP_Htag18" : "0p02",
     "WP_LP_Htag16" : "0p10",
     "WP_LP_Htag17" : "0p10",
-    "WP_LP_Htag18" : "0p10"
+    "WP_LP_Htag18" : "0p10",
+
+    "WP_HP_Htag161718" : "0p02",
+    "WP_LP_Htag161718" : "0p10"
 
     },
     "selection_cuts" : {
