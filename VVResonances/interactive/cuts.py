@@ -5,19 +5,19 @@ import json
 import ast
 
 class cuts():
-    lumi = 1.
-    lumi_unc = 1.
+    lumi = {}
+    lumi_unc = {}
     yeartag = "16"
-    HPSF_vtag = 1.                                
-    LPSF_vtag = 1.                                
-    HPSF_htag = 1.                                
-    LPSF_htag = 1.                                
+    HPSF_vtag = {}                                
+    LPSF_vtag = {}                                
+    HPSF_htag = {}                                
+    LPSF_htag = {}                                
                                                   
-    W_LPmassscale = 1.                                
-    W_HPmassscale = 1.
+    W_LPmassscale = {}                                
+    W_HPmassscale = {}
                   
-    H_LPmassscale = 1.
-    H_HPmassscale = 1.
+    H_LPmassscale = {}
+    H_HPmassscale = {}
                                                   
     minMJ = 0.                                    
     maxMJ = 0.                                    
@@ -53,32 +53,32 @@ class cuts():
 
 
 
-    WPHPl1Htag = ""
-    WPLPl1Htag = ""
+    WPHPl1Htag = {}
+    WPLPl1Htag = {}
     
-    varl2Wtag = ""
-    varl2Htag = ""
+    varl2Wtag = {}
+    varl2Htag = {}
     
-    WPHPl2Wtag = ""
-    WPLPl2Wtag = ""
+    WPHPl2Wtag = {}
+    WPLPl2Wtag = {}
     
-    WPHPl2Htag = ""
-    WPLPl2Htag = ""
+    WPHPl2Htag = {}
+    WPLPl2Htag = {}
     
     
       
     
-    W_tag_unc_HP= 1.
-    W_tag_unc_LP= 1.
-    H_tag_unc_HP= 1.
-    H_tag_unc_LP= 1.
+    W_tag_unc_HP = {}
+    W_tag_unc_LP = {}
+    H_tag_unc_HP = {}
+    H_tag_unc_LP = {}
     
     vtag_pt_dependence ={}
     
     cuts={}
     
     
-    def __init__(self,jsonfile,year,options,widerMVV=False):
+    def __init__(self,jsonfile,period,options,widerMVV=False):
         
         with open(jsonfile) as json_file:
                      
@@ -86,6 +86,7 @@ class cuts():
             data = json.load(json_file)
             ##### load binning and cut offs
             self.minMJ = data["ranges_and_binning"]["minMJ"]
+            print 'self.minMJ ', self.minMJ
             self.maxMJ = data["ranges_and_binning"]["maxMJ"]
             self.binsMJ = data["ranges_and_binning"]["binsMJ"]
             
@@ -104,69 +105,99 @@ class cuts():
                 self.maxMVV = data["ranges_and_binning"]["widerMVV_maxMVV"]
                 self.maxGenMVV = data["ranges_and_binning"]["widerMVV_maxGenMVV"]
             
-            ## load SF for the different years 
-            if year==2016:
-                self.yeartag = "16"
-            elif year==2017:
-                self.yeartag = "17"
-            elif year==2018:
-                self.yeartag = "18"
-                print " attention  lumi to be checked #to be checked! https://twiki.cern.ch/twiki/bin/view/CMS/PdmV2018Analysis"
-            else: print "no such data taking year -> running with default values on 2016 data"
+            if period.find(","):
+                years = period.split(',')
+                run2=True
+            else: 
+                years = period
+                run2=False
+
+            for year in years:
+                ## load SF for the different years 
+                if year=="2016":
+                    self.yeartag = "16"
+                elif year=="2017":
+                    self.yeartag = "17"
+                elif year=="2018":
+                    self.yeartag = "18"
+                    print " attention  lumi to be checked #to be checked! https://twiki.cern.ch/twiki/bin/view/CMS/PdmV2018Analysis"
+                else: print "no such data taking year -> running with default values on 2016 data"
            
          
          
-            self.W_tag_unc_HP= data["W_tag_unc_HP"][str(year)]
-            self.W_tag_unc_LP= data["W_tag_unc_LP"][str(year)]
-            self.H_tag_unc_HP= data["H_tag_unc_HP"][str(year)]
-            self.H_tag_unc_LP= data["H_tag_unc_LP"][str(year)]
+                self.W_tag_unc_HP[year] = data["W_tag_unc_HP"][str(year)]
+                self.W_tag_unc_LP[year] = data["W_tag_unc_LP"][str(year)]
+                self.H_tag_unc_HP[year] = data["H_tag_unc_HP"][str(year)]
+                self.H_tag_unc_LP[year] = data["H_tag_unc_LP"][str(year)]
             
-            self.varl1Wtag = data["tagging_variables_and_wp"]["varl1Wtag"]
-            self.varl1Htag = data["tagging_variables_and_wp"]["varl1Htag"]
-            self.WPHPl1Wtag = data["tagging_variables_and_wp"]["l1Wtag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Wtag"+self.yeartag])
-            self.WPLPl1Wtag = data["tagging_variables_and_wp"]["l1Wtag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Wtag"+self.yeartag])
-            self.WPHPl1Htag = data["tagging_variables_and_wp"]["l1Htag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Htag"+self.yeartag])
-            self.WPLPl1Htag = data["tagging_variables_and_wp"]["l1Htag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Htag"+self.yeartag])
-   
-            self.varl2Wtag = data["tagging_variables_and_wp"]["varl2Wtag"]
-            self.varl2Htag = data["tagging_variables_and_wp"]["varl2Htag"]
-            self.WPHPl2Wtag = data["tagging_variables_and_wp"]["l2Wtag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Wtag"+self.yeartag])
-            self.WPLPl2Wtag = data["tagging_variables_and_wp"]["l2Wtag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Wtag"+self.yeartag])
-            self.WPHPl2Htag = data["tagging_variables_and_wp"]["l2Htag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Htag"+self.yeartag])
-            self.WPLPl2Htag = data["tagging_variables_and_wp"]["l2Htag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Htag"+self.yeartag])
-            
-            self.lumi = data["lumi"+self.yeartag]
-            self.lumi_unc = data["unc_lumi"+self.yeartag]
-            
-            self.W_LPmassscale = data["W_HPmassscale"+self.yeartag]
-            self.W_HPmassscale = data["W_LPmassscale"+self.yeartag]
-                          
-            self.H_LPmassscale = data["H_HPmassscale"+self.yeartag]
-            self.H_HPmassscale = data["H_LPmassscale"+self.yeartag]
 
-            self.fixParsSigMVV = data["fixParsSigMVV"]
-            self.fixParsSig = data["fixParsSig"]
-            self.HPSF_vtag = data['HPSF'+self.yeartag]
-            self.LPSF_vtag = data['LPSF'+self.yeartag]
-            self.HPSF_htag = data['htagHPSF'+self.yeartag]
-            self.LPSF_htag = data['htagLPSF'+self.yeartag]
-            self.vtag_pt_dependence = data["vtag_pt_dependence"+self.yeartag]
+                self.varl1Wtag = data["tagging_variables_and_wp"]["varl1Wtag"]
+                self.varl1Htag = data["tagging_variables_and_wp"]["varl1Htag"]
+                self.varl2Wtag = data["tagging_variables_and_wp"]["varl2Wtag"]
+                self.varl2Htag = data["tagging_variables_and_wp"]["varl2Htag"]
+
+                if(run2==False):
+                    self.WPHPl1Wtag = data["tagging_variables_and_wp"]["l1Wtag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Wtag"+self.yeartag])
+                    self.WPLPl1Wtag = data["tagging_variables_and_wp"]["l1Wtag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Wtag"+self.yeartag])
+                    self.WPHPl1Htag = data["tagging_variables_and_wp"]["l1Htag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Htag"+self.yeartag])
+                    self.WPLPl1Htag = data["tagging_variables_and_wp"]["l1Htag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Htag"+self.yeartag])
+   
+                    self.WPHPl2Wtag = data["tagging_variables_and_wp"]["l2Wtag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Wtag"+self.yeartag])
+                    self.WPLPl2Wtag = data["tagging_variables_and_wp"]["l2Wtag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Wtag"+self.yeartag])
+                    self.WPHPl2Htag = data["tagging_variables_and_wp"]["l2Htag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Htag"+self.yeartag])
+                    self.WPLPl2Htag = data["tagging_variables_and_wp"]["l2Htag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Htag"+self.yeartag])
+                
+                self.lumi[year] =  data["lumi"+self.yeartag]
+                print "self.lumi[year]  ",self.lumi[year] 
+                self.lumi_unc[year] = data["unc_lumi"+self.yeartag]
             
-            self.catVtag['HP1'] = '('+data["tagging_variables_and_wp"]["varl1Wtag"]+'>'+ data["tagging_variables_and_wp"]["l1Wtag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Wtag"+self.yeartag])+')' 
-            self.catVtag['HP2'] = '('+data["tagging_variables_and_wp"]["varl2Wtag"]+'>'+ data["tagging_variables_and_wp"]["l2Wtag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Wtag"+self.yeartag])+')' 
-            self.catVtag['LP1'] = '(('+ data["tagging_variables_and_wp"]["varl1Wtag"]+'<'+ data["tagging_variables_and_wp"]["l1Wtag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Wtag"+self.yeartag]) +')&&('+ data["tagging_variables_and_wp"]["varl1Wtag"] +'>'+ data["tagging_variables_and_wp"]["l1Wtag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Wtag"+self.yeartag]) +'))' 
-            self.catVtag['LP2'] = '(('+ data["tagging_variables_and_wp"]["varl2Wtag"]+'<'+ data["tagging_variables_and_wp"]["l2Wtag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Wtag"+self.yeartag]) +')&&('+ data["tagging_variables_and_wp"]["varl2Wtag"] +'>'+ data["tagging_variables_and_wp"]["l2Wtag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Wtag"+self.yeartag]) +'))'
-            self.catVtag['NP1'] =  '('+data["tagging_variables_and_wp"]["varl1Wtag"] +'<' +data["tagging_variables_and_wp"]["l1Wtag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Wtag"+self.yeartag]) + ')' 
-            self.catVtag['NP2'] =  '('+data["tagging_variables_and_wp"]["varl2Wtag"] +'<' +data["tagging_variables_and_wp"]["l2Wtag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Wtag"+self.yeartag]) + ')' 
+                self.W_LPmassscale[year] = data["W_HPmassscale"+self.yeartag]
+                self.W_HPmassscale[year] = data["W_LPmassscale"+self.yeartag]
+                
+                self.H_LPmassscale[year] = data["H_HPmassscale"+self.yeartag]
+                self.H_HPmassscale[year] = data["H_LPmassscale"+self.yeartag]
+
+                self.fixParsSigMVV = data["fixParsSigMVV"]
+                self.fixParsSig = data["fixParsSig"]
+                self.HPSF_vtag[year] = data['HPSF'+self.yeartag]
+                self.LPSF_vtag[year] = data['LPSF'+self.yeartag]
+                self.HPSF_htag[year] = data['htagHPSF'+self.yeartag]
+                self.LPSF_htag[year] = data['htagLPSF'+self.yeartag]
+                self.vtag_pt_dependence[year] = data["vtag_pt_dependence"+self.yeartag]
+                
+                self.catVtag['HP1'] = '('+data["tagging_variables_and_wp"]["varl1Wtag"]+'>'+ data["tagging_variables_and_wp"]["l1Wtag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Wtag"+self.yeartag])+')' 
+                self.catVtag['HP2'] = '('+data["tagging_variables_and_wp"]["varl2Wtag"]+'>'+ data["tagging_variables_and_wp"]["l2Wtag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Wtag"+self.yeartag])+')' 
+                self.catVtag['LP1'] = '(('+ data["tagging_variables_and_wp"]["varl1Wtag"]+'<'+ data["tagging_variables_and_wp"]["l1Wtag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Wtag"+self.yeartag]) +')&&('+ data["tagging_variables_and_wp"]["varl1Wtag"] +'>'+ data["tagging_variables_and_wp"]["l1Wtag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Wtag"+self.yeartag]) +'))' 
+                self.catVtag['LP2'] = '(('+ data["tagging_variables_and_wp"]["varl2Wtag"]+'<'+ data["tagging_variables_and_wp"]["l2Wtag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Wtag"+self.yeartag]) +')&&('+ data["tagging_variables_and_wp"]["varl2Wtag"] +'>'+ data["tagging_variables_and_wp"]["l2Wtag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Wtag"+self.yeartag]) +'))'
+                self.catVtag['NP1'] =  '('+data["tagging_variables_and_wp"]["varl1Wtag"] +'<' +data["tagging_variables_and_wp"]["l1Wtag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Wtag"+self.yeartag]) + ')' 
+                self.catVtag['NP2'] =  '('+data["tagging_variables_and_wp"]["varl2Wtag"] +'<' +data["tagging_variables_and_wp"]["l2Wtag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Wtag"+self.yeartag]) + ')' 
+                
             
-            
-            self.catHtag['HP1'] = '('+data["tagging_variables_and_wp"]["varl1Htag"]+'>'+ data["tagging_variables_and_wp"]["l1Htag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Htag"+self.yeartag])+')' 
-            self.catHtag['HP2'] = '('+data["tagging_variables_and_wp"]["varl2Htag"]+'>'+ data["tagging_variables_and_wp"]["l2Htag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Htag"+self.yeartag])+')' 
-            self.catHtag['LP1'] = '(('+ data["tagging_variables_and_wp"]["varl1Htag"]+'<'+ data["tagging_variables_and_wp"]["l1Htag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Htag"+self.yeartag]) +')&&('+ data["tagging_variables_and_wp"]["varl1Htag"] +'>'+ data["tagging_variables_and_wp"]["l1Htag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Htag"+self.yeartag]) +'))' 
-            self.catHtag['LP2'] = '(('+ data["tagging_variables_and_wp"]["varl2Htag"]+'<'+ data["tagging_variables_and_wp"]["l2Htag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Htag"+self.yeartag]) +')&&('+ data["tagging_variables_and_wp"]["varl2Htag"] +'>'+ data["tagging_variables_and_wp"]["l2Htag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Htag"+self.yeartag]) +'))'
-            self.catHtag['NP1'] =  '('+data["tagging_variables_and_wp"]["varl1Htag"] +'<' +data["tagging_variables_and_wp"]["l1Htag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Htag"+self.yeartag]) + ')' 
-            self.catHtag['NP2'] =  '('+data["tagging_variables_and_wp"]["varl2Htag"] +'<' +data["tagging_variables_and_wp"]["l2Htag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Htag"+self.yeartag]) + ')' 
-            
+                self.catHtag['HP1'] = '('+data["tagging_variables_and_wp"]["varl1Htag"]+'>'+ data["tagging_variables_and_wp"]["l1Htag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Htag"+self.yeartag])+')' 
+                self.catHtag['HP2'] = '('+data["tagging_variables_and_wp"]["varl2Htag"]+'>'+ data["tagging_variables_and_wp"]["l2Htag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Htag"+self.yeartag])+')' 
+                self.catHtag['LP1'] = '(('+ data["tagging_variables_and_wp"]["varl1Htag"]+'<'+ data["tagging_variables_and_wp"]["l1Htag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Htag"+self.yeartag]) +')&&('+ data["tagging_variables_and_wp"]["varl1Htag"] +'>'+ data["tagging_variables_and_wp"]["l1Htag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Htag"+self.yeartag]) +'))' 
+                self.catHtag['LP2'] = '(('+ data["tagging_variables_and_wp"]["varl2Htag"]+'<'+ data["tagging_variables_and_wp"]["l2Htag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Htag"+self.yeartag]) +')&&('+ data["tagging_variables_and_wp"]["varl2Htag"] +'>'+ data["tagging_variables_and_wp"]["l2Htag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Htag"+self.yeartag]) +'))'
+                self.catHtag['NP1'] =  '('+data["tagging_variables_and_wp"]["varl1Htag"] +'<' +data["tagging_variables_and_wp"]["l1Htag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Htag"+self.yeartag]) + ')' 
+                self.catHtag['NP2'] =  '('+data["tagging_variables_and_wp"]["varl2Htag"] +'<' +data["tagging_variables_and_wp"]["l2Htag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Htag"+self.yeartag]) + ')' 
+
+
+
+            if(run2==True):
+               run2tag="161718"
+               self.WPHPl1Wtag = data["tagging_variables_and_wp"]["l1Wtag"+run2tag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Wtag"+run2tag])
+               self.WPLPl1Wtag = data["tagging_variables_and_wp"]["l1Wtag"+run2tag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Wtag"+run2tag])
+               self.WPHPl1Htag = data["tagging_variables_and_wp"]["l1Htag"+run2tag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Htag"+run2tag])
+               self.WPLPl1Htag = data["tagging_variables_and_wp"]["l1Htag"+run2tag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Htag"+run2tag])
+
+               self.WPHPl2Wtag = data["tagging_variables_and_wp"]["l2Wtag"+run2tag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Wtag"+run2tag])
+               self.WPLPl2Wtag = data["tagging_variables_and_wp"]["l2Wtag"+run2tag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Wtag"+run2tag])
+               self.WPHPl2Htag = data["tagging_variables_and_wp"]["l2Htag"+run2tag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Htag"+run2tag])
+               self.WPLPl2Htag = data["tagging_variables_and_wp"]["l2Htag"+run2tag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Htag"+run2tag])
+
+            print " lumi ",self.lumi
+
+
+                
             selections = ["common","common_VV","common_VBF","NP","res","nonres","resTT","acceptance","acceptanceMJ","acceptanceMVV","acceptanceGEN","looseacceptanceMJ"]
             for sel in selections:
                 self.cuts[sel] = data["selection_cuts"][sel]
@@ -249,11 +280,15 @@ class cuts():
 
 
 if __name__ == "__main__":
-    c = cuts("init_VV_VH.json",2016,"dijetbins_random")
-    print c.HPSF_vtag
-    print c.LPSF_vtag
+    c = cuts("init_VV_VH.json","2016","dijetbins_random")
+    print c.HPSF_vtag['2016']
+    print c.LPSF_vtag['2016']
     print c.minMJ
     print c.catVtag['LP1']
+
+    print "lumi ",c.lumi["lumi16"]
+    print c.fixParsSig["ZprimeWW"]['NP']
+    print c.minMX
     
     print c.catHtag['LP1']
     print c.maxMX
@@ -267,6 +302,3 @@ if __name__ == "__main__":
     for sel in selections:
         print c. cuts[sel]
     
-    
-    print c.fixParsSig["ZprimeWW"]['NP']
-    print c.minMX
