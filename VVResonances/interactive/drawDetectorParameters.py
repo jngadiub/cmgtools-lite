@@ -11,7 +11,7 @@ gROOT.SetBatch(True)
 
 path = sys.argv[1]
 cols = [46,30]
-colors = ["#4292c6","#41ab5d","#ef3b2c","#ffd300","#D02090","#fdae61","#abd9e9","#2c7bb6"]
+colors = ["#4292c6","#41ab5d","#ef3b2c","#17202A","#2c7bb6","#abd9e9","#fdae61","#abd9e9","#2c7bb6"]
 mstyle = [8,24,22,26,32]                                                                                                                                                                                                                     
 #linestyle=[1,2,1,2,3]                                                                                                                                                                                                                        
 markerstyle = [1,4,8,10,20,25]
@@ -106,9 +106,6 @@ def doDetPar(leg,years):
            print f
            g = f.Get(var)
            print g
-           print colors[i]
-           print mstyle[i]
-           print i 
            beautify(g ,rt.TColor.GetColor(colors[i]),1,mstyle[i])
 #           datas.append(g)
            l.AddEntry(g,years[i],"LP")
@@ -147,5 +144,5 @@ def doDetPar(leg,years):
 
 if __name__ == '__main__':
   prelim = ""
-  years = ["2016","2017","Run2"]
-  doDetPar("l1",years)
+  years = ["2016","2017","2018","Run2"]
+  doDetPar("l1l2",years)
