@@ -47,7 +47,10 @@ variables=options.vars.split(',')
 genVariables=options.genVars.split(',')
 
 doBothLegs = False
-if len(variables)==3 and len(genVariables)==5: doBothLegs = True
+leg="l1"
+if len(variables)==3 and len(genVariables)==5: 
+    doBothLegs = True
+    leg="l1l2"
 
 gaussian=ROOT.TF1("gaussian","gaus",0.5,1.5)
 
@@ -120,7 +123,8 @@ if doBothLegs == True:
     superHY.Add(superHY_l2)
     print " Added mjet hists"
 
-
+label=options.output.split("_")[1]
+print "label ",label
 f=ROOT.TFile(options.output,"RECREATE")
 f.cd()
    
@@ -147,14 +151,14 @@ for bin in range(1,superHX.GetNbinsX()+1):
    tmp.Fit(g1, "SR")
    c1 =ROOT.TCanvas("c","",800,800)
    tmp.Draw()
-   c1.SaveAs("debug_fit1_mvvres_%i.png"%(bin))
+   c1.SaveAs("debug_fit1_mvvres_%s_%s_%i.png"%(label,leg,bin))
    tmpmean = g1.GetParameter(1)
    tmpwidth = g1.GetParameter(2)
    g1 = ROOT.TF1("g1","gaus", tmpmean-(tmpwidth*2),tmpmean+(tmpwidth*2))
    tmp.Fit(g1, "SR")
    c1 =ROOT.TCanvas("c","",800,800)
    tmp.Draw()
-   c1.SaveAs("debug_fit2_mvvres_%i.png"%(bin))
+   c1.SaveAs("debug_fit2_mvvres_%s_%s_%i.png"%(label,leg,bin))
    tmpmean = g1.GetParameter(1)
    tmpmeanErr = g1.GetParError(1)
    tmpwidth = g1.GetParameter(2)
@@ -185,14 +189,14 @@ for bin in range(1,superHY.GetNbinsX()+1):
    tmp.Fit(g1, "SR")
    c1 =ROOT.TCanvas("c","",800,800)
    tmp.Draw()
-   c1.SaveAs("debug_fit1_mjres_%i.png"%(bin))
+   c1.SaveAs("debug_fit1_mjres_%s_%s_%i.png"%(label,leg,bin))
    tmpmean = g1.GetParameter(1)
    tmpwidth = g1.GetParameter(2)
    g1 = ROOT.TF1("g1","gaus", tmpmean-(tmpwidth*1.1),tmpmean+(tmpwidth*1.1))
    tmp.Fit(g1, "SR")
    c1 =ROOT.TCanvas("c","",800,800)
    tmp.Draw()
-   c1.SaveAs("debug_fit2_mjres_%i.png"%(bin))
+   c1.SaveAs("debug_fit2_mjres_%s_%s_%i.png"%(label,leg,bin))
    tmpmean = g1.GetParameter(1)
    tmpmeanErr = g1.GetParError(1)
    tmpwidth = g1.GetParameter(2)
