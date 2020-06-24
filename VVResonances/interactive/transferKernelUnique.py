@@ -380,7 +380,7 @@ def makeNonResCard():
  elif options.pdfIn.find("VH_HPLP")!=-1: category_pdf = "VH_HPLP"
  elif options.pdfIn.find("VH_LPHP")!=-1: category_pdf = "VH_LPHP"
  elif options.pdfIn.find("VH_LPLP")!=-1: category_pdf = "VH_LPLP"
- elif options.pdfIn.find("none")!=-1: category_pdf = "none"
+ elif options.pdfIn.find("NP")!=-1: category_pdf = "NP"
  else: category_pdf = "VV_LPLP"  
 
  dataset = options.year
