@@ -273,15 +273,27 @@ def doAll(signal,legend,years,colorindex):
       leg.Draw("same")
 
     
-      pt2 = ROOT.TPaveText(0.7,0.8,0.8,0.9,"NDC")
+      pt2 = ROOT.TPaveText(0.7,0.87,0.8,0.9,"NDC")
       pt2.SetTextFont(42)
-      pt2.SetTextSize(0.05)
+      pt2.SetTextSize(0.04)
       pt2.SetTextAlign(12)
       pt2.SetFillColor(0)
       pt2.SetBorderSize(0)
       pt2.SetFillStyle(0)
       pt2.AddText(legend)
       pt2.Draw()
+
+
+      pt3 = ROOT.TPaveText(0.7,0.75,0.8,0.87,"NDC")
+      pt3.SetTextFont(42)
+      pt3.SetTextSize(0.04)
+      pt3.SetTextAlign(12)
+      pt3.SetFillColor(0)
+      pt3.SetBorderSize(0)
+      pt3.SetFillStyle(0)
+      pt3.AddText(purity)
+      pt3.Draw()
+
       
       name = path+"signalYelds_%s_%s_%s"  %(purity,options.name,signal)
       c1.SaveAs(name+".png")
