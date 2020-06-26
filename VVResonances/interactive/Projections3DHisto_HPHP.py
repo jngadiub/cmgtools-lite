@@ -16,14 +16,14 @@ rt.gROOT.SetBatch(True)
 #python Projections3DHisto.py --mc 2016/JJ_nonRes_LPLP_altshapeUp.root,nonRes -k JJ_nonRes_3D_LPLP.root,histo -o control-plots-LPLPnew-herwig
 #python Projections3DHisto.py --mc JJ_nonRes_LPLP_nominal.root,nonRes -k JJ_nonRes_3D_LPLP.root,histo -o control-plots-LPLP-pythia
 
-def get_canvas(cname):
+def get_canvas(cname,period="2016"):
 
  #change the CMS_lumi variables (see CMS_lumi.py)
  CMS_lumi.lumi_7TeV = "4.8 fb^{-1}"
  CMS_lumi.lumi_8TeV = "18.3 fb^{-1}"
  CMS_lumi.writeExtraText = 1
  CMS_lumi.extraText = "Simulation"
- CMS_lumi.lumi_sqrtS = "13 TeV (2016)" # used with iPeriod = 0, e.g. for simulation-only plots (default is an empty string)
+ CMS_lumi.lumi_sqrtS = "13 TeV ("+period+")" # used with iPeriod = 0, e.g. for simulation-only plots (default is an empty string)
 
  iPos = 11
  if( iPos==0 ): CMS_lumi.relPosX = 0.12
@@ -60,6 +60,7 @@ parser.add_option("--mc","--mc",dest="mc",help="File with mc events and histo na
 parser.add_option("-k","--kernel",dest="kernel",help="File with kernel and histo name (separated by comma)",default='JJ_nonRes_3D_HPHP.root,histo')
 parser.add_option("-o","--outdir",dest="outdir",help="Output directory for plots",default='control-plots')
 parser.add_option("-l","--label",dest="label",help="MC type label (Pythia8, Herwig, Madgraph, Powheg)",default='Pythia8')
+parser.add_option("-p","--period",dest="period",default="2016")
 (options,args) = parser.parse_args()
 
 #void Projections3DHisto(std::string dataFile, std::string hdataName, std::string fitFile, std::string hfitName, std::string outDirName){
@@ -178,7 +179,7 @@ leg.AddEntry(hx[0],"Template","L")
 for i in range(1,len(zbinMin)):
  leg.AddEntry(hx[i],"%.1f < m_{jj} < %.1f TeV"%( hin.GetZaxis().GetBinLowEdge(zbinMin[i])/1000.,hin.GetZaxis().GetBinUpEdge(zbinMax[i])/1000.) )
  
-cx = get_canvas("cx")
+cx = get_canvas("cx",options.period)
 cx.cd()
 for i in range(len(zbinMin)):
  hx[i].Draw("HISTsame")
@@ -194,7 +195,7 @@ frame = cx.GetFrame()
 frame.Draw()
 cx.SaveAs(options.outdir+"/cx.png","pdf")
 
-cy = get_canvas("cy")
+cy = get_canvas("cy",options.period)
 cy.cd()
 hy[0].GetXaxis().SetTitle("m_{jet2} (proj. y) [GeV]")
 hy[0].GetXaxis().SetTitleSize(hx[0].GetXaxis().GetTitleSize())
@@ -328,7 +329,7 @@ for i in range(1,len(xbinMin)):
  leg2.AddEntry(hz[i],"%i < m_{jet} < %i GeV"%(  hin.GetXaxis().GetBinLowEdge(xbinMin[i]),hin.GetXaxis().GetBinUpEdge(xbinMax[i])) )
  #else: leg2.AddEntry(hz[i],"%i < m_{jet} < %i GeV"%(  hin.GetXaxis().GetBinLowEdge(xbinMin[i]),hin.GetXaxis().GetBinUpEdge(xbinMax[i])) )
 
-cz = get_canvas("cz")
+cz = get_canvas("cz",options.period)
 cz.SetLogy()
 cz.cd()
 hz[0].SetMinimum(1E-09)
@@ -462,7 +463,7 @@ leg3.AddEntry(hz_altshape2Up,"MADGRAPH+PYTHIA up/down","L")
 #leg3.AddEntry(hz_altshape3Up,"POWHEG up/down","L")
 leg3.AddEntry(hz_OPT3Up,"m_{jj} turn-on up/down","L")
 
-czSyst = get_canvas("czSyst")
+czSyst = get_canvas("czSyst",options.period)
 czSyst.cd()
 czSyst.SetLogy()
 
@@ -558,7 +559,7 @@ leg3.AddEntry(hx_altshape2Up,"MADGRAPH+PYTHIA up/down","L")
 #leg3.AddEntry(hx_altshape3Up,"POWHEG up/down","L")
 leg3.AddEntry(hx_OPT3Up,"m_{jj} turn-on up/down","L")
 
-cxSyst = get_canvas("cxSyst")
+cxSyst = get_canvas("cxSyst",options.period)
 cxSyst.cd()
 
 hx[0].SetMinimum(0)
@@ -648,7 +649,7 @@ leg3.AddEntry(hy_altshape2Up,"MADGRAPH+PYTHIA up/down","L")
 #leg3.AddEntry(hy_altshape3Up,"POWHEG up/down","L")
 leg3.AddEntry(hy_OPT3Up,"m_{jj} turn-on up/down","L")
 
-cySyst = get_canvas("cySyst")
+cySyst = get_canvas("cySyst",options.period)
 cySyst.cd()
 
 hy[0].SetMinimum(0)
