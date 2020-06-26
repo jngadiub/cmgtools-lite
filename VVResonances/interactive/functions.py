@@ -62,14 +62,12 @@ class AllFunctions():
     cmd='vvMakeJSON.py  -o "{jsonFile}" -g {pols} -m {minMX} -M {maxMX} {rootFile}  '.format(jsonFile=jsonFile,rootFile=rootFile,minMX=self.minMX,maxMX=self.maxMX,pols=fixPars["NP"]["pol"])
     os.system(cmd)
 
- def makeSignalYields(self,filename,template,branchingFraction,sfP = {'HPHP':1.0,'HPLP':1.0,'LPLP':1.0},functype="pol5"):
- 
-  print "using the following scalfactors:" ,sfP
+ def makeSignalYields(self,filename,template,branchingFraction,functype="pol5"):
   
   for c in self.categories:
    #if 'VBF' in c: cut = "*".join([self.cuts[c.replace('VBF_','')],self.cuts['common_VBF'],self.cuts['acceptance'],str(sfP[c.replace('VBF_','')])])
    #else: cut = "*".join([self.cuts[c],self.cuts['common_VV'],self.cuts['acceptance'],str(sfP[c])])
-   cut = "*".join([self.cuts[c],self.cuts['common'],self.cuts['acceptance'],str(sfP[c])])
+   cut = "*".join([self.cuts[c],self.cuts['common'],self.cuts['acceptance']]) #,str(sfP[c])])
    yieldFile=filename+"_"+c+"_yield"
    fnc = functype
    cmd='vvMakeSignalYields.py -s {template} -c "{cut}" -o {output} -V "jj_LV_mass" -m {minMVV} -M {maxMVV} -f {fnc} -b {BR} --minMX {minMX} --maxMX {maxMX} {samples} '.format(template=template, cut=cut, output=yieldFile,minMVV=self.minMVV,maxMVV=self.maxMVV,fnc=fnc,BR=branchingFraction,minMX=self.minMX,maxMX=self.maxMX,samples=self.samples)
@@ -96,11 +94,12 @@ class AllFunctions():
  def makeBackgroundShapesMVVKernel(self,name,filename,template,addCut="1",jobName="1DMVV",wait=True,corrFactorW=1,corrFactorZ=1):
 
   pwd = os.getcwd()
-  
+  print "samples ",self.samples
   for c in self.categories:
-  
-   jobname = jobName+"_"+c
+   period=filename.split("_")[1]  
+   jobname = jobName+"_"+period+"_"+c
    print "Working on purity: ", c
+   print "Working on period: ", period
    
    resFile=filename+"_nonRes_detectorResponse.root"
    print "Reading " ,resFile
@@ -110,10 +109,14 @@ class AllFunctions():
    
 #   if 'VBF' in c: cut='*'.join([self.cuts['common_VBF'],self.cuts[c.replace('VBF_','')],addCut,self.cuts['acceptanceGEN'],self.cuts['looseacceptanceMJ']])
 #   else: cut='*'.join([self.cuts['common_VV'],self.cuts[c],addCut,self.cuts['acceptanceGEN'],self.cuts['looseacceptanceMJ']])
-#   cut='*'.join([self.cuts['common'],self.cuts[c],addCut,self.cuts['acceptanceGEN'],self.cuts['looseacceptanceMJ']]) 
-   cut='*'.join([self.cuts['common'],addCut,self.cuts['acceptanceGEN'],self.cuts['looseacceptanceMJ']]) #irene removed category to make templates
-   smp = pwd +"/"+self.samples
-
+   cut='*'.join([self.cuts['common'],self.cuts[c],addCut,self.cuts['acceptanceGEN'],self.cuts['looseacceptanceMJ']]) 
+   folders=[]
+   folders= self.samples.split(',')
+   smp= ""
+   for s in folders:
+    smp+=pwd +"/"+s
+    if s != folders[-1]: smp+=","
+   print " smp ",smp
    if self.submitToBatch:
     if name.find("Jets") == -1: template += ",QCD_Pt-,QCD_HT" 
     #if name.find("Jets") == -1: template += ",QCD_HT" #irene because QCD Pt- should go without spike killer!!
@@ -122,7 +125,7 @@ class AllFunctions():
     jobList, files = Make1DMVVTemplateWithKernels(rootFile,template,cut,resFile,self.binsMVV,self.minMVV,self.maxMVV,smp,jobname,wait,self.HCALbinsMVV) #,addOption) #irene
     if wait: merge1DMVVTemplate(jobList,files,jobname,c,self.binsMVV,self.minMVV,self.maxMVV,self.HCALbinsMVV,name,filename)
    else:
-    cmd='vvMake1DMVVTemplateWithKernels.py -H "x" -o "{rootFile}" -s "{template}" -c "{cut}"  -v "jj_gen_partialMass" -b {binsMVV}  -x {minMVV} -X {maxMVV} -r {res} {directory} --corrFactorW {corrFactorW} --corrFactorZ {corrFactorZ} '.format(rootFile=rootFile,template=template,cut=cut,res=resFile,binsMVV=self.binsMVV,minMVV=self.minMVV,maxMVV=self.maxMVV,corrFactorW=corrFactorW,corrFactorZ=corrFactorZ,directory=smp)
+    cmd='vvMake1DMVVTemplateWithKernels.py -H "x" -o "{rootFile}" -s "{template}" -c "{cut}"  -v "jj_gen_partialMass" -b {binsMVV}  -x {minMVV} -X {maxMVV} -r {res} -d {directory} --corrFactorW {corrFactorW} --corrFactorZ {corrFactorZ} '.format(rootFile=rootFile,template=template,cut=cut,res=resFile,binsMVV=self.binsMVV,minMVV=self.minMVV,maxMVV=self.maxMVV,corrFactorW=corrFactorW,corrFactorZ=corrFactorZ,directory=smp)
     cmd = cmd+self.HCALbinsMVV
     os.system(cmd)    
 
@@ -130,12 +133,13 @@ class AllFunctions():
  def makeBackgroundShapesMVVConditional(self,name,filename,template,leg,addCut="",jobName="2DMVV",wait=True):
 
   pwd = os.getcwd()  
-  
-  for c in self.categories:
+  period=filename.split("_")[1]
 
+  for c in self.categories:
+   print "Working on period: ", period
    print " Working on purity: ", c
 
-   jobname = jobName+"_"+c
+   jobname = jobName+"_"+period+"_"+c
 
    resFile=filename+"_"+name+"_detectorResponse.root"
    rootFile=filename+"_"+name+"_COND2D_"+c+"_"+leg+".root"       
@@ -144,9 +148,16 @@ class AllFunctions():
    
 #   if 'VBF' in c: cut='*'.join([self.cuts['common_VBF'],self.cuts[c.replace('VBF_','')],addCut])#,cuts['acceptanceGEN'],cuts['looseacceptanceMJ']])
 #   else: cut='*'.join([self.cuts['common_VV'],self.cuts[c],addCut])#,cuts['acceptanceGEN'],cuts['looseacceptanceMJ']])
-#   cut='*'.join([self.cuts['common'],self.cuts[c],addCut])#,cuts['acceptanceGEN'],cuts['looseacceptanceMJ']])
-   cut='*'.join([self.cuts['common'],addCut])#,cuts['acceptanceGEN'],cuts['looseacceptanceMJ']]) #irene removed category to make templates    
-   smp = pwd +"/"+self.samples 
+   cut='*'.join([self.cuts['common'],self.cuts[c],addCut])#,cuts['acceptanceGEN'],cuts['looseacceptanceMJ']])
+
+   folders=[]
+   folders= self.samples.split(',')
+   smp= ""
+   for s in folders:
+    smp+=pwd +"/"+s
+    if s != folders[-1]: smp+=","
+   print " smp ",smp
+
  
    if self.submitToBatch:
     if name.find("VJets")== -1: template += ",QCD_Pt-,QCD_HT"
@@ -188,7 +199,13 @@ class AllFunctions():
  def makeNormalizations(self,name,filename,template,data=0,addCut='1',jobName="nR",factors="1",wait=True,HPSF=1.,LPSF=1.):
  
   pwd = os.getcwd()
-  sam = pwd +"/"+self.samples
+  period=filename.split("_")[1]
+  folders=[]
+  folders= self.samples.split(',')
+  sam= ""
+  for s in folders:
+   sam+=pwd +"/"+s
+   if s != folders[-1]: sam+=","
   print "Using files in" , sam
   
   for c in self.categories:
@@ -198,7 +215,7 @@ class AllFunctions():
         if c.find("HPLP"): factors=factors+",sf:"+str(LPSF)
         else: factors=factors+",sf:"+str(HPSF)
       
-   jobname = jobName+"_"+c
+   jobname = jobName+"_"+period+"_"+c
    rootFile=filename+"_"+name+"_"+c+".root"
    print "Saving to ",rootFile  
    
@@ -258,13 +275,12 @@ class AllFunctions():
      os.system(cmd)
      
 
- #this one I still have to fix and test, do not use submitToBatch yet
  def mergeKernelJobs(self,name,filename):
-    
+    period=filename.split("_")[1]     
     for c in self.categories:
         jobList = []
         files   = []
-        with open("tmp1D_%s_joblist.txt"%c,'r') as infile:
+        with open("tmp1D_%s_%s_joblist.txt"%(period,c),'r') as infile:
             for line in infile:
                 if line.startswith("job"):
                     for job in line.split("[")[1].split("]")[0].split(","):
@@ -273,11 +289,11 @@ class AllFunctions():
                     for job in line.split("[")[1].split("]")[0].split(","):
                         files.append(job.replace("'","").replace(" ",""))
         from modules.submitJobs import merge1DMVVTemplate
-        merge1DMVVTemplate(jobList,files,"1D"+"_"+c,c,self.binsMVV,self.minMVV,self.maxMVV,self.HCALbinsMVV,name,filename)
+        merge1DMVVTemplate(jobList,files,"1D"+"_"+period+"_"+c,c,self.binsMVV,self.minMVV,self.maxMVV,self.HCALbinsMVV,name,filename)
       
         jobList = []
         files   = []
-        with open("tmp2Dl1_%s_joblist.txt"%c,'r') as infile:
+        with open("tmp2Dl1_%s_%s_joblist.txt"%(period,c),'r') as infile:
             for line in infile:
                 if line.startswith("job"):
                     for job in line.split("[")[1].split("]")[0].split(","):
@@ -287,8 +303,8 @@ class AllFunctions():
                         files.append(job.replace("'","").replace(" ",""))
 
         from modules.submitJobs import merge2DTemplate
-        merge2DTemplate(jobList,files,"2Dl1"+"_"+c,c,"l1",self.binsMVV,self.binsMJ,self.minMVV,self.maxMVV,self.minMJ,self.maxMJ,self.HCALbinsMVV,name,filename)
-        merge2DTemplate(jobList,files,"2Dl2"+"_"+c,c,"l2",self.binsMVV,self.binsMJ,self.minMVV,self.maxMVV,self.minMJ,self.maxMJ,self.HCALbinsMVV,name,filename)
+        merge2DTemplate(jobList,files,"2Dl1"+"_"+period+"_"+c,c,"l1",self.binsMVV,self.binsMJ,self.minMVV,self.maxMVV,self.minMJ,self.maxMJ,self.HCALbinsMVV,name,filename)
+        merge2DTemplate(jobList,files,"2Dl2"+"_"+period+"_"+c,c,"l2",self.binsMVV,self.binsMJ,self.minMVV,self.maxMVV,self.minMJ,self.maxMJ,self.HCALbinsMVV,name,filename)
 		            	    
  def printAllParameters(self):
  
