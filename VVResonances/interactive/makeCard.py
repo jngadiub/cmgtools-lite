@@ -61,11 +61,10 @@ lumi_unc = {'2016':ctx16.lumi_unc,'2017':ctx17.lumi_unc, '2018':ctx18.lumi_unc}
 scales = {"2017" :[1,1], "2016":[1,1], "2018":[1,1]}
 scalesHiggs = {"2017" :[1,1], "2016":[1,1], "2018":[1,1]}
 
-
+vtag_pt_dependence = {'VV_HPHP':'((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))','VV_HPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))','VH_HPHP':'1','VH_HPLP':'1','VH_LPHP':'1','VH_LPLP':'1'}
 
 #quick fix to add VH !!!
 vtag_pt_dependence = {"2016" : ctx16.vtag_pt_dependence,"2017" : ctx17.vtag_pt_dependence,"2018" : ctx18.vtag_pt_dependence}
-
 
 doCorrelation = True 
 Tools = DatacardTools(scales,scalesHiggs,vtag_pt_dependence,lumi_unc,sf_qcd,pseudodata,outlabel,doCorrelation)
@@ -88,38 +87,42 @@ for sig in signals:
       Tools.AddSignal(card,dataset,p,sig,resultsDir[dataset],ncontrib)
       ncontrib+=1
 
-      if doVjets:
-        print "including W/Z jets in datacard"
-        rootFileMVV = resultsDir[dataset]+'/JJ_%s_WJets_MVV_'%dataset+p+'.root' 
-        rootFileNorm = resultsDir[dataset]+'/JJ_%s_WJets_%s.root'%(dataset,p)
-        Tools.AddWResBackground(card,dataset,p,rootFileMVV,rootFileNorm,resultsDir[dataset],ncontrib)
-        ncontrib+=1
+      print "##########################       including W/Z jets in datacard      ######################"
+      rootFileMVV = resultsDir[dataset]+'/JJ_%s_WJets_MVV_'%dataset+p+'.root'    
+      rootFileNorm = resultsDir[dataset]+'/JJ_%s_WJets_%s.root'%(dataset,p)
+      Tools.AddWResBackground(card,dataset,p,rootFileMVV,rootFileNorm,resultsDir[dataset],ncontrib)
+      ncontrib+=1
+      
+      rootFileMVV = resultsDir[dataset]+'/JJ_%s_ZJets_MVV_'%dataset+p+'.root'
+      rootFileNorm = resultsDir[dataset]+"/JJ_%s_ZJets_%s.root"%(dataset,p)
+      Tools.AddZResBackground(card,dataset,p,rootFileMVV,rootFileNorm,resultsDir[dataset],ncontrib)
+      ncontrib+=1
         
-        rootFileMVV = resultsDir[dataset]+'/JJ_%s_ZJets_MVV_'%dataset+p+'.root'
-        rootFileNorm = resultsDir[dataset]+"/JJ_%s_ZJets_%s.root"%(dataset,p)
-        Tools.AddZResBackground(card,dataset,p,rootFileMVV,rootFileNorm,resultsDir[dataset],ncontrib)
-        ncontrib+=1
+      print "including tt+jets in datacard"
+      rootFileMVV = resultsDir[dataset]+'/JJ_%s_TTJets_MVV_'%dataset+p+'.root' 
+      rootFileNorm = resultsDir[dataset]+'/JJ_%s_TTJets_%s.root'%(dataset,p)
+      Tools.AddTTBackground(card,dataset,p,rootFileMVV,rootFileNorm,resultsDir[dataset],ncontrib)
+      ncontrib+=1
 
       #rootFile3DPDF = resultsDir[dataset]+'/JJ_2016_nonRes_3D_VV_HPLP.root'
       rootFile3DPDF = resultsDir[dataset]+"/save_new_shapes_%s_pythia_"%dataset+"VVVH_all"+"_3D.root"
       print "rootFile3DPDF ",rootFile3DPDF
-      rootFileNorm = resultsDir[dataset]+"/JJ_%s_nonRes_"%dataset+p+".root"   
+      rootFileNorm = resultsDir[dataset]+"/JJ_%s_nonRes_"%dataset+p+".root"
       print "rootFileNorm ",rootFileNorm
 
-      Tools.AddNonResBackground(card,dataset,p,rootFile3DPDF,rootFileNorm,ncontrib) 
+      Tools.AddNonResBackground(card,dataset,p,rootFile3DPDF,rootFileNorm,ncontrib)
 
-      #if you run on real data or pseudodata
-      rootFileData = resultsDir[dataset]+"/JJ_"+p+".root"
+      # #if you run on real data or pseudodata
+      # rootFileData = resultsDir[dataset]+"/JJ_%s_nonRes_3D_none.root"%(dataset) #use this only to prepare workspace for making pseudo data with vjets
+      # histName="histo"
+      # scaleData=lumi[dataset]
+    
+      rootFileData = resultsDir[dataset]+"/pseudo40/JJ_"+p+".root"
       histName="data"
-      scaleData=1.0 
-      if pseudodata=="noVjets":
-        print "Using pseudodata without vjets"
-        rootFileData = resultsDir[dataset]+"/JJ_PDnoVjets_"+p+".root"
-        histName="datah"
-        scaleData=1.0
-      if pseudodata=="Vjets":
-        print "Using pseudodata with vjets"
-        rootFileData = resultsDir[dataset]+"/JJ_PDVjets_"+p+".root"
+      scaleData=1.0
+      if pseudodata==True:
+        print "Using pseudodata with all backgrounds (QCD, V+jets and tt+jets)"
+        rootFileData = resultsDir[dataset]+"/pseudo40/JJ_PD_"+p+".root"
         histName="data"
         scaleData=1.0
       if pseudodata==sig:
@@ -132,7 +135,7 @@ for sig in signals:
       Tools.AddResBackgroundSystematics(card,p)
       Tools.AddNonResBackgroundSystematics(card,p)
       Tools.AddTaggingSystematics(card,sig,dataset,p,resultsDir[dataset]+'/migrationunc.json')
-        
+      Tools.AddTTSystematics(card,sig,dataset,p)
       card.makeCard()
 
       t2wcmd = "text2workspace.py %s -o %s"%(cardName,workspaceName)
@@ -168,5 +171,7 @@ for sig in signals:
     t2wcmd = "text2workspace.py %s -o %s"%(combo_card,combo_workspace)
     print t2wcmd
     os.system(t2wcmd)
+
+    
 
 

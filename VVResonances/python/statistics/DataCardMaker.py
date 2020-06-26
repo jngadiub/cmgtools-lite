@@ -321,7 +321,138 @@ class DataCardMaker:
 
 
 
+    def addMJJTTJetsParametricShape(self,name,variable,jsonFile,scale ={},resolution={},fractionGauss={},fractionRes={},varToReplace="MJJ"):
+        self.w.factory("MH[2000]")
+        self.w.var("MH").setConstant(1)
+       
+        scaleStr='0'
+        resolutionStr='0'
+        fractionGaussStr='0'
+        fractionResStr='0'
 
+        scaleSysts=[]
+        resolutionSysts=[]
+        fractionGaussSysts=[]
+        fractionResSysts=[]
+        for syst,factor in scale.iteritems():
+            self.w.factory(syst+"[0,-0.1,0.1]")
+            scaleStr=scaleStr+"+{factor}*{syst}".format(factor=factor,syst=syst)
+            scaleSysts.append(syst)
+        for syst,factor in resolution.iteritems():
+            self.w.factory(syst+"[0,-0.5,0.5]")
+            resolutionStr=resolutionStr+"+{factor}*{syst}".format(factor=factor,syst=syst)
+            resolutionSysts.append(syst)
+        for syst,factor in fractionGauss.iteritems():
+            print "ADDING %s" %syst
+            self.w.factory(syst+"[0,-0.5,0.5]")
+            fractionGaussStr=fractionGaussStr+"+{factor}*{syst}".format(factor=factor,syst=syst)
+            fractionGaussSysts.append(syst)
+        
+        for syst,factor in fractionRes.iteritems():
+            self.w.factory(syst+"[0,-50,50]")
+            fractionResStr=fractionResStr+"+{factor}*{syst}".format(factor=factor,syst=syst)
+            fractionResSysts.append(syst)
+        MJJ=variable            
+        # try:
+        #   self.w.factory(variable+"[0,1000]")
+        # except:
+        #   print("Variable {} already in workspace!".format(variable))
+
+        f=open(jsonFile)
+        info=json.load(f)
+
+        mean1Var="_".join(["mean1",name,self.tag])
+        self.w.factory("expr::{name}('({param})*(1+{vv_syst})',MJJ,{vv_systs})".format(name=mean1Var,param=info['mean1'],vv_syst=scaleStr,vv_systs=','.join(scaleSysts)).replace("MH",varToReplace))
+
+        mean2Var="_".join(["mean2",name,self.tag])
+        self.w.factory("expr::{name}('({param})*(1+{vv_syst})',MJJ,{vv_systs})".format(name=mean2Var,param=info['mean2'],vv_syst=scaleStr,vv_systs=','.join(scaleSysts)).replace("MH",varToReplace))
+
+        sigma1Var="_".join(["sigma1",name,self.tag])
+        self.w.factory("expr::{name}('({param})*(1+{vv_syst})',MJJ,{vv_systs})".format(name=sigma1Var,param=info['sigma1'],vv_syst=resolutionStr,vv_systs=','.join(resolutionSysts)).replace("MH",varToReplace))
+
+        sigma2Var="_".join(["sigma2",name,self.tag])
+        self.w.factory("expr::{name}('({param})*(1+{vv_syst})',MJJ,{vv_systs})".format(name=sigma2Var,param=info['sigma2'],vv_syst=resolutionStr,vv_systs=','.join(resolutionSysts)).replace("MH",varToReplace))
+
+        c1Var="_".join(["c_1",name,self.tag])
+        self.w.factory("expr::{name}('MJJ*0+{param}',MJJ)".format(name=c1Var,param=info['c_1']).replace("MH",varToReplace))
+
+        c0Var="_".join(["c_0",name,self.tag])
+        self.w.factory("expr::{name}('MJJ*0+{param}',MJJ)".format(name=c0Var,param=info['c_0']).replace("MH",varToReplace))
+
+        c2Var="_".join(["c_2",name,self.tag])
+        self.w.factory("expr::{name}('MJJ*0+{param}',MJJ)".format(name=c2Var,param=info['c_2']).replace("MH",varToReplace))
+        
+        # #W peak function multiplied by the g fraction
+ #        Fg1Var="_".join(["f_g1",name,self.tag])
+ #        self.w.factory("EXPR::{name}('min((0+{param})*(1+{vv_syst}),1.0)',MJJ,{vv_systs})".format(name=Fg1Var, param=info['f_g1'],vv_syst=fractionGaussStr,vv_systs=','.join(fractionGaussSysts)).replace("MH",varToReplace))
+ #        pdfNameW="_".join([name+"PeakWTmp",self.tag])
+ #        self.w.factory("RooGaussian::{name}({var},{mean1},{sigma1})".format(name=pdfNameW,var=MJJ,mean1=mean1Var,sigma1=sigma1Var).replace("MH",variable))
+ #        pdfNameW2="_".join([name+"PeakW",self.tag])
+ #        self.w.factory("PROD::{name}({pdf1},{pdf2})".format(name=pdfNameW2,pdf1=Fg1Var,pdf2=pdfNameW))
+ #        print "DONE-WPEAK"
+ #
+ #        #Top peak function multiplied by the (1-g) fraction
+ #        Fg1Var2="_".join(["f_g1_inv",name,self.tag])
+ #        self.w.factory("EXPR::{name}('1-{f}',{f})".format(name=Fg1Var2,f=Fg1Var))
+ #        pdfNameTop="_".join([name+"PeakTopTmp",self.tag])
+ #        self.w.factory("RooGaussian::{name}({var},{mean2},{sigma2})".format(name=pdfNameTop,var=MJJ,mean2=mean2Var,sigma2=sigma2Var).replace("MH",variable))
+ #        pdfNameTop2="_".join([name+"PeakTop",self.tag])
+ #        self.w.factory("PROD::{name}({pdf1},{pdf2})".format(name=pdfNameTop2,pdf1=Fg1Var2,pdf2=pdfNameTop))
+ #        print "DONE-TPEAK"
+ #
+ #        #Now put together W and top functions (this gets multplied by the res fraction f)
+ #        FresVar="_".join(["f_res",name,self.tag])
+ #        self.w.factory("EXPR::{name}('0+{param}',MJJ)".format(name=FresVar,param=info['f_res']).replace("MH",varToReplace))
+ #        pdfNamePeaks="_".join([name+"PeakWTopTmp",self.tag])
+ #        self.w.factory("SUM::{name}(const_res_1[1]*{PDF1},const_res_2[1]*{PDF2})".format(name=pdfNamePeaks,PDF1=pdfNameW2,PDF2=pdfNameTop2))
+ #        pdfNamePeaks2="_".join([name+"PeakWTop",self.tag])
+ #        self.w.factory("PROD::{name}({pdf1},{pdf2})".format(name=pdfNamePeaks2,pdf1=FresVar,pdf2=pdfNamePeaks))
+ #        print "DONE-WTOPMERGING"
+ #
+ #        #Non res function (this gets multplied by the 1-f fraction)
+ #        FresVar2="_".join(["f_res_inv",name,self.tag])
+ #        self.w.factory("EXPR::{name}('1-{f}',{f})".format(name=FresVar2,f=FresVar))
+ #        pdfNameBKG="_".join([name+"nonResTmp",self.tag])
+ #        erfExp = ROOT.RooErfExpPdf(pdfNameBKG,pdfNameBKG,self.w.var(MJJ),self.w.function(c0Var),self.w.function(c1Var),self.w.function(c2Var))
+ #        getattr(self.w,'import')(erfExp,ROOT.RooFit.RenameVariable(pdfNameBKG,pdfNameBKG))
+ #        pdfNameBKG2="_".join([name+"nonRe",self.tag])
+ #        self.w.factory("PROD::{name}({pdf1},{pdf2})".format(name=pdfNameBKG2,pdf1=FresVar2,pdf2=pdfNameBKG))
+ #        print "DONE-NONRES"
+ #
+ #        #Now put together res and non res functions
+ #        pdfName="_".join([name,self.tag])
+ #        self.w.factory("SUM::{name}(const_nonres_1[1]*{PDF1},const_nonres_2[1]*{PDF2})".format(name=pdfName,PDF1=pdfNamePeaks2,PDF2=pdfNameBKG2))
+ #        print "DONE-RESNONRESMERGING"
+        
+
+        
+        pdfNameW="_".join([name+"PeakW",self.tag])
+        self.w.factory("RooGaussian::{name}({var},{mean1},{sigma1})".format(name=pdfNameW,var=MJJ,mean1=mean1Var,sigma1=sigma1Var).replace("MH",variable))
+
+        pdfNameTop="_".join([name+"PeakTop",self.tag])
+        self.w.factory("RooGaussian::{name}({var},{mean2},{sigma2})".format(name=pdfNameTop,var=MJJ,mean2=mean2Var,sigma2=sigma2Var).replace("MH",variable))
+
+        Fg1Var="_".join(["f_g1",name,self.tag])
+        self.w.factory("expr::{name}('min((MJJ*0+{param})*(1+{vv_syst}),1.0)',MJJ,{vv_systs})".format(name=Fg1Var,param=info['f_g1'],vv_syst=fractionGaussStr,vv_systs=','.join(fractionGaussSysts)).replace("MH",varToReplace))
+
+        pdfNamePeaks="_".join([name+"PeakWTop",self.tag])
+        expr = "'{frac}*{PDF1}+(1-{frac})*{PDF2}',MJJ,{var},{frac},{PDF1},{PDF2}".format(name=pdfNamePeaks,frac=Fg1Var,PDF1=pdfNameW,PDF2=pdfNameTop,var=MJJ)
+        self.w.factory("EXPR::%s(%s)"%(pdfNamePeaks,expr))
+
+        pdfNameBKG="_".join([name+"nonRes",self.tag])
+        erfExp = ROOT.RooErfExpPdf(pdfNameBKG,pdfNameBKG,self.w.var(MJJ),self.w.function(c0Var),self.w.function(c1Var),self.w.function(c2Var))
+        getattr(self.w,'import')(erfExp,ROOT.RooFit.RenameVariable(pdfNameBKG,pdfNameBKG))
+
+        FresVar="_".join(["f_res",name,self.tag])
+        self.w.factory("expr::{name}('min((MJJ*0+{param})*(1+{vv_syst}),1.0)',MJJ,{vv_systs})".format(name=FresVar,param=info['f_res'],vv_syst=fractionResStr,vv_systs=','.join(fractionResSysts)).replace("MH",varToReplace))
+        
+        pdfName="_".join([name,self.tag])
+        self.w.factory("EXPR::{name}('{f}*{PDF1}+(1-{f})*{PDF2}',MJJ,{var},{f},{PDF1},{PDF2})".format(name=pdfName,f=FresVar,PDF1=pdfNamePeaks,PDF2=pdfNameBKG,var=MJJ))
+        print("SUCCESS!!!!!")
+        f.close()
+        self.w.Print()
+
+        
     def addMJJTopMergedParametricShape(self,name,variable,jsonFile,scale ={},resolution={},fraction={},varToReplace="MH"):
         self.w.factory("MH[2000]")
         self.w.var("MH").setConstant(1)
@@ -347,7 +478,10 @@ class DataCardMaker:
             fractionSysts.append(syst)
        
         MJJ=variable            
-        self.w.factory(variable+"[0,1000]")
+        try:
+          self.w.factory(variable+"[0,1000]")
+        except:
+          print("Variable {} already in workspace!".format(variable))
 
         
         f=open(jsonFile)
@@ -1429,6 +1563,25 @@ class DataCardMaker:
             pdfName3="_".join([pdf3,tag3])
 	    
         self.w.factory("PROD::{name}({name1},{name2},{name3}| {x})".format(name=pdfName,name1=pdfName1,x=varName,name2=pdfName2,name3=pdfName3))    
+        
+    def conditionalProduct3(self,name,pdf1,pdf2,pdf3,varName,tag1="",tag2="",tag3=""):
+          pdfName="_".join([name,self.tag])
+
+          if tag1=="":
+              pdfName1="_".join([pdf1,self.tag])
+          else:
+              pdfName1="_".join([pdf1,tag1])
+          if tag2=="":    
+              pdfName2="_".join([pdf2,self.tag])
+          else:
+              pdfName2="_".join([pdf2,tag2])
+          if tag3=="":    
+              pdfName3="_".join([pdf3,self.tag])
+          else:
+              pdfName3="_".join([pdf3,tag3])
+          # self.w.factory("PROD::{name}({name1},{name2}| {x},{name3}| {x})".format(name=pdfName,name1=pdfName1,x=varName,name2=pdfName2,name3=pdfName3))
+          self.w.factory("PROD::{name}({name1},{name2}| {x},{name3}| {x})".format(name=pdfName,name1=pdfName1,x=varName,name2=pdfName2,name3=pdfName3))
+          # self.w.factory("PROD::{name}(mjj,mj1| {MJJ},{mj2}| {{MJJ}})".format(name=pdfName,mjj=pdfName1,MJJ=varName,mj1=pdfName2,{mj2}=pdfName3))
 
     def product(self,name,pdf1,pdf2):
         pdfName="_".join([name,self.tag])
@@ -1438,6 +1591,7 @@ class DataCardMaker:
 
     def product3D(self,name,pdf1,pdf2,pdf3):
         print self.tag
+        print("!!!!Using product3D!!!! ")
         pdfName="_".join([name,self.tag])
         pdfName1="_".join([pdf1,self.tag])
         pdfName2="_".join([pdf2,self.tag])

@@ -318,7 +318,7 @@ if (options.output).find("Jets")!=-1:
     print "add the histograms for W+jets, Z+jets and ttbar before smoothing the tails"
 for hist in finalHistograms.itervalues():
  # hist.Write(hist.GetName()+"_raw")
- if (options.output).find("Jets")!=-1 and hist.GetName()=="histo_nominal":
+ if (options.output).find("Jets")!=-1 and hist.GetName()=="histo_nominal" and (options.output).find("TTJets")==-1:
      print "smooth tails of 1D histogram for vjets background of histo "+hist.GetName()
      if hist.Integral() > 0:
         smoothTail1D(hist)

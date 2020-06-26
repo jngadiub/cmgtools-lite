@@ -235,8 +235,8 @@ def doFit(th1_projY,mjj_mean,mjj_error,N):
     fitter.w.var("c_0")   .setMax(0.2)
     fitter.w.var("c_1")   .setMin(100) #offset
     fitter.w.var("c_2")   .setMin(50) #width
-    fitter.w.var("f_g1")  .setMin(0.05)
-    fitter.w.var("f_res") .setMin(0.1)
+    # fitter.w.var("f_g1")  .setMin(0.05)
+    # fitter.w.var("f_res") .setMin(0.1)
     fitter.w.var("mean1") .setMin(75.)
     fitter.w.var("mean2") .setMin(160.)
     fitter.w.var("sigma1").setMin(5)
@@ -245,8 +245,8 @@ def doFit(th1_projY,mjj_mean,mjj_error,N):
     fitter.w.var("c_0")   .setMin(-0.20)
     fitter.w.var("c_1")   .setMax(600) #offset
     fitter.w.var("c_2")   .setMax(200) #width
-    fitter.w.var("f_g1")  .setMax(0.9)
-    fitter.w.var("f_res") .setMax(0.9)
+    # fitter.w.var("f_g1")  .setMax(0.9)
+    # fitter.w.var("f_res") .setMax(0.9)
     fitter.w.var("mean1") .setMax(90)
     fitter.w.var("mean2") .setMax(180)
     fitter.w.var("sigma1").setMax(9.)
