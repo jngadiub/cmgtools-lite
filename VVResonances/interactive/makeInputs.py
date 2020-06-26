@@ -28,7 +28,7 @@ parser.add_option("--signal",dest="signal",default="BGWW",help="which signal do 
 
 (options,args) = parser.parse_args()
 
-widerMVV=False
+widerMVV=True
 
 
 ctx  = cuts.cuts("init_VV_VH.json",options.period,options.sorting+"dijetbins",widerMVV)
@@ -75,7 +75,8 @@ if useTriggerWeights:
 #categories=['VH_HPHP','VH_HPLP','VH_LPHP','VV_HPHP','VV_HPLP','VBF_VV_HPHP','VBF_VV_HPLP']
 #categories=['VH_HPHP','VH_HPLP','VH_LPHP','VV_HPHP','VV_HPLP']
 #
-categories =["NP"]
+#categories =["NP"]
+categories =["VV_HPLP"]
        
 
 #list of signal samples --> nb, radion and vbf samples to be added
@@ -191,7 +192,7 @@ if options.run.find("all")!=-1 or options.run.find("sig")!=-1:
 
     if options.run.find("all")!=-1 or options.run.find("norm")!=-1:
         print "fit signal norm "
-        f.makeSignalYields("JJ_"+str(signal_inuse)+"_"+filePeriod,signaltemplate_inuse,xsec_inuse,{'VH_HPHP':ctx.HPSF_htag*ctx.HPSF_vtag,'VH_HPLP':ctx.HPSF_htag*ctx.LPSF_vtag,'VH_LPHP':ctx.HPSF_vtag*ctx.LPSF_htag,'VH_LPLP':ctx.LPSF_htag*ctx.LPSF_vtag,'VV_HPHP':ctx.HPSF_vtag*ctx.HPSF_vtag,'VV_HPLP':ctx.HPSF_vtag*ctx.LPSF_vtag,'VH_all':ctx.HPSF_vtag*ctx.HPSF_htag+ctx.HPSF_vtag*ctx.LPSF_htag},'"[0]*TMath::Log10(x)"')
+        f.makeSignalYields("JJ_"+str(signal_inuse)+"_"+filePeriod,signaltemplate_inuse,xsec_inuse,'"pol3"') #'"[0]*TMath::Log10(x)"')
         #f.makeNormalizations("sigonly_M2000","JJ_"+filePeriod+"_"+str(signal_inuse),signaltemplate_inuse+"narrow_2000",0,ctx.cuts['nonres'],"sig")
         #f.makeNormalizations("sigonly_M4000","JJ_"+filePeriod+"_"+str(signal_inuse),signaltemplate_inuse+"narrow_4000",0,ctx.cuts['nonres'],"sig")
 
@@ -204,6 +205,7 @@ if options.run.find("all")!=-1 or options.run.find("qcd")!=-1:
     if runParallel and submitToBatch:
         if options.run.find("all")!=-1 or options.run.find("templates")!=-1:
             wait = False
+            print "ctx.cuts['nonres'] = ",ctx.cuts['nonres']  
             f.makeBackgroundShapesMVVKernel("nonRes","JJ_"+filePeriod,nonResTemplate,ctx.cuts['nonres'],"1D",wait)
             f.makeBackgroundShapesMVVConditional("nonRes","JJ_"+filePeriod,nonResTemplate,'l1',ctx.cuts['nonres'],"2Dl1",wait)
             f.makeBackgroundShapesMVVConditional("nonRes","JJ_"+filePeriod,nonResTemplate,'l2',ctx.cuts['nonres'],"2Dl2",wait)
@@ -211,6 +213,7 @@ if options.run.find("all")!=-1 or options.run.find("qcd")!=-1:
             sys.exit()
         elif options.run.find("all")!=-1 or options.run.find("kernel")!=-1:
             f.mergeKernelJobs("nonRes","JJ_"+filePeriod)
+            print " calling merge Bckg shape"
 	    f.mergeBackgroundShapes("nonRes","JJ_"+filePeriod)
     else:
         if options.run.find("all")!=-1 or options.run.find("templates")!=-1:
