@@ -9,7 +9,7 @@ import subprocess, thread
 from array import array
 ROOT.gROOT.SetBatch(True)
 
-timeCheck = "30"
+timeCheck = "1000"
 userName=os.environ['USER']
 
 
@@ -81,13 +81,23 @@ def waitForBatchJobs( jobname, remainingjobs, listOfJobs, userName, timeCheck="3
         
 def submitJobs(minEv,maxEv,cmd,OutputFileNames,queue,jobname,path):
     joblist = []
+    print "minEv ",minEv
+    print " iteritems() ",minEv.iteritems()
+    i=0
     for k,v in minEv.iteritems():
-
+      print "k ",k
+      removefile=k[k.rindex("/")+1:]
+      print "remove file ",removefile        
+      directory = str(k).split(removefile)[0]
+      print " directory ",directory
+      template = str(k).split("/")[-1]
+      print "template ",template
       for j in range(len(v)):
-       os.system("mkdir tmp"+jobname+"/"+str(k).replace(".root","")+"_"+str(j+1))
-       os.chdir("tmp"+jobname+"/"+str(k).replace(".root","")+"_"+str(j+1))
+       os.system("mkdir tmp"+jobname+"/"+str(k).split("/")[-1].replace(".root","")+"_"+str(i+1))
+       os.chdir("tmp"+jobname+"/"+str(k).split("/")[-1].replace(".root","")+"_"+str(i+1))
       
-       with open('job_%s_%i.sh'%(k.replace(".root",""),j+1), 'w') as fout:
+       with open('job_%s_%i.sh'%(str(k).split("/")[-1].replace(".root",""),i+1), 'w') as fout:
+          print " fout" , fout
           fout.write("#!/bin/sh\n")
           fout.write("echo\n")
           fout.write("echo\n")
@@ -99,50 +109,52 @@ def submitJobs(minEv,maxEv,cmd,OutputFileNames,queue,jobname,path):
           fout.write("cd "+str(path)+"\n")
           fout.write("cmsenv\n")
           if runinKA==True: fout.write("mkdir -p /tmp/${USER}/\n")
-          fout.write(cmd+" -o res"+jobname+"/"+OutputFileNames+"_"+str(j+1)+"_"+k+" -s "+k+" -e "+str(minEv[k][j])+" -E "+str(maxEv[k][j])+"\n")
+          fout.write(cmd+" -o res"+jobname+"/"+OutputFileNames+"_"+str(i+1)+"_"+str(k).split("/")[-1]+" -e "+str(minEv[k][j])+" -E "+str(maxEv[k][j])+" -d "+directory+" -s "+template+"\n")
           fout.write("echo 'STOP---------------'\n")
           fout.write("echo\n")
           fout.write("echo\n")
-
+        
        if useCondorBatch:
                os.system("mv  job_*.sh "+jobname+".sh")
                makeSubmitFileCondor(jobname+".sh",jobname,"workday")
                os.system("condor_submit submit.sub")
        else:
-               os.system("chmod 755 job_%s_%i.sh"%(k.replace(".root",""),j+1) )
-               os.system("bsub -q "+queue+" -o logs job_%s_%i.sh -J %s"%(k.replace(".root",""),j+1,jobname))
-       print "job nr " + str(j+1) + " file " + k + " being submitted"
-       joblist.append("%s_%i"%(k.replace(".root",""),j+1))
+               os.system("chmod 755 job_%s_%i.sh"%(k.replace(".root",""),i+1) )
+               os.system("bsub -q "+queue+" -o logs job_%s_%i.sh -J %s"%(k.replace(".root",""),i+1,jobname))
+       print "job nr " + str(i+1) + " file " + k + " being submitted"
+       joblist.append("%s_%i"%(str(k).split("/")[-1].replace(".root",""),i+1))
        os.chdir("../..")
+       i+=1
     return joblist     
 
 def getEvents(template,samples):
     files = []
     sampleTypes = template.split(',')
-    for f in os.listdir(samples):
-        for t in sampleTypes:
-            if f.find('.root') != -1 and f.find(t) != -1: files.append(f)
+    for dirs in samples:
+        for f in os.listdir(dirs):
+            for t in sampleTypes:
+                if f.find('.root') != -1 and f.find(t) != -1: files.append(dirs+f)
 
     minEv = {}
     maxEv = {}
 
     for f in files:
-     inf = ROOT.TFile('%s/'%samples+f,'READ')
-     print "opening file "+str(samples+f)
-     minEv[f] = []
-     maxEv[f] = []
-     intree = inf.Get('AnalysisTree')
-     nentries = intree.GetEntries()
-     print f,nentries,nentries/500000
-     if nentries/500000 == 0:
-      minEv[f].append(0)
-      maxEv[f].append(500000)
-     else:
-      for i in range(nentries/500000):
-       minEv[f].append(i*500000)
-       maxEv[f].append(499999)
-
-
+        inf = ROOT.TFile(f,'READ')
+        print "opening file "+str(f)
+        minEv[f] = []
+        maxEv[f] = []
+        intree = inf.Get('AnalysisTree')
+        nentries = intree.GetEntries()
+        print f,nentries,nentries/500000
+        if nentries/500000 == 0:
+            minEv[f].append(0)
+            maxEv[f].append(500000)
+        else:
+            for i in range(nentries/500000):
+                minEv[f].append(i*500000)
+                maxEv[f].append(499999)
+                
+                
     NumberOfJobs = 0
     for k in maxEv.keys():
      NumberOfJobs += len(maxEv[k])
@@ -249,14 +261,21 @@ def Make1DMVVTemplateWithKernels(rootFile,template,cut,resFile,binsMVV,minMVV,ma
     print "maxMVV   = %i" %maxMVV    
     print "samples  = %s" %samples   
     print "jobName  = %s" %jobName 
-    print "samples  = %s",%samples
     print
-    minEv, maxEv, NumberOfJobs, files = getEvents(template,samples) 
-    print "Submitting %i number of jobs "  ,NumberOfJobs
+    folders = samples.split(",")
+    print "folders ",folders
+    minEv, maxEv, NumberOfJobs, files = getEvents(template,folders) 
+    print "Submitting %i number of jobs "%(NumberOfJobs)
+    print "files involved are ", files
+    print "minEv ",minEv
+    print "maxEv ",maxEv
     print
 
-    cmd='vvMake1DMVVTemplateWithKernels.py -H "x" -c "{cut}"  -v "jj_gen_partialMass" {binning} -b {binsMVV}  -x {minMVV} -X {maxMVV} -r {res} {addOption} {infolder} '.format(rootFile=rootFile,cut=cut,res=resFile,binsMVV=binsMVV,minMVV=minMVV,maxMVV=maxMVV,infolder=samples,binning=binning,addOption=addOption)
+    #cmd='vvMake1DMVVTemplateWithKernels.py -H "x" -c "{cut}"  -v "jj_gen_partialMass" {binning} -b {binsMVV}  -x {minMVV} -X {maxMVV} -r {res} {addOption} -d {infolder} '.format(rootFile=rootFile,cut=cut,res=resFile,binsMVV=binsMVV,minMVV=minMVV,maxMVV=maxMVV,infolder=samples,binning=binning,addOption=addOption)
+    cmd='vvMake1DMVVTemplateWithKernels.py -H "x" -c "{cut}"  -v "jj_gen_partialMass" {binning} -b {binsMVV}  -x {minMVV} -X {maxMVV} -r {res} {addOption} '.format(rootFile=rootFile,cut=cut,res=resFile,binsMVV=binsMVV,minMVV=minMVV,maxMVV=maxMVV,binning=binning,addOption=addOption)
+    print "cmd ",cmd 
     OutputFileNames = rootFile.replace(".root","") # base of the output file name, they will be saved in res directory
+    print "OutputFileNames ",OutputFileNames
     queue = "8nh" # give bsub queue -- 8nm (8 minutes), 1nh (1 hour), 8nh, 1nd (1day), 2nd, 1nw (1 week), 2nw 
     
     path = os.getcwd()
@@ -267,7 +286,9 @@ def Make1DMVVTemplateWithKernels(rootFile,template,cut,resFile,binsMVV,minMVV,ma
     except: os.mkdir("res"+jobName)
 
     #### Creating and sending jobs #####
+    print " Creating and sending jobs "
     joblist = submitJobs(minEv,maxEv,cmd,OutputFileNames,queue,jobName,path)
+    print "job list made "
     with open('tmp'+jobName+'_joblist.txt','w') as outfile:
         outfile.write("jobList = %s\n" % joblist)
         outfile.write("files = %s\n" % files)
@@ -306,11 +327,14 @@ def Make2DTemplateWithKernels(rootFile,template,cut,leg,binsMVV,minMVV,maxMVV,re
     print "samples   = %s" %samples   
     print "jobName   = %s" %jobName   
     print
-    minEv, maxEv, NumberOfJobs, files = getEvents(template,samples) 
-    print "Submitting %i number of jobs "  ,NumberOfJobs
+    folders = samples.split(",")
+    print "folders ",folders
+    minEv, maxEv, NumberOfJobs, files = getEvents(template,folders) 
+    print "Submitting %i number of jobs "%(NumberOfJobs)
+    print "files involved are ", files
     print
 
-    cmd='vvMake2DTemplateWithKernels.py -c "{cut}"  -v "jj_{leg}_gen_softDrop_mass,jj_gen_partialMass" {binning}  -b {binsMJ} -B {binsMVV} -x {minMJ} -X {maxMJ} -y {minMVV} -Y {maxMVV}  -r {res} {addOption} {infolder}'.format(rootFile=rootFile,samples=template,cut=cut,leg=leg,binsMVV=binsMVV,minMVV=minMVV,maxMVV=maxMVV,res=resFile,binsMJ=binsMJ,minMJ=minMJ,maxMJ=maxMJ,infolder=samples,binning=binning,addOption=addOption)
+    cmd='vvMake2DTemplateWithKernels.py -c "{cut}"  -v "jj_{leg}_gen_softDrop_mass,jj_gen_partialMass" {binning}  -b {binsMJ} -B {binsMVV} -x {minMJ} -X {maxMJ} -y {minMVV} -Y {maxMVV}  -r {res} {addOption} -s {samples}'.format(rootFile=rootFile,samples=template,cut=cut,leg=leg,binsMVV=binsMVV,minMVV=minMVV,maxMVV=maxMVV,res=resFile,binsMJ=binsMJ,minMJ=minMJ,maxMJ=maxMJ,binning=binning,addOption=addOption)
     OutputFileNames = rootFile.replace(".root","") # base of the output file name, they will be saved in res directory
     queue = "8nh" # give bsub queue -- 8nm (8 minutes), 1nh (1 hour), 8nh, 1nd (1day), 2nd, 1nw (1 week), 2nw 
     
@@ -431,15 +455,21 @@ def conditional(hist):
             hist.SetBinContent(j,i,hist.GetBinContent(j,i)/integral)
 
 def getJobs(files,jobList,outdir,purity):
+        print "getting jobs"
 	resubmit = []
 	jobsPerSample = {}
 	exit_flag = False
-
+        
 	for s in files:
+         print s
+         s = s.split("/")[-1]
 	 s = s.replace('.root','')
+         print "new s ",s
 	 filelist = []
 	 for t in jobList:
-	  if t.find(s) == -1: continue
+	  if t.find(s) == -1: 
+              continue
+          print " t ",t 
 	  jobid = t.split("_")[-1]
 	  found = False
 	  for o in os.listdir(outdir):
@@ -1442,13 +1472,16 @@ def makeData(template,cut,rootFile,binsMVV,binsMJ,minMVV,maxMVV,minMJ,maxMJ,fact
     print 
     files = []
     sampleTypes = template.split(',')
-    for f in os.listdir(samples):
-        for t in sampleTypes:
-            if f.find('.root') != -1 and f.find(t) != -1: files.append(f)
- 
-    NumberOfJobs= len(files) 
+    folders = samples.split(",")
+    for folder in folders:
+        for f in os.listdir(folder):
+            for t in sampleTypes:
+                if f.find('.root') != -1 and f.find(t) != -1: files.append(folder+f)
+    print " files ",files
+    NumberOfJobs= len(files)
+    print " ###### total number of files ",NumberOfJobs 
     OutputFileNames = rootFile.replace(".root","")
-    cmd='vvMakeData.py -d {data} -c "{cut}"  -v "jj_l1_softDrop_mass,jj_l2_softDrop_mass,jj_LV_mass" {binning} -b "{bins},{bins},{BINS}" -m "{mini},{mini},{MINI}" -M "{maxi},{maxi},{MAXI}" -f {factors} -n "{name}" {addOption} {infolder} '.format(cut=cut,BINS=binsMVV,bins=binsMJ,MINI=minMVV,MAXI=maxMVV,mini=minMJ,maxi=maxMJ,factors=factors,name=name,data=data,infolder=samples,binning=binning,addOption=addOption)  
+    cmd='vvMakeData.py -d {data} -c "{cut}"  -v "jj_l1_softDrop_mass,jj_l2_softDrop_mass,jj_LV_mass" {binning} -b "{bins},{bins},{BINS}" -m "{mini},{mini},{MINI}" -M "{maxi},{maxi},{MAXI}" -f {factors} -n "{name}" {addOption} '.format(cut=cut,BINS=binsMVV,bins=binsMJ,MINI=minMVV,MAXI=maxMVV,mini=minMJ,maxi=maxMJ,factors=factors,name=name,data=data,infolder=samples,binning=binning,addOption=addOption)  
     queue = "1nd" # give bsub queue -- 8nm (8 minutes), 1nh (1 hour), 8nh, 1nd (1day), 2nd, 1nw (1 week), 2nw 
     path = os.getcwd()
     try: os.system("rm -r tmp"+jobname)
@@ -1458,16 +1491,24 @@ def makeData(template,cut,rootFile,binsMVV,binsMJ,minMVV,maxMVV,minMJ,maxMJ,fact
     except: os.mkdir("res"+jobname)
         
     
+
+
     ##### Creating and sending jobs #####
     joblist = []
     ###### loop for creating and sending jobs #####
     for x in range(1, int(NumberOfJobs)+1):
-       os.system("mkdir tmp"+jobname+"/"+str(files[x-1]).replace(".root",""))
-       os.chdir("tmp"+jobname+"/"+str(files[x-1]).replace(".root",""))
+       removefile=files[x-1][files[x-1].rindex("/")+1:]
+       print "remove file ",removefile
+       directory = str(files[x-1]).split(removefile)[0]
+       print " directory ",directory
+       template = str(files[x-1]).split("/")[-1]
+       print "template ",template
+       os.system("mkdir tmp"+jobname+"/"+template.replace(".root",""))
+       os.chdir("tmp"+jobname+"/"+template.replace(".root",""))
        #os.system("mkdir tmp"+jobname+"/"+str(files[x-1]).replace(".root",""))
        #os.chdir(path+"tmp"+jobname+"/"+str(files[x-1]).replace(".root",""))
      
-       with open('job_%s.sh'%files[x-1].replace(".root",""), 'w') as fout:
+       with open('job_%s.sh'%template.replace(".root",""), 'w') as fout:
           fout.write("#!/bin/sh\n")
           fout.write("echo\n")
           fout.write("echo\n")
@@ -1479,20 +1520,20 @@ def makeData(template,cut,rootFile,binsMVV,binsMJ,minMVV,maxMVV,minMJ,maxMJ,fact
           fout.write("cd "+str(path)+"\n")
           fout.write("cmsenv\n")
           if runinKA==True: fout.write("mkdir -p /tmp/${USER}/\n")
-          fout.write(cmd+" -o "+path+"/res"+jobname+"/"+OutputFileNames+"_"+files[x-1]+" -s "+files[x-1]+"\n")
+          fout.write(cmd+" -o "+path+"/res"+jobname+"/"+OutputFileNames+"_"+template+" -s "+template+" "+directory+"\n")
           fout.write("echo 'STOP---------------'\n")
           fout.write("echo\n")
           fout.write("echo\n")
-       os.system("chmod 755 job_%s.sh"%(files[x-1].replace(".root","")) )
+       os.system("chmod 755 job_%s.sh"%(template.replace(".root","")) )
 
        if useCondorBatch:
            os.system("mv  job_*.sh "+jobname+".sh")
            makeSubmitFileCondor(jobname+".sh",jobname,"workday")
            os.system("condor_submit submit.sub")
        else:
-           os.system("bsub -q "+queue+" -o logs job_%s.sh -J %s"%(files[x-1].replace(".root",""),jobname))
+           os.system("bsub -q "+queue+" -o logs job_%s.sh -J %s"%(template.replace(".root",""),jobname))
        print "job nr " + str(x) + " submitted"
-       joblist.append("%s"%(files[x-1].replace(".root","")))
+       joblist.append("%s"%(template.replace(".root","")))
        os.chdir("../..")
    
     print
