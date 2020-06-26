@@ -180,7 +180,8 @@ class cuts():
                 self.catHtag['NP1'] =  '('+data["tagging_variables_and_wp"]["varl1Htag"] +'<' +data["tagging_variables_and_wp"]["l1Htag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Htag"+self.yeartag]) + ')' 
                 self.catHtag['NP2'] =  '('+data["tagging_variables_and_wp"]["varl2Htag"] +'<' +data["tagging_variables_and_wp"]["l2Htag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Htag"+self.yeartag]) + ')' 
 
-
+            #print "self.HPSF_vtag ",self.HPSF_vtag
+             
 
             if(run2==True):
                run2tag="161718"
@@ -194,7 +195,7 @@ class cuts():
                self.WPHPl2Htag = data["tagging_variables_and_wp"]["l2Htag"+run2tag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Htag"+run2tag])
                self.WPLPl2Htag = data["tagging_variables_and_wp"]["l2Htag"+run2tag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Htag"+run2tag])
 
-            print " lumi ",self.lumi
+            #print " lumi ",self.lumi
 
 
                 
