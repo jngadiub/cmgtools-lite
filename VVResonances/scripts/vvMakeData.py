@@ -6,6 +6,8 @@ from CMGTools.VVResonances.plotting.TreePlotter import TreePlotter
 from CMGTools.VVResonances.plotting.MergedPlotter import MergedPlotter
 from math import log
 import os, sys, re, optparse,pickle,shutil,json
+sys.path.insert(0, "/afs/cern.ch/work/i/izoi/RunII3Dfit/CMGToolsForStat10X/CMSSW_10_2_10/src/CMGTools/VVResonances/interactive/")
+import cuts
 
 
 parser = optparse.OptionParser()
@@ -39,8 +41,22 @@ sampleTypes=options.samples.split(',')
 
 dataPlotters=[]
 
-print "now we will  make data!"
+
+
+
+
 print "args[0] "+str(args[0])
+year=str(args[0]).split("/")[-2]
+print "year ",year
+print "now working with cuts "
+ctx = cuts.cuts("init_VV_VH.json",year,"dijetbins_random")
+print "lumi for year "+year+" = ",ctx.lumi[year]
+luminosity = int(ctx.lumi[year])
+if options.output.find("Run2") ==-1: luminosity = 1
+print "lumi for year "+year+" = ",ctx.lumi[year]
+luminosity = int(ctx.lumi[year])
+
+
 for filename in os.listdir(args[0]):
     if filename.find(".")==-1:
         print "in "+str(filename)+"the separator . was not found. -> continue!"
@@ -58,6 +74,7 @@ for filename in os.listdir(args[0]):
                 dataPlotters[-1].addCorrectionFactor('xsec','tree')
                 dataPlotters[-1].addCorrectionFactor('genWeight','tree')
                 dataPlotters[-1].addCorrectionFactor('puWeight','tree')
+                dataPlotters[-1].addCorrectionFactor(luminosity,'flat')
                 if fname.find("QCD_Pt_") !=-1 or fname.find("QCD_HT") !=-1:
                     print "going to apply spikekiller for ",fname
                     dataPlotters[-1].addCorrectionFactor('b_spikekiller','tree')

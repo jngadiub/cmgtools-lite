@@ -10,6 +10,8 @@ from CMGTools.VVResonances.plotting.tdrstyle import *
 setTDRStyle()
 from CMGTools.VVResonances.plotting.TreePlotter import TreePlotter
 from CMGTools.VVResonances.plotting.MergedPlotter import MergedPlotter
+sys.path.insert(0, "/afs/cern.ch/work/i/izoi/RunII3Dfit/CMGToolsForStat10X/CMSSW_10_2_10/src/CMGTools/VVResonances/interactive/")
+import cuts
 ROOT.gSystem.Load("libCMGToolsVVResonances")
 parser = optparse.OptionParser()
 parser.add_option("-o","--output",dest="output",help="Output",default='')
@@ -29,7 +31,7 @@ parser.add_option("-e","--firstEv",dest="firstEv",type=int,help="first event",de
 parser.add_option("-E","--lastEv",dest="lastEv",type=int,help="last event",default=-1)
 parser.add_option("--binsMVV",dest="binsMVV",help="use special binning",default="")
 parser.add_option("-t","--triggerweight",dest="triggerW",action="store_true",help="Use trigger weights",default=False)
-
+parser.add_option("-d","--directories",dest="directories",help="list of input directories",default="2016")
 def getBinning(binsMVV,minx,maxx,bins):
     l=[]
     if binsMVV=="":
@@ -107,20 +109,34 @@ print "Creating datasets for samples: " ,sampleTypes
 
 dataPlotters=[]
 dataPlottersNW=[]
+print "options.directories ",options.directories
+folder = options.directories #.split(',')                                                                                                                                                                                                     
+print "folder ",folder
+print "split ",folder.split("/")
+year=folder.split("/")[-2]
+print "year ",year
+print "now working with cuts "
+ctx = cuts.cuts("init_VV_VH.json",year,"dijetbins_random")
+print "lumi for year "+year+" = ",ctx.lumi[year]
+luminosity = int(ctx.lumi[year])
+if options.output.find("Run2") ==-1: luminosity = 1
 
-for filename in os.listdir(args[0]):
+for filename in os.listdir(folder):
  for sampleType in sampleTypes:
+  print "sampleType ",sampleType
   if filename.find(sampleType)!=-1:
    fnameParts=filename.split('.')
    fname=fnameParts[0]
+   print "fname ",fname
    ext=fnameParts[1]
    if ext.find("root") ==-1:
        continue
-   dataPlotters.append(TreePlotter(args[0]+'/'+fname+'.root','AnalysisTree'))
-   dataPlotters[-1].setupFromFile(args[0]+'/'+fname+'.pck')
+   dataPlotters.append(TreePlotter(folder+'/'+fname+'.root','AnalysisTree'))
+   dataPlotters[-1].setupFromFile(folder+'/'+fname+'.pck')
    dataPlotters[-1].addCorrectionFactor('xsec','tree')
    dataPlotters[-1].addCorrectionFactor('genWeight','tree')
    dataPlotters[-1].addCorrectionFactor('puWeight','tree')
+   dataPlotters[-1].addCorrectionFactor(luminosity,'flat')
    if fname.find("QCD_Pt_") !=-1 or fname.find("QCD_HT") !=-1:
        print "going to apply spikekiller for ",fname
        dataPlotters[-1].addCorrectionFactor('b_spikekiller','tree')
@@ -128,7 +144,7 @@ for filename in os.listdir(args[0]):
    for w in weights_:
     if w != '': dataPlotters[-1].addCorrectionFactor(w,'branch')
    dataPlotters[-1].filename=fname
-   dataPlottersNW.append(TreePlotter(args[0]+'/'+fname+'.root','AnalysisTree'))
+   dataPlottersNW.append(TreePlotter(folder+'/'+fname+'.root','AnalysisTree'))
    dataPlottersNW[-1].addCorrectionFactor('puWeight','tree')
    dataPlottersNW[-1].addCorrectionFactor('genWeight','tree')
    if fname.find("QCD_Pt_") !=-1 or fname.find("QCD_HT") !=-1:
@@ -137,6 +153,7 @@ for filename in os.listdir(args[0]):
    if options.triggerW: dataPlottersNW[-1].addCorrectionFactor('triggerWeight','tree')
    for w in weights_: 
     if w != '': dataPlottersNW[-1].addCorrectionFactor(w,'branch')
+   dataPlottersNW[-1].addCorrectionFactor(luminosity,'flat')
    dataPlottersNW[-1].filename=fname
 
 data=MergedPlotter(dataPlotters)
