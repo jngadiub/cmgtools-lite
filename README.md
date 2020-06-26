@@ -44,7 +44,7 @@ Current sample location with random sorting of jet1 and jet2
 ```
 /eos/cms/store/cmst3/group/exovv/VVtuple/FullRun2VVVHNtuple/deepAK8V2/
 ```
-Before running, initialiaze the basedir variable in makeInputs.py to your simboliklinkname
+Before running, initialiaze the `basedir` variable in `makeInputs.py` to your `simboliklinkname`
 
 Make the 3D templates. Several options can be specified to produce QCD, V+Jets or signal templates, normalization etc.
  
