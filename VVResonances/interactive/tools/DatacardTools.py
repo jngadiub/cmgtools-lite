@@ -107,22 +107,14 @@ class DatacardTools():
            card.addParametricYieldWithUncertainty("%s"%sig,ncontrib,resultsDir+"/JJ_%s_%s_%s_yield.json"%(sig,dataset,category),1,'CMS_tau21_PtDependence',self.vtag_pt_dependence[dataset][category],500.)
 
 
+ #default implementation not working
  def AddTTBackground(self,card,dataset,category,rootFileMVV,rootFileNorm,resultsDir,ncontrib):
        print "add TT+jets background"  
 
        card.addMJJTTJetsParametricShape("TTJets_mjetRes_l1","MJ1",resultsDir+"/JJ_%s_TTJets_%s.json"%(dataset,category),{'CMS_scale_prunedj':1.},{'CMS_res_prunedj':1.},{'CMS_f_g1':1.},{'CMS_f_res':1.})
        card.addMJJTTJetsParametricShape("TTJets_mjetRes_l2","MJ2",resultsDir+"/JJ_%s_TTJets_%s.json"%(dataset,category),{'CMS_scale_prunedj':1.},{'CMS_res_prunedj':1.},{'CMS_f_g1':1.},{'CMS_f_res':1.})
-       card.addHistoShapeFromFile("TTJets_mjj",["MJJ"],rootFileMVV,"histo_nominal",['PT:CMS_VV_JJ_TTJets_PTZ_'+category,'OPT:CMS_VV_JJ_TTJets_OPTZ_'+category],False,0)
-       
-       # card.conditionalProduct2('TTJets','TTJets_mjetRes_l1','TTJets_mjetRes_l2','TTJets_mjj','MJ1,MJ2,MJJ',tag1="",tag2="",tag3="")
-       # card.product("TTJets_mjetRes","TTJets_mjetRes_l1","TTJets_mjetRes_l2")
-       # card.conditionalProduct("TTJets",'TTJets_mjj',"MJ1,MJ2","TTJets_mjetRes")
+       card.addHistoShapeFromFile("TTJets_mjj",["MJJ"],rootFileMVV,"histo_nominal",['PT:CMS_VV_JJ_TTJets_PTZ_'+category,'OPT:CMS_VV_JJ_TTJets_OPTZ_'+category],False,0)       
        card.conditionalProduct3('TTJets','TTJets_mjj','TTJets_mjetRes_l1','TTJets_mjetRes_l2','MJJ',tag1="",tag2="",tag3="")
-       # print("USING product3D!!!!")
-       # card.product3D('TTJets','TTJets_mjj','TTJets_mjetRes_l1','TTJets_mjetRes_l2')
-       # card.conditionalProduct('TTJets_c1','TTJets_mjetRes_l1','MJJ','TTJets_mjj')
-       # card.conditionalProduct('TTJets_c2','TTJets_mjetRes_l2','MJJ','TTJets_mjj')
-       # card.product3D('TTJets','TTJets_mjj','TTJets_c1','TTJets_c2')
        
        print "outlabel "+self.outlabel
        if self.pseudodata=="" or self.pseudodata=="Vjets":
@@ -133,7 +125,39 @@ class DatacardTools():
        else:
            card.addFixedYieldFromFile('TTJets',ncontrib,rootFileNorm,"TTJets")
            
+ #new implementation: split in 3 contributions W+W, T+T, nonRes+nonRes
+ def AddTTBackground2(self,card,dataset,category,rootFileMVV,rootFileNorm,resultsDir,ncontrib):
+       print "add TT+jets background"  
+ 
+       #load mJJ - assume same for the three contributions (preliminary)
+       card.addHistoShapeFromFile("TTJets_mjj",["MJJ"],rootFileMVV,"histo_nominal",['PT:CMS_VV_JJ_TTJets_PTZ_'+category,'OPT:CMS_VV_JJ_TTJets_OPTZ_'+category],False,0)       
+
+       # W+W PDF
+       card.addMJJTTJetsParametricShapeResW("TTJetsW_mjetRes_l1","MJ1",resultsDir+"/JJ_%s_TTJets_%s.json"%(dataset,category),{'CMS_scale_prunedj':1.},{'CMS_res_prunedj':1.})#,{'CMS_f_g1':1.},{'CMS_f_res':1.})
+       card.addMJJTTJetsParametricShapeResW("TTJetsW_mjetRes_l2","MJ2",resultsDir+"/JJ_%s_TTJets_%s.json"%(dataset,category),{'CMS_scale_prunedj':1.},{'CMS_res_prunedj':1.})#,{'CMS_f_g1':1.},{'CMS_f_res':1.})
+       card.conditionalProduct3('TTJetsW','TTJets_mjj','TTJetsW_mjetRes_l1','TTJetsW_mjetRes_l2','MJJ',tag1="",tag2="",tag3="")
+
+       #T+T PDF
+       card.addMJJTTJetsParametricShapeResT("TTJetsTop_mjetRes_l1","MJ1",resultsDir+"/JJ_%s_TTJets_%s.json"%(dataset,category),{'CMS_scale_prunedj':1.},{'CMS_res_prunedj':1.})#,{'CMS_f_g1':1.},{'CMS_f_res':1.})
+       card.addMJJTTJetsParametricShapeResT("TTJetsTop_mjetRes_l2","MJ2",resultsDir+"/JJ_%s_TTJets_%s.json"%(dataset,category),{'CMS_scale_prunedj':1.},{'CMS_res_prunedj':1.})#,{'CMS_f_g1':1.},{'CMS_f_res':1.})
+       card.conditionalProduct3('TTJetsTop','TTJets_mjj','TTJetsTop_mjetRes_l1','TTJetsTop_mjetRes_l2','MJJ',tag1="",tag2="",tag3="")
+
+       #nonRes+nonRes PDF
+       card.addMJJTTJetsParametricShapeNonRes("TTJetsNonRes_mjetRes_l1","MJ1",resultsDir+"/JJ_%s_TTJets_%s.json"%(dataset,category),{'CMS_scale_prunedj':1.},{'CMS_res_prunedj':1.})#,{'CMS_f_g1':1.},{'CMS_f_res':1.})
+       card.addMJJTTJetsParametricShapeNonRes("TTJetsNonRes_mjetRes_l2","MJ2",resultsDir+"/JJ_%s_TTJets_%s.json"%(dataset,category),{'CMS_scale_prunedj':1.},{'CMS_res_prunedj':1.})#,{'CMS_f_g1':1.},{'CMS_f_res':1.})
+       card.conditionalProduct3('TTJetsNonRes','TTJets_mjj','TTJetsNonRes_mjetRes_l1','TTJetsNonRes_mjetRes_l2','MJJ',tag1="",tag2="",tag3="")
        
+       print "outlabel "+self.outlabel
+       if self.pseudodata=="" or self.pseudodata=="Vjets":
+           card.addFixedYieldFromFile('TTJets',ncontrib,rootFileNorm,"TTJets")
+       elif self.outlabel.find("sigOnly")!=-1 or self.outlabel.find("sigonly")!=-1:
+           print "add small yield"
+           card.addFixedYieldFromFile('TTJets',ncontrib,rootFileNorm,"TTJets",0.000001)
+       else:
+           card.addFixedYieldFromFile('TTJetsW',ncontrib,rootFileNorm,"TTJets")
+           card.addFixedYieldFromFile('TTJetsTop',ncontrib+1,rootFileNorm,"TTJets")
+           card.addFixedYieldFromFile('TTJetsNonRes',ncontrib+2,rootFileNorm,"TTJets")
+	          
  def AddWResBackground(self,card,dataset,category,rootFileMVV,rootFileNorm,resultsDir,ncontrib):
        print "add Wres background"  
        sys.path.append(resultsDir)
@@ -201,7 +225,8 @@ class DatacardTools():
  def AddData(self,card,fileData,histoName,scaleData):
   
       card.importBinnedData(fileData,histoName,["MJ1","MJ2","MJJ"],'data_obs',scaleData)
-  
+ 
+ #with old implementation 
  def AddTTSystematics(self,card,sig,dataset,category):
     card.addSystematic("CMS_f_g1","param",[0.0,0.02])
     card.addSystematic("CMS_f_res","param",[0.0,0.08])
@@ -209,6 +234,22 @@ class DatacardTools():
     card.addSystematic("CMS_VV_JJ_TTJets_PTZ_"+category,"param",[0,0.1]) #0.333
     card.addSystematic("CMS_VV_JJ_TTJets_OPTZ_"+category,"param",[0,0.1]) #0.333
    
+ #with new implementation
+ def AddTTSystematics2(self,card,sig,dataset,category,resultsDir):
+    card.addSystematic("CMS_f_g1","param",[0.0,0.02])
+    card.addSystematic("CMS_f_res","param",[0.0,0.08])
+    card.addSystematic("CMS_VV_JJ_TTJets_norm","lnN",{'TTJetsW':1.2,'TTJetsTop':1.2,'TTJetsNonRes':1.2})  
+    card.addSystematic("CMS_VV_JJ_TTJets_PTZ_"+category,"param",[0,0.1]) #0.333
+    card.addSystematic("CMS_VV_JJ_TTJets_OPTZ_"+category,"param",[0,0.1]) #0.333
+
+    f=open(resultsDir+"/JJ_%s_TTJets_%s.json"%(dataset,category))
+    info=json.load(f)
+    card.addSystematic("TTresW_frac","rateParam", "{formula}".format(formula=info['f_g1'].replace('MJJ','@0')),"JJ_{category}_13TeV_{year}".format(category=category,year=dataset), "TTJetsW",'MJJ')
+    card.addSystematic("TTres_frac","rateParam", "{formula}".format(formula=info['f_res'].replace('MJJ','@0')),"JJ_{category}_13TeV_{year}".format(category=category,year=dataset), "TTJetsW",'MJJ')
+    card.addSystematic("TTresT_frac","rateParam", "(@0*(1-@1))","JJ_{category}_13TeV_{year}".format(category=category,year=dataset), "TTJetsTop",'TTres_frac,TTresW_frac')
+    card.addSystematic("TTnonres_frac","rateParam", "(1-@0)","JJ_{category}_13TeV_{year}".format(category=category,year=dataset), "TTJetsNonRes",'TTres_frac')
+
+       
  def AddSigSystematics(self,card,sig,dataset,category,correlate):
 
       card.addSystematic("CMS_scale_prunedj","param",[0.0,0.02])

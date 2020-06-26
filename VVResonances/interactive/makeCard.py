@@ -101,11 +101,12 @@ for sig in signals:
       print "including tt+jets in datacard"
       rootFileMVV = resultsDir[dataset]+'/JJ_%s_TTJets_MVV_'%dataset+p+'.root' 
       rootFileNorm = resultsDir[dataset]+'/JJ_%s_TTJets_%s.root'%(dataset,p)
-      Tools.AddTTBackground(card,dataset,p,rootFileMVV,rootFileNorm,resultsDir[dataset],ncontrib)
-      ncontrib+=1
+      Tools.AddTTBackground2(card,dataset,p,rootFileMVV,rootFileNorm,resultsDir[dataset],ncontrib)
+      #ncontrib+=1 --> with old implementation
+      ncontrib+=3 #--> with new implementation
 
       #rootFile3DPDF = resultsDir[dataset]+'/JJ_2016_nonRes_3D_VV_HPLP.root'
-      rootFile3DPDF = resultsDir[dataset]+"/save_new_shapes_%s_pythia_"%dataset+"VVVH_all"+"_3D.root"
+      rootFile3DPDF = resultsDir[dataset]+"/save_new_shapes_{year}_pythia_{purity}_3D.root".format(year=dataset,purity=p)#    save_new_shapes_%s_pythia_"%dataset+"_""VVVH_all"+"_3D.root"
       print "rootFile3DPDF ",rootFile3DPDF
       rootFileNorm = resultsDir[dataset]+"/JJ_%s_nonRes_"%dataset+p+".root"
       print "rootFileNorm ",rootFileNorm
@@ -120,7 +121,7 @@ for sig in signals:
       rootFileData = resultsDir[dataset]+"/pseudo40/JJ_"+p+".root"
       histName="data"
       scaleData=1.0
-      if pseudodata==True:
+      if pseudodata=="True":
         print "Using pseudodata with all backgrounds (QCD, V+jets and tt+jets)"
         rootFileData = resultsDir[dataset]+"/pseudo40/JJ_PD_"+p+".root"
         histName="data"
@@ -135,7 +136,7 @@ for sig in signals:
       Tools.AddResBackgroundSystematics(card,p)
       Tools.AddNonResBackgroundSystematics(card,p)
       Tools.AddTaggingSystematics(card,sig,dataset,p,resultsDir[dataset]+'/migrationunc.json')
-      Tools.AddTTSystematics(card,sig,dataset,p)
+      Tools.AddTTSystematics2(card,sig,dataset,p,resultsDir[dataset])
       card.makeCard()
 
       t2wcmd = "text2workspace.py %s -o %s"%(cardName,workspaceName)
