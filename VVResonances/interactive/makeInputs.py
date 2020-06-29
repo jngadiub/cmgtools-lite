@@ -11,6 +11,7 @@ import cuts
 # python makeInputs.py -p 2016 --run "vjets" --batch False                                                                                                                                      
 # python makeInputs.py -p 2016 --run "qcdtemplates"
 # python makeInputs.py -p 2016 --run "qcdkernel"
+# python makeInputs.py -p "2016,2017,2018" --run "qcdkernel"  --single True
 # python makeInputs.py -p 2016 --run "qcdnorm"
 # python makeInputs.py -p 2016 --run "data"
 # python makeInputs.py -p 2016 --run "pseudoNOVJETS"
@@ -24,7 +25,7 @@ parser.add_option("--batch",action="store_false",dest="batch",help="submit to ba
 parser.add_option("--trigg",action="store_true",dest="trigg",help="add trigger weights or not ",default=False)
 parser.add_option("--run",dest="run",help="decide which parts of the code should be run right now possible optoins are: all : run everything, sigmvv: run signal mvv fit sigmj: run signal mj fit, signorm: run signal norm, vjets: run vjets, tt: run ttbar , qcdtemplates: run qcd templates, qcdkernel: run qcd kernel, qcdnorm: run qcd merge and norm, detector: run detector fit , data : run the data or pseudodata scripts ",default="all")
 parser.add_option("--signal",dest="signal",default="BGWW",help="which signal do you want to run? options are BulkGWW, BulkGZZ, WprimeWZ, ZprimeWW, ZprimeZH")
-
+parser.add_option("--single",dest="single",default=False,help="set to True to merge kernels also for single years when processing full run2 data")
 
 (options,args) = parser.parse_args()
 
@@ -75,8 +76,8 @@ if useTriggerWeights:
 #categories=['VH_HPHP','VH_HPLP','VH_LPHP','VV_HPHP','VV_HPLP','VBF_VV_HPHP','VBF_VV_HPLP']
 #categories=['VH_HPHP','VH_HPLP','VH_LPHP','VV_HPHP','VV_HPLP']
 #
-#categories =["NP"]
-categories =["VV_HPLP"]
+categories =["NP"]
+#categories =["VV_HPLP"]
        
 
 #list of signal samples --> nb, radion and vbf samples to be added
@@ -212,9 +213,9 @@ if options.run.find("all")!=-1 or options.run.find("qcd")!=-1:
             print "Exiting system! When all jobs are finished, please run mergeKernelJobs below"
             sys.exit()
         elif options.run.find("all")!=-1 or options.run.find("kernel")!=-1:
-            f.mergeKernelJobs("nonRes","JJ_"+filePeriod)
+            f.mergeKernelJobs("nonRes","JJ_"+filePeriod,options.single)
             print " calling merge Bckg shape"
-	    f.mergeBackgroundShapes("nonRes","JJ_"+filePeriod)
+	    f.mergeBackgroundShapes("nonRes","JJ_"+filePeriod,options.single)
     else:
         if options.run.find("all")!=-1 or options.run.find("templates")!=-1:
             wait = True
