@@ -31,7 +31,7 @@ parser.add_option("-e","--firstEv",dest="firstEv",type=int,help="first event",de
 parser.add_option("-E","--lastEv",dest="lastEv",type=int,help="last event",default=-1)
 parser.add_option("--binsMVV",dest="binsMVV",help="use special binning",default="")
 parser.add_option("-t","--triggerweight",dest="triggerW",action="store_true",help="Use trigger weights",default=False)
-parser.add_option("-d","--directories",dest="directories",help="list of input directories",default="2016")
+
 def getBinning(binsMVV,minx,maxx,bins):
     l=[]
     if binsMVV=="":
@@ -109,8 +109,8 @@ print "Creating datasets for samples: " ,sampleTypes
 
 dataPlotters=[]
 dataPlottersNW=[]
-print "options.directories ",options.directories
-folder = options.directories #.split(',')                                                                                                                                                                                                     
+print "args[0] ",args[0]
+folder = args[0] #.split(',')                                                                                                                                                                                                     
 print "folder ",folder
 print "split ",folder.split("/")
 year=folder.split("/")[-2]
@@ -123,7 +123,6 @@ if options.output.find("Run2") ==-1: luminosity = 1
 
 for filename in os.listdir(folder):
  for sampleType in sampleTypes:
-  print "sampleType ",sampleType
   if filename.find(sampleType)!=-1:
    fnameParts=filename.split('.')
    fname=fnameParts[0]
