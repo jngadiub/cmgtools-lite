@@ -125,7 +125,7 @@ class AllFunctions():
     jobList, files = Make1DMVVTemplateWithKernels(rootFile,template,cut,resFile,self.binsMVV,self.minMVV,self.maxMVV,smp,jobname,wait,self.HCALbinsMVV) #,addOption) #irene
     if wait: merge1DMVVTemplate(jobList,files,jobname,c,self.binsMVV,self.minMVV,self.maxMVV,self.HCALbinsMVV,name,filename)
    else:
-    cmd='vvMake1DMVVTemplateWithKernels.py -H "x" -o "{rootFile}" -s "{template}" -c "{cut}"  -v "jj_gen_partialMass" -b {binsMVV}  -x {minMVV} -X {maxMVV} -r {res} -d {directory} --corrFactorW {corrFactorW} --corrFactorZ {corrFactorZ} '.format(rootFile=rootFile,template=template,cut=cut,res=resFile,binsMVV=self.binsMVV,minMVV=self.minMVV,maxMVV=self.maxMVV,corrFactorW=corrFactorW,corrFactorZ=corrFactorZ,directory=smp)
+    cmd='vvMake1DMVVTemplateWithKernels.py -H "x" -o "{rootFile}" -s "{template}" -c "{cut}"  -v "jj_gen_partialMass" -b {binsMVV}  -x {minMVV} -X {maxMVV} -r {res} {directory} --corrFactorW {corrFactorW} --corrFactorZ {corrFactorZ} '.format(rootFile=rootFile,template=template,cut=cut,res=resFile,binsMVV=self.binsMVV,minMVV=self.minMVV,maxMVV=self.maxMVV,corrFactorW=corrFactorW,corrFactorZ=corrFactorZ,directory=smp)
     cmd = cmd+self.HCALbinsMVV
     os.system(cmd)    
 
@@ -171,7 +171,7 @@ class AllFunctions():
       os.system(cmd)
 
 
- def mergeBackgroundShapes(self,name,filename):
+ def mergeBackgroundShapes(self,name,filename,makesingle):
 
   for c in self.categories:
 
@@ -191,6 +191,31 @@ class AllFunctions():
    print "going to execute "+str(cmd)
    os.system(cmd)
    
+   if filename.find("Run2") != -1 and makesingle:
+      years = ["2016","2017","2018"]
+      for year in years:
+       print " doing also single year ",year
+       newfilename=filename.replace("Run2",year)
+
+
+       inputx=newfilename+"_"+name+"_COND2D_"+c+"_l1.root"
+       inputy=newfilename+"_"+name+"_COND2D_"+c+"_l2.root"
+       inputz=newfilename+"_"+name+"_MVV_"+c+".root"
+
+
+       rootFile=newfilename+"_"+name+"_3D_"+c+".root"
+
+       print "Reading " ,inputx
+       print "Reading " ,inputy
+       print "Reading " ,inputz
+       print "Saving to ",rootFile
+
+       cmd='vvMergeHistosToPDF3D.py -i "{inputx}" -I "{inputy}" -z "{inputz}" -o "{rootFile}"'.format(rootFile=rootFile,inputx=inputx,inputy=inputy,inputz=inputz)
+       print "going to execute "+str(cmd)
+       os.system(cmd)
+
+
+
    #print "Adding trigger shape uncertainties"
    #if useTriggerWeights: 
    #   cmd='vvMakeTriggerShapes.py -i "{rootFile}"'.format(rootFile=rootFile)
@@ -275,7 +300,7 @@ class AllFunctions():
      os.system(cmd)
      
 
- def mergeKernelJobs(self,name,filename):
+ def mergeKernelJobs(self,name,filename,makesingle):
     period=filename.split("_")[1]     
     for c in self.categories:
         jobList = []
@@ -289,7 +314,7 @@ class AllFunctions():
                     for job in line.split("[")[1].split("]")[0].split(","):
                         files.append(job.replace("'","").replace(" ",""))
         from modules.submitJobs import merge1DMVVTemplate
-        merge1DMVVTemplate(jobList,files,"1D"+"_"+period+"_"+c,c,self.binsMVV,self.minMVV,self.maxMVV,self.HCALbinsMVV,name,filename)
+        merge1DMVVTemplate(jobList,files,"1D"+"_"+period+"_"+c,c,self.binsMVV,self.minMVV,self.maxMVV,self.HCALbinsMVV,name,filename,self.samples)
       
         jobList = []
         files   = []
@@ -303,8 +328,54 @@ class AllFunctions():
                         files.append(job.replace("'","").replace(" ",""))
 
         from modules.submitJobs import merge2DTemplate
-        merge2DTemplate(jobList,files,"2Dl1"+"_"+period+"_"+c,c,"l1",self.binsMVV,self.binsMJ,self.minMVV,self.maxMVV,self.minMJ,self.maxMJ,self.HCALbinsMVV,name,filename)
-        merge2DTemplate(jobList,files,"2Dl2"+"_"+period+"_"+c,c,"l2",self.binsMVV,self.binsMJ,self.minMVV,self.maxMVV,self.minMJ,self.maxMJ,self.HCALbinsMVV,name,filename)
+        merge2DTemplate(jobList,files,"2Dl1"+"_"+period+"_"+c,c,"l1",self.binsMVV,self.binsMJ,self.minMVV,self.maxMVV,self.minMJ,self.maxMJ,self.HCALbinsMVV,name,filename,self.samples)
+        merge2DTemplate(jobList,files,"2Dl2"+"_"+period+"_"+c,c,"l2",self.binsMVV,self.binsMJ,self.minMVV,self.maxMVV,self.minMJ,self.maxMJ,self.HCALbinsMVV,name,filename,self.samples)
+
+        if period == "Run2":
+            if makesingle:
+             print " ########    making kernels also for single years ##############"
+             years = ["2016","2017","2018"]
+             for year in years:
+                print " year ",year
+                jobList = []
+                files   = []
+                with open("tmp1D_%s_%s_joblist.txt"%(period,c),'r') as infile:
+                     for line in infile:
+                         if line.startswith("job"):
+                            for job in line.split("[")[1].split("]")[0].split(","):
+                                if job.split("_")[0].replace("'","").replace(" ","") == year :
+                                   print " condition ",job.split('_')[0]," = ",year, " verified "
+                                   jobList.append(job.replace("'","").replace(" ",""))
+                         if line.startswith("file"):
+                            for job in line.split("[")[1].split("]")[0].split(","):
+                                if job.split("/")[-2] == year :
+                                   files.append(job.replace("'","").replace(" ",""))
+                from modules.submitJobs import merge1DMVVTemplate
+                newfilename=filename.replace("Run2",year)
+                print "newfilename ",newfilename
+                merge1DMVVTemplate(jobList,files,"1D"+"_"+period+"_"+c,c,self.binsMVV,self.minMVV,self.maxMVV,self.HCALbinsMVV,name,newfilename,self.samples)
+
+                jobList = []
+                files   = []
+                with open("tmp2Dl1_%s_%s_joblist.txt"%(period,c),'r') as infile:
+                     for line in infile:
+                         if line.startswith("job"):
+                            for job in line.split("[")[1].split("]")[0].split(","):
+                                if job.split("_")[0].replace("'","").replace(" ","") == year :
+                                   print " condition ",job.split('_')[0]," = ",year, " verified "
+                                   jobList.append(job.replace("'","").replace(" ",""))
+                         if line.startswith("file"):
+                             for job in line.split("[")[1].split("]")[0].split(","):
+                                 if job.split("/")[-2] == year :
+                                    files.append(job.replace("'","").replace(" ",""))
+
+                from modules.submitJobs import merge2DTemplate
+                merge2DTemplate(jobList,files,"2Dl1"+"_"+period+"_"+c,c,"l1",self.binsMVV,self.binsMJ,self.minMVV,self.maxMVV,self.minMJ,self.maxMJ,self.HCALbinsMVV,name,newfilename,self.samples)
+                merge2DTemplate(jobList,files,"2Dl2"+"_"+period+"_"+c,c,"l2",self.binsMVV,self.binsMJ,self.minMVV,self.maxMVV,self.minMJ,self.maxMJ,self.HCALbinsMVV,name,newfilename,self.samples)
+           
+
+    print " done merging jobs "       
+
 		            	    
  def printAllParameters(self):
  
