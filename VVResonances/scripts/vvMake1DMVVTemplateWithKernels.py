@@ -35,7 +35,6 @@ parser.add_option("--binsMVV",dest="binsMVV",help="use special binning",default=
 parser.add_option("-t","--triggerweight",dest="triggerW",action="store_true",help="Use trigger weights",default=False)
 parser.add_option("--corrFactorW",dest="corrFactorW",type=float,help="add correction factor xsec",default=1.)
 parser.add_option("--corrFactorZ",dest="corrFactorZ",type=float,help="add correction factor xsec",default=1.)
-parser.add_option("-d","--directories",dest="directories",help="list of input directories",default="2016")
 
 (options,args) = parser.parse_args()
 
@@ -134,8 +133,8 @@ dataPlotters=[]
 dataPlottersNW=[]
 
 #folders=[]
-print "options.directories ",options.directories
-folder = options.directories #.split(',')
+print "args[0] ",args[0]
+folder = args[0] #.split(',')
 print "folder ",folder
 print "split ",folder.split("/")
 year=folder.split("/")[-2]
