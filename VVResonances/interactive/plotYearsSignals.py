@@ -13,7 +13,17 @@ from array import array
 
 path = "../plots/"
 
-def getLegend(x1=0.2,y1=0.7,x2=0.4,y2=0.9):
+def beautify(h1,color,linestyle=1,markerstyle=8):
+    h1.SetLineColor(color)
+    h1.SetMarkerColor(color)
+    # h1.SetFillColor(color)                                                                                                                                                                                                                  
+    h1.SetLineWidth(3)
+    h1.SetLineStyle(linestyle)
+    h1.SetMarkerStyle(markerstyle)
+    h1.SetMarkerSize(1.5)
+
+
+def getLegend(x1=0.2,y1=0.65,x2=0.45,y2=0.75):
 #def getLegend(x1=0.70010112,y1=0.693362,x2=0.90202143,y2=0.829833):
   legend = ROOT.TLegend(x1,y1,x2,y2)
   legend.SetTextSize(0.032)
@@ -369,24 +379,101 @@ def doAll(signal,legend,years,colorindex):
     ct.SaveAs(name+".pdf" )
     ct.SaveAs(name+".C"   )
     ct.SaveAs(name+".root")
-          
+
+
+
+def doMVV(signal,titles,years):
+
+    vars = ["MEAN","SIGMA","ALPHA1","ALPHA2","N1","N2"]
+    ROOT.gStyle.SetOptFit(0)
+
+    files=[]
+    for year in years :
+      print " getting year ",year
+      files.append(ROOT.TFile("results_"+year+"/debug_JJ_"+signal+"_"+year+"_MVV.json.root","READ"))
+
+    for var in vars:
+      fits=[]
+      datas=[]
+
+      c,l,pt = getCanvasPaper("c")
+      l2 = getLegend(0.7788945,0.1783217,0.9974874,0.2482517)
+      ROOT.gStyle.SetOptStat(0)
+      ROOT.gStyle.SetOptTitle(0)
+
+      for i,f in enumerate(files):
+        g = f.Get(var)
+        fun = f.Get(var+"_func")
+        beautify(fun ,rt.TColor.GetColor(colorsyears[years[i]]),2,20+i)
+        beautify(g ,rt.TColor.GetColor(colorsyears[years[i]]),2,20+i)
+        #fun.SetLineColor(0)
+        #fun.SetLineWidth(0)
+
+        datas.append(g)
+        fits.append(fun)
+        l.AddEntry(fun,years[i],"LP")
+        
+        datas[0].GetXaxis().SetTitle("M_{X} [GeV]")
+        datas[0].GetYaxis().SetTitle(var+" [GeV]")
+        datas[0].GetYaxis().SetNdivisions(4,5,0)
+        datas[0].GetXaxis().SetNdivisions(9,2,0)
+        datas[0].GetYaxis().SetTitleOffset(0.97)
+        datas[0].GetYaxis().SetMaxDigits(2)
+        datas[0].GetXaxis().SetTitleOffset(0.94)
+        datas[0].GetXaxis().SetLimits(1126, 8500.)
+        datas[0].GetYaxis().SetRangeUser(-2., 3.)
+        if var.find("ALPHA1")!=-1: datas[0].GetYaxis().SetRangeUser(0., 4.)
+        if var.find("ALPHA2")!=-1: datas[0].GetYaxis().SetRangeUser(0., 20.)
+        if var.find("SIGMA")!=-1:  datas[0].GetYaxis().SetRangeUser(0., 400.)
+        if var.find("MEAN")!=-1:   datas[0].GetYaxis().SetRangeUser(700., 8000)
+        if var.find("N1")!=-1:     datas[0].GetYaxis().SetRangeUser(0., 50.)
+        if var.find("N2")!=-1:     datas[0].GetYaxis().SetRangeUser(-10., 150.)
+        datas[0].Draw("CA")
+        print datas[0].Eval(1200.)
+        c.Update()
+      for i,gg in enumerate(fits):
+        gg.Draw("Lsame")
+        datas[i].Draw("Psame")
+      l.SetNColumns(len(years)/2)
+      l.Draw("same")
+
+      pt2 = ROOT.TPaveText(0.7,0.87,0.8,0.9,"NDC")
+      pt2.SetTextFont(42)
+      pt2.SetTextSize(0.04)
+      pt2.SetTextAlign(12)
+      pt2.SetFillColor(0)
+      pt2.SetBorderSize(0)
+      pt2.SetFillStyle(0)
+      pt2.AddText(titles)
+      pt2.Draw()
+
+
+
+      cmslabel_sim_prelim(c,'sim',11)
+      c.Update()
+      name = path+"Signal_mVV_allyears_"+var+"_"+signal
+      c.SaveAs(name+".png")
+      c.SaveAs(name+".pdf")
+      c.SaveAs(name+".C")
+      
                 
 if __name__ == '__main__':
 #    doSingle() #NB: some fix would be needed here!
 #    signals = ["BulkGZZ","WprimeWZ","BulkGWW","ZprimeWW","ZprimeZH","WprimeWH"]
 #    legs = ["G_{bulk} #rightarrow ZZ","W' #rightarrow WZ","G_{bulk} #rightarrow WW","Z'#rightarrow WW","Z'#rightarrow ZH","W'#rightarrow WH"]                                               
-    #signals = ["BulkGWW","ZprimeZH"]
-    #legs = ["G_{bulk} #rightarrow WW","Z'#rightarrow ZH"]                                                                                                                                                     
+    signals = ["BulkGWW","ZprimeZH"]
+    legs = ["G_{bulk} #rightarrow WW","Z'#rightarrow ZH"]                                                                                                                                                     
 #    signals = ["ZprimeZH"]
 #    legs = ["Z'#rightarrow ZH"]                                                                                                                                                     
 
 
-    signals = ["BulkGWW"] 
-    legs = ["G_{bulk} #rightarrow WW"] 
+#    signals = ["BulkGWW"] 
+#    legs = ["G_{bulk} #rightarrow WW"] 
     years = ["2016","2017","2018","Run2"]    
     for i in range(len(signals)):
 #    for i in range(1):
       print i
       print signals[i]
       print legs[i]
-      doAll(signals[i],legs[i],years,i)
+#      doAll(signals[i],legs[i],years,i)
+      doMVV(signals[i],legs[i],years)
