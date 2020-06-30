@@ -303,6 +303,7 @@ for mass in sorted(complete_mass.keys()):
             print "using LO weight to avoid negative weights!"
             plotter[-1].addCorrectionFactor('genWeight_LO','tree')
         plotter[-1].addCorrectionFactor('puWeight','tree')
+        plotter[-1].addCorrectionFactor(luminosity,'flat')
         if options.triggerW:
             plotter[-1].addCorrectionFactor('jj_triggerWeight','tree')	
             print "Using triggerweight"
