@@ -6,7 +6,7 @@ from CMGTools.VVResonances.plotting.TreePlotter import TreePlotter
 from CMGTools.VVResonances.plotting.MergedPlotter import MergedPlotter
 from math import log
 import os, sys, re, optparse,pickle,shutil,json
-sys.path.insert(0, "/afs/cern.ch/work/i/izoi/RunII3Dfit/CMGToolsForStat10X/CMSSW_10_2_10/src/CMGTools/VVResonances/interactive/")
+sys.path.insert(0, "../interactive/")
 import cuts
 
 

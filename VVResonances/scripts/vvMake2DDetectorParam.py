@@ -8,7 +8,7 @@ from CMGTools.VVResonances.plotting.tdrstyle import *
 setTDRStyle()
 from CMGTools.VVResonances.plotting.TreePlotter import TreePlotter
 from CMGTools.VVResonances.plotting.MergedPlotter import MergedPlotter
-sys.path.insert(0, "/afs/cern.ch/work/i/izoi/RunII3Dfit/CMGToolsForStat10X/CMSSW_10_2_10/src/CMGTools/VVResonances/interactive/") 
+sys.path.insert(0, "../interactive/") 
 import cuts 
 ROOT.gROOT.SetBatch(True)
 
