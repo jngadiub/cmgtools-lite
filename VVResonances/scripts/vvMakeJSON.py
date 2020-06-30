@@ -28,7 +28,7 @@ parameterization={}
 
 ff=ROOT.TFile("debug_"+options.output+".root","RECREATE")
 ff.cd()
-print graphStr
+print " graphStr ",graphStr
 for string in graphStr:
     comps =string.split(':')
     graph=rootFile.Get(comps[0])
@@ -73,7 +73,7 @@ for string in graphStr:
         graph.Fit(func,"","",55,215)
         graph.Fit(func,"","",55,215)
     elif comps[1]=="spline":
-        print "no need to fit a spline"
+        print "Spline used, no need to fit it"
     else:
         print comps[1]
         print 'fit function '+func.GetName()
@@ -81,7 +81,7 @@ for string in graphStr:
         graph.Fit(func,"","",options.min,options.max)
         graph.Fit(func,"","",options.min,options.max)
     parameterization[comps[0]]=returnString(func,comps[1])
-    
+
     c = ROOT.TCanvas()
     graph.Draw()
     func.SetLineColor(ROOT.kRed)
