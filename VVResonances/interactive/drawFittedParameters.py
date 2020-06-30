@@ -341,7 +341,6 @@ def doMVV(signals,titles,year):
             filesHP.append(TFile("debug_JJ_"+s+"_"+year+"_MVV.json.root","READ"))
     
     for var in vars:
->>>>>>> 84fe9c1c... changed signal interpolation from using polinomials to using splines
         fitsHP=[]
         fitsLP=[]
         datasHP=[]
