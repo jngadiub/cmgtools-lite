@@ -7,7 +7,11 @@ from CMGTools.VVResonances.plotting.MergedPlotter import MergedPlotter
 from CMGTools.VVResonances.plotting.StackPlotter import StackPlotter
 from CMGTools.VVResonances.statistics.Fitter import Fitter
 from math import log
+from collections import defaultdict
 import os, sys, re, optparse,pickle,shutil,json
+sys.path.insert(0, "/afs/cern.ch/work/i/izoi/RunII3Dfit/CMGToolsForStat10X/CMSSW_10_2_10/src/CMGTools/VVResonances/interactive/")
+import cuts
+
 ROOT.gROOT.SetBatch(True)
 ROOT.gStyle.SetOptStat(0)
 
@@ -141,45 +145,90 @@ if options.sample.find("ZH")!=-1 or options.sample.find('Zh')!=-1 or options.sam
     testcorr = True
 
 print " ######### testcorr ",testcorr
-for filename in os.listdir(args[0]):
-    if not (filename.find(options.sample)!=-1):
-        continue
-    if filename.find("VBF")!=-1 and options.sample.find("VBF")==-1:
-        continue
 
-#found sample. get the mass
-    fnameParts=filename.split('.')
-    fname=fnameParts[0]
-    ext=fnameParts[1]
-    if ext.find("root") ==-1:
-        continue
+
+folders = str(args[0]).split(",")
+for folder in folders:
+    samples[folder] = {}
+    for filename in os.listdir(folder):
+        if not (filename.find(options.sample)!=-1):
+            continue
+        if filename.find("VBF")!=-1 and options.sample.find("VBF")==-1:
+            continue
+
+        #found sample. get the mass
+        fnameParts=filename.split('.')
+        fname=fnameParts[0]
+        ext=fnameParts[1]
+        if ext.find("root") ==-1:
+            continue
         
     
-    mass = float(fname.split('_')[-1])
-    if mass < options.minMX or mass > options.maxMX: continue
+        mass = float(fname.split('_')[-1])
+        if mass < options.minMX or mass > options.maxMX: continue
         
 
-    samples[mass] = fname
+        samples[folder].update({mass : folder+fname})
+        print 'found',filename,'mass',str(mass) 
 
-    print 'found',filename,'mass',str(mass) 
+
+flipped = defaultdict(dict)
+for key, val in samples.items():
+    for subkey, subval in val.items():
+        flipped[subkey][key] = subval
 
 
-#Now we have the samples: Sort the masses and run the fits
-N=0
+
+complete_mass = defaultdict(dict)
+for mass in flipped.keys():
+    print mass
+    i= 0
+    for folder in folders:
+        try:
+            x = flipped[mass][folder]
+            print " x ", x
+            i+=1
+        except KeyError:
+            print "!!!!    folder ", folder, " missing for mass", mass ," !!!!!!!!"
+            pass
+    print i
+    if i == len(folders):
+        for folder in folders:
+            x = flipped[mass][folder]
+            complete_mass[mass][folder] = x
+
+
+print " complete ",complete_mass
+
+
+luminosity_tot=0
+for folder in folders:
+    year=folder.split("/")[-2]
+    ctx = cuts.cuts("init_VV_VH.json",year,"dijetbins_random")
+    luminosity_tot += ctx.lumi[year]
+
+print "Total lumi ",luminosity_tot
+
+
+testfolder=folders[0]
+print "testfolder ",testfolder
+
+
 allgraphs = {}
 allgraphs_sigma = {}
+
 if testcorr ==True:
     if (options.sample.find("H")!=-1 or options.sample.find("h")!=-1 or options.sample.find("WZ")!=-1):
-        for mass in samples.keys():
-            if samples[mass].find("WZ")!=-1:
+        for mass in complete_mass.keys():
+            if complete_mass[mass][testfolder].find("WZ")!=-1:
                 print 'histos for WZ signal'
                 h = ROOT.TH2F("corr_mean_M"+str(mass),"corr_mean_M"+str(mass),2,array("f",[76,86,94]),2,array("f",[76,86,94]))
                 hs = ROOT.TH2F("corr_sigma_M"+str(mass),"corr_sigma_M"+str(mass),2,array("f",[55,85,215]),2,array("f",[55,85,215]))
-            elif samples[mass].find("WH")!=-1 or samples[mass].find("Wh")!=-1:
+            elif complete_mass[mass][testfolder].find("WH")!=-1 or complete_mass[mass][testfolder].find("Wh")!=-1:
                 print 'histos for WH signal'
                 h = ROOT.TH2F("corr_mean_M"+str(mass),"corr_mean_M"+str(mass),2,array("f",[65,105,145]),2,array("f",[65,105,145]))
                 hs = ROOT.TH2F("corr_sigma_M"+str(mass),"corr_sigma_M"+str(mass),2,array("f",[55,105,215]),2,array("f",[55,105,215]))    
-            elif samples[mass].find("ZH")!=-1 or samples[mass].find("Zh")!=-1:
+            elif complete_mass[mass][testfolder].find("ZH")!=-1 or complete_mass[mass][testfolder].find("Zh")!=-1:
                 print 'histos for ZH signal'
                 h = ROOT.TH2F("corr_mean_M"+str(mass),"corr_mean_M"+str(mass),2,array("f",[85,105,145]),2,array("f",[85,105,145]))
                 hs = ROOT.TH2F("corr_sigma_M"+str(mass),"corr_sigma_M"+str(mass),2,array("f",[55,105,215]),2,array("f",[55,105,215]))    
@@ -187,20 +236,20 @@ if testcorr ==True:
             allgraphs[mass] = h
             allgraphs_sigma[mass] = hs
 
-            if samples[mass].find("WZ")!=-1:
+            if complete_mass[mass][testfolder].find("WZ")!=-1:
                 print 'sigma histo for WZ'
                 graph_sum_sigma = ROOT.TH2F("corr_sigma","corr_sigma",2,array("f",[55,85,215]),2,array("f",[55,85,215]))
             else:
                 print 'add sigma hist'
                 graph_sum_sigma = ROOT.TH2F("corr_sigma","corr_sigma",2,array("f",[55,105,215]),2,array("f",[55,105,215]))
                 
-            if samples[mass].find("WZ")!=-1:
+            if complete_mass[mass][testfolder].find("WZ")!=-1:
                 print 'mean for WZ signal' 
                 graph_sum_mean = ROOT.TH2F("corr_mean","corr_mean",2,array("f",[76,86,94]),2,array("f",[76,86,94]))
-            elif options.sample.find("WH")!=-1 or samples[mass].find("Wh")!=-1:
+            elif options.sample.find("WH")!=-1 or complete_mass[mass][testfolder].find("Wh")!=-1:
                 print 'mean for WH signal'
                 graph_sum_mean  = ROOT.TH2F("corr_mean","corr_mean",2,array("f",[65,105,145]),2,array("f",[65,105,145]))
-            elif samples[mass].find("ZH")!=-1 or samples[mass].find("Zh")!=-1:
+            elif complete_mass[mass][testfolder].find("ZH")!=-1 or complete_mass[mass][testfolder].find("Zh")!=-1:
                 print 'mean for ZH signal'
                 graph_sum_mean = ROOT.TH2F("corr_mean","corr_mean",2,array("f",[85,105,145]),2,array("f",[85,105,145]))
         minmjet = 55
@@ -216,15 +265,18 @@ if testcorr ==True:
             binmidpoint = 15
             print bins_all
 
-for mass in sorted(samples.keys()):
-    print 'fitting',str(mass) 
-    plotter=TreePlotter(args[0]+'/'+samples[mass]+'.root','AnalysisTree')
-    plotter.addCorrectionFactor('genWeight','tree')
-    plotter.addCorrectionFactor('puWeight','tree')
-    if options.triggerW:
-        plotter.addCorrectionFactor('jj_triggerWeight','tree')	
-        print "Using triggerweight"
-   
+#Now we have the samples: Sort the masses and run the fits
+N=0
+
+for mass in sorted(complete_mass.keys()):
+    print "#############    mass ",mass,"       ###########"
+
+    histo = None
+    histos2D = None
+    histos3D = None
+
+    plotter = []
+
     fitter=Fitter(['MVV'])
     fitter.signalResonance('model',"MVV",mass,False)
    
@@ -237,16 +289,46 @@ for mass in sorted(samples.keys()):
     print binning
     print "-----------------------------------------------"
 
-    
-    histo = plotter.drawTH1Binned(options.mvv,options.cut+extra_extra_cut,"1",binning)
+    for folder in sorted(complete_mass[mass].keys()):
+        year=folder.split("/")[-2]
+        print "year ",year
+        ctx = cuts.cuts("init_VV_VH.json",year,"dijetbins_random")
+        print " fraction of lumi ",ctx.lumi[year]/luminosity_tot
+        luminosity=   ctx.lumi[year]/luminosity_tot #str(ctx.lumi[year]/luminosity_tot)                                                                                                                                                       
+        if options.output.find("Run2") ==-1: luminosity = 1
+
+        plotter.append(TreePlotter(complete_mass[mass][folder]+'.root','AnalysisTree'))
+        if year == "2016": plotter[-1].addCorrectionFactor('genWeight','tree')
+        else :
+            print "using LO weight to avoid negative weights!"
+            plotter[-1].addCorrectionFactor('genWeight_LO','tree')
+        plotter[-1].addCorrectionFactor('puWeight','tree')
+        if options.triggerW:
+            plotter[-1].addCorrectionFactor('jj_triggerWeight','tree')	
+            print "Using triggerweight"
+        if histo == None :
+            histo = plotter[-1].drawTH1Binned(options.mvv,options.cut+extra_extra_cut,"1",binning)
+        else:
+            histo.Add(plotter[-1].drawTH1Binned(options.mvv,options.cut+extra_extra_cut,"1",binning))
+        if testcorr==True:
+            print "initializing 2D & 3D hists " 
+            if histos2D == None:
+                histos2D = plotter[-1].drawTH2("jj_LV_mass:jj_l2_softDrop_mass",options.cut.replace(options.addcut,"1"),"1",binsmjet,minmjet,maxmjet,100,options.min,options.max)
+            else: 
+                histos2D.Add(plotter[-1].drawTH2("jj_LV_mass:jj_l2_softDrop_mass",options.cut.replace(options.addcut,"1"),"1",binsmjet,minmjet,maxmjet,100,options.min,options.max))
+            if histos3D == None:
+                histos3D = plotter[-1].drawTH3("jj_LV_mass:jj_l2_softDrop_mass:jj_l1_softDrop_mass",options.cut.replace(options.addcut,"1")+extra_extra_cut,"1",binsmjet,minmjet,maxmjet,binsmjet,minmjet,maxmjet,100,options.min,options.max)
+            else:
+                histos3D.Add(plotter[-1].drawTH3("jj_LV_mass:jj_l2_softDrop_mass:jj_l1_softDrop_mass",options.cut.replace(options.addcut,"1")+extra_extra_cut,"1",binsmjet,minmjet,maxmjet,binsmjet,minmjet,maxmjet,100,options.min,options.max))
+
+
+
+
     fitter.importBinnedData(histo,['MVV'],'data')
     ps = []
     if testcorr==True:
-        histos2D = plotter.drawTH2("jj_LV_mass:jj_l2_softDrop_mass",options.cut.replace(options.addcut,"1"),"1",binsmjet,minmjet,maxmjet,100,options.min,options.max)
+        print "histos2D ",histos2D
         proj = histos2D.ProjectionX("p")
-      
-        
-        histos3D = plotter.drawTH3("jj_LV_mass:jj_l2_softDrop_mass:jj_l1_softDrop_mass",options.cut.replace(options.addcut,"1")+extra_extra_cut,"1",binsmjet,minmjet,maxmjet,binsmjet,minmjet,maxmjet,100,options.min,options.max)
        
         hall = histos3D.ProjectionZ("all",0,binmidpoint,binmidpoint,binsmjet)
         par = dodCBFits(hall,mass,"all","1")
