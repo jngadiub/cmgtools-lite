@@ -10,7 +10,7 @@ from math import log
 from collections import defaultdict
 from CMGTools.VVResonances.plotting.VarTools import returnString
 import os, sys, re, optparse,pickle,shutil,json
-sys.path.insert(0, "/afs/cern.ch/work/i/izoi/RunII3Dfit/CMGToolsForStat10X/CMSSW_10_2_10/src/CMGTools/VVResonances/interactive/")
+sys.path.insert(0, "../interactive/")
 import cuts
 
 
