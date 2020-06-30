@@ -220,7 +220,7 @@ def doSingle():
       c1.SaveAs(path+"signalShapes%s_%s.C" %(options.var, inFileName.rsplit(".", 1)[0]))
       c1.SaveAs(path+"signalShapes%s_%s.root" %(options.var, inFileName.rsplit(".", 1)[0]))
 '''
-def doAll(signal,legend,years,colorindex):
+def doYields(signal,legend,years,colorindex):
 
     purities=["VV_HPHP","VV_HPLP","VH_HPHP","VH_HPLP","VH_LPHP"]
     gr = {}
@@ -426,7 +426,7 @@ def doMVV(signal,titles,years):
         if var.find("ALPHA2")!=-1: datas[0].GetYaxis().SetRangeUser(0., 20.)
         if var.find("SIGMA")!=-1:  datas[0].GetYaxis().SetRangeUser(0., 400.)
         if var.find("MEAN")!=-1:   datas[0].GetYaxis().SetRangeUser(700., 8000)
-        if var.find("N1")!=-1:     datas[0].GetYaxis().SetRangeUser(0., 50.)
+        if var.find("N1")!=-1:     datas[0].GetYaxis().SetRangeUser(0., 150.)
         if var.find("N2")!=-1:     datas[0].GetYaxis().SetRangeUser(-10., 150.)
         datas[0].Draw("CA")
         print datas[0].Eval(1200.)
@@ -456,6 +456,108 @@ def doMVV(signal,titles,years):
       c.SaveAs(name+".pdf")
       c.SaveAs(name+".C")
       
+
+
+def doJetMass(leg,signal,titles,years):
+    print signal
+    ROOT.gStyle.SetOptFit(0)
+
+    files=[]
+    filesHjet=[]
+
+    for i,year in enumerate(years):
+        files.append(ROOT.TFile("results_"+year+"/debug_JJ_"+signal+"_"+year+"_MJ"+leg+"_NP.json.root","READ"))
+        filesHjet.append(None)
+        if files[-1].IsZombie()==1:
+            files[-1] =(ROOT.TFile("results_"+year+"/debug_JJ_Vjet_"+signal+"_"+year+"_MJ"+leg+"_NP.json.root","READ"))
+            filesHjet[-1] =(ROOT.TFile("results_"+year+"/debug_JJ_Hjet_"+signal+"_"+year+"_MJ"+leg+"_NP.json.root","READ"))
+            
+
+    vars = ["mean","sigma","alpha","n","alpha2","n2"]
+    for var in vars:
+
+       fits =[]
+       fitsHjet=[]
+       datas=[]
+       datasHjet=[]
+
+       c,l,pt = getCanvasPaper("c")
+
+       ROOT.gStyle.SetOptStat(0)
+       ROOT.gStyle.SetOptTitle(0)
+       #title = "Jet mass width "
+       #if var == "mean": title="Jet mass mean"
+       for i,(f,fH) in enumerate(zip(files,filesHjet)):
+           print fH
+           print f
+
+           if fH ==None:
+                gH = f.Get(var)
+                funH = f.Get(var+"_func")
+           else:
+                print fH.GetName()
+                gH = fH.Get(var+"H")
+                funH = fH.Get(var+"H_func")
+           g = f.Get(var)
+           fun = f.Get(var+"_func")
+
+           beautify(fun  ,rt.TColor.GetColor(colorsyears[years[i]]),2,23+i)
+           beautify(funH ,rt.TColor.GetColor(colorsyears[years[i]]),1,23+i)
+           beautify(g ,rt.TColor.GetColor(colorsyears[years[i]]),2,23+i)
+           beautify(gH ,rt.TColor.GetColor(colorsyears[years[i]]),1,23+i)
+           datas.append(g)
+           datasHjet.append(gH)
+           fits.append(fun)
+           fitsHjet.append(funH)
+           l.AddEntry(funH,years[i],"LP")
+       print datasHjet
+
+       datas[0].GetXaxis().SetTitle("m_{X} [GeV]")
+       datas[0].GetYaxis().SetTitle(var)
+       datas[0].GetYaxis().SetNdivisions(4,5,0)
+       datas[0].GetXaxis().SetNdivisions(5,5,0)
+       datas[0].GetYaxis().SetTitleOffset(1.05)
+       datas[0].GetXaxis().SetTitleOffset(0.9)
+       datas[0].GetXaxis().SetRangeUser(1126, 5500.)
+       datas[0].GetXaxis().SetLabelSize(0.05)
+       datas[0].GetXaxis().SetTitleSize(0.06)
+       datas[0].GetYaxis().SetLabelSize(0.05)
+       datas[0].GetYaxis().SetTitleSize(0.06)
+       if var == "mean": datas[0].GetYaxis().SetRangeUser(75,150);
+       if var == "sigma": datas[0].GetYaxis().SetRangeUser(5,20.);
+       if var == "alpha": datas[0].GetYaxis().SetRangeUser(0,5); datas[0].GetYaxis().SetTitle("alpha")
+       if var == "n": datas[0].GetYaxis().SetRangeUser(0,250); datas[0].GetYaxis().SetTitle("n")
+       if var == "alpha2": datas[0].GetYaxis().SetRangeUser(0,5); datas[0].GetYaxis().SetTitle("alpha2")
+       if var == "n2": datas[0].GetYaxis().SetRangeUser(0,20); datas[0].GetYaxis().SetTitle("n2")
+       datas[0].Draw("AP")
+       for i,(g,gH) in enumerate(zip(datas,datasHjet)):
+           g.Draw("Psame")
+           gH.Draw("Psame")
+           fits[i].Draw("Csame")
+           fitsHjet[i].Draw("Csame")
+       datas[0].GetXaxis().SetLimits(1126, 8500.)
+       l.Draw("same")
+       pt2 = ROOT.TPaveText(0.7,0.87,0.8,0.9,"NDC")
+       pt2.SetTextFont(42)
+       pt2.SetTextSize(0.04)
+       pt2.SetTextAlign(12)
+       pt2.SetFillColor(0)
+       pt2.SetBorderSize(0)
+       pt2.SetFillStyle(0)
+       pt2.AddText(titles)
+       pt2.Draw()
+
+
+
+
+       cmslabel_sim_prelim(c,'sim',11)
+
+       c.Update()
+       name = path+"Signal_mjet_Allyears_"+signal+"_"+var
+       c.SaveAs(name+".png")
+       c.SaveAs(name+".pdf")
+       c.SaveAs(name+".C")
+
                 
 if __name__ == '__main__':
 #    doSingle() #NB: some fix would be needed here!
@@ -475,5 +577,7 @@ if __name__ == '__main__':
       print i
       print signals[i]
       print legs[i]
-#      doAll(signals[i],legs[i],years,i)
+      doYields(signals[i],legs[i],years,i)
       doMVV(signals[i],legs[i],years)
+      doJetMass("random",signals[i],legs[i],years)
+  
