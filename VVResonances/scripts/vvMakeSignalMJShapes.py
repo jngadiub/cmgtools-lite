@@ -7,7 +7,10 @@ from CMGTools.VVResonances.plotting.MergedPlotter import MergedPlotter
 from CMGTools.VVResonances.plotting.StackPlotter import StackPlotter
 from CMGTools.VVResonances.statistics.Fitter import Fitter
 from math import log
+from collections import defaultdict
 import os, sys, re, optparse,pickle,shutil,json
+sys.path.insert(0, "../interactive/")
+import cuts
 ROOT.gROOT.SetBatch(True)
 
 def returnString(func):
@@ -16,15 +19,6 @@ def returnString(func):
         st=st+"+("+str(func.GetParameter(i))+")"+("*MH"*i)
     return st    
 
-def fillHisto(plotter,mvv,cuts,maxi,mini):
-        print "ATTENTION: "+str(mvv)
-        if mvv.find("l1")!=-1 or mvv.find("l2")!=-1:
-            histo = plotter.drawTH1(mvv,cuts,"1",int((maxi-mini)/4),mini,maxi)
-        else:
-            histo = plotter.drawTH1(mvv.replace("random","l1"),cuts.replace("random","l1"),"1",int((maxi-mini)/4),mini,maxi) 
-            tmp = plotter.drawTH1(mvv.replace("random","l2"),cuts.replace("random","l2"),"1",int((maxi-mini)/4),options.mini,options.maxi)
-            histo.Add(tmp)
-        return histo
 
 
 parser = optparse.OptionParser()
@@ -47,52 +41,121 @@ isVH = False
 isHH = False
 samples={}
 
-
-for filename in os.listdir(args[0]):
-    if not (filename.find(options.sample)!=-1):
-        continue
-    if filename.find(".")==-1:
-        print "in "+str(filename)+"the separator . was not found. -> continue!"
-        continue
-    if filename.find("VBF")!=-1 and options.sample.find("VBF")==-1:
-        continue
+folders = str(args[0]).split(",")
+for folder in folders:
+    samples[folder] = {}
+    for filename in os.listdir(folder):
+        if not (filename.find(options.sample)!=-1):
+            continue
+        if filename.find(".")==-1:
+            print "in "+str(filename)+"the separator . was not found. -> continue!"
+            continue
+        if filename.find("VBF")!=-1 and options.sample.find("VBF")==-1:
+            continue
 
      
-    fnameParts=filename.split('.')
-    fname=fnameParts[0]
-    ext=fnameParts[1]
-    if ext.find("root") ==-1:
-        continue
-        
-    mass = float(fname.split('_')[-1])
-    if mass < options.minMX or mass > options.maxMX: continue	
-    samples[mass] = fname
+        fnameParts=filename.split('.')
+        fname=fnameParts[0]
+        ext=fnameParts[1]
+        if ext.find("root") ==-1:
+            continue
+            
+        mass = float(fname.split('_')[-1])
+        if mass < options.minMX or mass > options.maxMX: continue	
+        samples[folder].update({mass : folder+fname})
 
-    print 'found',filename,'mass',str(mass) 
-    if filename.find('hbb')!=-1: isVH=True;
-    if filename.find("HH")!=-1: isHH=True; 
+        print 'found',filename,'mass',str(mass) 
+        if filename.find('hbb')!=-1: isVH=True;
+        if filename.find("HH")!=-1: isHH=True; 
 
 
 leg = options.mvv.split('_')[1]
 graphs={'mean':ROOT.TGraphErrors(),'sigma':ROOT.TGraphErrors(),'alpha':ROOT.TGraphErrors(),'n':ROOT.TGraphErrors(),'f':ROOT.TGraphErrors(),'slope':ROOT.TGraphErrors(),'alpha2':ROOT.TGraphErrors(),'n2':ROOT.TGraphErrors(),
         'meanH':ROOT.TGraphErrors(),'sigmaH':ROOT.TGraphErrors(),'alphaH':ROOT.TGraphErrors(),'nH':ROOT.TGraphErrors(),'fH':ROOT.TGraphErrors(),'slopeH':ROOT.TGraphErrors(),'alpha2H':ROOT.TGraphErrors(),'n2H':ROOT.TGraphErrors() }
 
+
+flipped = defaultdict(dict)
+for key, val in samples.items():
+    for subkey, subval in val.items():
+        flipped[subkey][key] = subval
+
+
+
+complete_mass = defaultdict(dict)
+for mass in flipped.keys():
+    print mass
+    i= 0
+    for folder in folders:
+        try:
+            x = flipped[mass][folder]
+            print " x ", x
+            i+=1
+        except KeyError:
+            print "!!!!    folder ", folder, " missing for mass", mass ," !!!!!!!!"
+            pass
+    print i
+    if i == len(folders):
+        for folder in folders:
+            x = flipped[mass][folder]
+            complete_mass[mass][folder] = x
+
+
+print " complete ",complete_mass
+
+
+category=options.output.split("_")[-3]+"_"+options.output.split("_")[-2]
+print "category ",category
+
+luminosity_tot=0
+for folder in folders:
+    year=folder.split("/")[-2]
+    ctx = cuts.cuts("init_VV_VH.json",year,"dijetbins_random")
+    luminosity_tot += ctx.lumi[year]
+
+print "Total lumi ",luminosity_tot
+
+mvv,maxi,mini = options.mvv,options.maxi,options.mini
+
 #Now we have the samples: Sort the masses and run the fits
 N=0
-for mass in sorted(samples.keys()):
+for mass in sorted(complete_mass.keys()):
+    print "#############    mass ",mass,"       ###########"
+    
+    histo = None
+    plotter = []
+    for folder in sorted(complete_mass[mass].keys()):
+        year=folder.split("/")[-2]
+        print "year ",year
+        ctx = cuts.cuts("init_VV_VH.json",year,"dijetbins_random")
+        print " fraction of lumi ",ctx.lumi[year]/luminosity_tot
+        luminosity=   ctx.lumi[year]/luminosity_tot #str(ctx.lumi[year]/luminosity_tot)                                                                                                                                                       
+        if options.output.find("Run2") ==-1: luminosity = 1
+        plotter.append(TreePlotter(complete_mass[mass][folder]+'.root','AnalysisTree'))
+        if year == "2016": plotter[-1].addCorrectionFactor('genWeight','tree')
+        else :
+            print "using LO weight to avoid negative weights!"
+            plotter[-1].addCorrectionFactor('genWeight_LO','tree')
+        plotter[-1].addCorrectionFactor(luminosity,'flat')
+        plotter[-1].addCorrectionFactor('puWeight','tree')
+        if options.triggerW:
+            plotter[-1].addCorrectionFactor('jj_triggerWeight','tree')
+            print "Using triggerweight"
 
-    print 'fitting',str(mass) 
-    plotter=TreePlotter(args[0]+'/'+samples[mass]+'.root','AnalysisTree')
-    plotter.addCorrectionFactor('genWeight','tree')
-    plotter.addCorrectionFactor('puWeight','tree')
-    if options.triggerW:
-     plotter.addCorrectionFactor('jj_triggerWeight','tree')
-     print "Using triggerweight"
-       
+        print "ATTENTION: "+str(mvv)
+        if mvv.find("l1")!=-1 or mvv.find("l2")!=-1:
+           if histo == None : 
+               histo = plotter[-1].drawTH1(mvv,options.cut,"1",int((maxi-mini)/4),mini,maxi)
+           else:
+               histo.Add(plotter[-1].drawTH1(mvv,options.cut,"1",int((maxi-mini)/4),mini,maxi)) 
+        else:
+            if histo == None :
+                histo = plotter[-1].drawTH1(mvv.replace("random","l1"),options.cut.replace("random","l1"),"1",int((maxi-mini)/4),mini,maxi) 
+            else:
+                histo.Add(plotter[-1].drawTH1(mvv.replace("random","l1"),options.cut.replace("random","l1"),"1",int((maxi-mini)/4),mini,maxi))
+            tmp = plotter[-1].drawTH1(mvv.replace("random","l2"),options.cut.replace("random","l2"),"1",int((maxi-mini)/4),options.mini,options.maxi)
+            histo.Add(tmp)
+              
 
-
-#    fitter.w.var("MH").setVal(mass)
-    histo = fillHisto( plotter,options.mvv,options.cut,options.maxi,options.mini)
     
     fitter=Fitter(['x'])
     if isVH and options.cut.find('Truth')==-1: fitter.jetDoublePeakVH('model','x'); print "INFO: fit jet double peak";
