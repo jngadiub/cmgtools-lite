@@ -1494,14 +1494,16 @@ def makeData(template,cut,rootFile,binsMVV,binsMJ,minMVV,maxMVV,minMJ,maxMJ,fact
        print "remove file ",removefile
        directory = str(files[x-1]).split(removefile)[0]
        print " directory ",directory
+       year=directory.split("/")[-2]
+       print "year ",year
        template = str(files[x-1]).split("/")[-1]
        print "template ",template
-       os.system("mkdir tmp"+jobname+"/"+template.replace(".root",""))
-       os.chdir("tmp"+jobname+"/"+template.replace(".root",""))
+       os.system("mkdir tmp"+jobname+"/"+year+"_"+template.replace(".root",""))
+       os.chdir("tmp"+jobname+"/"+year+"_"+template.replace(".root",""))
        #os.system("mkdir tmp"+jobname+"/"+str(files[x-1]).replace(".root",""))
        #os.chdir(path+"tmp"+jobname+"/"+str(files[x-1]).replace(".root",""))
      
-       with open('job_%s.sh'%template.replace(".root",""), 'w') as fout:
+       with open('job_%s_%s.sh'%(year,template.replace(".root","")), 'w') as fout:
           fout.write("#!/bin/sh\n")
           fout.write("echo\n")
           fout.write("echo\n")
@@ -1513,11 +1515,11 @@ def makeData(template,cut,rootFile,binsMVV,binsMJ,minMVV,maxMVV,minMJ,maxMJ,fact
           fout.write("cd "+str(path)+"\n")
           fout.write("cmsenv\n")
           if runinKA==True: fout.write("mkdir -p /tmp/${USER}/\n")
-          fout.write(cmd+" -o "+path+"/res"+jobname+"/"+OutputFileNames+"_"+template+" -s "+template+" "+directory+"\n")
+          fout.write(cmd+" -o "+path+"/res"+jobname+"/"+OutputFileNames+"_"+year+"_"+template+" -s "+template+" "+directory+"\n")
           fout.write("echo 'STOP---------------'\n")
           fout.write("echo\n")
           fout.write("echo\n")
-       os.system("chmod 755 job_%s.sh"%(template.replace(".root","")) )
+       os.system("chmod 755 job_%s.sh"%(year+"_"+template.replace(".root","")) )
 
        if useCondorBatch:
            os.system("mv  job_*.sh "+jobname+".sh")
@@ -1526,7 +1528,7 @@ def makeData(template,cut,rootFile,binsMVV,binsMJ,minMVV,maxMVV,minMJ,maxMJ,fact
        else:
            os.system("bsub -q "+queue+" -o logs job_%s.sh -J %s"%(template.replace(".root",""),jobname))
        print "job nr " + str(x) + " submitted"
-       joblist.append("%s"%(template.replace(".root","")))
+       joblist.append("%s"%(year+"_"+template.replace(".root","")))
        os.chdir("../..")
    
     print
@@ -1543,7 +1545,7 @@ def makeData(template,cut,rootFile,binsMVV,binsMJ,minMVV,maxMVV,minMJ,maxMJ,fact
     print
     return joblist, files
 
-def mergeData(jobList, files,jobname,purity,rootFile,filename,name):
+def mergeData(jobList, files,jobname,purity,rootFile,filename,name,year=""):
     
     print "Merging data from job " ,jobname
     print "Purity is " ,purity
@@ -1578,6 +1580,7 @@ def mergeData(jobList, files,jobname,purity,rootFile,filename,name):
             
     # read out files
     filelist = os.listdir('./'+outdir+'/')
+    print "filelist ",filelist
 
     mg_files     = []
     pythia_files = []
@@ -1585,16 +1588,31 @@ def mergeData(jobList, files,jobname,purity,rootFile,filename,name):
     data_files   = []
 
     for f in filelist:
+     if year == "":
      #if f.find('COND2D') == -1: continue
-     if f.find(purity)==-1:
+         if f.find(purity)==-1:
              continue
-     if f.find(filename)==-1:
-         continue
-     if f.find('QCD_HT')    != -1: mg_files.append('./res'+jobname+'/'+f)
-     elif f.find('QCD_Pt_') != -1: pythia_files.append('./res'+jobname+'/'+f)
-     elif f.find('JetHT')   != -1: data_files.append('./res'+jobname+'/'+f)
-     else: herwig_files.append('./res'+jobname+'/'+f)
-
+         if f.find(filename)==-1:
+             print " f.find(filename)==-1 -> continue "
+             continue
+         if f.find('QCD_HT')    != -1: mg_files.append('./res'+jobname+'/'+f)
+         elif f.find('QCD_Pt_') != -1: pythia_files.append('./res'+jobname+'/'+f)
+         elif f.find('JetHT')   != -1: data_files.append('./res'+jobname+'/'+f)
+         else: herwig_files.append('./res'+jobname+'/'+f)
+     else: 
+         filename = filename.replace("Run2",year)
+         rootFile = rootFile.replace("Run2",year)
+         if f.find(purity)==-1:
+             continue
+         elif f.find(year) !=-1:
+              print " file ",f
+              if f.find('QCD_HT')    != -1: mg_files.append('./res'+jobname+'/'+f)
+              elif f.find('QCD_Pt_') != -1: pythia_files.append('./res'+jobname+'/'+f)
+              elif f.find('JetHT')   != -1: data_files.append('./res'+jobname+'/'+f)
+              else: herwig_files.append('./res'+jobname+'/'+f)
+    
+    print "filename ",filename
+    print "rootFile ",rootFile 
     #now hadd them
     if len(mg_files) > 0:
         cmd = 'hadd -f %s_%s_%s_altshape2.root '%(filename,name,purity)
