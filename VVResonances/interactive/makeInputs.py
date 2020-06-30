@@ -76,8 +76,8 @@ if useTriggerWeights:
 #categories=['VH_HPHP','VH_HPLP','VH_LPHP','VV_HPHP','VV_HPLP','VBF_VV_HPHP','VBF_VV_HPLP']
 #categories=['VH_HPHP','VH_HPLP','VH_LPHP','VV_HPHP','VV_HPLP']
 #
-categories =["NP"]
-#categories =["VV_HPLP"]
+#categories =["NP"]
+categories =["VV_HPLP"]
        
 
 #list of signal samples --> nb, radion and vbf samples to be added
@@ -224,7 +224,7 @@ if options.run.find("all")!=-1 or options.run.find("qcd")!=-1:
             f.makeBackgroundShapesMVVConditional("nonRes","JJ_"+filePeriod,nonResTemplate,'l2',ctx.cuts['nonres'],"2Dl2",wait)
             f.mergeBackgroundShapes("nonRes","JJ_"+filePeriod)
     if options.run.find("all")!=-1 or options.run.find("norm")!=-1:
-        f.makeNormalizations("nonRes","JJ_"+filePeriod,nonResTemplate,0,ctx.cuts['nonres'],"nRes")
+        f.makeNormalizations("nonRes","JJ_"+filePeriod,nonResTemplate,0,ctx.cuts['nonres'],"nRes",options.single)
 
 if options.run.find("all")!=-1 or options.run.find("vjets")!=-1:    
     print "for V+jets"
