@@ -221,7 +221,7 @@ class AllFunctions():
    #   cmd='vvMakeTriggerShapes.py -i "{rootFile}"'.format(rootFile=rootFile)
    #   os.system(cmd)
 
- def makeNormalizations(self,name,filename,template,data=0,addCut='1',jobName="nR",factors="1",wait=True,HPSF=1.,LPSF=1.):
+ def makeNormalizations(self,name,filename,template,data=0,addCut='1',jobName="nR",makesingle=False,factors="1",wait=True,HPSF=1.,LPSF=1.):
  
   pwd = os.getcwd()
   period=filename.split("_")[1]
@@ -256,6 +256,21 @@ class AllFunctions():
        jobList, files = makeData(template,cut,rootFile,self.binsMVV,self.binsMJ,self.minMVV,self.maxMVV,self.minMJ,self.maxMJ,factors,name,data,jobname,sam,wait,self.HCALbinsMVV) #,addOption) #irene
        wait = True
        if wait: mergeData(jobList, files,jobname,c,rootFile,filename,name)
+       if makesingle and period == "Run2":
+             print " ########    making norms also for single years ##############"
+             years = ["2016","2017","2018"]
+             for year in years:
+                print " year ",year
+                newjoblist = []
+                newfiles   = []
+                for job in jobList:
+                 if job.split("_")[0].replace("'","").replace(" ","") == year :
+                  print " condition ",job.split('_')[0]," = ",year, " verified "
+                  newjoblist.append(job.replace("'","").replace(" ",""))
+                for f in files: 
+                 if f.split("/")[-2] == year :
+                  newfiles.append(f.replace("'","").replace(" ",""))
+                mergeData(newjoblist, newfiles,jobname,c,rootFile,filename,name,year)
    else:
         if filename.find("gen")!=-1:
             cmd='vvMakeData.py -s "{template}" -d {data} -c "{cut}"  -o "{rootFile}" -v "jj_l1_gen_softDrop_mass,jj_l2_gen_softDrop_mass,jj_gen_partialMass" -b "{bins},{bins},{BINS}" -m "{mini},{mini},{MINI}" -M "{maxi},{maxi},{MAXI}" -f {factors} -n "{name}" {samples}'.format(template=template,cut=cut,rootFile=rootFile,BINS=self.binsMVV,bins=self.binsMJ,MINI=self.minMVV,MAXI=self.maxMVV,mini=self.minMJ,maxi=self.maxMJ,factors=factors,name=name,data=data,samples=sam)
