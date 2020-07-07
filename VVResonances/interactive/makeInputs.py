@@ -8,7 +8,8 @@ import cuts
 # python makeInputs.py -p 2016 --run "detector" --batch False
 # python makeInputs.py -p 2016 --run "signorm" --signal "ZprimeWW" --batch False 
 # python makeInputs.py -p 2016 --run "tt" --batch False 
-# python makeInputs.py -p 2016 --run "vjets" --batch False                                                                                                                                      
+# python makeInputs.py -p 2016 --run "vjets" --batch False   
+#python makeInputs.py -p "2016,2017,2018"  --run "vjets"
 # python makeInputs.py -p 2016 --run "qcdtemplates"
 # python makeInputs.py -p 2016 --run "qcdkernel"
 # python makeInputs.py -p "2016,2017,2018" --run "qcdkernel"  --single True
@@ -229,17 +230,19 @@ if options.run.find("all")!=-1 or options.run.find("qcd")!=-1:
 if options.run.find("all")!=-1 or options.run.find("vjets")!=-1:    
     print "for V+jets"
     print "first we fit"
-    f.fitVJets("JJ_WJets",resTemplate,1.,1.)
+    f.fitVJets("JJ_"+filePeriod+"_WJets",resTemplate,1.,1.)
     print "and then we make kernels"
+    wait=False
+    if options.batch == True : wait=True 
     print " did you run Detector response  for this period? otherwise the kernels steps will not work!"
     print "first kernel W"
-    f.makeBackgroundShapesMVVKernel("WJets","JJ_"+filePeriod,WresTemplate,ctx.cuts['nonres'],"1D",0,1.,1.)
+    f.makeBackgroundShapesMVVKernel("WJets","JJ_"+filePeriod,WresTemplate,ctx.cuts['nonres'],"1D",wait,1.,1.)
     print "then kernel Z"
-    f.makeBackgroundShapesMVVKernel("ZJets","JJ_"+filePeriod,ZresTemplate,ctx.cuts['nonres'],"1D",0,1.,1.)
+    f.makeBackgroundShapesMVVKernel("ZJets","JJ_"+filePeriod,ZresTemplate,ctx.cuts['nonres'],"1D",wait,1.,1.)
     print "then norm W"
-    f.makeNormalizations("WJets","JJ_"+filePeriod,WresTemplate,0,ctx.cuts['nonres'],"nRes","",HPSF_vtag,LPSF_vtag)
+    f.makeNormalizations("WJets","JJ_"+filePeriod,WresTemplate,0,ctx.cuts['nonres'],"nRes",options.single,"1") #,HPSF_vtag,LPSF_vtag)
     print "then norm Z"
-    f.makeNormalizations("ZJets","JJ_"+filePeriod,ZresTemplate,0,ctx.cuts['nonres'],"nRes","",HPSF_vtag,LPSF_vtag)
+    f.makeNormalizations("ZJets","JJ_"+filePeriod,ZresTemplate,0,ctx.cuts['nonres'],"nRes",options.single,"1")
 
 
 
