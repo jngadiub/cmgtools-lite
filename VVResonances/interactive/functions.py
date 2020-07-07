@@ -289,11 +289,19 @@ class AllFunctions():
      cut='*'.join([self.cuts['common'],self.cuts[c],self.cuts['acceptance']])
      rootFile=filename+"_"+c+".root"
      pwd = os.getcwd()
-     directory=pwd+"/"+self.samples
+     folders=[]
+     folders= self.samples.split(',')
+     directory= ""
+     for s in folders:
+      if filename.find("Run2")!=-1:
+       if s.find("2016")!=-1: continue #we do not have Wjets and Zjets sample for 2016, so it is useless to run twice on the same files when running on full Run2
+      directory+=pwd +"/"+s
+      if s != folders[-1]: directory+=","
+      print "Using files in" , directory
 
      print self.cuts["acceptance"]
      fixPars="1"  #"n:0.8,alpha:1.9"
-     cmd='vvMakeVjetsShapes.py -s "{template}" -c "{cut}"  -o "{rootFile}" -m {minMJ} -M {maxMJ} --store "{filename}_{purity}.py" --minMVV {minMVV} --maxMVV {maxMVV} {addOption} --corrFactorW {Wxsec} --corrFactorZ {Zxsec} {samples} {lumi}'.format(template=template,cut=cut,rootFile=rootFile,minMJ=self.minMJ,maxMJ=self.maxMJ,filename=filename,purity=c,minMVV=self.minMVV,maxMVV=self.maxMVV,addOption="",Wxsec=Wxsec,Zxsec=Zxsec,samples=directory,lumi=self.lumi)
+     cmd='vvMakeVjetsShapes.py -s "{template}" -c "{cut}"  -o "{rootFile}" -m {minMJ} -M {maxMJ} --store "{filename}_{purity}.py" --minMVV {minMVV} --maxMVV {maxMVV} {addOption} --corrFactorW {Wxsec} --corrFactorZ {Zxsec} {samples} '.format(template=template,cut=cut,rootFile=rootFile,minMJ=self.minMJ,maxMJ=self.maxMJ,filename=filename,purity=c,minMVV=self.minMVV,maxMVV=self.maxMVV,addOption="",Wxsec=Wxsec,Zxsec=Zxsec,samples=directory)
      cmd+=self.HCALbinsMVV
      print "going to execute command: "
      print str(cmd)
