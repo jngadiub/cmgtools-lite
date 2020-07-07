@@ -221,7 +221,7 @@ class AllFunctions():
    #   cmd='vvMakeTriggerShapes.py -i "{rootFile}"'.format(rootFile=rootFile)
    #   os.system(cmd)
 
- def makeNormalizations(self,name,filename,template,data=0,addCut='1',jobName="nR",makesingle=False,factors="1",wait=True,HPSF=1.,LPSF=1.):
+ def makeNormalizations(self,name,filename,template,data=0,addCut='1',jobName="nR",makesingle=False,factors="1",wait=True): #,HPSF=1.,LPSF=1.):
  
   pwd = os.getcwd()
   period=filename.split("_")[1]
@@ -234,12 +234,12 @@ class AllFunctions():
   print "Using files in" , sam
   
   for c in self.categories:
-   
+   '''
    #apply V/H tagging scale factors --> this will have to be updated
    if name.find("Jets")!=-1:
         if c.find("HPLP"): factors=factors+",sf:"+str(LPSF)
         else: factors=factors+",sf:"+str(HPSF)
-      
+   '''   
    jobname = jobName+"_"+period+"_"+c
    rootFile=filename+"_"+name+"_"+c+".root"
    print "Saving to ",rootFile  
