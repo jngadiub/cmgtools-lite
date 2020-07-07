@@ -753,7 +753,7 @@ def merge2DDetectorParam(jobList,files,resFile,binsxStr,jobname,template="QCD_Pt
         print " outname used for copy: "+str(outname)
         os.system( 'cp %s %s'%(outname,resFile) )
 
-def merge1DMVVTemplate(jobList,files,jobname,purity,binsMVV,minMVV,maxMVV,HCALbinsMVV,name,filename,samples):
+def merge1DMVVTemplate(jobList,files,jobname,purity,binsMVV,minMVV,maxMVV,HCALbinsMVV,name,filename): # ,samples):
 	print "Merging 1D templates"
 	print
 	print "Jobs to merge :   " ,jobList
@@ -1491,7 +1491,6 @@ def makeData(template,cut,rootFile,binsMVV,binsMJ,minMVV,maxMVV,minMJ,maxMJ,fact
     ###### loop for creating and sending jobs #####
     for x in range(1, int(NumberOfJobs)+1):
        removefile=files[x-1][files[x-1].rindex("/")+1:]
-       print "remove file ",removefile
        directory = str(files[x-1]).split(removefile)[0]
        print " directory ",directory
        year=directory.split("/")[-2]
