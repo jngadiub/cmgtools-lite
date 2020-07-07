@@ -8,6 +8,9 @@ from CMGTools.VVResonances.plotting.StackPlotter import StackPlotter
 from CMGTools.VVResonances.statistics.Fitter import Fitter
 from math import log
 import os, sys, re, optparse,pickle,shutil,json
+sys.path.insert(0, "../interactive/")
+import cuts
+
 ROOT.gROOT.SetBatch(True)
 ROOT.gStyle.SetOptStat(0)
 
@@ -30,8 +33,7 @@ parser.add_option("-t","--triggerweight",dest="triggerW",action="store_true",hel
 (options,args) = parser.parse_args()
 print "********************* fitting Vjets ********************"
 samples={}
-lumi = args[1]
-print "luminosity is "+str(lumi)
+
 
 def getBinning(binsMVV,minx,maxx,bins):
     l=[]
@@ -138,26 +140,34 @@ for words in t:
 label = el
 
 samplenames = options.sample.split(",")
-for filename in os.listdir(args[0]):
-    if filename.find(".")==-1:
-        print "in "+str(filename)+"the separator . was not found. -> continue!"
-        continue
-    for samplename in samplenames:
-        if not (filename.find(samplename)!=-1):
+samples = {}
+folders = str(args[0]).split(",")
+print "folders ",folders
+
+for folder in folders:
+    samples[folder] = []
+    for filename in os.listdir(folder):
+        if filename.find(".")==-1:
+            print "in "+str(filename)+"the separator . was not found. -> continue!"
             continue
+        for samplename in samplenames:
+            if not (filename.find(samplename)!=-1):
+                continue
 
 
-        fnameParts=filename.split('.')
-        print "fnameParts "+str(fnameParts)
-        fname=fnameParts[0]
-        ext=fnameParts[1]
-        if ext.find("root") ==-1:
-            continue
-    
-        name = fname.split('_')[0]    
-        samples[fname] = fname
+            fnameParts=filename.split('.')
+            print "fnameParts "+str(fnameParts)
+            fname=fnameParts[0]
+            ext=fnameParts[1]
+            if ext.find("root") ==-1:
+                continue
+                
+            name = fname.split('_')[0]    
+            samples[folder].append(folder+fname)
 
-        print 'found',filename
+            print 'found',filename, " and stored in ",samples[folder]
+
+
 
 sigmas=[]
 
@@ -167,20 +177,32 @@ legs=["l1","l2"]
 
 plotters=[]
 names = []
-for name in samples.keys():
-    plotters.append(TreePlotter(args[0]+'/'+samples[name]+'.root','AnalysisTree'))
-    plotters[-1].setupFromFile(args[0]+'/'+samples[name]+'.pck')
-    plotters[-1].addCorrectionFactor('xsec','tree')
-    plotters[-1].addCorrectionFactor('genWeight','tree')
-    plotters[-1].addCorrectionFactor('puWeight','tree')
-    if options.triggerW: plotters[-1].addCorrectionFactor('triggerWeight','tree')	
-    corrFactor = options.corrFactorW
-    if samples[name].find('Z') != -1: corrFactor = options.corrFactorZ
-    if samples[name].find('W') != -1: corrFactor = options.corrFactorW
-    print "corrFactor ",corrFactor
-    plotters[-1].addCorrectionFactor(corrFactor,'flat')
-    names.append(samples[name])
-    
+for files in samples.keys():
+    for f in samples[files]:
+        print " samples name ",f 
+        year=f.split("/")[-2]
+        print "year ",year
+        ctx = cuts.cuts("init_VV_VH.json",year,"dijetbins_random")
+        lumi = ctx.lumi[year]
+
+        if options.output.find("Run2")!=-1 and year=="2017":
+            ctx2016 = cuts.cuts("init_VV_VH.json","2016","dijetbins_random")
+            lumi+= ctx2016.lumi["2016"]
+        print "luminosity is "+str(lumi)
+        plotters.append(TreePlotter(f+'.root','AnalysisTree'))
+        plotters[-1].setupFromFile(f+'.pck')
+        plotters[-1].addCorrectionFactor('xsec','tree')
+        plotters[-1].addCorrectionFactor('genWeight','tree')
+        plotters[-1].addCorrectionFactor('puWeight','tree')
+        plotters[-1].addCorrectionFactor(lumi,'flat')
+        if options.triggerW: plotters[-1].addCorrectionFactor('triggerWeight','tree')	
+        corrFactor = options.corrFactorW
+        if f.find('Z') != -1: corrFactor = options.corrFactorZ
+        if f.find('W') != -1: corrFactor = options.corrFactorW
+        print "corrFactor ",corrFactor
+        plotters[-1].addCorrectionFactor(corrFactor,'flat')
+        names.append(f)
+
 print 'Fitting Mjet:' 
 
 
@@ -203,40 +225,41 @@ for p in range(0,len(plotters)):
 
       histos2D_nonRes [key] = plotters[p].drawTH2("jj_l1_softDrop_mass:jj_l2_softDrop_mass",options.cut+"*(jj_l1_mergedVTruth==0)*(jj_l1_softDrop_mass>55&&jj_l1_softDrop_mass<215)","1",80,55,215,80,55,215)
       histos2D_nonRes [key].SetName(key+"_nonResl1")
-      print "histos2D_nonRes ",histos2D_nonRes [key].GetEntries()
+      print "Make histos2D_nonRes ",histos2D_nonRes [key].GetEntries()
            
       histos2D [key] = plotters[p].drawTH2("jj_l1_softDrop_mass:jj_l2_softDrop_mass",options.cut+"*(jj_l1_mergedVTruth==1)*(jj_l1_softDrop_mass>55&&jj_l1_softDrop_mass<215)","1",80,55,215,80,55,215)
       histos2D [key].SetName(key+"_Resl1")
-      print "histos2D ",histos2D [key].GetEntries()
+      print "Make histos2D ",histos2D [key].GetEntries()
       
       histos2D_nonRes_l2 [key] = plotters[p].drawTH2("jj_l2_softDrop_mass:jj_l1_softDrop_mass",options.cut+"*(jj_l2_mergedVTruth==0)*(jj_l2_softDrop_mass>55&&jj_l2_softDrop_mass<215)","1",80,55,215,80,55,215)
       histos2D_nonRes_l2 [key].SetName(key+"_nonResl2")
-      print "histos2D_nonRes_l2 ",histos2D_nonRes_l2 [key].GetEntries()
+      print "Make histos2D_nonRes_l2 ",histos2D_nonRes_l2 [key].GetEntries()
      
       histos2D_l2 [key] = plotters[p].drawTH2("jj_l2_softDrop_mass:jj_l1_softDrop_mass",options.cut+"*(jj_l2_mergedVTruth==1)*(jj_l2_softDrop_mass>55&&jj_l2_softDrop_mass<215)","1",80,55,215,80,55,215)
       histos2D_l2 [key].SetName(key+"_Resl2")
-      print "histos2D_l2 ",histos2D_l2 [key].GetEntries()
+      print "Make histos2D_l2 ",histos2D_l2 [key].GetEntries()
      else:
       histos2D_nonRes [key].Add(plotters[p].drawTH2("jj_l1_softDrop_mass:jj_l2_softDrop_mass",options.cut+"*(jj_l1_mergedVTruth==0)*(jj_l1_softDrop_mass>55&&jj_l1_softDrop_mass<215)","1",80,55,215,80,55,215))
-      print "histos2D_nonRes ",histos2D_nonRes [key].GetEntries()
+      print "Add histos2D_nonRes ",histos2D_nonRes [key].GetEntries()
       histos2D [key].Add(plotters[p].drawTH2("jj_l1_softDrop_mass:jj_l2_softDrop_mass",options.cut+"*(jj_l1_mergedVTruth==1)*(jj_l1_softDrop_mass>55&&jj_l1_softDrop_mass<215)","1",80,55,215,80,55,215))
-      print "histos2D ",histos2D [key].GetEntries()
+      print "Add histos2D ",histos2D [key].GetEntries()
       histos2D_nonRes_l2 [key].Add(plotters[p].drawTH2("jj_l2_softDrop_mass:jj_l1_softDrop_mass",options.cut+"*(jj_l2_mergedVTruth==0)*(jj_l2_softDrop_mass>55&&jj_l2_softDrop_mass<215)","1",80,55,215,80,55,215))
-      print "histos2D_nonRes_l2 ",histos2D_nonRes_l2 [key].GetEntries()
+      print "Add histos2D_nonRes_l2 ",histos2D_nonRes_l2 [key].GetEntries()
       histos2D_l2 [key].Add(plotters[p].drawTH2("jj_l2_softDrop_mass:jj_l1_softDrop_mass",options.cut+"*(jj_l2_mergedVTruth==1)*(jj_l2_softDrop_mass>55&&jj_l2_softDrop_mass<215)","1",80,55,215,80,55,215))
-      print "histos2D_l2 ",histos2D_l2 [key].GetEntries()
+      print "Add histos2D_l2 ",histos2D_l2 [key].GetEntries()
 
 for key in histos2D.keys():      
      #add together the two legs to make the fit more stable
      histos2D[key].Add(histos2D_l2[key])
      histos2D_nonRes[key].Add(histos2D_nonRes_l2[key])
-     
+     '''
+     #handling lumi differently now
      #scale to lumi for nice visualization
      histos2D[key].Scale(float(lumi)) 
      histos2D_l2[key].Scale(float(lumi))
      histos2D_nonRes[key].Scale(float(lumi))
      histos2D_nonRes_l2[key].Scale(float(lumi))
-
+     '''
 ############################
 tmpfile = ROOT.TFile("test.root","RECREATE")
 for key in histos2D.keys():
@@ -317,7 +340,8 @@ print "histos "+str(histos)
 print "histos_nonRes "+str(histos_nonRes)	
 print "scales "+str(scales)	  
 print "scales_nonRes "+str(scales_nonRes)	
-fitter.drawVjets("Vjets_mjetRes_"+purity+".pdf",histos,histos_nonRes,scales,scales_nonRes)
+period=options.output.split("_")[1]
+fitter.drawVjets("Vjets_mjetRes_"+purity+"_"+period+".pdf",histos,histos_nonRes,scales,scales_nonRes)
 del histos,histos_nonRes,fitter,fitterZ
 
 if options.store!="":
