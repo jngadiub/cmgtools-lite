@@ -40,21 +40,20 @@ def getBinning(binsMVV):
 sampleTypes=options.samples.split(',')
 
 dataPlotters=[]
-
-
+category=options.output.split(".")[0].split("_")[-2]+"_"+options.output.split(".")[0].split("_")[-1]
+print " cat ",category
 
 
 
 print "args[0] "+str(args[0])
-year=str(args[0]).split("/")[-2]
+try: year=str(args[0]).split("/")[-2]
+except: year=options.output.split("_")[1]
 print "year ",year
 print "now working with cuts "
 ctx = cuts.cuts("init_VV_VH.json",year,"dijetbins_random")
 print "lumi for year "+year+" = ",ctx.lumi[year]
 luminosity = int(ctx.lumi[year])
 if options.output.find("Run2") ==-1: luminosity = 1
-print "lumi for year "+year+" = ",ctx.lumi[year]
-luminosity = int(ctx.lumi[year])
 
 
 for filename in os.listdir(args[0]):
@@ -81,13 +80,21 @@ for filename in os.listdir(args[0]):
                 if options.triggerW:
                     print "Using triggerweights! Are you sure?"
                     dataPlotters[-1].addCorrectionFactor('triggerWeight','tree')	
-            corrFactors = options.factors.split(',')
-	    for c in corrFactors:
-	     if len(c.split(':')) < 2: continue
-	     if c.split(':')[0] in fname:
-	      print "Add correction factor:",fname,c.split(':')[1]
-	      dataPlotters[-1].addCorrectionFactor(float(c.split(':')[1]),'flat')
+            if fname.find("Jets") !=-1:
+                print "applying tagging SF"
+                taggerSF={'VV_HPLP':{year:ctx.HPSF_vtag[year]*ctx.LPSF_vtag.get(year,0) for year in ctx.LPSF_vtag.keys()},'VH_HPHP':{year:ctx.HPSF_htag[year]*ctx.HPSF_vtag.get(year,0) for year in ctx.HPSF_vtag.keys()},'VH_HPLP':{year:ctx.HPSF_htag[year]*ctx.LPSF_vtag.get(year,0) for year in ctx.LPSF_vtag.keys()},'VH_LPHP':{year:ctx.HPSF_vtag[year]*ctx.LPSF_htag.get(year,0) for year in ctx.LPSF_htag.keys()},'VH_LPLP':{year:ctx.LPSF_htag[year]*ctx.LPSF_vtag.get(year,0) for year in ctx.LPSF_vtag.keys()},'VV_HPHP':{year:ctx.HPSF_vtag[year]*ctx.HPSF_vtag.get(year,0) for year in ctx.HPSF_vtag.keys() }}
 
+                SF = taggerSF[category][year]
+                print "SF ",SF
+                dataPlotters[-1].addCorrectionFactor(SF,'flat')
+                '''
+                corrFactors = options.factors.split(',')
+                for c in corrFactors:
+                    if len(c.split(':')) < 2: continue
+                    if c.split(':')[0] in fname:
+                        print "Add correction factor:",fname,c.split(':')[1]
+                        dataPlotters[-1].addCorrectionFactor(float(c.split(':')[1]),'flat')
+                '''
 
 
         
