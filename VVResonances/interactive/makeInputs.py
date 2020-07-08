@@ -9,7 +9,7 @@ import cuts
 # python makeInputs.py -p 2016 --run "signorm" --signal "ZprimeWW" --batch False 
 # python makeInputs.py -p 2016 --run "tt" --batch False 
 # python makeInputs.py -p 2016 --run "vjets" --batch False   
-#python makeInputs.py -p "2016,2017,2018"  --run "vjets"
+# python makeInputs.py -p "2016,2017,2018"  --run "vjets"
 # python makeInputs.py -p 2016 --run "qcdtemplates"
 # python makeInputs.py -p 2016 --run "qcdkernel"
 # python makeInputs.py -p "2016,2017,2018" --run "qcdkernel"  --single True
@@ -106,10 +106,12 @@ dataTemplate="JetHT"
 nonResTemplate="QCD_Pt_" #high stat pythia8
 
 #commentin TT for the moment, will need better shaping                                                                                                                                                                                       
-if(period == 2016):                                                                                                                                                                                                                         
-    TTemplate= "TT_Mtt-700to1000,TT_Mtt-1000toInf" #do we need a separate fit for ttbar?                                                                                                                                                    
+if(period == "2016"):                                                                                                                                                                                                                        
+    TTemplate= "TT_Mtt-700to1000,TT_Mtt-1000toInf" 
+elif (filePeriod == "Run2"):
+    TTemplate= "TT_Mtt-700to1000,TT_Mtt-1000toInf,TTToHadronic"
 else:                                                                                                                                                                                                                                       
-    TTemplate= "TTToHadronic" #do we need a separate fit for ttbar?                                                                                                                                                                         
+    TTemplate= "TTToHadronic" 
 #WresTemplate= "WJetsToQQ_HT400to600,WJetsToQQ_HT600to800,WJetsToQQ_HT800toInf,"+str(TTemplate)                                                                                                                                              
 WresTemplate= "WJetsToQQ_HT400to600,WJetsToQQ_HT600to800,WJetsToQQ_HT800toInf"
 ZresTemplate= "ZJetsToQQ_HT400to600,ZJetsToQQ_HT600to800,ZJetsToQQ_HT800toInf"
@@ -247,9 +249,11 @@ if options.run.find("all")!=-1 or options.run.find("vjets")!=-1:
 
 
 if options.run.find("all")!=-1 or options.run.find("tt")!=-1:
-    f.fitTT   ("JJ_%s_TTJets"%(period),TTemplate,1.,)
-    # f.makeBackgroundShapesMVVKernel("TTJets","JJ_"+filePeriod,TTemplate,cuts['nonres'],"1D",0,1.,1.)
-    # f.makeNormalizations("TTJets","JJ_"+filePeriod,TTemplate,0,cuts['nonres'],"nRes","")
+    f.fitTT   ("JJ_%s_TTJets"%(filePeriod),TTemplate,1.,)
+    wait=False
+    if options.batch == True : wait=True
+    f.makeBackgroundShapesMVVKernel("TTJets","JJ_"+filePeriod,TTemplate,ctx.cuts['nonres'],"1D",wait,1.,1.)
+    f.makeNormalizations("TTJets","JJ_"+filePeriod,TTemplate,0,ctx.cuts['nonres'],"nRes",options.single,"1")
   
 if options.run.find("all")!=-1 or options.run.find("data")!=-1:
     print " Do data "
