@@ -242,9 +242,9 @@ if options.run.find("all")!=-1 or options.run.find("vjets")!=-1:
     print "then kernel Z"
     f.makeBackgroundShapesMVVKernel("ZJets","JJ_"+filePeriod,ZresTemplate,ctx.cuts['nonres'],"1D",wait,1.,1.)
     print "then norm W"
-    f.makeNormalizations("WJets","JJ_"+filePeriod,WresTemplate,0,ctx.cuts['nonres'],"nRes",options.single,"1") #,HPSF_vtag,LPSF_vtag)
+    f.makeNormalizations("WJets","JJ_"+filePeriod,WresTemplate,0,ctx.cuts['nonres'],"nResVJets",options.single,"1") #,HPSF_vtag,LPSF_vtag)
     print "then norm Z"
-    f.makeNormalizations("ZJets","JJ_"+filePeriod,ZresTemplate,0,ctx.cuts['nonres'],"nRes",options.single,"1")
+    f.makeNormalizations("ZJets","JJ_"+filePeriod,ZresTemplate,0,ctx.cuts['nonres'],"nResVJets",options.single,"1")
 
 
 
@@ -253,7 +253,7 @@ if options.run.find("all")!=-1 or options.run.find("tt")!=-1:
     wait=False
     if options.batch == True : wait=True
     f.makeBackgroundShapesMVVKernel("TTJets","JJ_"+filePeriod,TTemplate,ctx.cuts['nonres'],"1D",wait,1.,1.)
-    f.makeNormalizations("TTJets","JJ_"+filePeriod,TTemplate,0,ctx.cuts['nonres'],"nRes",options.single,"1")
+    f.makeNormalizations("TTJets","JJ_"+filePeriod,TTemplate,0,ctx.cuts['nonres'],"nResTT",options.single,"1")
   
 if options.run.find("all")!=-1 or options.run.find("data")!=-1:
     print " Do data "
