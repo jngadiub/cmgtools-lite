@@ -12,6 +12,9 @@ ROOT.gROOT.SetBatch(True)
 ROOT.gStyle.SetOptStat(0)
 from time import sleep
 from  CMGTools.VVResonances.plotting.CMS_lumi import *
+sys.path.insert(0, "../interactive/")
+import cuts
+
 parser = optparse.OptionParser()
 parser.add_option("-s","--sample",dest="sample",default='',help="Type of sample")
 parser.add_option("-c","--cut",dest="cut",help="Cut to apply for shape",default='')
@@ -165,46 +168,61 @@ def getMean(h2,binL,binH):
 def getFileList():
   samples={}
   samplenames = options.sample.split(",")
-  for filename in os.listdir(args[0]):
-    if filename.find("root") ==-1:
-      continue
-    for samplename in samplenames:
-      if not (filename.find(samplename)!=-1):
+  folders = str(args[0]).split(",")
+  print "folders ",folders
+
+  for folder in folders:
+    samples[folder] = []
+
+    for filename in os.listdir(folder):
+      if filename.find("root") ==-1:
         continue
-      fnameParts=filename.split('.')
-      try:
-        fname=filename.split('.')[0]
-        samples[fname] = fname
-        print 'Fitting ttbar using file(s) ',filename
-      except AssertionError as error:
+      for samplename in samplenames:
+        if not (filename.find(samplename)!=-1):
+          continue
+        fnameParts=filename.split('.')
+        try:
+          fname=filename.split('.')[0]
+          samples[folder].append(folder+fname)
+          print 'Fitting ttbar using file(s) ',folder+fname
+        except AssertionError as error:
           print(error)
           print('Root files does not have proper . separator')
   if len(samples) == 0:
     raise Exception('No input files found for samplename(s) {}'.format(options.sample))
+  print "samples ",samples
   return samples
 
 def getPlotters(samples_in):
   plotters_ = []
-  for name in samples_in.keys():
-    plotters_.append(TreePlotter(args[0]+'/'+samples[name]+'.root','AnalysisTree'))
-    plotters_[-1].setupFromFile(args[0]+'/'+samples[name]+'.pck')
-    plotters_[-1].addCorrectionFactor('xsec','tree')
-    plotters_[-1].addCorrectionFactor('genWeight','tree')
-    plotters_[-1].addCorrectionFactor('puWeight','tree')
-    if options.triggerW: 
-      plotters_[-1].addCorrectionFactor('triggerWeight','tree')	
-    plotters_[-1].addCorrectionFactor(options.corrFactor,'flat')
+  for folder in samples_in.keys():
+    for name in samples_in[folder]:
+      print " samples name ",name
+      year=name.split("/")[-2]
+      print "year ",year
+      ctx = cuts.cuts("init_VV_VH.json",year,"dijetbins_random")
+      lumi = ctx.lumi[year]
+      print "lumi ",lumi
+      plotters_.append(TreePlotter(name+'.root','AnalysisTree'))
+      plotters_[-1].setupFromFile(name+'.pck')
+      plotters_[-1].addCorrectionFactor('xsec','tree')
+      plotters_[-1].addCorrectionFactor('genWeight','tree')
+      plotters_[-1].addCorrectionFactor('puWeight','tree')
+      plotters_[-1].addCorrectionFactor(lumi,'flat')
+      if options.triggerW: 
+        plotters_[-1].addCorrectionFactor('triggerWeight','tree')	
+      plotters_[-1].addCorrectionFactor(options.corrFactor,'flat')
   return plotters_
   
-def get2DHist(plts, lumi_):
+def get2DHist(plts):
   mergedPlotter = MergedPlotter(plts)
   histo2D_l1 = mergedPlotter.drawTH2("jj_l1_softDrop_mass:jj_LV_mass",options.cut,"1",80,options.minMVV,options.maxMVV,80,options.mini,options.maxi) #y:x
   histo2D_l2 = mergedPlotter.drawTH2("jj_l2_softDrop_mass:jj_LV_mass",options.cut,"1",80,options.minMVV,options.maxMVV,80,options.mini,options.maxi)  
   histo2D    = copy.deepcopy(histo2D_l1)
   histo2D.Add(histo2D_l2)
-  histo2D.Scale(float(lumi_))
-  histo2D_l1.Scale(float(lumi_))
-  histo2D_l2.Scale(float(lumi_))
+  #histo2D.Scale(float(lumi_))
+  #histo2D_l1.Scale(float(lumi_))
+  #histo2D_l2.Scale(float(lumi_))
   c, pt = getCanvasPaper('2D')
   histo2D.Draw("COLZ")
   addInfo = getPaveText(x1=0.71,y1=0.15,x2=0.81,y2=0.35)
@@ -376,11 +394,10 @@ if __name__ == "__main__":
   
   graphs={'mean1':ROOT.TGraphErrors(),'sigma1':ROOT.TGraphErrors(),'mean2':ROOT.TGraphErrors(),'sigma2':ROOT.TGraphErrors(),'f_g1':ROOT.TGraphErrors(),'f_res':ROOT.TGraphErrors(),
             'c_0':ROOT.TGraphErrors(),'c_1':ROOT.TGraphErrors(),'c_2':ROOT.TGraphErrors()}
-  
-  lumi = args[1]
+
   samples = getFileList()
   plotters = getPlotters(samples)
-  h2D_l1,h2D_l2,h2D = get2DHist(plotters,lumi)
+  h2D_l1,h2D_l2,h2D = get2DHist(plotters) 
   tmpfile = ROOT.TFile("testTT.root","RECREATE")
   
   coarse_bins_low  = [1,3,5,7,7,7]
