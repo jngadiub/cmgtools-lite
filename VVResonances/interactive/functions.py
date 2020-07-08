@@ -294,7 +294,7 @@ class AllFunctions():
      directory= ""
      for s in folders:
       if filename.find("Run2")!=-1:
-       if s.find("2016")!=-1: continue #we do not have Wjets and Zjets sample for 2016, so it is useless to run twice on the same files when running on full Run2
+       if s.find("2016")!=-1: continue #we do not have Wjets and Zjets sample for 2016, so it is useless to run twice on the same files when running on full Run2, 2017 is rescaled by 2016+2017 lumi
       directory+=pwd +"/"+s
       if s != folders[-1]: directory+=","
       print "Using files in" , directory
@@ -309,16 +309,23 @@ class AllFunctions():
 
  def fitTT(self,filename,template,xsec=1):
    for c in self.categories:
-     print("\r"+"Fitting ttbar in category %s" %c)
+     print("\r"+"Fitting ttbar in category %s for template %s" %(c,template))
      if 'VBF' in c: 
        cut='*'.join([self.cuts['common_VBF'],self.cuts[c.replace('VBF_','')],self.cuts['acceptance']])
      else: 
        cut='*'.join([self.cuts['common_VV'],self.cuts[c],self.cuts['acceptance']])
      outname=filename+"_"+c
      pwd = os.getcwd()
-     directory=pwd+"/"+self.samples
+     folders=[]
+     folders= self.samples.split(',')
+     directory= ""
+     for s in folders:
+      directory+=pwd +"/"+s
+      if s != folders[-1]: directory+=","
+     print "Using files in" , directory
+
      fixPars="1" 
-     cmd='vvMakeTTShapes.py -s "{template}" -c "{cut}"  -o "{outname}" -m {minMJ} -M {maxMJ} --store "{filename}_{purity}.py" --minMVV {minMVV} --maxMVV {maxMVV} {addOption} --corrFactor {xsec} {samples} {lumi}'.format(template=template,cut=cut,outname=outname,minMJ=self.minMJ,maxMJ=self.maxMJ,filename=filename,purity=c,minMVV=self.minMVV,maxMVV=self.maxMVV,addOption="",xsec=xsec, samples=directory,lumi=self.lumi)
+     cmd='vvMakeTTShapes.py -s "{template}" -c "{cut}"  -o "{outname}" -m {minMJ} -M {maxMJ} --store "{filename}_{purity}.py" --minMVV {minMVV} --maxMVV {maxMVV} {addOption} --corrFactor {xsec} {samples}'.format(template=template,cut=cut,outname=outname,minMJ=self.minMJ,maxMJ=self.maxMJ,filename=filename,purity=c,minMVV=self.minMVV,maxMVV=self.maxMVV,addOption="",xsec=xsec, samples=directory)
      cmd+=self.HCALbinsMVV
      os.system(cmd)
      
