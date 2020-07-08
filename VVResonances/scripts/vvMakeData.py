@@ -40,7 +40,7 @@ def getBinning(binsMVV):
 sampleTypes=options.samples.split(',')
 
 dataPlotters=[]
-category=options.output.split(".")[0].split("_")[-2]+"_"+options.output.split(".")[0].split("_")[-1]
+category=options.output.split("/")[-1].split(".")[0].split("_")[3]+"_"+options.output.split("/")[-1].split(".")[0].split("_")[4]
 print " cat ",category
 
 
