@@ -344,7 +344,7 @@ class AllFunctions():
                     for job in line.split("[")[1].split("]")[0].split(","):
                         files.append(job.replace("'","").replace(" ",""))
         from modules.submitJobs import merge1DMVVTemplate
-        merge1DMVVTemplate(jobList,files,"1D"+"_"+period+"_"+c,c,self.binsMVV,self.minMVV,self.maxMVV,self.HCALbinsMVV,name,filename,self.samples)
+        merge1DMVVTemplate(jobList,files,"1D"+"_"+period+"_"+c,c,self.binsMVV,self.minMVV,self.maxMVV,self.HCALbinsMVV,name,filename) #,self.samples)
       
         jobList = []
         files   = []
