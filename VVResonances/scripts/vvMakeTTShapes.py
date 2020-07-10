@@ -235,7 +235,7 @@ def get2DHist(plts):
   return histo2D_l1,histo2D_l2,histo2D
 
 def doFit(th1_projY,mjj_mean,mjj_error,N):
-  
+
   fitter=Fitter(['x'])
   fitter.erfexp2Gaus('model','x')
   projY.Rebin(2)
