@@ -339,7 +339,7 @@ finalHistograms={}
 if (options.output).find("Jets")!=-1:
     histograms[0].Add(histograms[1])
     histograms[0].Add(histograms[2])
-    
+
     histograms[3].Add(histograms[4])
     histograms[3].Add(histograms[5])
     print "add all the histograms "

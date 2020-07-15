@@ -213,7 +213,7 @@ class myTree:
 if __name__=='__main__':
     outfile = ROOT.TFile('migrationunc/'+options.signal+'_'+options.year+'.root','RECREATE')
     if options.directory.find(options.year)== -1: print 'ATTENTION: are you sure you are using the right directory for '+options.year+' data?'    
-    ctx  = cuts.cuts("init_VV_VH.json",int(options.year),"random_dijetbins")
+    ctx  = cuts.cuts("init_VV_VH.json",options.year,"random_dijetbins")
     samplelist= getSamplelist(options.directory,options.signal)
     for sample in samplelist:
         print sample
