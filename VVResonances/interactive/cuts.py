@@ -194,7 +194,7 @@ class cuts():
                self.WPLPl2Wtag = data["tagging_variables_and_wp"]["l2Wtag"+run2tag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Wtag"+run2tag])
                self.WPHPl2Htag = data["tagging_variables_and_wp"]["l2Htag"+run2tag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Htag"+run2tag])
                self.WPLPl2Htag = data["tagging_variables_and_wp"]["l2Htag"+run2tag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Htag"+run2tag])
-
+               self.vtag_pt_dependence["Run2"] = data["vtag_pt_dependence"+run2tag]
             #print " lumi ",self.lumi
 
 
@@ -219,7 +219,7 @@ class cuts():
                     if b > self.maxMVV: continue
                     if b < self.minMVV: continue
                     dijetbins.append(b)
-                
+
                 self.HCALbinsMVV = " --binsMVV " 
                 self.HCALbinsMVV += ','.join(str(e) for e in dijetbins)
 
@@ -232,7 +232,7 @@ class cuts():
                     if b > self.maxMX: continue
                     if b < self.minMX: continue
                     dijetbins.append(b)
-                
+
                 self.HCALbinsMVVSignal = " --binsMVV "
                 self.HCALbinsMVVSignal += ','.join(str(e) for e in dijetbins)
             else:
