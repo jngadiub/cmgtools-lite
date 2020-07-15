@@ -458,8 +458,10 @@ def getJobs(files,jobList,outdir,purity):
 	exit_flag = False
         
 	for s in files:
+         y = s.split("/")[-2] 
          s = s.split("/")[-1]
 	 s = s.replace('.root','')
+         s = y+"_"+s
 	 filelist = []
 	 for t in jobList:
 	  if t.find(s) == -1: 
@@ -763,7 +765,7 @@ def merge1DMVVTemplate(jobList,files,jobname,purity,binsMVV,minMVV,maxMVV,HCALbi
         jobdir = 'tmp'+jobname
 
         resubmit, jobsPerSample,exit_flag = getJobs(files,jobList,outdir,purity)
-	
+
         if exit_flag:
             submit = raw_input("The following files are missing: %s. Do you  want to resubmit the jobs to the batch system before merging? [y/n] "%resubmit)
             if submit == 'y' or submit=='Y':
@@ -903,21 +905,22 @@ def merge1DMVVTemplate(jobList,files,jobname,purity,binsMVV,minMVV,maxMVV,HCALbi
             doPythia = True
             
         if len(dijet_files) > 0:
-            cmd = 'hadd -f %s_%s_MVV_%s_NLO.root '%(filename,name,purity)
+            
+            cmd = 'hadd -f %s_%s_MVV_%s.root '%(filename,name,purity)
             for f in dijet_files:
                 cmd += f
                 cmd += ' '
             print cmd
             os.system(cmd)
 		
-            fhadd_dijet = ROOT.TFile.Open('%s_%s_MVV_%s_NLO.root'%(filename,name,purity),'READ')
+            fhadd_dijet = ROOT.TFile.Open('%s_%s_MVV_%s.root'%(filename,name,purity),'READ')
             mvv_NLO = fhadd_dijet.Get('mvv_nominal')
-            mvv_NLO.SetName('mvv_NLO')
-            mvv_NLO.SetTitle('mvv_NLO')
+            mvv_NLO.SetName('mvv_nominal')
+            mvv_NLO.SetTitle('mvv_nominal')
             histo_NLO = fhadd_dijet.Get('histo_nominal')
-            histo_NLO.SetName('histo_NLO')
-            histo_NLO.SetTitle('histo_NLO')
-            
+            histo_NLO.SetName('histo_nominal')
+            histo_NLO.SetTitle('histo_nominal')
+
             doDijet = True
 		
         outf = ROOT.TFile.Open('%s_%s_MVV_%s.root'%(filename,name,purity),'RECREATE') 
@@ -1012,8 +1015,32 @@ def merge1DMVVTemplate(jobList,files,jobname,purity,binsMVV,minMVV,maxMVV,HCALbi
                 histogram_altshape2Down.Write('histo_altshape2Down')
                 
         if doDijet:
-            mvv_NLO.Write('mvv_NLO')
-            histo_NLO.Write('histo_NLO')
+            print "doing VJETS!!"
+            mvv_NLO.Write('mvv_nominal')
+            histo_NLO.Write('histo_nominal')
+
+
+            print "Now pT"
+            alpha=1.5/float(maxMVV)
+            histogram_pt_up,histogram_pt_down=unequalScale(histo_NLO,"histo_nominal_PT",alpha)
+            histogram_pt_down.SetName('histo_nominal_PTDown')
+            histogram_pt_down.SetTitle('histo_nominal_PTDown')
+            histogram_pt_down.Write('histo_nominal_PTDown')
+            histogram_pt_up.SetName('histo_nominal_PTUp')
+            histogram_pt_up.SetTitle('histo_nominal_PTUp')
+            histogram_pt_up.Write('histo_nominal_PTUp')
+
+            print "Now OPT"
+            alpha=1.5*float(minMVV)
+            histogram_opt_up,histogram_opt_down=unequalScale(histo_NLO,"histo_nominal_OPT",alpha,-1)
+            histogram_opt_down.SetName('histo_nominal_OPTDown')
+            histogram_opt_down.SetTitle('histo_nominal_OPTDown')
+            histogram_opt_down.Write('histo_nominal_OPTDown')
+            histogram_opt_up.SetName('histo_nominal_OPTUp')
+            histogram_opt_up.SetTitle('histo_nominal_OPTUp')
+            histogram_opt_up.Write('histo_nominal_OPTUp')
+
+
             if doPythia:
                 histogram_NLODown=mirror(histo_NLO,histo_nominal,"histo_NLODown")
                 histogram_NLODown.SetName('histo_NLODown')
@@ -1585,6 +1612,7 @@ def mergeData(jobList, files,jobname,purity,rootFile,filename,name,year=""):
     pythia_files = []
     herwig_files = []
     data_files   = []
+    vjets_files  = []
 
     for f in filelist:
      if year == "":
@@ -1597,6 +1625,7 @@ def mergeData(jobList, files,jobname,purity,rootFile,filename,name,year=""):
          if f.find('QCD_HT')    != -1: mg_files.append('./res'+jobname+'/'+f)
          elif f.find('QCD_Pt_') != -1: pythia_files.append('./res'+jobname+'/'+f)
          elif f.find('JetHT')   != -1: data_files.append('./res'+jobname+'/'+f)
+         elif f.find('Jets')   != -1: vjets_files.append('./res'+jobname+'/'+f)
          else: herwig_files.append('./res'+jobname+'/'+f)
      else: 
          filename = filename.replace("Run2",year)
@@ -1608,6 +1637,7 @@ def mergeData(jobList, files,jobname,purity,rootFile,filename,name,year=""):
               if f.find('QCD_HT')    != -1: mg_files.append('./res'+jobname+'/'+f)
               elif f.find('QCD_Pt_') != -1: pythia_files.append('./res'+jobname+'/'+f)
               elif f.find('JetHT')   != -1: data_files.append('./res'+jobname+'/'+f)
+              elif f.find('Jets')   != -1: vjets_files.append('./res'+jobname+'/'+f)
               else: herwig_files.append('./res'+jobname+'/'+f)
     
     print "filename ",filename
@@ -1636,6 +1666,16 @@ def mergeData(jobList, files,jobname,purity,rootFile,filename,name,year=""):
          cmd += ' '
         print cmd
         os.system(cmd)
+
+
+    if len(vjets_files) > 0:
+        cmd = 'hadd -f %s '%rootFile
+        for f in vjets_files:
+         cmd += f
+         cmd += ' '
+        print cmd
+        os.system(cmd)
+
     
     if len(data_files) > 0:
         cmd = 'hadd -f JJ_%s.root '%purity
@@ -1670,23 +1710,28 @@ def getListOfBinsLowEdge(hist,dim):
     return r
 
 def makePseudoData(input="JJ_nonRes_LPLP.root",kernel="JJ_nonRes_3D_LPLP.root",mc="pythia",output="JJ_LPLP.root",lumi=35900):
-
+ print " makind pseudodata with lumi ",lumi 
  pwd = os.getcwd()
  
  ROOT.gRandom.SetSeed(0)
  
  finmc = ROOT.TFile.Open(pwd+'/'+input,'READ')
  hmcin = finmc.Get('nonRes')
+ print " mc file = ",pwd+'/'+input
+ print " mc events ", hmcin.GetEntries() , " and integral ", hmcin.Integral()
 
  findata = ROOT.TFile.Open(pwd+'/'+kernel,'READ')
  #findata.ls()
  hdata = ROOT.TH3F()
+ print " data/kernel file ",pwd+'/'+kernel
  
  if   mc == 'pythia': hdata = findata.Get('histo')
  elif mc == 'herwig': hdata = findata.Get('histo_altshapeUp')
  elif mc == 'madgraph': hdata = findata.Get('histo_altshape2')
  elif mc == 'powheg': hdata = findata.Get('histo_NLO')
  
+ print "  events ", hdata.GetEntries() , " and integral ", hdata.Integral()
+
  fout = ROOT.TFile.Open(output,'RECREATE')
  #hmcin.Scale(10.)
  hmcin.Write('nonRes')
@@ -1857,7 +1902,7 @@ def mergeCPs(template,jobname="CPs"):
     os.system(cmd)
 
 def makePseudoDataVjets(input,kernel,mc,output,lumi,workspace,year,purity):
- 
+ print " year ",year, " lumi ",lumi
  pwd = os.getcwd()
  pwd = "/"
  ROOT.gRandom.SetSeed(0)
@@ -1880,28 +1925,32 @@ def makePseudoDataVjets(input,kernel,mc,output,lumi,workspace,year,purity):
  xbins = array("f",getListOfBinsLowEdge(hmcin,"x"))
  zbins = array("f",getListOfBinsLowEdge(hmcin,"z"))
  hout = ROOT.TH3F('data','data',len(xbins)-1,xbins,len(xbins)-1,xbins,len(zbins)-1,zbins)
- 
- hout.FillRandom(hdata,int(hmcin.Integral()*lumi))
+ print " hmcin Integral ",hmcin.Integral(), " Entries ",hmcin.GetEntries()
+ nEventsQCD = int(hmcin.Integral()*lumi)
+ if year == "Run2": nEventsQCD = int(hmcin.Integral())
+ print "Expected QCD events: ",nEventsQCD
+ hout.FillRandom(hdata,nEventsQCD)
  
  ws_file = ROOT.TFile.Open(workspace,'READ')
  ws = ws_file.Get('w')
  ws_file.Close()
  ws.Print()
 
- modelWjets = ws.pdf('shapeBkg_Wjets_JJ_%s_13TeV_%i'%(purity,year))
- modelZjets = ws.pdf('shapeBkg_Zjets_JJ_%s_13TeV_%i'%(purity,year))
- category = ws.obj("CMS_channel==CMS_channel::JJ_"+purity+"_13TeV_%i"%year)
+ modelWjets = ws.pdf('shapeBkg_Wjets_JJ_%s_13TeV_%s'%(purity,year))
+ modelZjets = ws.pdf('shapeBkg_Zjets_JJ_%s_13TeV_%s'%(purity,year))
+ category = ws.obj("CMS_channel==CMS_channel::JJ_"+purity+"_13TeV_%s"%year)
 
  MJ1= ws.var("MJ1");
  MJ2= ws.var("MJ2");
  MJJ= ws.var("MJJ");
  args = ROOT.RooArgSet(MJ1,MJ2,MJJ)
  ### Wjets
- print "n_exp_binJJ_"+purity+"_13TeV_%i_proc_Wjets"%year
- o_norm_wjets = ws.obj("n_exp_binJJ_"+purity+"_13TeV_%i_proc_Wjets"%year)
+ print "n_exp_binJJ_"+purity+"_13TeV_%s_proc_Wjets"%year
+ o_norm_wjets = ws.obj("n_exp_binJJ_"+purity+"_13TeV_%s_proc_Wjets"%year)
  hout_wjets = ROOT.TH3F('wjets','wjets',len(xbins)-1,xbins,len(xbins)-1,xbins,len(zbins)-1,zbins)
  
  nEventsW = o_norm_wjets.getVal()
+ if year == "Run2": nEventsW=nEventsW/lumi
  print "Expected W+jets events: ",nEventsW
  wjets = modelWjets.generate(args,int(nEventsW))
  if wjets!=None:
@@ -1920,11 +1969,12 @@ def makePseudoDataVjets(input,kernel,mc,output,lumi,workspace,year,purity):
  hout.Add(hout_wjets)
 
  ### Zjets
- print "n_exp_binJJ_"+purity+"_13TeV_%i_proc_Zjets"%year
- o_norm_zjets = ws.obj("n_exp_binJJ_"+purity+"_13TeV_%i_proc_Zjets"%year)
+ print "n_exp_binJJ_"+purity+"_13TeV_%s_proc_Zjets"%year
+ o_norm_zjets = ws.obj("n_exp_binJJ_"+purity+"_13TeV_%s_proc_Zjets"%year)
  hout_zjets = ROOT.TH3F('zjets','zjets',len(xbins)-1,xbins,len(xbins)-1,xbins,len(zbins)-1,zbins)
  
  nEventsZ = o_norm_zjets.getVal()
+ if year == "Run2": nEventsZ=nEventsZ/lumi
  print "Expected Z+jets events: ",nEventsZ
  zjets = modelZjets.generate(args,int(nEventsZ))
  if zjets!=None:
@@ -1955,7 +2005,7 @@ def makePseudoDataVjets(input,kernel,mc,output,lumi,workspace,year,purity):
  print "purity   ", purity
  print "Expected W+jets events: ",nEventsW
  print "Expected Z+jets events: ",nEventsZ
- print "Expected QCD events: ",int(hmcin.Integral()*lumi)
+ print "Expected QCD events: ",nEventsQCD
  print "Writing histograms nonRes and data to file ", output
 
  finmc.Close()
