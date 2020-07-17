@@ -62,8 +62,8 @@ class cuts():
     WPHPl2Wtag = ""
     WPLPl2Wtag = ""
     
-    WPHPl2Htag = {}
-    WPLPl2Htag = {}
+    WPHPl2Htag = ""
+    WPLPl2Htag = ""
     
     
       
@@ -113,8 +113,27 @@ class cuts():
                 years.append(period)
                 run2=False
 
-            print "years ", years
-            print "run2 ",run2
+            self.yeartag="161718"
+            if(run2==True):
+                print " taggers initialization is the one of run2 ",self.yeartag
+                self.WPHPl1Wtag = data["tagging_variables_and_wp"]["l1Wtag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Wtag"+self.yeartag])
+                self.WPLPl1Wtag = data["tagging_variables_and_wp"]["l1Wtag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Wtag"+self.yeartag])
+                self.WPHPl1Htag = data["tagging_variables_and_wp"]["l1Htag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Htag"+self.yeartag])
+                self.WPLPl1Htag = data["tagging_variables_and_wp"]["l1Htag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Htag"+self.yeartag])
+                    
+                self.WPHPl2Wtag = data["tagging_variables_and_wp"]["l2Wtag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Wtag"+self.yeartag])
+                self.WPLPl2Wtag = data["tagging_variables_and_wp"]["l2Wtag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Wtag"+self.yeartag])
+                self.WPHPl2Htag = data["tagging_variables_and_wp"]["l2Htag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Htag"+self.yeartag])
+                self.WPLPl2Htag = data["tagging_variables_and_wp"]["l2Htag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Htag"+self.yeartag])
+                 
+
+
+
+            self.vtag_pt_dependence["Run2"] = data["vtag_pt_dependence"+self.yeartag]
+            self.lumi["Run2"] =  data["lumi"+self.yeartag]
+            self.lumi_unc["Run2"] = data["unc_lumi"+self.yeartag]
+            print " lumi run2 ",self.lumi["Run2"]  
+
             for year in years:
                 if year=="2016":
                     self.yeartag = "16"
@@ -168,24 +187,7 @@ class cuts():
                     self.WPLPl2Wtag = data["tagging_variables_and_wp"]["l2Wtag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Wtag"+self.yeartag])
                     self.WPHPl2Htag = data["tagging_variables_and_wp"]["l2Htag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Htag"+self.yeartag])
                     self.WPLPl2Htag = data["tagging_variables_and_wp"]["l2Htag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Htag"+self.yeartag])
-                
 
-                if(run2==True):
-                    run2tag="161718"
-                    print " taggers initialization is the one of run2 ",run2tag
-                    self.WPHPl1Wtag = data["tagging_variables_and_wp"]["l1Wtag"+run2tag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Wtag"+run2tag])
-                    self.WPLPl1Wtag = data["tagging_variables_and_wp"]["l1Wtag"+run2tag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Wtag"+run2tag])
-                    self.WPHPl1Htag = data["tagging_variables_and_wp"]["l1Htag"+run2tag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Htag"+run2tag])
-                    self.WPLPl1Htag = data["tagging_variables_and_wp"]["l1Htag"+run2tag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Htag"+run2tag])
-                    
-                    self.WPHPl2Wtag = data["tagging_variables_and_wp"]["l2Wtag"+run2tag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Wtag"+run2tag])
-                    self.WPLPl2Wtag = data["tagging_variables_and_wp"]["l2Wtag"+run2tag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Wtag"+run2tag])
-                    self.WPHPl2Htag = data["tagging_variables_and_wp"]["l2Htag"+run2tag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Htag"+run2tag])
-                    self.WPLPl2Htag = data["tagging_variables_and_wp"]["l2Htag"+run2tag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Htag"+run2tag])
-                    self.vtag_pt_dependence["Run2"] = data["vtag_pt_dependence"+run2tag]
-                    self.lumi["Run2"] =  data["lumi"+run2tag]
-                    self.lumi_unc["Run2"] = data["unc_lumi"+run2tag]
-                    
 
                 self.catVtag['HP1'] =  '('+ self.varl1Wtag +'>'+ self.WPHPl1Wtag +')'
                 self.catVtag['HP2'] =  '('+ self.varl2Wtag +'>'+ self.WPHPl2Wtag +')'
@@ -201,11 +203,6 @@ class cuts():
                 self.catHtag['LP2'] = '(('+ self.varl2Htag +'<'+ self.WPHPl2Htag +')&&('+ self.varl2Htag +'>'+ self.WPLPl2Htag +'))'
                 self.catHtag['NP1'] =  '('+ self.varl1Htag +'<'+ self.WPLPl1Htag +')' 
                 self.catHtag['NP2'] =  '('+ self.varl2Htag +'<'+ self.WPLPl2Htag +')' 
-
-                #print "self.HPSF_vtag ",self.HPSF_vtag
-             
-
-
 
 
             print " tagging cuts ",self.WPHPl1Wtag
