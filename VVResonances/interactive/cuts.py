@@ -7,7 +7,7 @@ import ast
 class cuts():
     lumi = {}
     lumi_unc = {}
-    yeartag = "16"
+    yeartag = ""
     HPSF_vtag = {}                                
     LPSF_vtag = {}                                
     HPSF_htag = {}                                
@@ -53,14 +53,14 @@ class cuts():
 
 
 
-    WPHPl1Htag = {}
-    WPLPl1Htag = {}
+    WPHPl1Htag = ""
+    WPLPl1Htag = ""
     
-    varl2Wtag = {}
-    varl2Htag = {}
+    varl2Wtag = ""
+    varl2Htag = ""
     
-    WPHPl2Wtag = {}
-    WPLPl2Wtag = {}
+    WPHPl2Wtag = ""
+    WPLPl2Wtag = ""
     
     WPHPl2Htag = {}
     WPLPl2Htag = {}
@@ -104,23 +104,24 @@ class cuts():
             if widerMVV==True:
                 self.maxMVV = data["ranges_and_binning"]["widerMVV_maxMVV"]
                 self.maxGenMVV = data["ranges_and_binning"]["widerMVV_maxGenMVV"]
-            
-            if period.find(","):
+
+            years = []
+            if period.find(",")!=-1:
                 years = period.split(',')
                 run2=True
             else: 
-                years = period
+                years.append(period)
                 run2=False
 
+            print "years ", years
+            print "run2 ",run2
             for year in years:
-                ## load SF for the different years 
                 if year=="2016":
                     self.yeartag = "16"
                 elif year=="2017":
                     self.yeartag = "17"
                 elif year=="2018":
                     self.yeartag = "18"
-                    print " attention  lumi to be checked #to be checked! https://twiki.cern.ch/twiki/bin/view/CMS/PdmV2018Analysis"
                 else: print "no such data taking year -> running with default values on 2016 data"
            
          
@@ -129,28 +130,7 @@ class cuts():
                 self.W_tag_unc_LP[year] = data["W_tag_unc_LP"][str(year)]
                 self.H_tag_unc_HP[year] = data["H_tag_unc_HP"][str(year)]
                 self.H_tag_unc_LP[year] = data["H_tag_unc_LP"][str(year)]
-            
 
-                self.varl1Wtag = data["tagging_variables_and_wp"]["varl1Wtag"]
-                self.varl1Htag = data["tagging_variables_and_wp"]["varl1Htag"]
-                self.varl2Wtag = data["tagging_variables_and_wp"]["varl2Wtag"]
-                self.varl2Htag = data["tagging_variables_and_wp"]["varl2Htag"]
-
-                if(run2==False):
-                    self.WPHPl1Wtag = data["tagging_variables_and_wp"]["l1Wtag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Wtag"+self.yeartag])
-                    self.WPLPl1Wtag = data["tagging_variables_and_wp"]["l1Wtag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Wtag"+self.yeartag])
-                    self.WPHPl1Htag = data["tagging_variables_and_wp"]["l1Htag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Htag"+self.yeartag])
-                    self.WPLPl1Htag = data["tagging_variables_and_wp"]["l1Htag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Htag"+self.yeartag])
-   
-                    self.WPHPl2Wtag = data["tagging_variables_and_wp"]["l2Wtag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Wtag"+self.yeartag])
-                    self.WPLPl2Wtag = data["tagging_variables_and_wp"]["l2Wtag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Wtag"+self.yeartag])
-                    self.WPHPl2Htag = data["tagging_variables_and_wp"]["l2Htag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Htag"+self.yeartag])
-                    self.WPLPl2Htag = data["tagging_variables_and_wp"]["l2Htag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Htag"+self.yeartag])
-                
-                self.lumi[year] =  data["lumi"+self.yeartag]
-                print "self.lumi[year]  ",self.lumi[year] 
-                self.lumi_unc[year] = data["unc_lumi"+self.yeartag]
-            
                 self.W_LPmassscale[year] = data["W_HPmassscale"+self.yeartag]
                 self.W_HPmassscale[year] = data["W_LPmassscale"+self.yeartag]
                 
@@ -164,41 +144,71 @@ class cuts():
                 self.HPSF_htag[year] = data['htagHPSF'+self.yeartag]
                 self.LPSF_htag[year] = data['htagLPSF'+self.yeartag]
                 self.vtag_pt_dependence[year] = data["vtag_pt_dependence"+self.yeartag]
-                
-                self.catVtag['HP1'] = '('+data["tagging_variables_and_wp"]["varl1Wtag"]+'>'+ data["tagging_variables_and_wp"]["l1Wtag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Wtag"+self.yeartag])+')' 
-                self.catVtag['HP2'] = '('+data["tagging_variables_and_wp"]["varl2Wtag"]+'>'+ data["tagging_variables_and_wp"]["l2Wtag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Wtag"+self.yeartag])+')' 
-                self.catVtag['LP1'] = '(('+ data["tagging_variables_and_wp"]["varl1Wtag"]+'<'+ data["tagging_variables_and_wp"]["l1Wtag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Wtag"+self.yeartag]) +')&&('+ data["tagging_variables_and_wp"]["varl1Wtag"] +'>'+ data["tagging_variables_and_wp"]["l1Wtag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Wtag"+self.yeartag]) +'))' 
-                self.catVtag['LP2'] = '(('+ data["tagging_variables_and_wp"]["varl2Wtag"]+'<'+ data["tagging_variables_and_wp"]["l2Wtag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Wtag"+self.yeartag]) +')&&('+ data["tagging_variables_and_wp"]["varl2Wtag"] +'>'+ data["tagging_variables_and_wp"]["l2Wtag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Wtag"+self.yeartag]) +'))'
-                self.catVtag['NP1'] =  '('+data["tagging_variables_and_wp"]["varl1Wtag"] +'<' +data["tagging_variables_and_wp"]["l1Wtag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Wtag"+self.yeartag]) + ')' 
-                self.catVtag['NP2'] =  '('+data["tagging_variables_and_wp"]["varl2Wtag"] +'<' +data["tagging_variables_and_wp"]["l2Wtag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Wtag"+self.yeartag]) + ')' 
+
+                #    https://twiki.cern.ch/twiki/bin/viewauth/CMS/TWikiLUM
+                self.lumi[year] =  data["lumi"+self.yeartag]
+                print "self.lumi[year]  ",self.lumi[year] 
+                self.lumi_unc[year] = data["unc_lumi"+self.yeartag]
                 
             
-                self.catHtag['HP1'] = '('+data["tagging_variables_and_wp"]["varl1Htag"]+'>'+ data["tagging_variables_and_wp"]["l1Htag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Htag"+self.yeartag])+')' 
-                self.catHtag['HP2'] = '('+data["tagging_variables_and_wp"]["varl2Htag"]+'>'+ data["tagging_variables_and_wp"]["l2Htag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Htag"+self.yeartag])+')' 
-                self.catHtag['LP1'] = '(('+ data["tagging_variables_and_wp"]["varl1Htag"]+'<'+ data["tagging_variables_and_wp"]["l1Htag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Htag"+self.yeartag]) +')&&('+ data["tagging_variables_and_wp"]["varl1Htag"] +'>'+ data["tagging_variables_and_wp"]["l1Htag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Htag"+self.yeartag]) +'))' 
-                self.catHtag['LP2'] = '(('+ data["tagging_variables_and_wp"]["varl2Htag"]+'<'+ data["tagging_variables_and_wp"]["l2Htag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Htag"+self.yeartag]) +')&&('+ data["tagging_variables_and_wp"]["varl2Htag"] +'>'+ data["tagging_variables_and_wp"]["l2Htag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Htag"+self.yeartag]) +'))'
-                self.catHtag['NP1'] =  '('+data["tagging_variables_and_wp"]["varl1Htag"] +'<' +data["tagging_variables_and_wp"]["l1Htag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Htag"+self.yeartag]) + ')' 
-                self.catHtag['NP2'] =  '('+data["tagging_variables_and_wp"]["varl2Htag"] +'<' +data["tagging_variables_and_wp"]["l2Htag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Htag"+self.yeartag]) + ')' 
 
-            #print "self.HPSF_vtag ",self.HPSF_vtag
+                self.varl1Wtag = data["tagging_variables_and_wp"]["varl1Wtag"]
+                self.varl1Htag = data["tagging_variables_and_wp"]["varl1Htag"]
+                self.varl2Wtag = data["tagging_variables_and_wp"]["varl2Wtag"]
+                self.varl2Htag = data["tagging_variables_and_wp"]["varl2Htag"]
+
+                if(run2==False):
+                    print " taggers initialization is the one of this year ",self.yeartag
+                    self.WPHPl1Wtag = data["tagging_variables_and_wp"]["l1Wtag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Wtag"+self.yeartag])
+                    self.WPLPl1Wtag = data["tagging_variables_and_wp"]["l1Wtag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Wtag"+self.yeartag])
+                    self.WPHPl1Htag = data["tagging_variables_and_wp"]["l1Htag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Htag"+self.yeartag])
+                    self.WPLPl1Htag = data["tagging_variables_and_wp"]["l1Htag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Htag"+self.yeartag])
+   
+                    self.WPHPl2Wtag = data["tagging_variables_and_wp"]["l2Wtag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Wtag"+self.yeartag])
+                    self.WPLPl2Wtag = data["tagging_variables_and_wp"]["l2Wtag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Wtag"+self.yeartag])
+                    self.WPHPl2Htag = data["tagging_variables_and_wp"]["l2Htag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Htag"+self.yeartag])
+                    self.WPLPl2Htag = data["tagging_variables_and_wp"]["l2Htag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Htag"+self.yeartag])
+                
+
+                if(run2==True):
+                    run2tag="161718"
+                    print " taggers initialization is the one of run2 ",run2tag
+                    self.WPHPl1Wtag = data["tagging_variables_and_wp"]["l1Wtag"+run2tag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Wtag"+run2tag])
+                    self.WPLPl1Wtag = data["tagging_variables_and_wp"]["l1Wtag"+run2tag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Wtag"+run2tag])
+                    self.WPHPl1Htag = data["tagging_variables_and_wp"]["l1Htag"+run2tag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Htag"+run2tag])
+                    self.WPLPl1Htag = data["tagging_variables_and_wp"]["l1Htag"+run2tag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Htag"+run2tag])
+                    
+                    self.WPHPl2Wtag = data["tagging_variables_and_wp"]["l2Wtag"+run2tag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Wtag"+run2tag])
+                    self.WPLPl2Wtag = data["tagging_variables_and_wp"]["l2Wtag"+run2tag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Wtag"+run2tag])
+                    self.WPHPl2Htag = data["tagging_variables_and_wp"]["l2Htag"+run2tag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Htag"+run2tag])
+                    self.WPLPl2Htag = data["tagging_variables_and_wp"]["l2Htag"+run2tag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Htag"+run2tag])
+                    self.vtag_pt_dependence["Run2"] = data["vtag_pt_dependence"+run2tag]
+                    self.lumi["Run2"] =  data["lumi"+run2tag]
+                    self.lumi_unc["Run2"] = data["unc_lumi"+run2tag]
+                    
+
+                self.catVtag['HP1'] =  '('+ self.varl1Wtag +'>'+ self.WPHPl1Wtag +')'
+                self.catVtag['HP2'] =  '('+ self.varl2Wtag +'>'+ self.WPHPl2Wtag +')'
+                self.catVtag['LP1'] = '(('+ self.varl1Wtag +'<'+ self.WPHPl1Wtag +')&&('+ self.varl1Wtag +'>'+ self.WPLPl1Wtag +'))' 
+                self.catVtag['LP2'] = '(('+ self.varl2Wtag +'<'+ self.WPHPl2Wtag +')&&('+ self.varl2Wtag +'>'+ self.WPLPl2Wtag +'))'
+                self.catVtag['NP1'] =  '('+ self.varl1Wtag +'<'+ self.WPLPl1Wtag +')' 
+                self.catVtag['NP2'] =  '('+ self.varl2Wtag +'<'+ self.WPLPl2Wtag +')' 
+                
+            
+                self.catHtag['HP1'] =  '('+ self.varl1Htag +'>'+ self.WPHPl1Htag +')' 
+                self.catHtag['HP2'] =  '('+ self.varl2Htag +'>'+ self.WPHPl2Htag +')' 
+                self.catHtag['LP1'] = '(('+ self.varl1Htag +'<'+ self.WPHPl1Htag +')&&('+ self.varl1Htag +'>'+ self.WPLPl1Htag +'))' 
+                self.catHtag['LP2'] = '(('+ self.varl2Htag +'<'+ self.WPHPl2Htag +')&&('+ self.varl2Htag +'>'+ self.WPLPl2Htag +'))'
+                self.catHtag['NP1'] =  '('+ self.varl1Htag +'<'+ self.WPLPl1Htag +')' 
+                self.catHtag['NP2'] =  '('+ self.varl2Htag +'<'+ self.WPLPl2Htag +')' 
+
+                #print "self.HPSF_vtag ",self.HPSF_vtag
              
 
-            if(run2==True):
-               run2tag="161718"
-               self.WPHPl1Wtag = data["tagging_variables_and_wp"]["l1Wtag"+run2tag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Wtag"+run2tag])
-               self.WPLPl1Wtag = data["tagging_variables_and_wp"]["l1Wtag"+run2tag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Wtag"+run2tag])
-               self.WPHPl1Htag = data["tagging_variables_and_wp"]["l1Htag"+run2tag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Htag"+run2tag])
-               self.WPLPl1Htag = data["tagging_variables_and_wp"]["l1Htag"+run2tag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Htag"+run2tag])
-
-               self.WPHPl2Wtag = data["tagging_variables_and_wp"]["l2Wtag"+run2tag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Wtag"+run2tag])
-               self.WPLPl2Wtag = data["tagging_variables_and_wp"]["l2Wtag"+run2tag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Wtag"+run2tag])
-               self.WPHPl2Htag = data["tagging_variables_and_wp"]["l2Htag"+run2tag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Htag"+run2tag])
-               self.WPLPl2Htag = data["tagging_variables_and_wp"]["l2Htag"+run2tag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Htag"+run2tag])
-               self.vtag_pt_dependence["Run2"] = data["vtag_pt_dependence"+run2tag]
-            #print " lumi ",self.lumi
 
 
-                
+
+            print " tagging cuts ",self.WPHPl1Wtag
             selections = ["common","common_VV","common_VBF","NP","res","nonres","resTT","acceptance","acceptanceMJ","acceptanceMVV","acceptanceGEN","looseacceptanceMJ"]
             for sel in selections:
                 self.cuts[sel] = data["selection_cuts"][sel]
@@ -286,7 +296,7 @@ if __name__ == "__main__":
     print c.LPSF_vtag['2016']
     print c.minMJ
     print c.catVtag['LP1']
-
+    print " tagging cuts ",self.WPHPl1Wtag 
     print "lumi ",c.lumi["lumi16"]
     print c.fixParsSig["ZprimeWW"]['NP']
     print c.minMX
