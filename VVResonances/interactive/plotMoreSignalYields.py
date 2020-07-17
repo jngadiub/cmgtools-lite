@@ -129,7 +129,6 @@ parser.add_option("-l","--leg",dest="leg",help="l1 or l2",default='l1')
 parser.add_option("-p","--period",dest="period",help="2016 or 2017 or 2018",default='2016')
 parser.add_option("-c","--category",dest="category",help="VV_HPHP or VV_HPLP or VH_HPHP etc",default='VV_HPLP')
 parser.add_option("-d","--directory",dest="directory",help="input directory",default='')
-parser.add_option("-f","--folder",dest="folder",help="input directory",default='')
 parser.add_option("-n","--name",dest="name",help="specify a label for the output file name",default='All')
 
 postfix = "Jet 1 "
