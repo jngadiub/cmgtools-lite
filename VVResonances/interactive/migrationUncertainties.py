@@ -185,18 +185,18 @@ if __name__=="__main__":
     ######### first apply the usual acceptance cuts to the trees ####################
     data ={}
     year = '2016'
-    ctx  = cuts.cuts("init_VV_VH.json",int(year),"random_dijetbins")
-    W_tag_SF_HP = ctx.HPSF_vtag
-    W_tag_SF_LP = ctx.LPSF_vtag
+    ctx  = cuts.cuts("init_VV_VH.json",year,"random_dijetbins")
+    W_tag_SF_HP = ctx.HPSF_vtag[year]
+    W_tag_SF_LP = ctx.LPSF_vtag[year]
 
-    H_tag_SF_HP = ctx.HPSF_htag
-    H_tag_SF_LP = ctx.LPSF_htag
+    H_tag_SF_HP = ctx.HPSF_htag[year]
+    H_tag_SF_LP = ctx.LPSF_htag[year]
 
-    W_tag_unc_HP = ctx.W_tag_unc_HP
-    W_tag_unc_LP = ctx.W_tag_unc_LP
+    W_tag_unc_HP = ctx.W_tag_unc_HP[year]
+    W_tag_unc_LP = ctx.W_tag_unc_LP[year]
 
-    H_tag_unc_HP = ctx.H_tag_unc_HP
-    H_tag_unc_LP = ctx.H_tag_unc_LP
+    H_tag_unc_HP = ctx.H_tag_unc_HP[year]
+    H_tag_unc_LP = ctx.H_tag_unc_LP[year]
 
     
     categories = ['VH_HPHP','VV_HPHP','VH_LPHP','VH_HPLP','VV_HPLP']
