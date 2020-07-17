@@ -6,6 +6,7 @@ from array import array
 ROOT.gErrorIgnoreLevel = ROOT.kWarning
 ROOT.gROOT.ProcessLine(".x tdrstyle.cc");
 import math, copy
+import cuts
 from tools.PostFitTools import *
 from tools.DatacardTools import *
 from CMGTools.VVResonances.statistics.DataCardMaker import DataCardMaker
@@ -70,7 +71,8 @@ def mirror(histo,histoNominal,name,dim=1):
 		for i in range(1,histo.GetNbinsX()+1):
 			up=histo.GetBinContent(i)/intUp
 			nominal=histoNominal.GetBinContent(i)/intNominal
-			newHisto.SetBinContent(i,histoNominal.GetBinContent(i)*nominal/up)	
+                        if up!=0: newHisto.SetBinContent(i,histoNominal.GetBinContent(i)*nominal/up)
+                        else: newHisto.SetBinContent(i,histoNominal.GetBinContent(i)*nominal)
     return newHisto       
 
 def expandHisto(histo,suffix,binsMVV,binsMJ,minMVV,maxMVV,minMJ,maxMJ):
@@ -383,41 +385,43 @@ def makeNonResCard():
  elif options.pdfIn.find("NP")!=-1: category_pdf = "NP"
  else: category_pdf = "VV_LPLP"  
 
- dataset = options.year
+ dataset = str(options.year)
  sig = 'BulkGWW' 
  doCorrelation = False
  if 'VBF' in purity: sig = 'VBF_BulkGWW'
  
- lumi = {'2016':35900,'2017':41367}
- lumi_unc = {'2016':1.025,'2017':1.023}
- scales = {"2017" :[0.983,1.08], "2016":[1.014,1.086]}
- scalesHiggs = {"2017" :[1.,1.], "2016":[1.,1.]}
 
- vtag_unc = {'VV_HPHP':{},'VV_HPLP':{},'VV_LPLP':{},'VH_HPHP':{},'VH_HPLP':{},'VH_LPHP':{}, 'VV_etraLP':{}}
- vtag_unc['VV_HPHP'] = {'2016':'1.232/0.792','2017':'1.269/0.763'}
- vtag_unc['VV_HPLP'] = {'2016':'0.882/1.12','2017':'0.866/1.136'}    
- vtag_unc['VV_LPLP'] = {'2016':'1.063','2017':'1.043'}
- vtag_unc['VV_extraLP'] = {'2016':'1.063','2017':'1.043'}
-
- vtag_unc['VBF_VV_HPHP'] = {'2016':'1.232/0.792','2017':'1.269/0.763'}
- vtag_unc['VBF_VV_HPLP'] = {'2016':'0.882/1.12','2017':'0.866/1.136'}
- vtag_unc['VBF_VV_LPLP'] = {'2016':'1.063','2017':'1.043'}
+ if dataset != "Run2":
+     print dataset
+     ctx = cuts.cuts("init_VV_VH.json",dataset,"dijetbins_random")
+     lumi = {dataset : ctx.lumi[dataset]}
+     print "lumi ",lumi
+     lumi_unc = {dataset : ctx.lumi_unc[dataset]}
+     print "lumi unc",lumi_unc 
+     vtag_pt_dependence ={dataset:ctx.vtag_pt_dependence[dataset] }
+     print " vtag_pt_dependence ",vtag_pt_dependence
 
 
- #this is a quick fix! these values are wrong!!
- vtag_unc['VH_HPHP'] = {'2016':'1.232/0.792','2017':'1.269/0.763'}
- vtag_unc['VH_HPLP'] = {'2016':'0.882/1.12','2017':'0.866/1.136'}    
- vtag_unc['VH_LPHP'] = {'2016':'1.063','2017':'1.043'}
- vtag_unc['VH_LPLP'] = {'2016':'1.063','2017':'1.043'}
+ # what are there scales?                                                                                                                                                                                                              
+ #scales = {"2017" :[ctx17.W_HPmassscale,ctx17.W_LPmassscale], "2016":[ctx16.W_HPmassscale,ctx16.W_LPmassscale], "2018":[ctx18.W_HPmassscale,ctx18.W_LPmassscale]}                                                                           
+ #scalesHiggs = {"2017" :[ctx17.H_HPmassscale,ctx17.H_LPmassscale], "2016":[ctx16.H_HPmassscale,ctx16.H_LPmassscale], "2018":[ctx18.H_HPmassscale,ctx18.H_LPmassscale]}                                                                      
+ scales = {"2017" :[1,1], "2016":[1,1], "2018":[1,1]}
+ scalesHiggs = {"2017" :[1,1], "2016":[1,1], "2018":[1,1]}
 
+ ## NB : vtag uncertainty is added through the migrationunc.json file (in MakeCard, should this happen also here? )
 
+# print " going to set up vtag_pt_dependence"
+ #if dataset != "Run2":
+ #    print dataset 
+ #    ctx = cuts.cuts("init_VV_VH.json",dataset,"dijetbins_random")
+ 
+ #else:
+ #    print " fix me here!!" 
+ #    ctx = cuts.cuts("init_VV_VH.json","2016","dijetbins_random")
+ #    vtag_pt_dependence ={"2016" : ctx.vtag_pt_dependence["2016"]}
+ #print vtag_pt_dependence 
 
- vtag_pt_dependence = {'VV_HPHP':'((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))','VV_HPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))','VV_LPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))','VH_HPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))','VH_LPHP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))','VH_HPHP':'((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))','VH_LPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))','VV_extraLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))'} #irene added fakes  for a quick test!
-# vtag_pt_dependence = {'VV_HPHP':'((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))','VV_HPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))'}
-# vtag_pt_dependence = {'VV_HPHP':'((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))','VV_HPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))',
-#                       'VBF_VV_HPHP':'((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))','VBF_VV_HPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))'}
-
- DTools = DatacardTools(scales,scalesHiggs,vtag_pt_dependence,lumi_unc,vtag_unc,1.0,"","",doCorrelation)
+ DTools = DatacardTools(scales,scalesHiggs,vtag_pt_dependence,lumi_unc,1.0,"","",doCorrelation)
  print '##########      PURITY      :', purity 
 
  cat='_'.join(['JJ',sig,purity,'13TeV_'+dataset])
