@@ -383,7 +383,7 @@ class AllFunctions():
                 from modules.submitJobs import merge1DMVVTemplate
                 newfilename=filename.replace("Run2",year)
                 print "newfilename ",newfilename
-                merge1DMVVTemplate(jobList,files,"1D"+"_"+period+"_"+c,c,self.binsMVV,self.minMVV,self.maxMVV,self.HCALbinsMVV,name,newfilename,self.samples)
+                merge1DMVVTemplate(jobList,files,"1D"+"_"+period+"_"+c,c,self.binsMVV,self.minMVV,self.maxMVV,self.HCALbinsMVV,name,newfilename)
 
                 jobList = []
                 files   = []
