@@ -33,7 +33,7 @@ plotVV1D=False
 plotVV3D2016= True
 plotVV3D=False
 plotVV3D2016data=False #True
-plotVV3D2016pseudodata=True
+plotVV3D2016pseudodata=False
 plotVH2016=False
 
 
@@ -62,7 +62,7 @@ def getLegend(x1=0.650010112,y1=0.523362,x2=0.90202143,y2=0.8279833):
 #oname= "ZprimeZH_VVVH_pseudo20_testvhlplp"
 #oname= "ZprimeZH_VV_pseudo20_testvhlplp"
 #oname= "ZprimeZH_pseudo20_tau21DDT_doubleB_0p91_0p86"
-#oname= "ZprimeZH_scheme2_deepAK8_VVVH_optimizations_noBR"
+#oname= "ZprimeZH_scheme2_deepAK8_VVVH_deltaEtaMaps"
 
 titleY = "#sigma x BR(G_{Bulk} #rightarrow WW) (pb)  "
 #oname= "BulkGWW_VVVH_testvhlplp"
@@ -70,9 +70,9 @@ titleY = "#sigma x BR(G_{Bulk} #rightarrow WW) (pb)  "
 #oname= "BulkGWW_VH_testvhlplp"
 #oname= "BulkGWW_tau21DDT_doubleB_0p91_0p86"
 #oname= "BulkGWW_scheme2_deepAK8_VVVH_optimizations"
-oname= "BulkGWW_VVinclu_tau21_vs_VVVHtau21doubleB_VVinclu_deepWDDT_VVVHdeepAK8"
+#oname= "BulkGWW_VVinclu_tau21_vs_VVVHtau21doubleB_VVinclu_deepWDDT_VVVHdeepAK8_deltaEtaMaps"
 #oname= "BulkGWW_VVinclu_tau21_vs_VVVHtau21doubleB_migrUnc"
-#oname="BulkGWW_scheme2_deepAK8_VVVH_migrUnc"
+oname="BulkGWW_scheme2_deepAK8_VVVH_deltaEtaMaps"
 #title = ["HPLP","HPHP","HPHP+HPLP","B2G-17-001"]
 #files = ["LIMITS_DDT_latest/WW/HPLP/Limits_BulkGWW_HPLP_13TeV.root","LIMITS_DDT_latest/WW/HPHP/Limits_BulkGWW_HPHP_13TeV.root","LIMITS_DDT_latest/WW/combined/Limits_BulkGWW_13TeV.root","limits_b2g17001/Limits_b2g17001_BulkGWW_13TeV.root"]
 
@@ -80,9 +80,11 @@ oname= "BulkGWW_VVinclu_tau21_vs_VVVHtau21doubleB_VVinclu_deepWDDT_VVVHdeepAK8"
 #files = ["results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_nominalMap/Limits_BulkGWW_13TeV_2016_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT.root","results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_nominalMap/Limits_BulkGWW_13TeV_2016_VV_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT.root","results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_nominalMap/Limits_BulkGWW_13TeV_2016_VVVH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT.root","results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_nominalMap/Limits_BulkGWW_13TeV_2016_VH_scheme2_deepAK8WZH_migrUnc.root","results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_nominalMap/Limits_BulkGWW_13TeV_2016_VV_scheme2_deepAK8WZH_migrUnc.root","results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_nominalMap/Limits_BulkGWW_13TeV_2016_VVVH_scheme2_deepAK8WZH_migrUnc.root"]
 #title = ["tau21DDT","VVVH tau21DDT+doubleB","VV","VH","VVVH tau21DDT+doubleB migrUnc","VV","VH"] 
 #files=["debugSensitivityBulkGWW/VVinclu/Limits_VVinclu_tau21.root","debugSensitivityBulkGWW/VVVH/Limits_BulkGWW_VVVH_tau21_doubleB_newTemplates.root","debugSensitivityBulkGWW/VVVH/Limits_BulkGWW_13TeV_2016_VV_scheme2_tau21_doubleB.root","debugSensitivityBulkGWW/VVVH/Limits_BulkGWW_13TeV_2016_VH_scheme2_tau21_doubleB.root","debugSensitivityBulkGWW/VVVH/Limits_BulkGWW_13TeV_2016_VVVH_scheme2_tau21_doubleB_migrUnc.root","debugSensitivityBulkGWW/VVVH/Limits_BulkGWW_13TeV_2016_VV_scheme2_tau21_doubleB_migrUnc.root","debugSensitivityBulkGWW/VVVH/Limits_BulkGWW_13TeV_2016_VH_scheme2_tau21_doubleB_migrUnc.root"]
-title = ["tau21DDT","deepAKWDDT","VVVH tau21DDT+doubleB migrUnc","VV","VH","VVVH deepAK8"] 
-files=["debugSensitivityBulkGWW/VVinclu/Limits_VVinclu_tau21.root","results_2016_VVinclu_deepAK8WDDT_noCutTemplates/Limits_BulkGWW_13TeV_2016_VVinclu_deepAK8WDDT_noCutTemplates.root","debugSensitivityBulkGWW/VVVH/Limits_BulkGWW_13TeV_2016_VVVH_scheme2_tau21_doubleB_migrUnc.root","debugSensitivityBulkGWW/VVVH/Limits_BulkGWW_13TeV_2016_VV_scheme2_tau21_doubleB_migrUnc.root","debugSensitivityBulkGWW/VVVH/Limits_BulkGWW_13TeV_2016_VH_scheme2_tau21_doubleB_migrUnc.root","results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_nominalMap/Limits_BulkGWW_13TeV_2016_VVVH_scheme2_deepAK8WZH_migrUnc.root"]
+#title = ["tau21DDT","deepAKWDDT","VVVH tau21DDT+doubleB migrUnc","VVVH deepAK8","VVVH deepAK8 deltaEta Maps"] 
+#files=["debugSensitivityBulkGWW/VVinclu/Limits_VVinclu_tau21.root","results_2016_VVinclu_deepAK8WDDT_noCutTemplates/Limits_BulkGWW_13TeV_2016_VVinclu_deepAK8WDDT_noCutTemplates.root","debugSensitivityBulkGWW/VVVH/Limits_BulkGWW_13TeV_2016_VVVH_scheme2_tau21_doubleB_migrUnc.root","results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_nominalMap/Limits_BulkGWW_13TeV_2016_VVVH_scheme2_deepAK8WZH_migrUnc.root","results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_deltaEtaMaps/Limits_BulkGWW_13TeV_2016_VVVH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT.root"]
 
+title = ["VVVH deepAK8","VVVH deepAK8 deltaEta Maps"] 
+files=["results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_nominalMap/Limits_BulkGWW_13TeV_2016_VVVH_scheme2_deepAK8WZH_migrUnc.root","results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_deltaEtaMaps/Limits_BulkGWW_13TeV_2016_VVVH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT.root"]
 
 #title = ["tau_{21}^{DDT}+doubleB","deepAK8: W 5%, ZH 2%"]
 #title = ["tau_{21}^{DDT}+doubleB","deepAK8: W 5%, ZH 5%","deepAK8: W 5%, ZH 2%"]
@@ -92,10 +94,14 @@ files=["debugSensitivityBulkGWW/VVinclu/Limits_VVinclu_tau21.root","results_2016
 #files = ["results_2016_VV_VH_doubleB_HP0p91_LP0p86_scheme2/Limits_ZprimeZH_VVVH_13TeV_2016_scheme2_doubleB_0p91_0p86_pseudo80.root","results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p05_0p10_DDT_defaultMap/Limits_ZprimeZH_13TeV_2016_VVVH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p05_0p10_DDT.root","results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_nominalMap/Limits_ZprimeZH_13TeV_2016_VVVH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_pseudo40.root"]
 
 #title = ["VH DDT","VV DDT","VVVH DDT","VH doubleB","VV doubleB","VVVH doubleB"]
+
 #files = ["results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_nominalMap/Limits_BulkGWW_13TeV_2016_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT.root","results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_nominalMap/Limits_BulkGWW_13TeV_2016_VV_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT.root","results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_nominalMap/Limits_BulkGWW_13TeV_2016_VVVH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT.root","results_2016_VV_VH_doubleB_HP0p91_LP0p86_scheme2/Limits_BulkGWW_VH_13TeV_2016_scheme2_doubleB_0p91_0p86_pseudo80.root","results_2016_VV_VH_doubleB_HP0p91_LP0p86_scheme2/Limits_BulkGWW_VV_13TeV_2016_scheme2_doubleB_0p91_0p86_pseudo80.root","results_2016_VV_VH_doubleB_HP0p91_LP0p86_scheme2/Limits_BulkGWW_VVVH_13TeV_2016_scheme2_doubleB_0p91_0p86_pseudo80.root"]
 #files = ["results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_nominalMap/Limits_ZprimeZH_13TeV_2016_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_pseudo40.root","results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_nominalMap/Limits_ZprimeZH_13TeV_2016_VV_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_pseudo40.root","results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_nominalMap/Limits_ZprimeZH_13TeV_2016_VVVH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_pseudo40.root","results_2016_VV_VH_doubleB_HP0p91_LP0p86_scheme2/Limits_ZprimeZH_VH_13TeV_2016_scheme2_doubleB_0p91_0p86_pseudo80.root","results_2016_VV_VH_doubleB_HP0p91_LP0p86_scheme2/Limits_ZprimeZH_VV_13TeV_2016_scheme2_doubleB_0p91_0p86_pseudo80.root","results_2016_VV_VH_doubleB_HP0p91_LP0p86_scheme2/Limits_ZprimeZH_VVVH_13TeV_2016_scheme2_doubleB_0p91_0p86_pseudo80.root"]
+#title = ["VVVH deepAK8","VVVH deepAK8 deltaEtaMaps","VVVH doubleB"]
+#files = ["results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_nominalMap/Limits_ZprimeZH_13TeV_2016_VVVH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_pseudo40.root","results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_deltaEtaMaps/Limits_ZprimeZH_13TeV_2016_VVVH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT.root","results_2016_VV_VH_doubleB_HP0p91_LP0p86_scheme2/Limits_ZprimeZH_VVVH_13TeV_2016_scheme2_doubleB_0p91_0p86_pseudo80.root"]    
 
-
+#title = ["VVVH deepAK8","VVVH deepAK8 deltaEtaMaps"]
+#files = ["results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_nominalMap/Limits_ZprimeZH_13TeV_2016_VVVH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_pseudo40.root","results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_deltaEtaMaps/Limits_ZprimeZH_13TeV_2016_VVVH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT.root"] 
 
 
 #title = ["VH","VV ","VVVH"]
