@@ -6,6 +6,7 @@ from array import array
 ROOT.gErrorIgnoreLevel = ROOT.kWarning
 ROOT.gROOT.ProcessLine(".x tdrstyle.cc");
 import math, copy
+import cuts
 from tools.PostFitTools import *
 from tools.DatacardTools import *
 from CMGTools.VVResonances.statistics.DataCardMaker import DataCardMaker
@@ -70,7 +71,7 @@ def mirror(histo,histoNominal,name,dim=1):
 		for i in range(1,histo.GetNbinsX()+1):
 			up=histo.GetBinContent(i)/intUp
 			nominal=histoNominal.GetBinContent(i)/intNominal
-			if up!=0: newHisto.SetBinContent(i,histoNominal.GetBinContent(i)*nominal/up)	
+                        if up!=0: newHisto.SetBinContent(i,histoNominal.GetBinContent(i)*nominal/up)
                         else: newHisto.SetBinContent(i,histoNominal.GetBinContent(i)*nominal)
     return newHisto       
 
@@ -381,7 +382,7 @@ def makeNonResCard():
  elif options.pdfIn.find("VH_HPLP")!=-1: category_pdf = "VH_HPLP"
  elif options.pdfIn.find("VH_LPHP")!=-1: category_pdf = "VH_LPHP"
  elif options.pdfIn.find("VH_LPLP")!=-1: category_pdf = "VH_LPLP"
- elif options.pdfIn.find("VV_extraLP")!=-1: category_pdf = "VV_extraLP"
+ elif options.pdfIn.find("NP")!=-1: category_pdf = "NP"
  else: category_pdf = "VV_LPLP"  
 
  dataset = options.year
@@ -408,6 +409,9 @@ def makeNonResCard():
  vtag_unc['VH_HPHP'] = {'2016':'1.232/0.792','2017':'1.269/0.763'}
  vtag_unc['VH_HPLP'] = {'2016':'0.882/1.12','2017':'0.866/1.136'}    
  vtag_unc['VH_LPHP'] = {'2016':'1.063','2017':'1.043'}
+
+
+ vtag_pt_dependence = cuts{"2016" : ctx16.vtag_pt_dependence,"2017" : ctx17.vtag_pt_dependence,"2018" : ctx18.vtag_pt_dependence}
 
 # vtag_pt_dependence = {'VV_HPHP':'((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))','VV_HPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))','VV_LPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))','VH_HPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))','VH_LPHP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))','VH_HPHP':'((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))','VH_LPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))','VV_extraLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))'} #irene added fakes  for a quick test!
 # vtag_pt_dependence = {'VV_HPHP':'((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))','VV_HPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))'}
