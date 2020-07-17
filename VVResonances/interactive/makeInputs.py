@@ -44,10 +44,12 @@ print "options.period  ",options.period
 period = options.period
 samples=""
 filePeriod=period
+rescale=False #for pseudodata: set to True if files comes from splitting Run2
 if options.period.find(",")!=-1: 
     lumitot=0
     period = options.period.split(',') 
     filePeriod="Run2"
+    rescale=True
     for year in period:
         print year
         if year==period[-1]: samples+=basedir+year+"/"
@@ -80,10 +82,10 @@ if useTriggerWeights:
     
 #all categories
 #categories = ['none']
-#categories=['VH_HPHP','VH_HPLP','VH_LPHP','VV_HPHP','VV_HPLP','VBF_VV_HPHP','VBF_VV_HPLP']
-#categories=['VH_HPHP','VH_HPLP','VH_LPHP','VV_HPHP'] #,'VV_HPLP']
+categories=["VV_HPLP"]
+#categories=["VH_HPLP"]
 #categories =["NP"]
-categories =["VV_HPLP"]
+#categories =["VV_HPLP"]
        
 
 #list of signal samples --> nb, radion and vbf samples to be added
@@ -274,7 +276,7 @@ if options.run.find("all")!=-1 or options.run.find("pseudoVJETS")!=-1:
     print " Do pseudodata with vjets: DID YOU PRODUCE THE WORKSPACE BEFORE???"
     from modules.submitJobs import makePseudoDataVjets
     #for p in categories: makePseudoDataVjets("results_"+filePeriod+"/JJ_"+filePeriod+"_nonRes_%s.root"%p,"results_"+filePeriod+"/save_new_shapes_"+filePeriod+"_pythia_%s_3D.root"%p,"pythia","JJ_%s_PDVjets_%s.root"%(filePeriod,p),ctx.lumi[filePeriod],"results_"+filePeriod+"/workspace_JJ_BulkGWW_"+p+"_13TeV_"+filePeriod+"_VV_V_prepVjets.root",filePeriod,p)
-    for p in categories: makePseudoDataVjets("results_"+filePeriod+"/JJ_"+filePeriod+"_nonRes_%s.root"%p,"results_"+filePeriod+"/JJ_"+filePeriod+"_nonRes_3D_NP.root","pythia","JJ_%s_PDVjets_%s.root"%(filePeriod,p),ctx.lumi[filePeriod],"results_"+filePeriod+"/workspace_JJ_BulkGWW_"+p+"_13TeV_"+filePeriod+"testRun2_prepVjets.root",filePeriod,p)
+    for p in categories: makePseudoDataVjets("results_"+filePeriod+"/JJ_"+filePeriod+"_nonRes_%s.root"%p,"results_"+filePeriod+"/JJ_"+filePeriod+"_nonRes_3D_NP.root","pythia","JJ_%s_PDVjets_%s.root"%(filePeriod,p),ctx.lumi[filePeriod],"results_"+filePeriod+"/workspace_JJ_BulkGWW_"+p+"_13TeV_"+filePeriod+"test_prepVjets.root",filePeriod,p,rescale)
 if options.run.find("all")!=-1 or options.run.find("pseudoALL")!=-1:
     print " Do pseudodata. DID YOU PRODUCE THE WORKSPACE BEFORE???"
     from modules.submitJobs import makePseudoDataVjetsTT
