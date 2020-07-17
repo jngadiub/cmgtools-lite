@@ -211,8 +211,8 @@ def doAll(signal,legend,colorindex):
 #    directorypaper="results_QCD_pythia_signals_2016_tau21DDT_rho_VVpaper_HPHP_HPLP/"
 #    directoryVV="doubleB_signalYield/VVVH_HPLP/"+options.name+"/"
 #    directoryVH="doubleB_signalYield/VVVH_HPLP/"+options.name+"/"
-    directoryVV="results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_defaultMap_spikeKiller/"
-    directoryVH="results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_defaultMap_spikeKiller/"
+    directoryVV="results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_deltaEtaMaps/"
+    directoryVH="results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_deltaEtaMaps/"
     purities=["VV_HPHP","VV_HPLP","VH_HPHP","VH_HPLP","VH_LPHP"]
 #    purities=["VV_HPHP","VV_HPLP","VH_HPHP","VH_LPHP"]
     c1,leg,pt = getCanvasPaper("c1")
@@ -258,6 +258,7 @@ def doAll(signal,legend,colorindex):
     ff.SetLineWidth(0)
 
     gr_VV_HPHP.Draw("APL")
+#    gr_VV_HPHP.Draw("AP")
 
     r_file_VV_HPLP = ROOT.TFile(directoryVV+"JJ_"+signal+"_"+str(options.period)+"_VV_HPLP_yield.root","READ")
     gr_VV_HPLP = r_file_VV_HPLP.Get("yield")
@@ -941,21 +942,21 @@ if __name__ == '__main__':
 #    doSingle() #NB: some fix would be needed here!
 #    signals = ["BulkGZZ","WprimeWZ","BulkGWW","ZprimeWW","ZprimeZH","WprimeWH"]
 #    legs = ["G_{bulk} #rightarrow ZZ","W' #rightarrow WZ","G_{bulk} #rightarrow WW","Z'#rightarrow WW","Z'#rightarrow ZH","W'#rightarrow WH"]                                               
-#    signals = ["BulkGWW","ZprimeZH"]
-#    legs = ["G_{bulk} #rightarrow WW","Z'#rightarrow ZH"]                                                                                                                                                     
+    signals = ["BulkGWW","ZprimeZH"]
+    legs = ["G_{bulk} #rightarrow WW","Z'#rightarrow ZH"]                                                                                                                                                     
 #    signals = ["ZprimeZH"]
 #    legs = ["Z'#rightarrow ZH"]                                                                                                                                                     
 
 
-    signals = ["BulkGWW"] 
-    legs = ["G_{bulk} #rightarrow WW"] 
+#    signals = ["BulkGWW"] 
+#    legs = ["G_{bulk} #rightarrow WW"] 
     
     for i in range(len(signals)):
 #    for i in range(1):
       print i
       print signals[i]
       print legs[i]
-      doAllOld(signals[i],legs[i],i)
+#      doAllOld(signals[i],legs[i],i)
 #      doAllOldCompare(signals[i],legs[i],i)
-#      doAll(signals[i],legs[i],i)
+      doAll(signals[i],legs[i],i)
 #      doAllTestVHLPLP(signals[i],legs[i],i)
