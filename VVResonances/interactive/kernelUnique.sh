@@ -5,8 +5,8 @@ postfitdir=postfit_qcd/${name}/
 mkdir $postfitdir
 categories=('VH_LPHP' 'VH_HPHP' 'VH_HPLP' 'VV_HPLP' 'VV_HPHP')
 
-for cat in ${categories[*]}; do
 
+for cat in ${categories[*]}; do
     #               pythia
     python transferKernelUnique.py -i ${indir}JJ_2016_nonRes_${cat}.root --sample pythia --year 2016 -p x --pdfIn ${indir}JJ_2016_nonRes_3D_NP.root | tee KernelTransf_2016_${cat}_pythia_x_${name}.out
     #python transferKernel.py -i ${indir}JJ_2016_nonRes_${cat}.root --sample pythia --year 2016 -p y --pdfIn ${indir}JJ_2016_nonRes_3D_NP.root | tee KernelTransf_2016_${cat}_pythia_y_${name}.out
@@ -24,7 +24,7 @@ for cat in ${categories[*]}; do
     #python transferKernel.py -i ${indir}JJ_2016_nonRes_${cat}.root --sample herwig --year 2016 -p z --pdfIn ${indir}JJ_2016_nonRes_3D_NP.root | tee KernelTransf_2016_${cat}_herwig_z_${name}.out
 
     #        merge 
-    python transferKernel.py -i ${indir}JJ_2016_nonRes_${cat}.root --sample pythia --year 2016 -p z --pdfIn ${indir}JJ_2016_nonRes_3D_NP.root --merge
+    python transferKernelUnique.py -i ${indir}JJ_2016_nonRes_${cat}.root --sample pythia --year 2016 -p z --pdfIn ${indir}JJ_2016_nonRes_3D_NP.root --merge
     
     mv postfit_qcd/PostFit_*.* $postfitdir
 
