@@ -52,9 +52,9 @@ print "year ",year
 print "now working with cuts "
 ctx = cuts.cuts("init_VV_VH.json",year,"dijetbins_random")
 print "lumi for year "+year+" = ",ctx.lumi[year]
-luminosity = int(ctx.lumi[year])
+luminosity = ctx.lumi[year]/ctx.lumi["Run2"]  #int(ctx.lumi[year]/ctx.lumi["Run2"])
 if options.output.find("Run2") ==-1: luminosity = 1
-
+print " lumi rewight ",luminosity
 
 for filename in os.listdir(args[0]):
     if filename.find(".")==-1:
@@ -87,14 +87,6 @@ for filename in os.listdir(args[0]):
                 SF = taggerSF[category][year]
                 print "SF ",SF
                 dataPlotters[-1].addCorrectionFactor(SF,'flat')
-                '''
-                corrFactors = options.factors.split(',')
-                for c in corrFactors:
-                    if len(c.split(':')) < 2: continue
-                    if c.split(':')[0] in fname:
-                        print "Add correction factor:",fname,c.split(':')[1]
-                        dataPlotters[-1].addCorrectionFactor(float(c.split(':')[1]),'flat')
-                '''
 
 
         
