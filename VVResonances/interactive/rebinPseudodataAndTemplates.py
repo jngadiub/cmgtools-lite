@@ -60,3 +60,4 @@ for gen in generators:
         hist.RebinY(rebin)
         #print hist.GetXaxis().GetNbins()
         hist.Write()
+

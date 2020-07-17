@@ -66,6 +66,11 @@ class DatacardTools():
         card.addMVVSignalParametricShape("%s_MVV"%sig1,"MJJ",resultsDir+"/JJ_%s_%s_MVV.json"%(sig1,dataset),{'CMS_scale_j':1},{'CMS_res_j':1.0})
         card.addMJJSignalParametricShapeNOEXP("%s_Wqq1"%sig1,"MJ1" ,resultsDir+"/JJ_%s_%s_MJrandom_"%(sig1,dataset)+"NP.json",{'CMS_scale_prunedj':1.},{'CMS_res_prunedj':1.},self.scales[dataset])
         card.addMJJSignalParametricShapeNOEXP("%s_Wqq2"%sig1,"MJ2" ,resultsDir+"/JJ_%s_%s_MJrandom_"%(sig1,dataset)+"NP.json",{'CMS_scale_prunedj':1.},{'CMS_res_prunedj':1.},self.scales[dataset])
+        print " self.vtag_pt_dependence ",self.vtag_pt_dependence
+        print "dataset ",dataset
+        print "self.vtag_pt_dependence[dataset] ",self.vtag_pt_dependence[dataset]
+        print "category ",category
+        print " self.vtag_pt_dependence[dataset][category] ",self.vtag_pt_dependence[dataset][category]
         card.addParametricYieldHVTBR("%s"%sig1,ncontrib-1,resultsDir+"/JJ_%s_%s_"%(sig1,dataset)+category+"_yield.json","../scripts/theoryXsec/BulkG.json","sigma","BRWW",1000.,'CMS_tau21_PtDependence',self.vtag_pt_dependence[dataset][category],1.0)
         card.product3D("%s"%sig1,"%s_Wqq1"%sig1,"%s_Wqq2"%sig1,"%s_MVV"%sig1)
        if sig.find('BulkGVV')!= -1 or sig.find('BulkGZZ')!= -1:
@@ -114,7 +119,7 @@ class DatacardTools():
  def AddWResBackground(self,card,dataset,category,rootFileMVV,rootFileNorm,resultsDir,ncontrib):
        print "add Wres background"  
        sys.path.append(resultsDir)
-       module_name = 'JJ_WJets_%s'%category
+       module_name = 'JJ_%s_WJets_%s'%(dataset,category)
        module = __import__(module_name)  
        print module_name
        # W+jets 
@@ -149,7 +154,7 @@ class DatacardTools():
  def AddZResBackground(self,card,dataset,category,rootFileMVV,rootFileNorm,resultsDir,ncontrib):  
        print "add Zres background"
        sys.path.append(resultsDir)
-       module_name = 'JJ_WJets_%s'%category
+       module_name = 'JJ_%s_WJets_%s'%(dataset,category)
        module = __import__(module_name)   
             
        # Z+jets 
