@@ -9,7 +9,7 @@ import subprocess, thread
 from array import array
 ROOT.gROOT.SetBatch(True)
 
-timeCheck = "1000"
+timeCheck = "2000"
 userName=os.environ['USER']
 
 
@@ -1901,7 +1901,7 @@ def mergeCPs(template,jobname="CPs"):
     cmd = "hadd %s/%s.root %s/controlplots_*%s*.root" %(resDir,t,resDir,t)
     os.system(cmd)
 
-def makePseudoDataVjets(input,kernel,mc,output,lumi,workspace,year,purity):
+def makePseudoDataVjets(input,kernel,mc,output,lumi,workspace,year,purity, rescale=False):
  print " year ",year, " lumi ",lumi
  pwd = os.getcwd()
  pwd = "/"
@@ -1927,7 +1927,7 @@ def makePseudoDataVjets(input,kernel,mc,output,lumi,workspace,year,purity):
  hout = ROOT.TH3F('data','data',len(xbins)-1,xbins,len(xbins)-1,xbins,len(zbins)-1,zbins)
  print " hmcin Integral ",hmcin.Integral(), " Entries ",hmcin.GetEntries()
  nEventsQCD = int(hmcin.Integral()*lumi)
- if year == "Run2": nEventsQCD = int(hmcin.Integral())
+ if rescale==True: nEventsQCD = int(hmcin.Integral())
  print "Expected QCD events: ",nEventsQCD
  hout.FillRandom(hdata,nEventsQCD)
  
@@ -1950,7 +1950,7 @@ def makePseudoDataVjets(input,kernel,mc,output,lumi,workspace,year,purity):
  hout_wjets = ROOT.TH3F('wjets','wjets',len(xbins)-1,xbins,len(xbins)-1,xbins,len(zbins)-1,zbins)
  
  nEventsW = o_norm_wjets.getVal()
- if year == "Run2": nEventsW=nEventsW/lumi
+ if rescale==True: nEventsW=nEventsW/lumi
  print "Expected W+jets events: ",nEventsW
  wjets = modelWjets.generate(args,int(nEventsW))
  if wjets!=None:
@@ -1974,7 +1974,7 @@ def makePseudoDataVjets(input,kernel,mc,output,lumi,workspace,year,purity):
  hout_zjets = ROOT.TH3F('zjets','zjets',len(xbins)-1,xbins,len(xbins)-1,xbins,len(zbins)-1,zbins)
  
  nEventsZ = o_norm_zjets.getVal()
- if year == "Run2": nEventsZ=nEventsZ/lumi
+ if rescale==True: nEventsZ=nEventsZ/lumi
  print "Expected Z+jets events: ",nEventsZ
  zjets = modelZjets.generate(args,int(nEventsZ))
  if zjets!=None:
