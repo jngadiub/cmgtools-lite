@@ -48,11 +48,6 @@ ctx = cuts.cuts("init_VV_VH.json",options.period,"dijetbins_random")
 lumi = ctx.lumi #{'2016':ctx16.lumi["2016"],'2017':ctx17.lumi["2017"], '2018':ctx18.lumi}
 lumi_unc = ctx.lumi_unc #{'2016':ctx16.lumi_unc,'2017':ctx17.lumi_unc, '2018':ctx18.lumi_unc}
 
-lumitot=0
-for year in lumi.keys():
-  print year
-  lumitot+=lumi[year]
-print "lumi tot ",lumitot
 print "lumi ",lumi
 print type(lumi)
 
@@ -76,7 +71,6 @@ resultsDir = {year:'results_'+year for year in datasets}
 if len(datasets) == 3 and options.combo == True:
   datasets = []
   datasets.append("Run2")
-  lumi.update({"Run2":lumitot})
   resultsDir.update({"Run2" : "results_Run2"})
   lumi_unc.update( {"Run2": 1.8 }) # from https://twiki.cern.ch/twiki/bin/view/CMS/TWikiLUM but maybe it should be moved to the init json
 print "datasets ",datasets
