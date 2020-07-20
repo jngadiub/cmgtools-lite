@@ -1901,7 +1901,7 @@ def mergeCPs(template,jobname="CPs"):
     cmd = "hadd %s/%s.root %s/controlplots_*%s*.root" %(resDir,t,resDir,t)
     os.system(cmd)
 
-def makePseudoDataVjets(input,kernel,mc,output,lumi,workspace,year,purity, rescale=False):
+def makePseudoDataVjets(input,kernel,mc,output,lumi,workspace,year,purity,rescale=False,rescalefactor=1.):
  print " year ",year, " lumi ",lumi
  pwd = os.getcwd()
  pwd = "/"
@@ -1927,7 +1927,6 @@ def makePseudoDataVjets(input,kernel,mc,output,lumi,workspace,year,purity, resca
  hout = ROOT.TH3F('data','data',len(xbins)-1,xbins,len(xbins)-1,xbins,len(zbins)-1,zbins)
  print " hmcin Integral ",hmcin.Integral(), " Entries ",hmcin.GetEntries()
  nEventsQCD = int(hmcin.Integral()*lumi)
- if rescale==True: nEventsQCD = int(hmcin.Integral())
  print "Expected QCD events: ",nEventsQCD
  hout.FillRandom(hdata,nEventsQCD)
  
@@ -1950,7 +1949,7 @@ def makePseudoDataVjets(input,kernel,mc,output,lumi,workspace,year,purity, resca
  hout_wjets = ROOT.TH3F('wjets','wjets',len(xbins)-1,xbins,len(xbins)-1,xbins,len(zbins)-1,zbins)
  
  nEventsW = o_norm_wjets.getVal()
- if rescale==True: nEventsW=nEventsW/lumi
+ if rescale==True: nEventsW=nEventsW*rescalefactor/lumi
  print "Expected W+jets events: ",nEventsW
  wjets = modelWjets.generate(args,int(nEventsW))
  if wjets!=None:
@@ -1974,7 +1973,7 @@ def makePseudoDataVjets(input,kernel,mc,output,lumi,workspace,year,purity, resca
  hout_zjets = ROOT.TH3F('zjets','zjets',len(xbins)-1,xbins,len(xbins)-1,xbins,len(zbins)-1,zbins)
  
  nEventsZ = o_norm_zjets.getVal()
- if rescale==True: nEventsZ=nEventsZ/lumi
+ if rescale==True: nEventsZ=nEventsZ*rescalefactor/lumi
  print "Expected Z+jets events: ",nEventsZ
  zjets = modelZjets.generate(args,int(nEventsZ))
  if zjets!=None:
