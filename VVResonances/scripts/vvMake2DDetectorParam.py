@@ -71,6 +71,12 @@ for folder in folders:
     print "split ",folder.split("/")
     year=folder.split("/")[1]
     print "year ",year
+    print "now working with cuts "
+    ctx = cuts.cuts("init_VV_VH.json",year,"dijetbins_random")
+    print "lumi for year "+year+" = ",ctx.lumi[year]
+    luminosity = ctx.lumi[year]/ctx.lumi["Run2"]
+    if len(folders) ==1: luminosity = 1.
+
     for filename in os.listdir(folder):
         for sampleType in sampleTypes:
             if filename.find(sampleType)!=-1:
@@ -84,35 +90,31 @@ for folder in folders:
                 dataPlotters[-1].addCorrectionFactor('xsec','tree')
                 dataPlotters[-1].addCorrectionFactor('genWeight','tree')
                 dataPlotters[-1].addCorrectionFactor('puWeight','tree')
+                dataPlotters[-1].addCorrectionFactor(luminosity,'flat')
                 if fname.find("QCD_Pt_") !=-1 or fname.find("QCD_HT") !=-1:
                     print "going to apply spikekiller for ",fname
                     dataPlotters[-1].addCorrectionFactor('b_spikekiller','tree')
 
     data=MergedPlotter(dataPlotters)
-    print "now working with cuts "
-    ctx = cuts.cuts("init_VV_VH.json",year,"dijetbins_random")
-    print "lumi for year "+year+" = ",ctx.lumi[year]
-    luminosity = str(ctx.lumi[year])
-    if len(folders) ==1: luminosity = "1."
     if superHX==None:
         print "create superHX"    
-        superHX=data.drawTH2Binned(variables[0]+'/'+genVariables[0]+':'+genVariables[2],options.cut,luminosity,binsx,binsz_x) #mvv
+        superHX=data.drawTH2Binned(variables[0]+'/'+genVariables[0]+':'+genVariables[2],options.cut,"1.",binsx,binsz_x) #mvv
         print "created superHX ",superHX
     else: 
         print "Add to superHX"
-        superHX.Add(data.drawTH2Binned(variables[0]+'/'+genVariables[0]+':'+genVariables[2],options.cut,luminosity,binsx,binsz_x)) 
+        superHX.Add(data.drawTH2Binned(variables[0]+'/'+genVariables[0]+':'+genVariables[2],options.cut,"1.",binsx,binsz_x)) 
     if superHY == None:  
-        superHY=data.drawTH2Binned(variables[1]+'/'+genVariables[1]+':'+genVariables[2],options.cut,luminosity,binsx,binsz_y) #mjet
+        superHY=data.drawTH2Binned(variables[1]+'/'+genVariables[1]+':'+genVariables[2],options.cut,"1.",binsx,binsz_y) #mjet
     else:
-        superHY.Add(data.drawTH2Binned(variables[1]+'/'+genVariables[1]+':'+genVariables[2],options.cut,luminosity,binsx,binsz_y))    
+        superHY.Add(data.drawTH2Binned(variables[1]+'/'+genVariables[1]+':'+genVariables[2],options.cut,"1.",binsx,binsz_y))    
     if doBothLegs == True:
         if superHX_l2 == None:
-            superHX_l2=data.drawTH2Binned(variables[0]+'/'+genVariables[0]+':'+genVariables[4],options.cut,luminosity,binsx,binsz_x) #mvv
+            superHX_l2=data.drawTH2Binned(variables[0]+'/'+genVariables[0]+':'+genVariables[4],options.cut,"1.",binsx,binsz_x) #mvv
         else:
-            superHX_l2.Add(data.drawTH2Binned(variables[0]+'/'+genVariables[0]+':'+genVariables[4],options.cut,luminosity,binsx,binsz_x))
+            superHX_l2.Add(data.drawTH2Binned(variables[0]+'/'+genVariables[0]+':'+genVariables[4],options.cut,"1.",binsx,binsz_x))
         if superHY_l2 == None: 
-            superHY_l2=data.drawTH2Binned(variables[2]+'/'+genVariables[3]+':'+genVariables[4],options.cut,luminosity,binsx,binsz_y) #mjet
-        else:  superHY_l2.Add(data.drawTH2Binned(variables[2]+'/'+genVariables[3]+':'+genVariables[4],options.cut,luminosity,binsx,binsz_y))
+            superHY_l2=data.drawTH2Binned(variables[2]+'/'+genVariables[3]+':'+genVariables[4],options.cut,"1.",binsx,binsz_y) #mjet
+        else:  superHY_l2.Add(data.drawTH2Binned(variables[2]+'/'+genVariables[3]+':'+genVariables[4],options.cut,"1.",binsx,binsz_y))
     print " done with folder ",folder
 
 print " all folders done"

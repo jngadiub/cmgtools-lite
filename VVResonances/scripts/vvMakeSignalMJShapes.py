@@ -106,14 +106,6 @@ print " complete ",complete_mass
 category=options.output.split("_")[-3]+"_"+options.output.split("_")[-2]
 print "category ",category
 
-luminosity_tot=0
-for folder in folders:
-    year=folder.split("/")[-2]
-    ctx = cuts.cuts("init_VV_VH.json",year,"dijetbins_random")
-    luminosity_tot += ctx.lumi[year]
-
-print "Total lumi ",luminosity_tot
-
 mvv,maxi,mini = options.mvv,options.maxi,options.mini
 
 #Now we have the samples: Sort the masses and run the fits
@@ -127,9 +119,9 @@ for mass in sorted(complete_mass.keys()):
         year=folder.split("/")[-2]
         print "year ",year
         ctx = cuts.cuts("init_VV_VH.json",year,"dijetbins_random")
-        print " fraction of lumi ",ctx.lumi[year]/luminosity_tot
-        luminosity=   ctx.lumi[year]/luminosity_tot #str(ctx.lumi[year]/luminosity_tot)                                                                                                                                                       
+        luminosity=   ctx.lumi[year]/ctx.lumi["Run2"]
         if options.output.find("Run2") ==-1: luminosity = 1
+        print " fraction of lumi ",luminosity
         plotter.append(TreePlotter(complete_mass[mass][folder]+'.root','AnalysisTree'))
         if year == "2016": plotter[-1].addCorrectionFactor('genWeight','tree')
         else :
