@@ -72,7 +72,6 @@ if len(datasets) == 3 and options.combo == True:
   datasets = []
   datasets.append("Run2")
   resultsDir.update({"Run2" : "results_Run2"})
-  lumi_unc.update( {"Run2": 1.8 }) # from https://twiki.cern.ch/twiki/bin/view/CMS/TWikiLUM but maybe it should be moved to the init json
 print "datasets ",datasets
 print "result dir ",resultsDir
 
