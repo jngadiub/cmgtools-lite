@@ -122,8 +122,8 @@ for sig in signals:
 
       #rootFile3DPDF = resultsDir[dataset]+'/JJ_2016_nonRes_3D_VV_HPLP.root'
       print "##########################       including QCD in datacard      ######################"
-      rootFile3DPDF = resultsDir[dataset]+'/JJ_%s_nonRes_3D_'%dataset+'NP.root'            
-      #rootFile3DPDF = resultsDir[dataset]+"/save_new_shapes_%s_pythia_"%dataset+p+"_3D.root"
+      #rootFile3DPDF = resultsDir[dataset]+'/JJ_%s_nonRes_3D_'%dataset+'NP.root'            
+      rootFile3DPDF = resultsDir[dataset]+"/save_new_shapes_%s_pythia_"%dataset+p+"_3D.root"
       #rootFile3DPDF = resultsDir[dataset]+"/save_new_shapes_%s_pythia_"%dataset+"VVVH_all"+"_3D.root"
       print "rootFile3DPDF ",rootFile3DPDF
       rootFileNorm = resultsDir[dataset]+"/JJ_%s_nonRes_"%dataset+p+".root"   
