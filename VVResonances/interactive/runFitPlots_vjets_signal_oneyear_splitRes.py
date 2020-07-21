@@ -34,7 +34,7 @@ parser.add_option("--pdfy",dest="pdfy",help="name of pdfs lie PTYUp etc",default
 parser.add_option("-s","--signal",dest="fitSignal",action="store_true",help="do S+B fit",default=False)
 parser.add_option("--doFit",dest="fit",action="store_false",help="actually fit the the distributions",default=True)
 parser.add_option("-t","--addTop",dest="addTop",action="store_true",help="Fit top",default=False)
-parser.add_option("-v","--doVjets",dest="doVjets",action="store_true",help="Fit top",default=False)
+parser.add_option("-v","--doVjets",dest="doVjets",action="store_true",help="Fit Vjets",default=True)
 parser.add_option("-M","--mass",dest="signalMass",type=float,help="signal mass",default=1560.)
 parser.add_option("--prelim",dest="prelim",type=int,help="add preliminary label",default=0)
 parser.add_option("--log",dest="log",help="write output in logfile given as argument here!",default="chi2.log")
@@ -61,6 +61,9 @@ if options.name.find("BulkGZZ")!=-1:
     signalName="BulkGZZ"
 period = "2016"
 if options.name.find("2017")!=-1: period = "2017"
+if options.name.find("2018")!=-1: period = "2018"
+if options.name.find("Run2")!=-1: period = "Run2"
+
 
 
 def calculateChi2ForSig(hsig,pred,axis,logfile,label):
@@ -131,9 +134,11 @@ def get_pad(name):
  CMS_lumi.lumi_7TeV = "4.8 fb^{-1}"
  CMS_lumi.lumi_8TeV = "18.3 fb^{-1}"
  if period =="2016":  CMS_lumi.lumi_13TeV = "35.9 fb^{-1}"
- if period =="2017":  CMS_lumi.lumi_13TeV = "77.3 fb^{-1}"
+ if period =="2017":  CMS_lumi.lumi_13TeV = "41.5 fb^{-1}"
+ if period =="2018":  CMS_lumi.lumi_13TeV = "59.7 fb^{-1}"
+ if period =="Run2":  CMS_lumi.lumi_13TeV = "137.2 fb^{-1}"
  CMS_lumi.writeExtraText = 1
- CMS_lumi.lumi_sqrtS = "13 TeV (2016+2017)" # used with iPeriod = 0, e.g. for simulation-only plots (default is an empty string)
+ CMS_lumi.lumi_sqrtS = "13 TeV (Run2)" # used with iPeriod = 0, e.g. for simulation-only plots (default is an empty string)
  if options.prelim==0:
     CMS_lumi.extraText = " "
  if options.prelim==1:
@@ -366,7 +371,7 @@ def MakePlots(histos,hdata,hsig,axis,nBins,normsig = 1.,errors=None):
         scaling = 100.
         eff = 0.02
     
-    if hsig and (options.name.find('sigonly')!=-1  and doFit==0):
+    if hsig : #and (options.name.find('sigonly')!=-1  and doFit==0):
       print hsig.Integral()
       if hsig.Integral()!=0.:   
         hsig.Scale(scaling/normsig)
@@ -1196,7 +1201,7 @@ if __name__=="__main__":
     
      
      print period+" Postfit nonRes pdf:"
-     pdf1_nonres_shape_postfit  = args["shapeBkg_nonRes_JJ_"+purity+"_13TeV_2016"]
+     pdf1_nonres_shape_postfit  = args["shapeBkg_nonRes_JJ_"+purity+"_13TeV_"+period]
      pdf1_nonres_shape_postfit.Print()
      pdf1_nonres_shape_postfit.funcList().Print()
      pdf1_nonres_shape_postfit.coefList().Print()
@@ -1204,18 +1209,18 @@ if __name__=="__main__":
     
      if options.doVjets:
         print period+" Postfit W+jets res pdf:"
-        pdf1_Wres_shape_postfit  = args["shapeBkg_Wjets_JJ_"+purity+"_13TeV_2016"]
+        pdf1_Wres_shape_postfit  = args["shapeBkg_Wjets_JJ_"+purity+"_13TeV_"+period]
         pdf1_Wres_shape_postfit.Print()
         
         
         print period+" Postfit Z+jets res pdf:"
-        pdf1_Zres_shape_postfit  = args["shapeBkg_Zjets_JJ_"+purity+"_13TeV_2016"]
+        pdf1_Zres_shape_postfit  = args["shapeBkg_Zjets_JJ_"+purity+"_13TeV_"+period]
         pdf1_Zres_shape_postfit.Print()
         
      
      if options.addTop:
         print period+" Postfit tt res pdf:"
-        pdf1_TThad_shape_postfit  = args["shapeBkg_TThad_JJ_"+purity+"_13TeV_2016"]
+        pdf1_TThad_shape_postfit  = args["shapeBkg_TThad_JJ_"+purity+"_13TeV_"+period]
         pdf1_TThad_shape_postfit.Print()
         
      
@@ -1223,16 +1228,16 @@ if __name__=="__main__":
      pdf1_signal_postfit = 0
      if options.fitSignal:
       print period+" Signal pdf:"     
-      pdf1_signal_postfit  = args["shapeSig_"+signalName+"_JJ_"+purity+"_13TeV_2016"]
+      pdf1_signal_postfit  = args["shapeSig_"+signalName+"_JJ_"+purity+"_13TeV_"+period]
       pdf1_signal_postfit.Print()
       print
       
       
-     print "Full 2016 post-fit pdf:"     
+     print "Full post-fit pdf:"     
      pdf1_shape_postfit  = args[pdf1Name+"_nuis"]
      pdf1_shape_postfit.Print()
      print
-    
+
 		    
      allpdfsz = [] #let's have always pre-fit and post-fit as firt elements here, and add the optional shapes if you want with options.pdf
      allpdfsz.append(pdf1_nonres_shape_postfit)
@@ -1244,8 +1249,8 @@ if __name__=="__main__":
         if options.addTop:
             print "add top"
             allpdfsz.append(pdf1_TThad_shape_postfit)
-        else:
-            allpdfsz.append(pdf1_Zres_shape_postfit)
+       # else:
+       #     allpdfsz.append(pdf1_Zres_shape_postfit)
      allpdfsz.append(pdf1_shape_postfit)
      for p in options.pdfz.split(","):
          if p == '': continue
@@ -1260,8 +1265,8 @@ if __name__=="__main__":
         allpdfsx.append(pdf1_Zres_shape_postfit)
         if options.addTop:
             allpdfsx.append(pdf1_TThad_shape_postfit)
-        else:
-            allpdfsx.append(pdf1_Zres_shape_postfit) #dummy, not used
+        #else:
+        #    allpdfsx.append(pdf1_Zres_shape_postfit) #dummy, not used
      allpdfsx.append(pdf1_shape_postfit)
      for p in options.pdfx.split(","):
          if p == '': continue
@@ -1276,8 +1281,8 @@ if __name__=="__main__":
         allpdfsy.append(pdf1_Zres_shape_postfit)
         if options.addTop:
             allpdfsy.append(pdf1_TThad_shape_postfit)
-        else:
-            allpdfsy.append(pdf1_Zres_shape_postfit)
+        #else:
+        #    allpdfsy.append(pdf1_Zres_shape_postfit)
      allpdfsy.append(pdf1_shape_postfit)
      for p in options.pdfy.split(","):
          if p == '': continue
@@ -1285,7 +1290,7 @@ if __name__=="__main__":
          args[p].Print()
          allpdfsy.append(args[p])
       
-      
+
      norm1_nonres = [0,0]
      norm1_nonres[0] = (args[pdf1Name].getComponents())["n_exp_binJJ_"+purity+"_13TeV_"+period+"_proc_nonRes"].getVal()
      norm1_Wres = [0,0]
