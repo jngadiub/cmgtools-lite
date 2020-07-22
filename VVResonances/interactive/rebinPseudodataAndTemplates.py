@@ -12,52 +12,59 @@ parser.add_option("-c","--category",dest="category",help="VV_HPHP or VV_HPLP or 
 parser.add_option("-i","--indir",dest="indir",help="input directory",default='')
 parser.add_option("-o","--outdir",dest="outdir",help="output directory",default='')
 parser.add_option("-b","--binning",dest="binning",help="rebinning factor",type="int",default=1)
+parser.add_option("-p","--period",dest="period",help="period e.g 2016 or Run2",default="2016")
+parser.add_option("-w","--wtd",dest="wtd",help="What to do? pseudodata and/or shapes",default="shapes")
+
 (options,args) = parser.parse_args()
+
 purity = options.category
-rebin= options.binning
+rebin  = options.binning
+period = options.period
 
 
-# first rebin pseudodata
-pseudo = "JJ_PDVjets_"+str(purity)+".root"
+if options.wtd.find("pseudo")!= -1 :
+    print "####        rebinning pseudo data "
+    pseudo = "JJ_"+str(period)+"_PDVjets_"+str(purity)+".root"
 
-r_file = ROOT.TFile(str(options.indir)+pseudo,"READ")
-data = r_file.Get("data")
-nonRes = r_file.Get("nonRes")
+    r_file = ROOT.TFile(str(options.indir)+pseudo,"READ")
+    data = r_file.Get("data")
+    nonRes = r_file.Get("nonRes")
 
-#print data.GetXaxis().GetNbins()
+    #print data.GetXaxis().GetNbins()
 
-data.RebinX(rebin)
+    data.RebinX(rebin)
 
-#print data.GetXaxis().GetNbins()
+    #print data.GetXaxis().GetNbins()
+    
+    data.RebinY(rebin)
 
-data.RebinY(rebin)
-
-nonRes.RebinX(rebin)
-nonRes.RebinY(rebin)
-
-
-r_file_out = ROOT.TFile(str(options.outdir)+pseudo,"RECREATE")
-data.Write()
-nonRes.Write("nonRes")
+    nonRes.RebinX(rebin)
+    nonRes.RebinY(rebin)
 
 
+    r_file_out = ROOT.TFile(str(options.outdir)+pseudo,"RECREATE")
+    data.Write()
+    nonRes.Write("nonRes")
 
 
-# then rebin also templates
-generators = ["pythia","madgraph","herwig"]
-for gen in generators:
-    print "gen"
-    templ = "save_new_shapes_2016_"+gen+"_"+str(purity)+"_3D.root"
-    f_templ = ROOT.TFile(str(options.indir)+templ,"READ")
-    fout_templ = ROOT.TFile(str(options.outdir)+templ,"RECREATE")
-    for key in f_templ.GetListOfKeys():
-        print key.GetName()
-        kname = key.GetName()
-        hist = f_templ.Get(kname)
-        #print hist.GetEntries()
-        #print hist.GetXaxis().GetNbins()
-        hist.RebinX(rebin)
-        hist.RebinY(rebin)
-        #print hist.GetXaxis().GetNbins()
-        hist.Write()
+
+if options.wtd.find("shapes")!=-1 :
+    print "####        rebinning template shapes "
+
+    generators = ["pythia","madgraph","herwig"]
+    for gen in generators:
+        print "gen"
+        templ = "save_new_shapes_"+str(period)+"_"+gen+"_"+str(purity)+"_3D.root"
+        f_templ = ROOT.TFile(str(options.indir)+templ,"READ")
+        fout_templ = ROOT.TFile(str(options.outdir)+templ,"RECREATE")
+        for key in f_templ.GetListOfKeys():
+            print key.GetName()
+            kname = key.GetName()
+            hist = f_templ.Get(kname)
+            #print hist.GetEntries()
+            #print hist.GetXaxis().GetNbins()
+            hist.RebinX(rebin)
+            hist.RebinY(rebin)
+            #print hist.GetXaxis().GetNbins()
+            hist.Write()
 
