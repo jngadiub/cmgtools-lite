@@ -23,7 +23,7 @@ def beautify(h1,color,linestyle=1,markerstyle=8):
     h1.SetMarkerSize(1.5)
 
 
-def getLegend(x1=0.2,y1=0.65,x2=0.45,y2=0.75):
+def getLegend(x1=0.2,y1=0.75,x2=0.45,y2=0.85):
 #def getLegend(x1=0.70010112,y1=0.693362,x2=0.90202143,y2=0.829833):
   legend = ROOT.TLegend(x1,y1,x2,y2)
   legend.SetTextSize(0.032)
@@ -168,7 +168,7 @@ colors.append(["#e6a3e1","#d987e6","#ce5ce0","#822391","#8526bd","#9b20e3","#a87
 colors.append(["#45444B","#6B6974","#807D8D","#8F8BA2","#A39EBB","#AEA7D1","#B2A9E2","#B2A6F5"]*3)
 
 colorsyears= {'2016': "#4292c6",'2017': "#41ab5d",'2018':"#ef3b2c", 'Run2': "#17202A"}
-
+markeryears={'2016':8, '2017':25,'2018':22,'Run2':32}
 
 '''
 def doSingle():
@@ -249,7 +249,7 @@ def doYields(signal,legend,years,colorindex):
         gr[purity][year].SetLineStyle(2)
         gr[purity][year].SetLineWidth(2)
         gr[purity][year].SetMarkerColor(ROOT.TColor.GetColor(colorsyears[year]))
-        gr[purity][year].SetMarkerStyle(22)
+        gr[purity][year].SetMarkerStyle(markeryears[year])
         
         ff = gr[purity][year].GetFunction("func")
         gr[purity][year].Fit(ff)
@@ -346,7 +346,7 @@ def doYields(signal,legend,years,colorindex):
       gr_tot.SetLineStyle(1)
       gr_tot.SetLineWidth(2)
       gr_tot.SetMarkerColor(ROOT.TColor.GetColor(colorsyears[year]))
-      gr_tot.SetMarkerStyle(20)
+      gr_tot.SetMarkerStyle(markeryears[year])
       gr_tot.SetMinimum(0.)
       gr_tot.SetMaximum(0.3)
       gr_tot.GetXaxis().SetLimits(1000.,8500.)
@@ -404,8 +404,8 @@ def doMVV(signal,titles,years):
       for i,f in enumerate(files):
         g = f.Get(var)
         fun = f.Get(var+"_func")
-        beautify(fun ,rt.TColor.GetColor(colorsyears[years[i]]),2,20+i)
-        beautify(g ,rt.TColor.GetColor(colorsyears[years[i]]),2,20+i)
+        beautify(fun ,rt.TColor.GetColor(colorsyears[years[i]]),2,markeryears[years[i]])
+        beautify(g ,rt.TColor.GetColor(colorsyears[years[i]]),2,markeryears[years[i]])
         #fun.SetLineColor(0)
         #fun.SetLineWidth(0)
 
@@ -451,7 +451,7 @@ def doMVV(signal,titles,years):
 
       cmslabel_sim_prelim(c,'sim',11)
       c.Update()
-      name = path+"Signal_mVV_allyears_"+var+"_"+signal
+      name = path+"Signal_mVV_allyears_"+var+"_"+signal+"_"+options.name
       c.SaveAs(name+".png")
       c.SaveAs(name+".pdf")
       c.SaveAs(name+".C")
@@ -501,10 +501,10 @@ def doJetMass(leg,signal,titles,years):
            g = f.Get(var)
            fun = f.Get(var+"_func")
 
-           beautify(fun  ,rt.TColor.GetColor(colorsyears[years[i]]),2,23+i)
-           beautify(funH ,rt.TColor.GetColor(colorsyears[years[i]]),1,23+i)
-           beautify(g ,rt.TColor.GetColor(colorsyears[years[i]]),2,23+i)
-           beautify(gH ,rt.TColor.GetColor(colorsyears[years[i]]),1,23+i)
+           beautify(fun  ,rt.TColor.GetColor(colorsyears[years[i]]),2,markeryears[years[i]])
+           beautify(funH ,rt.TColor.GetColor(colorsyears[years[i]]),1,markeryears[years[i]])
+           beautify(g ,rt.TColor.GetColor(colorsyears[years[i]]),2,markeryears[years[i]])
+           beautify(gH ,rt.TColor.GetColor(colorsyears[years[i]]),1,markeryears[years[i]])
            datas.append(g)
            datasHjet.append(gH)
            fits.append(fun)
@@ -553,7 +553,7 @@ def doJetMass(leg,signal,titles,years):
        cmslabel_sim_prelim(c,'sim',11)
 
        c.Update()
-       name = path+"Signal_mjet_Allyears_"+signal+"_"+var
+       name = path+"Signal_mjet_Allyears_"+signal+"_"+var+"_"+options.name
        c.SaveAs(name+".png")
        c.SaveAs(name+".pdf")
        c.SaveAs(name+".C")
@@ -563,14 +563,14 @@ if __name__ == '__main__':
 #    doSingle() #NB: some fix would be needed here!
 #    signals = ["BulkGZZ","WprimeWZ","BulkGWW","ZprimeWW","ZprimeZH","WprimeWH"]
 #    legs = ["G_{bulk} #rightarrow ZZ","W' #rightarrow WZ","G_{bulk} #rightarrow WW","Z'#rightarrow WW","Z'#rightarrow ZH","W'#rightarrow WH"]                                               
-    signals = ["BulkGWW","ZprimeZH"]
-    legs = ["G_{bulk} #rightarrow WW","Z'#rightarrow ZH"]                                                                                                                                                     
+#    signals = ["BulkGWW","ZprimeZH"]
+#    legs = ["G_{bulk} #rightarrow WW","Z'#rightarrow ZH"]                                                                                                                                                     
 #    signals = ["ZprimeZH"]
 #    legs = ["Z'#rightarrow ZH"]                                                                                                                                                     
 
 
-#    signals = ["BulkGWW"] 
-#    legs = ["G_{bulk} #rightarrow WW"] 
+    signals = ["BulkGWW"] 
+    legs = ["G_{bulk} #rightarrow WW"] 
     years = ["2016","2017","2018","Run2"]    
     for i in range(len(signals)):
 #    for i in range(1):
