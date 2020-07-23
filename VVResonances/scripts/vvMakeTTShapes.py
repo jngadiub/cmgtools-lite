@@ -274,7 +274,15 @@ def doFit(th1_projY,mjj_mean,mjj_error,N):
     fitter.importBinnedData(projY,['x'],'data_full')
     fitter.fit('model','data_full',[ROOT.RooFit.SumW2Error(False),ROOT.RooFit.Save(1),ROOT.RooFit.Range(options.mini,options.maxi),ROOT.RooFit.Minimizer('Minuit2','migrad'), ROOT.RooFit.Extended(True)],requireConvergence=False) #55,140 works well with fitting only the resonant part
     fitter.projection_ratioplot("model","data_full","x","%s/%s_fullMjjSpectra.pdf"%(debug_out,options.output),0,False,"m_{jet} (GeV)",options.output.split("_")[-2]+" "+options.output.split("_")[-1])
-
+    string = '{'
+    for var,graph in graphs.iteritems():
+        value,error=fitter.fetch(var)
+        string = string+'"%s": "%f",'%(var,value)
+    string = string +'}'
+    f=open(options.output+"_inclusive.json","w")
+    json.dump(string,f)
+    f.close()
+    print "Output name is %s" %options.output+"_inclusive.json"
   else:
     for var,graph in graphs.iteritems():
       yvalues = graphs[var].GetY()
