@@ -12,7 +12,7 @@ gROOT.SetBatch(True)
 path = sys.argv[1]
 cols = [46,30]
 colors = ["#4292c6","#41ab5d","#ef3b2c","#17202A","#2c7bb6","#abd9e9","#fdae61","#abd9e9","#2c7bb6"]
-mstyle = [8,24,22,26,32]                                                                                                                                                                                                                     
+mstyle = [8,25,22,32]                                                                                                                                                                                                                     
 #linestyle=[1,2,1,2,3]                                                                                                                                                                                                                        
 markerstyle = [1,4,8,10,20,25]
 linestyle = [1,2,3,4,5,6,7,8,9]
