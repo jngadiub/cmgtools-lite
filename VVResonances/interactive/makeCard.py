@@ -58,7 +58,7 @@ print type(lumi)
 #scalesHiggs = {"2017" :[ctx17.H_HPmassscale,ctx17.H_LPmassscale], "2016":[ctx16.H_HPmassscale,ctx16.H_LPmassscale], "2018":[ctx18.H_HPmassscale,ctx18.H_LPmassscale]}
 
 scales = {"2017" :[1,1], "2016":[1,1], "2018":[1,1], "Run2":[1,1]}
-scalesHiggs = {"2017" :[1,1], "2016":[1,1], "2018":[1,1]}
+scalesHiggs = {"2017" :[1,1], "2016":[1,1], "2018":[1,1], "Run2":[1,1]}
 
 #quick fix to add VH !!!
 vtag_pt_dependence = ctx.vtag_pt_dependence #{"2016" : ctx.vtag_pt_dependence["2016"],"2017" : ctx.vtag_pt_dependence["2017"],"2018" : ctx.vtag_pt_dependence["2018"]}
