@@ -31,7 +31,7 @@ parser.add_option("-l","--label",dest="label",help="add extra label such as pyth
 parser.add_option("--pdfz",dest="pdfz",help="name of pdfs lie PTZUp etc",default="")
 parser.add_option("--pdfx",dest="pdfx",help="name of pdfs lie PTXUp etc",default="")
 parser.add_option("--pdfy",dest="pdfy",help="name of pdfs lie PTYUp etc",default="")
-parser.add_option("-s","--signal",dest="fitSignal",action="store_true",help="do S+B fit",default=False)
+parser.add_option("-s","--signal",dest="fitSignal",help="do S+B fit",default=False)
 parser.add_option("--doFit",dest="fit",action="store_false",help="actually fit the the distributions",default=True)
 parser.add_option("-t","--addTop",dest="addTop",action="store_true",help="Fit top",default=False)
 parser.add_option("-v","--doVjets",dest="doVjets",action="store_true",help="Fit Vjets",default=True)
@@ -47,6 +47,7 @@ ROOT.RooMsgService.instance().setGlobalKillBelow(ROOT.RooFit.FATAL)
 colors = [ROOT.kGray+2,ROOT.kRed,ROOT.kBlue,ROOT.kGray+1,210,210,ROOT.kMagenta,ROOT.kMagenta,ROOT.kOrange,ROOT.kOrange,ROOT.kViolet,ROOT.kViolet]
 doFit = options.fit
 
+print " do signal fit ? ",options.fitSignal
 
 signalName = "ZprimeZH"
 if options.name.find("WZ")!=-1:
@@ -267,7 +268,7 @@ def reduceBinsToRange(Bins,r):
     return result
 
 
-def MakePlots(histos,hdata,hsig,axis,nBins,normsig = 1.,errors=None):
+def MakePlots(histos,hdata,hsig,axis,nBins,normsig = 1.,errors=None, binwidth =2):
    
     extra1 = ''
     extra2 = ''
@@ -326,7 +327,7 @@ def MakePlots(histos,hdata,hsig,axis,nBins,normsig = 1.,errors=None):
     histos[0].GetYaxis().SetTitleOffset(1.3)
     histos[0].GetYaxis().SetTitle("Events")
     histos[0].GetYaxis().SetTitleOffset(1.3)
-    histos[0].GetYaxis().SetTitle("Events / 2 GeV")
+    histos[0].GetYaxis().SetTitle("Events / "+str(binwidth)+" GeV")
     if axis == 'z': histos[0].GetYaxis().SetTitle("Events / 100 GeV")
     histos[0].GetYaxis().SetTitleSize(0.06)
     histos[0].GetYaxis().SetLabelSize(0.06)
@@ -636,12 +637,12 @@ def doZprojection(pdfs,data,norm_nonres,norm_Wres,pdf_sig,norm_sig,norm_Zres,nor
     for i in range(10,len(h)): hfinals.append(h[i])    
     for b,v in neventsPerBin_1.iteritems(): dh.SetBinContent(b,neventsPerBin_1[b])
     dh.SetBinErrorOption(ROOT.TH1.kPoisson)
-    if doFit:
+    if doFit == True:
         errors = draw_error_band(htot,norm_nonres[0]+norm_Wres[0]+norm_Zres[0]+norm_TThad[0],math.sqrt(norm_nonres[1]*norm_nonres[1]+norm_Wres[1]*norm_Wres[1]+norm_Zres[1]*norm_Zres[1]+norm_TThad[1]*norm_TThad[1]),pdfs[-1],zBinslowedge,'z')
         MakePlots(hfinals,dh,htot_sig,'z',zBinslowedge,norm_sig[0],errors)
     else: MakePlots(hfinals,dh,htot_sig,'z',zBinslowedge,norm_sig[0])
         
-def doXprojection(pdfs,data1,norm1_nonres,norm1_Wres,pdf1_sig,norm1_sig,norm1_Zres,norm1_TThad):
+def doXprojection(pdfs,data1,norm1_nonres,norm1_Wres,pdf1_sig,norm1_sig,norm1_Zres,norm1_TThad,binwidth=2):
     data1 = ROOT.RooDataHist("data1","data1",args_ws,data1)
     # do some x projections
     h=[]
@@ -729,12 +730,12 @@ def doXprojection(pdfs,data1,norm1_nonres,norm1_Wres,pdf1_sig,norm1_sig,norm1_Zr
     for i in range(10,len(h)): hfinals.append(h[i])    
     for b,v in neventsPerBin_1.iteritems(): dh.SetBinContent(b,neventsPerBin_1[b])
     dh.SetBinErrorOption(ROOT.TH1.kPoisson)
-    if doFit:
+    if doFit == True:
         errors = draw_error_band(htot,norm1_nonres[0]+norm1_Wres[0]+norm1_Zres[0]+norm1_TThad[0],math.sqrt(norm1_nonres[1]*norm1_nonres[1]+norm1_Wres[1]*norm1_Wres[1]+norm1_Zres[1]*norm1_Zres[1]+norm1_TThad[1]*norm1_TThad[1]),pdfs[-1],xBinslowedge,'x')
-        MakePlots(hfinals,dh,htot_sig,'x',xBinslowedge,norm1_sig[0],errors)
+        MakePlots(hfinals,dh,htot_sig,'x',xBinslowedge,norm1_sig[0],errors,binwidth)
     else: MakePlots(hfinals,dh,htot_sig,'x',xBinslowedge,norm1_sig[0])
 
-def doYprojection(pdfs,data1,norm1_nonres,norm1_Wres,pdf1_sig,norm1_sig,norm1_Zres,norm1_TThad):
+def doYprojection(pdfs,data1,norm1_nonres,norm1_Wres,pdf1_sig,norm1_sig,norm1_Zres,norm1_TThad,binwidth = 2):
     data1 = ROOT.RooDataHist("data1","data1",args_ws,data1)
     # do some y projections
     h=[]
@@ -799,7 +800,7 @@ def doYprojection(pdfs,data1,norm1_nonres,norm1_Wres,pdf1_sig,norm1_sig,norm1_Zr
         htot_Wres = ROOT.TH1F("htot_Wres","htot_Wres",len(yBinslowedge)-1,yBinslowedge)
         htot_Wres.Add(h[1])
     
-        htot_Zres = ROOT.TH1F("htot_Wres","htot_Wres",len(yBinslowedge)-1,yBinslowedge)
+        htot_Zres = ROOT.TH1F("htot_Zres","htot_Zres",len(yBinslowedge)-1,yBinslowedge)
         htot_Zres.Add(h[2])
         
         htot_TThad = ROOT.TH1F("htot_TThad","htot_TThad",len(yBinslowedge)-1,yBinslowedge)
@@ -819,9 +820,9 @@ def doYprojection(pdfs,data1,norm1_nonres,norm1_Wres,pdf1_sig,norm1_sig,norm1_Zr
     for i in range(10,len(h)): hfinals.append(h[i])    
     for b,v in neventsPerBin_1.iteritems(): dh.SetBinContent(b,neventsPerBin_1[b])
     dh.SetBinErrorOption(ROOT.TH1.kPoisson)
-    if doFit:
+    if doFit == True:
         errors = draw_error_band(htot,norm1_nonres[0]+norm1_Wres[0]+norm1_Zres[0]+norm1_TThad[0],math.sqrt(norm1_nonres[1]*norm1_nonres[1]+norm1_Wres[1]*norm1_Wres[1]+norm1_Zres[1]*norm1_Zres[1]+norm1_TThad[1]*norm1_TThad[1]),pdfs[-1],yBinslowedge,'y')
-        MakePlots(hfinals,dh,htot_sig,'y',yBinslowedge,norm1_sig[0],errors)
+        MakePlots(hfinals,dh,htot_sig,'y',yBinslowedge,norm1_sig[0],errors,binwidth)
     else: MakePlots(hfinals,dh,htot_sig,'y',yBinslowedge,norm1_sig[0])
  
 
@@ -1077,7 +1078,8 @@ def getChi2proj(histo_pdf,histo_data,minx=-1,maxx=-1):
 if __name__=="__main__":
      finMC = ROOT.TFile(options.input,"READ");
      hinMC = finMC.Get("nonRes");
-
+     binwidth = hinMC.GetXaxis().GetBinWidth(3)
+     print "binwidth ",binwidth
      print options.input
      if options.input.find("VV_HPLP")!=-1: purity="VV_HPLP"
      elif options.input.find("VV_HPHP")!=-1: purity="VV_HPHP"
@@ -1137,7 +1139,9 @@ if __name__=="__main__":
 
      model = workspace.pdf("model_b") 
      model_b = workspace.pdf("model_b")
-     if options.fitSignal: model = workspace.pdf("model_s")
+     if options.fitSignal == True: 
+         print " %%%%%%%%% model = model_s" 
+         model = workspace.pdf("model_s")
      data_all = workspace.data("data_obs")
      data_all.Print()
      data1 = workspace.data("data_obs").reduce("CMS_channel==CMS_channel::JJ_"+purity+"_13TeV_"+period)
@@ -1147,7 +1151,7 @@ if __name__=="__main__":
      print model
      args  = model.getComponents()
      pdf1Name = "pdf_binJJ_"+purity+"_13TeV_"+period+"_bonly"
-     if options.fitSignal:
+     if options.fitSignal == True:
       pdf1Name = "pdf_binJJ_"+purity+"_13TeV_"+period
      print "pdf1Name ",pdf1Name
      print args
@@ -1161,10 +1165,11 @@ if __name__=="__main__":
         wjets_exp      = (args[pdf1Name].getComponents())["n_exp_binJJ_"+purity+"_13TeV_"+period+"_proc_Wjets"].getVal()
         zjets_exp      = (args[pdf1Name].getComponents())["n_exp_binJJ_"+purity+"_13TeV_"+period+"_proc_Zjets"].getVal()
      else: wjets_exp= 0.; zjets_exp=0.
-     
+     print " QCD ",qcd_exp, " wjets_exp ",wjets_exp , " zjets_exp ",zjets_exp
+
      if options.addTop:
        print "Expected number of tt events:",(args[pdf1Name].getComponents())["n_exp_binJJ_"+purity+"_13TeV_"+period+"_proc_TThad"].getVal(),"("+period+")"
-     if options.fitSignal:
+     if options.fitSignal == True:
       print "fitting Signal"
       workspace.var("MH").setVal(options.signalMass)
       workspace.var("MH").setConstant(1)
@@ -1176,10 +1181,10 @@ if __name__=="__main__":
 
      #################################################
      print
-     if doFit:
+     if doFit == True:
         print "Fitting S+B"
         fitresult = model.fitTo(data_all,ROOT.RooFit.SumW2Error(not(options.data)),ROOT.RooFit.Minos(0),ROOT.RooFit.Verbose(0),ROOT.RooFit.Save(1),ROOT.RooFit.NumCPU(8))  
-
+        print " FIT RESULT ",fitresult.Print() 
 #        print "Fitting b"
 #        fitresult_bkg_only = model_b.fitTo(data_all,ROOT.RooFit.SumW2Error(not(options.data)),ROOT.RooFit.Minos(0),ROOT.RooFit.Verbose(0),ROOT.RooFit.Save(1),ROOT.RooFit.NumCPU(8))  
 #        print "done fitting!!!!!!"
@@ -1212,7 +1217,6 @@ if __name__=="__main__":
         pdf1_Wres_shape_postfit  = args["shapeBkg_Wjets_JJ_"+purity+"_13TeV_"+period]
         pdf1_Wres_shape_postfit.Print()
         
-        
         print period+" Postfit Z+jets res pdf:"
         pdf1_Zres_shape_postfit  = args["shapeBkg_Zjets_JJ_"+purity+"_13TeV_"+period]
         pdf1_Zres_shape_postfit.Print()
@@ -1226,7 +1230,7 @@ if __name__=="__main__":
      
 
      pdf1_signal_postfit = 0
-     if options.fitSignal:
+     if options.fitSignal == True:
       print period+" Signal pdf:"     
       pdf1_signal_postfit  = args["shapeSig_"+signalName+"_JJ_"+purity+"_13TeV_"+period]
       pdf1_signal_postfit.Print()
@@ -1300,21 +1304,24 @@ if __name__=="__main__":
         norm1_Zres[0] = (args[pdf1Name].getComponents())["n_exp_binJJ_"+purity+"_13TeV_"+period+"_proc_Zjets"].getVal()
      norm1_TThad = [0,0]
      norm1_sig = [0,0]
+
+
+     print " norm1_nonres[0] ",norm1_nonres[0] ," norm1_Wres[0] ",norm1_Wres[0] ," norm1_Zres ",norm1_Zres[0]
       
      print
      (args[pdf1Name].getComponents())["n_exp_binJJ_"+purity+"_13TeV_"+period+"_proc_nonRes"].dump() 
-     if doFit:
+     if doFit == True:
         norm1_nonres[1] = (args[pdf1Name].getComponents())["n_exp_binJJ_"+purity+"_13TeV_"+period+"_proc_nonRes"].getPropagatedError(fitresult)
         
      if options.doVjets:              
         print
         (args[pdf1Name].getComponents())["n_exp_binJJ_"+purity+"_13TeV_"+period+"_proc_Wjets"].dump()
-        if doFit:
+        if doFit == True:
             norm1_Wres[1] = (args[pdf1Name].getComponents())["n_exp_binJJ_"+purity+"_13TeV_"+period+"_proc_Wjets"].getPropagatedError(fitresult)
             
         print
         (args[pdf1Name].getComponents())["n_exp_binJJ_"+purity+"_13TeV_"+period+"_proc_Zjets"].dump()
-        if doFit:
+        if doFit == True:
             norm1_Zres[1] = (args[pdf1Name].getComponents())["n_exp_binJJ_"+purity+"_13TeV_"+period+"_proc_Zjets"].getPropagatedError(fitresult)
             
         
@@ -1322,7 +1329,7 @@ if __name__=="__main__":
         print
         (args[pdf1Name].getComponents())["n_exp_binJJ_"+purity+"_13TeV_"+period+"_proc_TThad"].dump()
         norm1_TThad[0] = (args[pdf1Name].getComponents())["n_exp_binJJ_"+purity+"_13TeV_"+period+"_proc_TThad"].getVal()
-        if doFit:
+        if doFit == True:
             norm1_TThad[1] = (args[pdf1Name].getComponents())["n_exp_binJJ_"+purity+"_13TeV_"+period+"_proc_TThad"].getPropagatedError(fitresult)
         
      else:
@@ -1333,23 +1340,24 @@ if __name__=="__main__":
         norm2_TThad[0] = 1.
         norm2_TThad[1] = 1.
         
-     if options.fitSignal:
+     if options.fitSignal==True:
          print
          #(args[pdfName].getComponents())["n_exp_final_binJJ_"+purity+"_13TeV_proc_"+signalName+""].dump()
          norm1_sig[0] = (args[pdf1Name].getComponents())["n_exp_final_binJJ_"+purity+"_13TeV_"+period+"_proc_"+signalName+""].getVal() 
-         if doFit:
+         if doFit == True:
             norm1_sig[1] = (args[pdf1Name].getComponents())["n_exp_final_binJJ_"+purity+"_13TeV_"+period+"_proc_"+signalName+""].getPropagatedError(fitresult)
          print "get norm sig "+str(norm1_sig[0])
             
-     if doFit:                
+     if doFit == True:                
         print
         print "QCD normalization after fit: ",norm1_nonres[0],"+/-",norm1_nonres[1],"("+period+")"
-        if options.doVjets:
+        if options.doVjets == True:
             print "W+jets normalization after fit: ",norm1_Wres[0],"+/-",norm1_Wres[1],"("+period+")"
             print "Z+jets normalization after fit: ",norm1_Zres[0],"+/-",norm1_Zres[1],"("+period+")"
             if options.addTop: print "tt normalization after fit: ",norm1_TThad[0],"+/-",norm1_TThad[1],"("+period+")"
-            if options.fitSignal: print "Signal yields after fit: ",norm1_sig[0],"+/-",norm1_sig[1],"("+period+")"
+            if options.fitSignal == True: print "Signal yields after fit: ",norm1_sig[0],"+/-",norm1_sig[1],"("+period+")"
             print
+        #print " %%%%%% Fit Result ",fitresults.Print()
      
                    
     
@@ -1393,8 +1401,8 @@ if __name__=="__main__":
          
      if options.projection =="xyz":
       doZprojection(allpdfsz,data1,norm1_nonres,norm1_Wres,pdf1_signal_postfit,norm1_sig,norm1_Zres,norm1_TThad)
-      doXprojection(allpdfsx,data1,norm1_nonres,norm1_Wres,pdf1_signal_postfit,norm1_sig,norm1_Zres,norm1_TThad)
-      doYprojection(allpdfsy,data1,norm1_nonres,norm1_Wres,pdf1_signal_postfit,norm1_sig,norm1_Zres,norm1_TThad)
+      doXprojection(allpdfsx,data1,norm1_nonres,norm1_Wres,pdf1_signal_postfit,norm1_sig,norm1_Zres,norm1_TThad,binwidth)
+      doYprojection(allpdfsy,data1,norm1_nonres,norm1_Wres,pdf1_signal_postfit,norm1_sig,norm1_Zres,norm1_TThad,binwidth)
      
      logfile.close()
 
