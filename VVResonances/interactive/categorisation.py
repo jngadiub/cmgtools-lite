@@ -2,6 +2,7 @@
 #use this as input for the migrationUncertainties.py script
 import ROOT
 import os, sys, re, optparse,pickle,shutil,json
+from collections import defaultdict
 ROOT.gROOT.SetBatch(True)
 ROOT.gStyle.SetOptStat(0)
 from array import array
@@ -24,18 +25,51 @@ parser.add_option("-d","--directory",dest="directory",help="directory with signa
 (options,args) = parser.parse_args()
 
 
-def getSamplelist(directory,signal):
-    samples =[]
-    for filename in os.listdir(directory):
-      if filename.find(signal)!=-1 and filename.find('root')!=-1:
-        if filename.find("VBF")!=-1 and signal.find("VBF")==-1: continue  
-        samples.append(directory+filename)
-    print samples
-    return samples
+def getSamplelist(directories,signal,minMX=1200.,maxMX=8000.):
+    samples = {}
+    dirs=directories.split(",")
+    for directory in dirs:
+        #samples[directory] = {}
+        for filename in os.listdir(directory):
+            if filename.find(signal)!=-1 and filename.find('root')!=-1:
+                if filename.find("VBF")!=-1 and signal.find("VBF")==-1: continue  
+                fnameParts=filename.split('.')
+                fname=fnameParts[0]
+
+                mass = float(fname.split('_')[-1])
+                if mass < minMX or mass > maxMX: continue
+                #if samples[fname] == None: samples.update({fname:[]})
+                samples[fname].update({directory : directory+fname})
+                #samples[directory].update({fname : directory+fname})
+                print 'found ',directory+fname,' mass',str(mass)
+
+    complete_mass = {} #defaultdict(dict)
+    for mass in samples.keys():
+        print mass
+        i= 0
+        for directory in dirs:
+            try:
+                x = samples[mass][directory]
+                print " x ", x
+                i+=1
+            except KeyError:
+                print "!!!!    directory ", directory, " missing for mass", mass ," !!!!!!!!"
+                pass
+        print i
+        if i == len(dirs):
+            for directory in dirs:
+                x = samples[mass][directory]
+                complete_mass[mass].append(x)
+
+
+    print " complete ",complete_mass
+
+    return complete_mass
 
 
 
 def selectSignalTree(cs,sample):
+    print sample 
     rfile = ROOT.TFile(sample,'READ')
     tree = rfile.Get('AnalysisTree')
     outfile = ROOT.TFile('tmp.root','RECREATE')
@@ -211,14 +245,31 @@ class myTree:
         self.newTree.Write()
 
 if __name__=='__main__':
-    outfile = ROOT.TFile('migrationunc/'+options.signal+'_'+options.year+'.root','RECREATE')
     if options.directory.find(options.year)== -1: print 'ATTENTION: are you sure you are using the right directory for '+options.year+' data?'    
-    ctx  = cuts.cuts("init_VV_VH.json",options.year,"random_dijetbins")
-    samplelist= getSamplelist(options.directory,options.signal)
-    for sample in samplelist:
+    period = options.year
+    ctx  = cuts.cuts("init_VV_VH.json",period,"random_dijetbins")
+    samples=""
+    basedir=options.directory
+    filePeriod=options.year
+
+    if options.year.find(",")!=-1:
+        period = options.year.split(',')
+        filePeriod="Run2"
+
+        for year in period:
+            print year
+            if year==period[-1]: samples+=basedir+year+"/"
+            else: samples+=basedir+year+"/,"
+    else: 
+        samples=basedir+period+"/"
+    outfile = ROOT.TFile('migrationunc/'+options.signal+'_'+filePeriod+'.root','RECREATE')
+
+    samplelist= getSamplelist(samples,options.signal,ctx.minMX,ctx.maxMX)
+
+    for sample in samplelist.keys():
         print sample
         print 'init new tree'
-        outtree = myTree(sample.split('.root')[0].replace(options.directory,''),outfile)
+        outtree = myTree(sample,outfile)
         print 'select common cuts signal tree' 
         selectSignalTree(ctx.cuts,sample)
         
