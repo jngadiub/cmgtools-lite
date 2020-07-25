@@ -31,7 +31,7 @@ parser.add_option("-l","--label",dest="label",help="add extra label such as pyth
 parser.add_option("--pdfz",dest="pdfz",help="name of pdfs lie PTZUp etc",default="")
 parser.add_option("--pdfx",dest="pdfx",help="name of pdfs lie PTXUp etc",default="")
 parser.add_option("--pdfy",dest="pdfy",help="name of pdfs lie PTYUp etc",default="")
-parser.add_option("-s","--signal",dest="fitSignal",help="do S+B fit",default=False)
+parser.add_option("-s","--signal",dest="fitSignal",action="store_true",help="do S+B fit",default=False)
 parser.add_option("--doFit",dest="fit",action="store_false",help="actually fit the the distributions",default=True)
 parser.add_option("-t","--addTop",dest="addTop",action="store_true",help="Fit top",default=False)
 parser.add_option("-v","--doVjets",dest="doVjets",action="store_true",help="Fit Vjets",default=True)
