@@ -31,7 +31,7 @@ parser.add_option("-f","--final",dest="final",type=int, default=1,help="Prelimin
 
 plotVV1D=False
 plotVV3D2016= True
-plotVV3D=False
+plotVV3D=True
 plotVV3D2016data=False #True
 plotVV3D2016pseudodata=False
 plotVH2016=False
@@ -72,7 +72,7 @@ titleY = "#sigma x BR(G_{Bulk} #rightarrow WW) (pb)  "
 #oname= "BulkGWW_scheme2_deepAK8_VVVH_optimizations"
 #oname= "BulkGWW_VVinclu_tau21_vs_VVVHtau21doubleB_VVinclu_deepWDDT_VVVHdeepAK8_deltaEtaMaps"
 #oname= "BulkGWW_VVinclu_tau21_vs_VVVHtau21doubleB_migrUnc"
-oname="BulkGWW_scheme2_deepAK8_VVVH_deltaEtaMaps"
+oname="BulkGWW_scheme2_deepAK8_VVVH_deltaEtaMaps_2016vsRun2"
 #title = ["HPLP","HPHP","HPHP+HPLP","B2G-17-001"]
 #files = ["LIMITS_DDT_latest/WW/HPLP/Limits_BulkGWW_HPLP_13TeV.root","LIMITS_DDT_latest/WW/HPHP/Limits_BulkGWW_HPHP_13TeV.root","LIMITS_DDT_latest/WW/combined/Limits_BulkGWW_13TeV.root","limits_b2g17001/Limits_b2g17001_BulkGWW_13TeV.root"]
 
@@ -83,8 +83,11 @@ oname="BulkGWW_scheme2_deepAK8_VVVH_deltaEtaMaps"
 #title = ["tau21DDT","deepAKWDDT","VVVH tau21DDT+doubleB migrUnc","VVVH deepAK8","VVVH deepAK8 deltaEta Maps"] 
 #files=["debugSensitivityBulkGWW/VVinclu/Limits_VVinclu_tau21.root","results_2016_VVinclu_deepAK8WDDT_noCutTemplates/Limits_BulkGWW_13TeV_2016_VVinclu_deepAK8WDDT_noCutTemplates.root","debugSensitivityBulkGWW/VVVH/Limits_BulkGWW_13TeV_2016_VVVH_scheme2_tau21_doubleB_migrUnc.root","results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_nominalMap/Limits_BulkGWW_13TeV_2016_VVVH_scheme2_deepAK8WZH_migrUnc.root","results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_deltaEtaMaps/Limits_BulkGWW_13TeV_2016_VVVH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT.root"]
 
-title = ["VVVH deepAK8","VVVH deepAK8 deltaEta Maps"] 
-files=["results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_nominalMap/Limits_BulkGWW_13TeV_2016_VVVH_scheme2_deepAK8WZH_migrUnc.root","results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_deltaEtaMaps/Limits_BulkGWW_13TeV_2016_VVVH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT.root"]
+#title = ["VVVH deepAK8","VVVH deepAK8 deltaEta Maps"] 
+#files=["results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_nominalMap/Limits_BulkGWW_13TeV_2016_VVVH_scheme2_deepAK8WZH_migrUnc.root","results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_deltaEtaMaps/Limits_BulkGWW_13TeV_2016_VVVH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT.root"]
+
+title = ["VVVH 2016","VVVH Run2", "shapefix"] 
+files=["results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_deltaEtaMaps/Limits_BulkGWW_13TeV_2016_VVVH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT.root","fileRun2fromRun2lumitot/Limits_BulkGWW_13TeV_Run2_VVVH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_shapefix.root"]
 
 #title = ["tau_{21}^{DDT}+doubleB","deepAK8: W 5%, ZH 2%"]
 #title = ["tau_{21}^{DDT}+doubleB","deepAK8: W 5%, ZH 5%","deepAK8: W 5%, ZH 2%"]
@@ -206,7 +209,7 @@ masses = array('d',[i*100. for i in range(8,60)])
 
 if scaleBR:
   x, y = array( 'd' ), array( 'd' )
-  fin = ROOT.TFile.Open("results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_nominalMap/workspace_JJ_BulkGWW_VV_13TeV_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_nominalMaps_fullStats_pseudo80.root","READ")
+  fin = ROOT.TFile.Open("results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_deltaEtaMaps/workspace_JJ_BulkGWW_VVVH_13TeV_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_DeltaEtaMaps.root","READ")
   #fin = ROOT.TFile.Open("results_2016_2VV_2VH_doubleB_HP0p91_LP0p86/workspace_JJ_BulkGWW_VV_13TeV_2016_2VV2VH.root","READ")
   w = fin.Get("w")
 
@@ -503,7 +506,7 @@ VV3D.SetLineColor(429);
 VV3D.SetLineStyle(1);
 VV3D.SetLineWidth(3);
 VV3D.SetMarkerStyle(20);
-if plotVV3D: leg.AddEntry(VV3D,"B2G-18-001","L")
+if plotVV3D: leg.AddEntry(VV3D,"B2G-18-002","L")
 
 
 limits_VVinclu_2016_data=[
@@ -652,8 +655,8 @@ c.cd()
 frame.Draw()
 #cols  = [42,46,49,32,36,39]*3
 #tline = [10,9,1,10,9,1]*3
-cols  = [432,636,632,627,610,615,608]*3
-tline = [1,1,1,1,2,2,2]*3
+cols  = [634,636,632,627,610,615,608]*3
+tline = [2,1,1,1,2,2,2]*3
 #cols  = [42,46,49,1]*3
 #tline = [10,9,1,2]*3
 
@@ -673,7 +676,7 @@ for i,g in enumerate(tgraphs):
 c.SetLogy(options.log)
 #c.Draw()
 leg.Draw("same")
-cmslabel_prelim(c,options.period,11)
+#cmslabel_prelim(c,options.period,11)
 
 #c.Update()
 #c.RedrawAxis()
