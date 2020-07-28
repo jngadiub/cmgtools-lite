@@ -23,10 +23,10 @@ def beautify(h1,color,linestyle=1,markerstyle=8):
     h1.SetMarkerSize(1.5)
 
 
-def getLegend(x1=0.2,y1=0.75,x2=0.45,y2=0.85):
+def getLegend(x1=0.2,y1=0.71,x2=0.45,y2=0.88):
 #def getLegend(x1=0.70010112,y1=0.693362,x2=0.90202143,y2=0.829833):
   legend = ROOT.TLegend(x1,y1,x2,y2)
-  legend.SetTextSize(0.032)
+  legend.SetTextSize(0.035)
   legend.SetLineColor(0)
   legend.SetShadowColor(0)
   legend.SetLineStyle(1)
@@ -71,69 +71,6 @@ def getCanvasPaper(cname):
         pt.SetFillStyle(0)
 
         return canvas, legend, pt
-'''
-def getMVVPdf(j,MH,postfix=""):
-
-        var = w.var(options.var)
-
-        pdfName 	= "signal_%d%s" %(MH,postfix)
-        Jmean 		= eval(j['MEAN'])
-        Jsigma		= eval(j['SIGMA'])
-        Jalpha1     = eval(j['ALPHA1'])
-        Jalpha2     = eval(j['ALPHA2'])
-        Jn1 		= eval(j['N1'])
-        Jn2 		= eval(j['N2'])
-        
-        mean        = ROOT.RooRealVar("mean_%d%s"%(MH,postfix),"mean_%d%s"%(MH,postfix),Jmean)
-        sigma       = ROOT.RooRealVar("sigma_%d%s"%(MH,postfix),"sigma_%d%s"%(MH,postfix),Jsigma)        
-        alpha1      = ROOT.RooRealVar("alpha1_%d%s"%(MH,postfix),"alpha1_%d%s"%(MH,postfix),Jalpha1)
-        alpha2      = ROOT.RooRealVar("alpha2_%d%s"%(MH,postfix),"alpha2_%d%s"%(MH,postfix),Jalpha2)
-        n1          = ROOT.RooRealVar("n1_%d%s"%(MH,postfix),"n1_%d%s"%(MH,postfix),Jn1)
-        n2          = ROOT.RooRealVar("n2_%d%s"%(MH,postfix),"n2_%d%s"%(MH,postfix),Jn2)
-        
-
-        alpha1.setConstant(ROOT.kTRUE)
-        alpha2.setConstant(ROOT.kTRUE)
-        n2.setConstant(ROOT.kTRUE)
-        n1.setConstant(ROOT.kTRUE)
-        mean.setConstant(ROOT.kTRUE)
-        sigma.setConstant(ROOT.kTRUE)
-                
-        # gauss     = ROOT.RooGaussian("gauss_%d%s"%(MH,postfix), "gauss_%d%s"%(MH,postfix), var, mean, gsigma)
-        # cb        = ROOT.RooCBShape("cb_%d%s"%(MH,postfix), "cb_%d%s"%(MH,postfix),var, mean, sigma, alpha, sign)
-        # function = ROOT.RooAddPdf(pdfName, pdfName,gauss, cb, sigfrac)
-        function = ROOT.RooDoubleCB(pdfName, pdfName,var, mean,sigma,alpha1,n1,alpha2,n2)
-        getattr(w,'import')(function,ROOT.RooFit.Rename(pdfName))
-
-def getMJPdf(j,MH,postfix=""):
- 
-        var = w.var(options.var)
-	
-        pdfName 	= "signal_%d%s" %(MH,postfix)
-        Jmean 		= eval(j['mean'])
-        Jsigma		= eval(j['sigma'])
-        Jalpha 		= eval(j['alpha'])
-        Jalpha2 	= eval(j['alpha2'])
-        Jn 		= eval(j['n'])
-        Jn2 		= eval(j['n2'])
-
-        mean        = ROOT.RooRealVar("mean_%d%s"%(MH,postfix),"mean_%d%s"%(MH,postfix),Jmean)
-        sigma       = ROOT.RooRealVar("sigma_%d%s"%(MH,postfix),"sigma_%d%s"%(MH,postfix),Jsigma)
-        alpha       = ROOT.RooRealVar("alpha_%d%s"%(MH,postfix),"alpha_%d%s"%(MH,postfix),Jalpha)
-        alpha2      = ROOT.RooRealVar("alpha2_%d%s"%(MH,postfix),"alpha2_%d%s"%(MH,postfix),Jalpha2)
-        sign        = ROOT.RooRealVar("sign_%d%s"%(MH,postfix),"sign_%d%s"%(MH,postfix),Jn)
-        sign2        = ROOT.RooRealVar("sign2_%d%s"%(MH,postfix),"sign2_%d%s"%(MH,postfix),Jn2)        
-
-        alpha.setConstant(ROOT.kTRUE)
-        sign.setConstant(ROOT.kTRUE)
-        alpha2.setConstant(ROOT.kTRUE)
-        sign2.setConstant(ROOT.kTRUE)
-        mean.setConstant(ROOT.kTRUE)
-        sigma.setConstant(ROOT.kTRUE)
-        
-	function = ROOT.RooDoubleCB(pdfName, pdfName, var, mean, sigma, alpha, sign,  alpha2, sign2)  
-	getattr(w,'import')(function,ROOT.RooFit.Rename(pdfName))
-'''		
 parser = optparse.OptionParser()
 
 parser.add_option("-v","--var",dest="var",help="mVV or mJ",default='mVV')
@@ -170,56 +107,6 @@ colors.append(["#45444B","#6B6974","#807D8D","#8F8BA2","#A39EBB","#AEA7D1","#B2A
 colorsyears= {'2016': "#4292c6",'2017': "#41ab5d",'2018':"#ef3b2c", 'Run2': "#17202A"}
 markeryears={'2016':8, '2017':25,'2018':22,'Run2':32}
 
-'''
-def doSingle():
-    with open(inFileName) as jsonFile:
-      j = json.load(jsonFile)
-    
-      c1 = getCanvas()
-      c1.Draw()
-      leg = ROOT.TLegend(0.8, 0.2, 0.95, 0.8)
-      frame = w.var(options.var).frame()   
-      
-      for i, MH in enumerate(massPoints):  # mind that MH is evaluated below
-        if options.var == 'mVV': getMVVPdf(j,MH)
-        else: getMJPdf(j,MH)
-        w.pdf('signal_%d'%MH).plotOn(frame, ROOT.RooFit.LineColor(ROOT.TColor.GetColor(colors[0][i])),ROOT.RooFit.Name(str(MH)))#,ROOT.RooFit.Range(MH*0.8,1.2*MH))#ROOT.RooFit.Normalization(1, ROOT.RooAbsReal.RelativeExpected),
-        leg.AddEntry(frame.findObject(str(MH)), "%d GeV" % MH, "L")
-      frame.GetYaxis().SetTitle("A.U")
-      frame.GetYaxis().SetNdivisions(4,5,0)
-      frame.SetMaximum(0.1)
-      if options.var == 'mVV':frame.SetMaximum(0.5)
-      frame.Draw()
-      # leg.Draw("same")
-      model = "G_{B} #rightarrow WW"
-      if options.file.find("ZZ")!=-1:
-          model = "G_{B} #rightarrow ZZ"
-      if options.file.find("WZ")!=-1:
-          model = "W' #rightarrow WZ"
-      if options.file.find("Zprime")!=-1:
-          model = "Z' #rightarrow WW"
-      if   options.file.find("HPHP")!=-1: purity = "HPHP"
-      elif options.file.find("HPLP")!=-1: purity = "HPLP"
-      else:purity = "HPLP+HPHP"
-      c1.cd()
-      pt =ROOT.TPaveText(0.81,0.82,0.84,0.89,"brNDC")
-      pt.SetBorderSize(0)
-      pt.SetTextAlign(12)
-      pt.SetFillStyle(0)
-      pt.SetTextFont(42)
-      pt.SetTextSize(0.04)
-      pt.AddText(model)
-      # pt.AddText(purity)
-
-      pt.Draw()
-      cmslabel_sim(c1,'2016',11)
-      c1.Update()
-      
-      c1.SaveAs(path+"signalShapes%s_%s.png" %(options.var, inFileName.rsplit(".", 1)[0]))
-      c1.SaveAs(path+"signalShapes%s_%s.pdf" %(options.var, inFileName.rsplit(".", 1)[0]))
-      c1.SaveAs(path+"signalShapes%s_%s.C" %(options.var, inFileName.rsplit(".", 1)[0]))
-      c1.SaveAs(path+"signalShapes%s_%s.root" %(options.var, inFileName.rsplit(".", 1)[0]))
-'''
 def doYields(signal,legend,years,colorindex):
 
     purities=["VV_HPHP","VV_HPLP","VH_HPHP","VH_HPLP","VH_LPHP"]
@@ -266,8 +153,8 @@ def doYields(signal,legend,years,colorindex):
         gr[purity][year].GetXaxis().SetLimits(1000.,8500.)
         gr[purity][year].GetXaxis().SetTitleSize(0.055)
         gr[purity][year].GetYaxis().SetTitleSize(0.055)
-        gr[purity][year].GetYaxis().SetLabelSize(0.05)
-        gr[purity][year].GetXaxis().SetLabelSize(0.05)
+        gr[purity][year].GetYaxis().SetLabelSize(0.04)
+        gr[purity][year].GetXaxis().SetLabelSize(0.04)
         data.append(gr[purity][year])        
         leg.AddEntry(gr[purity][year],year, "LP")
 
@@ -449,7 +336,7 @@ def doMVV(signal,titles,years):
 
 
 
-      cmslabel_sim_prelim(c,'sim',11)
+      #cmslabel_sim_prelim(c,'sim',11)
       c.Update()
       name = path+"Signal_mVV_allyears_"+var+"_"+signal+"_"+options.name
       c.SaveAs(name+".png")
@@ -519,9 +406,9 @@ def doJetMass(leg,signal,titles,years):
        datas[0].GetYaxis().SetTitleOffset(1.05)
        datas[0].GetXaxis().SetTitleOffset(0.9)
        datas[0].GetXaxis().SetRangeUser(1126, 5500.)
-       datas[0].GetXaxis().SetLabelSize(0.05)
+       datas[0].GetXaxis().SetLabelSize(0.04)
        datas[0].GetXaxis().SetTitleSize(0.06)
-       datas[0].GetYaxis().SetLabelSize(0.05)
+       datas[0].GetYaxis().SetLabelSize(0.04)
        datas[0].GetYaxis().SetTitleSize(0.06)
        if var == "mean": datas[0].GetYaxis().SetRangeUser(75,150);
        if var == "sigma": datas[0].GetYaxis().SetRangeUser(5,20.);
@@ -550,7 +437,7 @@ def doJetMass(leg,signal,titles,years):
 
 
 
-       cmslabel_sim_prelim(c,'sim',11)
+       #cmslabel_sim_prelim(c,'sim',11)
 
        c.Update()
        name = path+"Signal_mjet_Allyears_"+signal+"_"+var+"_"+options.name
@@ -560,17 +447,17 @@ def doJetMass(leg,signal,titles,years):
 
                 
 if __name__ == '__main__':
-#    doSingle() #NB: some fix would be needed here!
+
 #    signals = ["BulkGZZ","WprimeWZ","BulkGWW","ZprimeWW","ZprimeZH","WprimeWH"]
 #    legs = ["G_{bulk} #rightarrow ZZ","W' #rightarrow WZ","G_{bulk} #rightarrow WW","Z'#rightarrow WW","Z'#rightarrow ZH","W'#rightarrow WH"]                                               
-#    signals = ["BulkGWW","ZprimeZH"]
-#    legs = ["G_{bulk} #rightarrow WW","Z'#rightarrow ZH"]                                                                                                                                                     
+    signals = ["BulkGWW","ZprimeZH"]
+    legs = ["G_{bulk} #rightarrow WW","Z'#rightarrow ZH"]                                                                                                                                                     
 #    signals = ["ZprimeZH"]
 #    legs = ["Z'#rightarrow ZH"]                                                                                                                                                     
 
 
-    signals = ["BulkGWW"] 
-    legs = ["G_{bulk} #rightarrow WW"] 
+#    signals = ["BulkGWW"] 
+#    legs = ["G_{bulk} #rightarrow WW"] 
     years = ["2016","2017","2018","Run2"]    
     for i in range(len(signals)):
 #    for i in range(1):
