@@ -236,9 +236,10 @@ def doAll():
       gr.GetYaxis().SetLabelSize(0.05)
       gr.GetXaxis().SetLabelSize(0.05)
       ff = gr.GetFunction("func")
-      gr.Fit(ff)
-      ff.SetLineColor(0) 
-      ff.SetLineWidth(0)
+      if ff != None:
+        gr.Fit(ff)
+        ff.SetLineColor(0) 
+        ff.SetLineWidth(0)
       #ff1000.Draw("same")
       leg.AddEntry(gr, legs[ii], "L")
       #    if options.var == 'mVV':gr.SetMaximum(0.45)
