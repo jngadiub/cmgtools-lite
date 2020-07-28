@@ -3,8 +3,8 @@ indir=$1
 name=$2_OPT3_0and2_OPTXY0and2_OPTZ0and2_PTZ0and2 #OPT31and1_OPTXY2_OPTZ2
 postfitdir=postfit_qcd/${name}/
 mkdir $postfitdir
-#categories=('VH_LPHP' 'VH_HPHP' 'VH_HPLP' 'VV_HPLP' 'VV_HPHP')
-categories=('VV_HPHP')
+categories=('VH_LPHP' 'VH_HPHP' 'VH_HPLP' 'VV_HPLP' 'VV_HPHP')
+#categories=('VV_HPHP')
 period=$3
 fileperiod=$4
 for cat in ${categories[*]}; do
