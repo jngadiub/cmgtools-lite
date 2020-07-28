@@ -29,7 +29,6 @@ def getSamplelist(directories,signal,minMX=1200.,maxMX=8000.):
     samples = {}
     dirs=directories.split(",")
     for directory in dirs:
-        #samples[directory] = {}
         for filename in os.listdir(directory):
             if filename.find(signal)!=-1 and filename.find('root')!=-1:
                 if filename.find("VBF")!=-1 and signal.find("VBF")==-1: continue  
@@ -38,28 +37,23 @@ def getSamplelist(directories,signal,minMX=1200.,maxMX=8000.):
 
                 mass = float(fname.split('_')[-1])
                 if mass < minMX or mass > maxMX: continue
-                #if samples[fname] == None: samples.update({fname:[]})
-                samples[fname].update({directory : directory+fname})
-                #samples[directory].update({fname : directory+fname})
+                print fname 
+                if fname not in samples:         
+                    samples.update({fname : []}   )
+                    samples[fname].append(directory+fname)
+                else:
+                    samples[fname].append(directory+fname)
                 print 'found ',directory+fname,' mass',str(mass)
+
 
     complete_mass = {} #defaultdict(dict)
     for mass in samples.keys():
         print mass
-        i= 0
-        for directory in dirs:
-            try:
-                x = samples[mass][directory]
-                print " x ", x
-                i+=1
-            except KeyError:
-                print "!!!!    directory ", directory, " missing for mass", mass ," !!!!!!!!"
-                pass
-        print i
-        if i == len(dirs):
-            for directory in dirs:
-                x = samples[mass][directory]
-                complete_mass[mass].append(x)
+        x = samples[mass]
+        if len(x) < len(dirs):    
+            print "!!!!    directories missing for mass", mass ," !!!!!!!! only ",x, "available "
+        else:
+            complete_mass.update({ mass: x})
 
 
     print " complete ",complete_mass
@@ -70,11 +64,16 @@ def getSamplelist(directories,signal,minMX=1200.,maxMX=8000.):
 
 def selectSignalTree(cs,sample):
     print sample 
-    rfile = ROOT.TFile(sample,'READ')
-    tree = rfile.Get('AnalysisTree')
+    chain = ROOT.TChain('AnalysisTree')
     outfile = ROOT.TFile('tmp.root','RECREATE')
-    finaltree = tree.CopyTree(cs['common']+'*'+cs['acceptance'])
-    print 'overall entries in tree '+str(tree.GetEntries())
+    for signal in sample:
+        rfile = signal+".root"
+        chain.Add(rfile)
+        print " entries ",chain.GetEntries()
+
+
+    finaltree = chain.CopyTree(cs['common']+'*'+cs['acceptance'])
+    print 'overall entries in tree '+str(chain.GetEntries())
     print 'entries after analysis selections '+str(finaltree.GetEntries())
     signaltree_VH_HPHP = finaltree.CopyTree(cs['VH_HPHP'])
     signaltree_VV_HPHP = finaltree.CopyTree(cs['VV_HPHP'])#all other categories before are explicitly removed so that each event can only live in one category!!
@@ -86,12 +85,9 @@ def selectSignalTree(cs,sample):
     print '#event no category '+str(rest.GetEntries())
     sumcat = signaltree_VH_HPHP.GetEntries()+signaltree_VV_HPHP.GetEntries()+signaltree_VH_LPHP.GetEntries()+signaltree_VH_HPLP.GetEntries()+signaltree_VV_HPLP.GetEntries()
     print 'sum '+str(sumcat)
-    print 'overall signal efficiency after selection cut '+str(finaltree.GetEntries()/float(tree.GetEntries()))
-    print 'signal efficiency after category cuts '+str(sumcat/float(tree.GetEntries()))
+    print 'overall signal efficiency after selection cut '+str(finaltree.GetEntries()/float(chain.GetEntries()))
+    print 'signal efficiency after category cuts '+str(sumcat/float(chain.GetEntries()))
     print 'efficiency of all category cuts '+str(sumcat/float(finaltree.GetEntries()))
-    #inversetree = tree.CopyTree('!('+cuts['common']+'*'+cuts['acceptance']+')')
-    #print inversetree.GetEntries()
-    #print inversetree.GetEntries()+finaltree.GetEntries()
     signaltree_VH_HPHP.SetName('VH_HPHP')
     signaltree_VV_HPHP.SetName('VV_HPHP')
     signaltree_VH_LPHP.SetName('VH_LPHP')
@@ -271,7 +267,7 @@ if __name__=='__main__':
         print 'init new tree'
         outtree = myTree(sample,outfile)
         print 'select common cuts signal tree' 
-        selectSignalTree(ctx.cuts,sample)
+        selectSignalTree(ctx.cuts,samplelist[sample])
         
         #for t in signaltrees:
         outtree.setOutputTreeBranchValues('VH_HPHP',ctx)
