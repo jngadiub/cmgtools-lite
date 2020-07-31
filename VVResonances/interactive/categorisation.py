@@ -1,7 +1,7 @@
 # make tree containing genweight, other event weights, as well as is jet H/ V jet, what category is the event classified in, what V/Htag has each jet -> for each signal sample!
 #use this as input for the migrationUncertainties.py script
 import ROOT
-import os, sys, re, optparse,pickle,shutil,json
+import os, sys, re, optparse,pickle,shutil,json,time
 from collections import defaultdict
 ROOT.gROOT.SetBatch(True)
 ROOT.gStyle.SetOptStat(0)
@@ -15,7 +15,9 @@ from ROOT import rootlong
 import cuts
 from rootpy.tree import CharArrayCol
 
-
+# python categorisation.py -y "2016" -s WJetsToQQ -d deepAK8V2/
+# python categorisation.py -y "2016,2017,2018" -s WJetsToQQ -d deepAK8V2/
+# python categorisation.py -y "2016" -s BulkGravToWW -d deepAK8V2/
 
 parser = optparse.OptionParser()
 parser.add_option("-y","--year",dest="year",default='2016',help="year of data taking")
@@ -62,10 +64,33 @@ def getSamplelist(directories,signal,minMX=1200.,maxMX=8000.):
 
 
 
+def getBkgSamplelist(directories,signal):
+    samples = {}
+    dirs=directories.split(",")
+    for directory in dirs:
+        for filename in os.listdir(directory):
+            if filename.find(signal)!=-1 and filename.find('root')!=-1:
+                fnameParts=filename.split('.')
+                fname=fnameParts[0]
+                fpart=fnameParts[0].split("_")[0]
+                if fpart not in samples:
+                    samples.update({fpart : []}   )
+                    samples[fpart].append(directory+fname)
+                else:
+                    samples[fpart].append(directory+fname)
+                print 'found ',directory+fname
+
+    print "samples ",samples
+    return samples
+
+
+
+
 def selectSignalTree(cs,sample):
     print sample 
     chain = ROOT.TChain('AnalysisTree')
-    outfile = ROOT.TFile('tmp.root','RECREATE')
+    tmpname = "tmp_"+time.strftime("%Y%m%d-%H%M%S")
+    outfile = ROOT.TFile(tmpname+'.root','RECREATE')
     for signal in sample:
         rfile = signal+".root"
         chain.Add(rfile)
@@ -100,6 +125,8 @@ def selectSignalTree(cs,sample):
     signaltree_VH_HPLP.Write()
     signaltree_VV_HPLP.Write()
     outfile.Close()
+
+    return tmpname
 
 class myTree:
     
@@ -153,8 +180,8 @@ class myTree:
      
         self.newTree.Branch("category",self.category,"category[7]/C")
         
-    def setOutputTreeBranchValues(self,cat,ctx):
-        rf = ROOT.TFile('tmp.root','READ')
+    def setOutputTreeBranchValues(self,cat,ctx,tmpname):
+        rf = ROOT.TFile(tmpname+'.root','READ')
         cattree = rf.Get(cat)
         ZHbb_branch_l1 = cattree.GetBranch(ctx.varl1Htag)
         ZHbb_leaf_l1 = ZHbb_branch_l1.GetLeaf(ctx.varl1Htag)
@@ -260,26 +287,28 @@ if __name__=='__main__':
         samples=basedir+period+"/"
     outfile = ROOT.TFile('migrationunc/'+options.signal+'_'+filePeriod+'.root','RECREATE')
 
-    samplelist= getSamplelist(samples,options.signal,ctx.minMX,ctx.maxMX)
+    if(options.signal.find("Jets")==-1):
+        samplelist= getSamplelist(samples,options.signal,ctx.minMX,ctx.maxMX)
+    else: samplelist= getBkgSamplelist(samples,options.signal)
 
     for sample in samplelist.keys():
         print sample
         print 'init new tree'
         outtree = myTree(sample,outfile)
         print 'select common cuts signal tree' 
-        selectSignalTree(ctx.cuts,samplelist[sample])
+        tmpfilename = selectSignalTree(ctx.cuts,samplelist[sample])
         
         #for t in signaltrees:
-        outtree.setOutputTreeBranchValues('VH_HPHP',ctx)
-        outtree.setOutputTreeBranchValues('VV_HPHP',ctx)
-        outtree.setOutputTreeBranchValues('VH_LPHP',ctx)
-        outtree.setOutputTreeBranchValues('VH_HPLP',ctx)
-        outtree.setOutputTreeBranchValues('VV_HPLP',ctx)
+        outtree.setOutputTreeBranchValues('VH_HPHP',ctx,tmpfilename)
+        outtree.setOutputTreeBranchValues('VV_HPHP',ctx,tmpfilename)
+        outtree.setOutputTreeBranchValues('VH_LPHP',ctx,tmpfilename)
+        outtree.setOutputTreeBranchValues('VH_HPLP',ctx,tmpfilename)
+        outtree.setOutputTreeBranchValues('VV_HPLP',ctx,tmpfilename)
         
         #outtree.test()
         outfile.cd()
         outtree.write()
         #tree.Write(outfile.GetName())
         
-        
+        os.system("rm "+tmpfilename+".root")
         
