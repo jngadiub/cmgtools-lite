@@ -133,6 +133,28 @@ def printresult(res,cats):
             #print res[str(m)+'.'+cat][0]
             tmp+='   '
         print tmp
+
+def printresultbkg(res,cats):
+    masses = []
+    for key in res.keys():
+        if (key.split('.')[1]).find(cats[0])!=-1:
+            masses.append(key.split('.')[0])
+
+    c = 'mass '
+    for cat in cats:
+        c+='              '
+        c+=cat
+    print c
+    for m in sorted(masses):
+        tmp =str(m)+'  '
+        for cat in cats:
+            if res[str(m)+'.'+cat][0]!=0 :
+                tmp+= str(res[str(m)+'.'+cat][1]/float(res[str(m)+'.'+cat][0]))+' / '+str(res[str(m)+'.'+cat][2]/res[str(m)+'.'+cat][0])
+            #print res[str(m)+'.'+cat][1]
+            #print res[str(m)+'.'+cat][0]
+            tmp+='   '
+        print tmp
+
         
 def calcfinalUnc(final,tag,cats):
     data={}
@@ -145,7 +167,7 @@ def calcfinalUnc(final,tag,cats):
     res2=final[savekeys[1]]
     for key in res.keys():
         if (key.split('.')[1]).find(cats[0])!=-1:
-            masses.append(int(key.split('.')[0]))
+            masses.append(key.split('.')[0])
     tmplistu = []
     tmplistd = []
     c = 'mass '
@@ -230,12 +252,12 @@ if __name__=="__main__":
 
     categories = ['VH_HPHP','VV_HPHP','VH_LPHP','VH_HPLP','VV_HPLP']
     tags = ['H_tag_HP','H_tag_LP','V_tag_HP','V_tag_LP']
-    directory = "migrationunc/Run2/"
+    directory = "migrationunc/"
 
-    files = ["BulkGravToWW_Run2.root"]
+    #files = ["BulkGravToWW_Run2.root"]
     #files = ["ZprimeToZh_2016.root",'ZprimeToWW_2016.root',"WprimeToWh_2016.root","BulkGravToWW_2016.root","BulkGravToZZ_2016.root","WprimeToWZ_2016.root"]
-
-
+    files = ['WJetsToQQ_2016.root']
+    #files = ["BulkGravToWW_2016.root"]
     final={}
 
     for root_file in files:
@@ -245,8 +267,11 @@ if __name__=="__main__":
             print 'for signal '+str(root_file.replace('.root',''))
             result = {}
             trees = []
-            for i in masses:
-                trees.append(root_file.split("_")[0]+"_narrow_"+str(i))
+            if root_file.find("Jets")==-1:
+               for i in masses:
+                   trees.append(root_file.split("_")[0]+"_narrow_"+str(i))
+            else:
+                trees.append(root_file.split("_")[0])
             print " trees ",trees
             for t in trees:
                 try:
@@ -256,29 +281,32 @@ if __name__=="__main__":
                     print t," not found" 
                     continue
                 print " using tree ",t 
+                if root_file.find("Jets")==-1: splitstr = t.split('narrow_')[1]
+                else:  splitstr = root_file.split("_")[0]
                 for cat in categories:
                     if tag.find('HP')!=-1:
-                        if tag.find('V')!=-1:
-                            result[t.split('narrow_')[1]+'.'+cat] = calculateMigration(fulltree,tag,W_tag_unc_HP,cat)
+                        if tag.find('V')!=--1:
+                            result[splitstr+'.'+cat] = calculateMigration(fulltree,tag,W_tag_unc_HP,cat)
                         if tag.find('H')!=-1:
-                            result[t.split('narrow_')[1]+'.'+cat] = calculateMigration(fulltree,tag,H_tag_unc_HP,cat)
+                            result[splitstr+'.'+cat] = calculateMigration(fulltree,tag,H_tag_unc_HP,cat)
                     if tag.find('LP')!=-1:
                         if tag.find('V')!=-1:
-                            result[t.split('narrow_')[1]+'.'+cat] = calculateMigration(fulltree,tag,W_tag_unc_LP,cat)
+                            result[splitstr+'.'+cat] = calculateMigration(fulltree,tag,W_tag_unc_LP,cat)
                         if tag.find('H')!=-1:
-                            result[t.split('narrow_')[1]+'.'+cat] = calculateMigration(fulltree,tag,H_tag_unc_LP,cat)
+                            result[splitstr+'.'+cat] = calculateMigration(fulltree,tag,H_tag_unc_LP,cat)
             
         
             print '###################'+tag+'######################'
-            printresult(result,categories)
+            if root_file.find("Jets")==-1: printresult(result,categories)
+            else: printresultbkg(result,categories)
             final[tag]=result
-        
+
         print 'CMS_VV_JJ_DeepJet_Htag_eff' 
         data[root_file.replace('.root','')+'_'+'CMS_VV_JJ_DeepJet_Htag_eff'] = calcfinalUnc(final,'H_tag',categories)
         print 'CMS_VV_JJ_DeepJet_Vtag_eff' 
         data[root_file.replace('.root','')+'_'+'CMS_VV_JJ_DeepJet_Vtag_eff'] = calcfinalUnc(final,'V_tag',categories)
-        
-    with open('migrationunc.json', 'w') as outfile:    
+
+    with open('migrationunc_'+root_file.split(".")[0]+'.json', 'w') as outfile:
         json.dump(data, outfile)
     
     
