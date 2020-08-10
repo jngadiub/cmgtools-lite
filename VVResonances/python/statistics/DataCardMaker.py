@@ -68,7 +68,7 @@ class DataCardMaker:
                 print " make spline " + name+'spline'
                 spline=ROOT.RooSpline1D(name+'spline',name+'spline',self.w.var("MH"),len(xArr),array("d",xArr),array("d",yArr))    
                 getattr(self.w,'import')(spline,ROOT.RooFit.RenameVariable(name,name))
-                print " make uncertainty "+"expr::"+corr+"expr('"+self.physics+"_"+self.period+"_lumi"+"*(exp(log("+uncstr+")*"+corr+"',MH,"+corr+","+self.physics+"_"+self.period+"_lumi"+")"
+                
                 
                 self.w.factory("expr::"+name+"('"+self.physics+"_"+self.period+"_lumi"+"*"+name+"spline"+"*(exp(log("+uncstr+")*"+corr+"',MH,"+corr+","+self.physics+"_"+self.period+"_lumi"+")")
                 self.w.factory("expr::"+corr+"expr('"+self.physics+"_"+self.period+"_lumi"+"*(exp(log("+uncstr+")*"+corr+"',MH,"+corr+","+self.physics+"_"+self.period+"_lumi"+","+name+"spline"+")")
@@ -83,7 +83,7 @@ class DataCardMaker:
                     print "MVV sigma & mean will be correlated to jet mass"
                     if self.w.function(uncsyst[0]+"expr_corr")== None:
                        self.w.factory("expr::"+uncsyst[0]+"expr_corr('"+uncstr+"*"+info['corr_'+variablename.lower()]+"',{MH,MJ1,MJ2},"+uncsyst[0]+")") 
-                    self.w.factory("expr::"+name+"('"+uncstr+"*"+info['corr_'+variablename.lower()]+"',{MH,MJ1,MJ2},"+uncsyst[0]","+name+"spline"+")")
+                    self.w.factory("expr::"+name+"('"+uncstr+"*"+info['corr_'+variablename.lower()]+"',{MH,MJ1,MJ2},"+uncsyst[0]+","+name+"spline"+")")
                    
                 else:
                    print "MVV sigma & mean will NOT be correlated to jet mass"

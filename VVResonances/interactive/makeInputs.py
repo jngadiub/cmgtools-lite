@@ -222,25 +222,26 @@ if options.run.find("all")!=-1 or options.run.find("vjets")!=-1:
 if options.run.find("all")!=-1 or options.run.find("tt")!=-1:
     #f.fitTT   ("JJ_%s_TTJets"%(period),TTemplate,1.,)
     #print "resT"
-    f.makeBackgroundShapesMVVKernel("TTJets","JJ_resT"+str(period),TTemplate,ctx.cuts['resTT'],"1D",0,1.,1.)
-    f.makeNormalizations("TTJets","JJ_resT"+str(period),TTemplate,0,ctx.cuts['resTT'],"nRes","")
-    print "resW"
-    f.makeBackgroundShapesMVVKernel("TTJets","JJ_resW"+str(period),TTemplate,ctx.cuts['resTT_W'],"1D",0,1.,1.)
-    f.makeNormalizations("TTJets","JJ_resW"+str(period),TTemplate,0,ctx.cuts['resTT_W'],"nRes","")
-    print "nonres"
-    f.makeBackgroundShapesMVVKernel("TTJets","JJ_nonresT"+str(period),TTemplate,ctx.cuts['nonresTT'],"1D",0,1.,1.)
-    f.makeNormalizations("TTJets","JJ_nonresTT"+str(period),TTemplate,0,ctx.cuts['nonresTT'],"nRes","")
-    print "resTresW"
-    f.makeBackgroundShapesMVVKernel("TTJets","JJ_resTresW"+str(period),TTemplate,ctx.cuts['resTresW'],"1D",0,1.,1.)
-    f.makeNormalizations("TTJets","JJ_resTresW"+str(period),TTemplate,0,ctx.cuts['resTresW'],"nRes","")
-    print "resTnonresT"
-    f.makeBackgroundShapesMVVKernel("TTJets","JJ_resTnonresT"+str(period),TTemplate,ctx.cuts['resTnonresT'],"1D",0,1.,1.)
-    f.makeNormalizations("TTJets","JJ_resTnonresT"+str(period),TTemplate,0,ctx.cuts['resTnonresT'],"nRes","")
-    print "resWnonresT"
-    f.makeBackgroundShapesMVVKernel("TTJets","JJ_resWnonresT"+str(period),TTemplate,ctx.cuts['resWnonresT'],"1D",0,1.,1.)
-    f.makeNormalizations("TTJets","JJ_resWnonresT"+str(period),TTemplate,0,ctx.cuts['resWnonresT'],"nRes","")
-    f.makeNormalizations("TTJets","JJ_nonresT"+str(period),TTemplate,0,ctx.cuts['nonresTT'],"nRes","")
-    f.makeBackgroundShapesMVVKernel("TTJets","JJ_"+str(period),TTemplate,ctx.cuts['nonres'],"1D",0,1.,1.)
+    #f.makeBackgroundShapesMVVKernel("TTJets","JJ_resT"+str(period),TTemplate,ctx.cuts['resTT'],"1D",0,1.,1.)
+    f.makeMinorBkgShapesMVV("TTJets","JJ_resT"+str(period),TTemplate,ctx.cuts['resTT'])
+    #f.makeNormalizations("TTJets","JJ_resT"+str(period),TTemplate,0,ctx.cuts['resTT'],"nRes","")
+    #print "resW"
+    #f.makeBackgroundShapesMVVKernel("TTJets","JJ_resW"+str(period),TTemplate,ctx.cuts['resTT_W'],"1D",0,1.,1.)
+    #f.makeNormalizations("TTJets","JJ_resW"+str(period),TTemplate,0,ctx.cuts['resTT_W'],"nRes","")
+    #print "nonres"
+    #f.makeBackgroundShapesMVVKernel("TTJets","JJ_nonresT"+str(period),TTemplate,ctx.cuts['nonresTT'],"1D",0,1.,1.)
+    #f.makeNormalizations("TTJets","JJ_nonresTT"+str(period),TTemplate,0,ctx.cuts['nonresTT'],"nRes","")
+    #print "resTresW"
+    #f.makeBackgroundShapesMVVKernel("TTJets","JJ_resTresW"+str(period),TTemplate,ctx.cuts['resTresW'],"1D",0,1.,1.)
+    #f.makeNormalizations("TTJets","JJ_resTresW"+str(period),TTemplate,0,ctx.cuts['resTresW'],"nRes","")
+    #print "resTnonresT"
+    #f.makeBackgroundShapesMVVKernel("TTJets","JJ_resTnonresT"+str(period),TTemplate,ctx.cuts['resTnonresT'],"1D",0,1.,1.)
+    #f.makeNormalizations("TTJets","JJ_resTnonresT"+str(period),TTemplate,0,ctx.cuts['resTnonresT'],"nRes","")
+    #print "resWnonresT"
+    #f.makeBackgroundShapesMVVKernel("TTJets","JJ_resWnonresT"+str(period),TTemplate,ctx.cuts['resWnonresT'],"1D",0,1.,1.)
+    #f.makeNormalizations("TTJets","JJ_resWnonresT"+str(period),TTemplate,0,ctx.cuts['resWnonresT'],"nRes","")
+    #f.makeNormalizations("TTJets","JJ_nonresT"+str(period),TTemplate,0,ctx.cuts['nonresTT'],"nRes","")
+    #f.makeBackgroundShapesMVVKernel("TTJets","JJ_"+str(period),TTemplate,ctx.cuts['nonres'],"1D",0,1.,1.)
   
 if options.run.find("all")!=-1 or options.run.find("data")!=-1:
     print " Do data "
