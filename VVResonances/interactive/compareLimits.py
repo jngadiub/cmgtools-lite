@@ -31,7 +31,7 @@ parser.add_option("-f","--final",dest="final",type=int, default=1,help="Prelimin
 
 plotVV1D=False
 plotVV3D2016= True
-plotVV3D=True
+plotVV3D=False
 plotVV3D2016data=False #True
 plotVV3D2016pseudodata=False
 plotVH2016=False
@@ -72,7 +72,8 @@ titleY = "#sigma x BR(G_{Bulk} #rightarrow WW) (pb)  "
 #oname= "BulkGWW_scheme2_deepAK8_VVVH_optimizations"
 #oname= "BulkGWW_VVinclu_tau21_vs_VVVHtau21doubleB_VVinclu_deepWDDT_VVVHdeepAK8_deltaEtaMaps"
 #oname= "BulkGWW_VVinclu_tau21_vs_VVVHtau21doubleB_migrUnc"
-oname="BulkGWW_scheme2_deepAK8_VVVH_deltaEtaMaps_2016vsRun2"
+oname="BulkGWW_scheme2_deepAK8_VVVH_deltaEtaMaps_2016vs2016mapsRun2"
+#oname="BulkGWW_scheme2_deepAK8_VVVH_deltaEtaMaps_2016vsRun2"
 #title = ["HPLP","HPHP","HPHP+HPLP","B2G-17-001"]
 #files = ["LIMITS_DDT_latest/WW/HPLP/Limits_BulkGWW_HPLP_13TeV.root","LIMITS_DDT_latest/WW/HPHP/Limits_BulkGWW_HPHP_13TeV.root","LIMITS_DDT_latest/WW/combined/Limits_BulkGWW_13TeV.root","limits_b2g17001/Limits_b2g17001_BulkGWW_13TeV.root"]
 
@@ -86,8 +87,11 @@ oname="BulkGWW_scheme2_deepAK8_VVVH_deltaEtaMaps_2016vsRun2"
 #title = ["VVVH deepAK8","VVVH deepAK8 deltaEta Maps"] 
 #files=["results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_nominalMap/Limits_BulkGWW_13TeV_2016_VVVH_scheme2_deepAK8WZH_migrUnc.root","results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_deltaEtaMaps/Limits_BulkGWW_13TeV_2016_VVVH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT.root"]
 
-title = ["VVVH 2016","VVVH Run2", "shapefix"] 
-files=["results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_deltaEtaMaps/Limits_BulkGWW_13TeV_2016_VVVH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT.root","fileRun2fromRun2lumitot/Limits_BulkGWW_13TeV_Run2_VVVH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_shapefix.root"]
+#title = ["VVVH 2016","VVVH Run2"] 
+#files=["results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_deltaEtaMaps/Limits_BulkGWW_13TeV_2016_VVVH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT.root","fileRun2fromRun2lumitot/Limits_BulkGWW_13TeV_Run2_VVVH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_shapefix.root"]
+
+title = ["VVVH 2016 maps 2016","VVVH 2016 maps Run2"] 
+files=["results_2016_VV_VH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT_deltaEtaMaps/Limits_BulkGWW_13TeV_2016_VVVH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT.root","file2016fromRun2lumitot/Limits_BulkGWW_13TeV_2016_mapsRun2_VVVH_scheme2_deepAK8_W_0p05_0p10_ZHbb_0p02_0p10_DDT.root"]
 
 #title = ["tau_{21}^{DDT}+doubleB","deepAK8: W 5%, ZH 2%"]
 #title = ["tau_{21}^{DDT}+doubleB","deepAK8: W 5%, ZH 5%","deepAK8: W 5%, ZH 2%"]
