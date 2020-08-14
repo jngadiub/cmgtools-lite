@@ -252,11 +252,11 @@ if __name__=="__main__":
 
     categories = ['VH_HPHP','VV_HPHP','VH_LPHP','VH_HPLP','VV_HPLP']
     tags = ['H_tag_HP','H_tag_LP','V_tag_HP','V_tag_LP']
-    directory = "migrationunc/"
+    directory = "migrationunc/Run2/"
 
     #files = ["BulkGravToWW_Run2.root"]
     #files = ["ZprimeToZh_2016.root",'ZprimeToWW_2016.root',"WprimeToWh_2016.root","BulkGravToWW_2016.root","BulkGravToZZ_2016.root","WprimeToWZ_2016.root"]
-    files = ['WJetsToQQ_2016.root']
+    files = ['WJetsToQQ_Run2.root','ZJetsToQQ_Run2.root']
     #files = ["BulkGravToWW_2016.root"]
     final={}
 
@@ -306,8 +306,8 @@ if __name__=="__main__":
         print 'CMS_VV_JJ_DeepJet_Vtag_eff' 
         data[root_file.replace('.root','')+'_'+'CMS_VV_JJ_DeepJet_Vtag_eff'] = calcfinalUnc(final,'V_tag',categories)
 
-    with open('migrationunc_'+root_file.split(".")[0]+'.json', 'w') as outfile:
-        json.dump(data, outfile)
+        with open('migrationunc_'+root_file.split(".")[0]+'.json', 'w') as outfile:
+            json.dump(data, outfile)
     
     
     
