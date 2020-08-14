@@ -98,6 +98,9 @@
     "WP_LP_Wtag16" : "0p10",
     "WP_LP_Wtag17" : "0p10",
     "WP_LP_Wtag18" : "0p10",
+    "WP_NP_Wtag16" : "0p30",
+    "WP_NP_Wtag17" : "0p30",
+    "WP_NP_Wtag18" : "0p30",
     
     
     "WP_HP_Htag16" : "0p02",
