@@ -11,6 +11,8 @@ setTDRStyle()
 from CMGTools.VVResonances.plotting.TreePlotter import TreePlotter
 from CMGTools.VVResonances.plotting.MergedPlotter import MergedPlotter
 ROOT.gSystem.Load("libCMGToolsVVResonances")
+ROOT.v5.TFormula.SetMaxima(10000) #otherwise we get an error that the TFormula called by the TTree draw has too many operators when running on the CR
+
 parser = optparse.OptionParser()
 parser.add_option("-o","--output",dest="output",help="Output",default='')
 parser.add_option("-r","--res",dest="res",help="res",default='')
