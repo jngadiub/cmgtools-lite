@@ -30,6 +30,11 @@ class cuts():
     minMX = 0.
     maxMX = 0.
     
+    minGenMJ = 1.
+    maxGenMJ = 1.
+    minGenMVV = 1.
+    maxGenMVV = 1.
+
     HCALbinsMVV  = ""#" --binsMVV "
     HCALbinsMVVSignal= ""# 
     
@@ -44,15 +49,6 @@ class cuts():
     WPHPl1Wtag = ""
     WPLPl1Wtag = ""
 
-
-
-    minGenMJ = 1.
-    maxGenMJ = 1.
-    minGenMVV = 1.
-    maxGenMVV = 1.
-
-
-
     WPHPl1Htag = ""
     WPLPl1Htag = ""
     
@@ -64,10 +60,7 @@ class cuts():
     
     WPHPl2Htag = ""
     WPLPl2Htag = ""
-    
-    
-      
-    
+
     W_tag_unc_HP= 1.
     W_tag_unc_LP= 1.
     H_tag_unc_HP= 1.
