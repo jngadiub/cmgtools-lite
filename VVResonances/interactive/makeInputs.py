@@ -14,7 +14,9 @@ import cuts
 # python makeInputs.py -p 2016 --run "qcdnorm"
 # python makeInputs.py -p 2016 --run "data"
 # python makeInputs.py -p 2016 --run "pseudoNOVJETS"
-# python makeInputs.py -p 2016 --run "pseudoVJETS"                                                                                                                                                                                                                   
+# python makeInputs.py -p 2016 --run "pseudoVJETS"
+# python makeInputs.py -p 2016 --run "pseudoTT"
+# python makeInputs.py -p 2016 --run "pseudoALL" #to produce also the TT pseudodata
 
 parser = OptionParser()
 parser.add_option("-p","--period",dest="period",type="int",default=2016,help="run period")
@@ -53,8 +55,9 @@ if useTriggerWeights:
     addOption = "-t"
     
 #all categories
-categories=['VH_HPHP','VH_HPLP','VH_LPHP','VV_HPHP','VV_HPLP','VBF_VV_HPHP','VBF_VV_HPLP']
+#categories=['VH_HPHP','VH_LPHP'] #,'VH_HPLP','VV_HPHP','VV_HPLP'] #,'VBF_VV_HPHP','VBF_VV_HPLP']
 categories=['VH_NPHP_control_region']
+#categories=['NP']
        
 #list of signal samples --> nb, radion and vbf samples to be added
 BulkGravWWTemplate="BulkGravToWW_"
@@ -251,11 +254,17 @@ if options.run.find("all")!=-1 or options.run.find("pseudoVJETS")!=-1:
     print " Do pseudodata with vjets: DID YOU PRODUCE THE WORKSPACE BEFORE???"
     from modules.submitJobs import makePseudoDataVjets
     for p in categories: makePseudoDataVjets("results_"+str(period)+"/JJ_"+str(period)+"_nonRes_%s.root"%p,"results_"+str(period)+"/save_new_shapes_"+str(period)+"_pythia_%s_3D.root"%p,"pythia","JJ_PDVjets_%s.root"%p,ctx.lumi,"results_"+str(period)+"/workspace_JJ_BulkGWW_"+p+"_13TeV_"+str(period)+"_VjetsPrep.root",period,p)
+if options.run.find("all")!=-1 or options.run.find("pseudoTT")!=-1:
+    print " Do pseudodata with tt"
+    from modules.submitJobs import makePseudoDataTT
+    for p in categories: makePseudoDataTT("results_"+str(period)+"/JJ_all_"+str(period)+"_TTJets_"+p+".root",
+					  "JJ_PDTT_%s.root"%p,ctx.lumi,
+                                          period,p)
 if options.run.find("all")!=-1 or options.run.find("pseudoALL")!=-1:
-    print " Do pseudodata with vjets: DID YOU PRODUCE THE WORKSPACE BEFORE???"
+    print " Do pseudodata with vjets & tt: DID YOU PRODUCE THE WORKSPACE BEFORE???"
     from modules.submitJobs import makePseudoDataVjetsTT
     for p in categories: makePseudoDataVjetsTT("results_"+str(period)+"/JJ_"+str(period)+"_nonRes_%s.root"%p,
-                                               "JJ_all_"+str(period)+"_TTJets_"+p+".root",
+                                               "results_"+str(period)+"/JJ_all_"+str(period)+"_TTJets_"+p+".root",
 					       "results_"+str(period)+"/save_new_shapes_"+str(period)+"_pythia_%s_3D.root"%p,
 					       "pythia","JJ_PDALL_%s.root"%p,ctx.lumi,
 					       "results_"+str(period)+"/workspace_JJ_BulkGWW_"+p+"_13TeV_"+str(period)+".root",

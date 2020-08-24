@@ -9,7 +9,7 @@ import subprocess, thread
 from array import array
 ROOT.gROOT.SetBatch(True)
 
-timeCheck = "30"
+timeCheck = "100"
 userName=os.environ['USER']
 
 
@@ -1923,4 +1923,34 @@ def makePseudoDataVjetsTT(input,input_tt,kernel,mc,output,lumi,workspace,year,pu
 
  finmc.Close()
  findata.Close()
+ fout.Close()    
+
+def makePseudoDataTT(input_tt,output,lumi,year,purity):
+ 
+ pwd = os.getcwd()
+ pwd = "/"
+ ROOT.gRandom.SetSeed(0)
+ fout = ROOT.TFile.Open(output,'RECREATE')
+ 
+ ftt = ROOT.TFile.Open(input_tt,'READ')
+ hin_tt = ftt.Get('TTJets')
+ xbins = array("f",getListOfBinsLowEdge(hin_tt,"x"))
+ zbins = array("f",getListOfBinsLowEdge(hin_tt,"z"))
+
+ hout_tt = ROOT.TH3F('data','data',len(xbins)-1,xbins,len(xbins)-1,xbins,len(zbins)-1,zbins) 
+ hout_tt.FillRandom(hin_tt,int(hin_tt.Integral()*lumi))
+ 
+ fout.cd()
+ hout_tt.Write('data')
+ 
+
+ print "output   ", output
+ print "lumi     ", lumi
+ print "year     ", year
+ print "purity   ", purity
+ print "Expected TTJets events:",int(hin_tt.Integral()*lumi)
+ print "Writing histograms nonRes and data to file ", output
+
+
+ ftt.Close()
  fout.Close()    
