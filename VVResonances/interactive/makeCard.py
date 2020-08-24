@@ -86,17 +86,17 @@ for sig in signals:
 
       Tools.AddSignal(card,dataset,p,sig,resultsDir[dataset],ncontrib)
       ncontrib+=1
-
-      print "##########################       including W/Z jets in datacard      ######################"
-      rootFileMVV = resultsDir[dataset]+'/JJ_%s_WJets_MVV_'%dataset+p+'.root'    
-      rootFileNorm = resultsDir[dataset]+'/JJ_%s_WJets_%s.root'%(dataset,p)
-      Tools.AddWResBackground(card,dataset,p,rootFileMVV,rootFileNorm,resultsDir[dataset],ncontrib)
-      ncontrib+=1
+      if pseudodata.find("ttbar")==-1:
+        print "##########################       including W/Z jets in datacard      ######################"
+        rootFileMVV = resultsDir[dataset]+'/JJ_%s_WJets_MVV_'%dataset+p+'.root'    
+        rootFileNorm = resultsDir[dataset]+'/JJ_%s_WJets_%s.root'%(dataset,p)
+        Tools.AddWResBackground(card,dataset,p,rootFileMVV,rootFileNorm,resultsDir[dataset],ncontrib)
+        ncontrib+=1
       
-      rootFileMVV = resultsDir[dataset]+'/JJ_%s_ZJets_MVV_'%dataset+p+'.root'
-      rootFileNorm = resultsDir[dataset]+"/JJ_%s_ZJets_%s.root"%(dataset,p)
-      Tools.AddZResBackground(card,dataset,p,rootFileMVV,rootFileNorm,resultsDir[dataset],ncontrib)
-      ncontrib+=1
+        rootFileMVV = resultsDir[dataset]+'/JJ_%s_ZJets_MVV_'%dataset+p+'.root'
+        rootFileNorm = resultsDir[dataset]+"/JJ_%s_ZJets_%s.root"%(dataset,p)
+        Tools.AddZResBackground(card,dataset,p,rootFileMVV,rootFileNorm,resultsDir[dataset],ncontrib)
+        ncontrib+=1
         
       print "including tt+jets in datacard"
       #rootFileMVV = {"resT":resultsDir[dataset]+'/JJ_resT'+dataset+'_TTJets_MVV_NP.root', "resW":resultsDir[dataset]+"/JJ_resW"+dataset+"_TTJets_MVV_NP.root","nonresT":resultsDir[dataset]+"/JJ_nonresT"+dataset+"_TTJets_MVV_NP.root","resTnonresT":resultsDir[dataset]+"/JJ_resTnonresT"+dataset+"_TTJets_MVV_NP.root","resWnonresT":resultsDir[dataset]+"/JJ_resWnonresT"+dataset+"_TTJets_MVV_NP.root","resTresW":resultsDir[dataset]+"/JJ_resTresW"+dataset+"_TTJets_MVV_NP.root"}
@@ -110,31 +110,38 @@ for sig in signals:
       #ncontrib+=1 --> with old implementation
       ncontrib+=6 #--> with new implementation
       #ncontrib+=3 #--> with new implementation
+      if pseudodata.find("ttbar")==-1:
+        print " including QCD in datacard"
+        #rootFile3DPDF = resultsDir[dataset]+'/JJ_2016_nonRes_3D_VV_HPLP.root'
+        rootFile3DPDF = resultsDir[dataset]+"/save_new_shapes_{year}_pythia_{purity}_3D.root".format(year=dataset,purity=p)#    save_new_shapes_%s_pythia_"%dataset+"_""VVVH_all"+"_3D.root"
+        print "rootFile3DPDF ",rootFile3DPDF
+        rootFileNorm = resultsDir[dataset]+"/JJ_%s_nonRes_"%dataset+p+".root"
+        print "rootFileNorm ",rootFileNorm
+        Tools.AddNonResBackground(card,dataset,p,rootFile3DPDF,rootFileNorm,ncontrib)
 
-      #rootFile3DPDF = resultsDir[dataset]+'/JJ_2016_nonRes_3D_VV_HPLP.root'
-      rootFile3DPDF = resultsDir[dataset]+"/save_new_shapes_{year}_pythia_{purity}_3D.root".format(year=dataset,purity=p)#    save_new_shapes_%s_pythia_"%dataset+"_""VVVH_all"+"_3D.root"
-      print "rootFile3DPDF ",rootFile3DPDF
-      rootFileNorm = resultsDir[dataset]+"/JJ_%s_nonRes_"%dataset+p+".root"
-      print "rootFileNorm ",rootFileNorm
-      Tools.AddNonResBackground(card,dataset,p,rootFile3DPDF,rootFileNorm,ncontrib)
 
-      # #if you run on real data or pseudodata
-      # rootFileData = resultsDir[dataset]+"/JJ_%s_nonRes_3D_none.root"%(dataset) #use this only to prepare workspace for making pseudo data with vjets
-      # histName="histo"
-      # scaleData=lumi[dataset]
-    
-      rootFileData = resultsDir[dataset]+"/JJ_"+dataset+"_"+p+".root" #resultsDir[dataset]+"/pseudo40/JJ_"+p+".root"
+      print " including data or pseudodata in datacard"
+      rootFileData = resultsDir[dataset]+"/JJ_"+dataset+"_data_"+p+".root" #resultsDir[dataset]+"/pseudo40/JJ_"+p+".root"
       histName="data"
       scaleData=1.0
+      if pseudodata=="PrepPseudo":
+        rootFileData = resultsDir[dataset]+"/JJ_%s_nonRes_3D_NP.root"%(dataset) #use this only to prepare workspace for making pseudo data with vjets
+        histName="histo"
+        scaleData=lumi[dataset]
       if pseudodata=="True":
         print "Using pseudodata with all backgrounds (QCD, V+jets and tt+jets)"
         rootFileData = resultsDir[dataset]+"/JJ_PDALL_"+p+".root" #resultsDir[dataset]+"/pseudo40/JJ_PD_"+p+".root"
         histName="data"
         scaleData=1.0
-      if pseudodata=="ttbar":
+      if pseudodata=="ttjets":
         print "Using pseudodata with only tt+jets backgrounds"
         rootFileData = resultsDir[dataset]+"/JJ_TTJets_"+p+".root"
         histName="data_obs"
+        scaleData=1.0
+      if pseudodata=="ttbar":
+        print "Using pseudodata with only tt backgrounds"
+        rootFileData = resultsDir[dataset]+"/JJ_PDTT_"+p+".root"
+        histName="data"
         scaleData=1.0
       if pseudodata==sig:
        rootFileData = resultsDir[dataset]+"/pseudodata_sigOnly_"+dataset+"_"+sig+"_"+p+"_"+"M"+outlabel.split("_M")[1]+".root"
@@ -145,7 +152,7 @@ for sig in signals:
       Tools.AddSigSystematics(card,sig,dataset,p,1)
       Tools.AddResBackgroundSystematics(card,p)
       Tools.AddNonResBackgroundSystematics(card,p)
-      Tools.AddTaggingSystematics(card,sig,dataset,p,resultsDir[dataset]+'/migrationunc.json')
+      #Tools.AddTaggingSystematics(card,sig,dataset,p,resultsDir[dataset]+'/migrationunc.json')
       Tools.AddTTSystematics3(card,sig,dataset,p)
       #Tools.AddTTSystematics2(card,sig,dataset,p,resultsDir[dataset])
       card.makeCard()
