@@ -285,7 +285,7 @@ class Postfitplotter():
 
 
 
-    def MakePlots(self,histos,hdata,hsig,axis,nBins,maxY=-1.,normsig = 1.,errors=None):
+    def MakePlots(self,histos,hdata,hsig,axis,nBins,maxY=-1.,normsig = 1.,errors=None,isTT=False):
         print histos
         extra1 = ''
         extra2 = ''
@@ -314,7 +314,7 @@ class Postfitplotter():
             hhtitle = self.options.channel
             xtitle = " m_{jet1} [GeV]"
             ymin = 0.02
-            ymax = hdata.GetMaximum()*1.5#max(hdata.GetMaximum()*1.3,maxY*1.3)
+            ymax = hdata.GetMaximum()*1.8#max(hdata.GetMaximum()*1.3,maxY*1.3)
             extra1 = yrange.split(',')[0]+' < m_{jet2} < '+ yrange.split(',')[1]+' GeV'
             extra2 = zrange.split(',')[0]+' < m_{jj} < '+ zrange.split(',')[1]+' GeV'
         elif axis=='y':
@@ -323,7 +323,7 @@ class Postfitplotter():
             hhtitle = self.options.channel
             xtitle = " m_{jet2} [GeV]"
             ymin = 0.02
-            ymax = hdata.GetMaximum()*1.5#max(hdata.GetMaximum()*1.3,maxY*1.3)
+            ymax = hdata.GetMaximum()*1.8#max(hdata.GetMaximum()*1.3,maxY*1.3)
             extra1 = xrange.split(',')[0]+' < m_{jet1} < '+ xrange.split(',')[1]+' GeV'
             extra2 = zrange.split(',')[0]+' < m_{jj} < '+ zrange.split(',')[1]+' GeV'
                     
@@ -561,17 +561,32 @@ class Postfitplotter():
         
         self.calculateChi2ForSig(hdata,hsig,axis,self.logfile,"\n \n projection "+extra1+"  "+extra2+" \n")
         if self.options.prelim==0:
-            print "save plot as ", self.options.output+"PostFit"+self.options.label+"_"+htitle.replace(' ','_').replace('.','_').replace(':','_').replace(',','_')+".pdf" 
-            c.SaveAs(self.options.output+"PostFit"+self.options.label+"_"+htitle.replace(' ','_').replace('.','_').replace(':','_').replace(',','_')+".png")
-            c.SaveAs(self.options.output+"PostFit"+self.options.label+"_"+htitle.replace(' ','_').replace('.','_').replace(':','_').replace(',','_')+".pdf")
-            c.SaveAs(self.options.output+"PostFit"+self.options.label+"_"+htitle.replace(' ','_').replace('.','_').replace(':','_').replace(',','_')+".C")
-            c.SaveAs(self.options.output+"PostFit"+self.options.label+"_"+htitle.replace(' ','_').replace('.','_').replace(':','_').replace(',','_')+".root")
+            if isTT == False:
+                print "save plot as ", self.options.output+"PostFit"+self.options.label+"_"+htitle.replace(' ','_').replace('.','_').replace(':','_').replace(',','_')+".pdf" 
+                c.SaveAs(self.options.output+"PostFit"+self.options.label+"_"+htitle.replace(' ','_').replace('.','_').replace(':','_').replace(',','_')+".png")
+                c.SaveAs(self.options.output+"PostFit"+self.options.label+"_"+htitle.replace(' ','_').replace('.','_').replace(':','_').replace(',','_')+".pdf")
+                c.SaveAs(self.options.output+"PostFit"+self.options.label+"_"+htitle.replace(' ','_').replace('.','_').replace(':','_').replace(',','_')+".C")
+                c.SaveAs(self.options.output+"PostFit"+self.options.label+"_"+htitle.replace(' ','_').replace('.','_').replace(':','_').replace(',','_')+".root")
+            else:
+                print "save plot as ", self.options.output+"PostFitTTonly"+self.options.label+"_"+htitle.replace(' ','_').replace('.','_').replace(':','_').replace(',','_')+".pdf"
+                c.SaveAs(self.options.output+"PostFitTTonly"+self.options.label+"_"+htitle.replace(' ','_').replace('.','_').replace(':','_').replace(',','_')+".png")
+                c.SaveAs(self.options.output+"PostFitTTonly"+self.options.label+"_"+htitle.replace(' ','_').replace('.','_').replace(':','_').replace(',','_')+".pdf")
+                c.SaveAs(self.options.output+"PostFitTTonly"+self.options.label+"_"+htitle.replace(' ','_').replace('.','_').replace(':','_').replace(',','_')+".C")
+                c.SaveAs(self.options.output+"PostFitTTonly"+self.options.label+"_"+htitle.replace(' ','_').replace('.','_').replace(':','_').replace(',','_')+".root")
+ 
         else:
-            print "save plot as ",   self.options.output+"PostFit"+self.options.label+"_"+htitle.replace(' ','_').replace('.','_').replace(':','_').replace(',','_')+"_prelim.pdf"
-            c.SaveAs(self.options.output+"PostFit"+self.options.label+"_"+htitle.replace(' ','_').replace('.','_').replace(':','_').replace(',','_')+"_prelim.png")
-            c.SaveAs(self.options.output+"PostFit"+self.options.label+"_"+htitle.replace(' ','_').replace('.','_').replace(':','_').replace(',','_')+"_prelim.pdf")
-            c.SaveAs(self.options.output+"PostFit"+self.options.label+"_"+htitle.replace(' ','_').replace('.','_').replace(':','_').replace(',','_')+"_prelim.C")
-            c.SaveAs(self.options.output+"PostFit"+self.options.label+"_"+htitle.replace(' ','_').replace('.','_').replace(':','_').replace(',','_')+"_prelim.root")
+            if isTT == False:
+                print "save plot as ",   self.options.output+"PostFit"+self.options.label+"_"+htitle.replace(' ','_').replace('.','_').replace(':','_').replace(',','_')+"_prelim.pdf"
+                c.SaveAs(self.options.output+"PostFit"+self.options.label+"_"+htitle.replace(' ','_').replace('.','_').replace(':','_').replace(',','_')+"_prelim.png")
+                c.SaveAs(self.options.output+"PostFit"+self.options.label+"_"+htitle.replace(' ','_').replace('.','_').replace(':','_').replace(',','_')+"_prelim.pdf")
+                c.SaveAs(self.options.output+"PostFit"+self.options.label+"_"+htitle.replace(' ','_').replace('.','_').replace(':','_').replace(',','_')+"_prelim.C")
+                c.SaveAs(self.options.output+"PostFit"+self.options.label+"_"+htitle.replace(' ','_').replace('.','_').replace(':','_').replace(',','_')+"_prelim.root")
+            else:
+                print "save plot as ",   self.options.output+"PostFitTTonly"+self.options.label+"_"+htitle.replace(' ','_').replace('.','_').replace(':','_').replace(',','_')+"_prelim.pdf"
+                c.SaveAs(self.options.output+"PostFitTTonly"+self.options.label+"_"+htitle.replace(' ','_').replace('.','_').replace(':','_').replace(',','_')+"_prelim.png")
+                c.SaveAs(self.options.output+"PostFitTTonly"+self.options.label+"_"+htitle.replace(' ','_').replace('.','_').replace(':','_').replace(',','_')+"_prelim.pdf")
+                c.SaveAs(self.options.output+"PostFitTTonly"+self.options.label+"_"+htitle.replace(' ','_').replace('.','_').replace(':','_').replace(',','_')+"_prelim.C")
+                c.SaveAs(self.options.output+"PostFitTTonly"+self.options.label+"_"+htitle.replace(' ','_').replace('.','_').replace(':','_').replace(',','_')+"_prelim.root")
 
 
 class Projection():
