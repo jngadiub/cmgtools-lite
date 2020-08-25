@@ -772,7 +772,7 @@ class Projection():
         self.maxYaxis = 0
         self.axis = axis
         if axis=="x":
-           self.dh = ROOT.TH1F("dh","dh",len(self.xBinslowedge)-1,self.xBinslowedge)
+           self.dh = ROOT.TH1F("dh"+axis,"dh",len(self.xBinslowedge)-1,self.xBinslowedge)
            self.Bins_redux = self.xBins_redux
            self.Bins_redux_1 = self.yBins_redux
            self.Bins_redux_2 = self.zBins_redux
@@ -787,7 +787,7 @@ class Projection():
            for xk,xv in self.xBins_redux.iteritems():
                 self.neventsPerBin_1[xk]=0
         if axis=="y":
-           self.dh = ROOT.TH1F("dh","dh",len(self.yBinslowedge)-1,self.yBinslowedge)
+           self.dh = ROOT.TH1F("dh"+axis,"dh",len(self.yBinslowedge)-1,self.yBinslowedge)
            self.Bins_redux = self.yBins_redux
            self.Bins_redux_1 = self.xBins_redux
            self.Bins_redux_2 = self.zBins_redux
@@ -802,7 +802,7 @@ class Projection():
            for yk,yv in self.yBins_redux.iteritems():
                 self.neventsPerBin_1[yk]=0
         if axis=="z":
-           self.dh = ROOT.TH1F("dh","dh",len(self.zBinslowedge)-1,self.zBinslowedge)
+           self.dh = ROOT.TH1F("dh"+axis,"dh",len(self.zBinslowedge)-1,self.zBinslowedge)
            self.Bins_redux = self.zBins_redux
            self.Bins_redux_1 = self.xBins_redux
            self.Bins_redux_2 = self.yBins_redux
@@ -822,20 +822,20 @@ class Projection():
         argset.add(self.M1);
         self.args_ws = argset
         print "initialize histograms with ",self.Binslowedge
-        self.data = ROOT.RooDataHist("data","data",self.args_ws,data)
-        self.htot_nonres = ROOT.TH1F("htot_nonres","htot_nonres",len(self.Binslowedge)-1,self.Binslowedge)
-        self.htot_sig = ROOT.TH1F("htot_sig","htot_sig",len(self.Binslowedge)-1,self.Binslowedge)
-        self.htot = ROOT.TH1F("htot","htot",len(self.Binslowedge)-1,self.Binslowedge)
-        self.htot_Wres = ROOT.TH1F("htot_Wres","htot_Wres",len(self.Binslowedge)-1,self.Binslowedge)
-        self.htot_Zres = ROOT.TH1F("htot_Zres","htot_Zres",len(self.Binslowedge)-1,self.Binslowedge)
-        self.htot_TTJets = ROOT.TH1F("htot_TTJets","htot_TTJets",len(self.Binslowedge)-1,self.Binslowedge)
-        self.htot_TTJetsTop = ROOT.TH1F("htot_TTJetsTop","htot_TTJetsTop",len(self.Binslowedge)-1,self.Binslowedge)
-        self.htot_TTJetsW = ROOT.TH1F("htot_TTJetsW","htot_TTJetsW",len(self.Binslowedge)-1,self.Binslowedge)
-        self.htot_TTJetsNonRes = ROOT.TH1F("htot_TTJetsNonRes","htot_TTJetsNonRes",len(self.Binslowedge)-1,self.Binslowedge)
-        self.htot_TTJetsTnonresT = ROOT.TH1F("htot_TTJetsTnonresT","htot_TTJetsTnonresT",len(self.Binslowedge)-1,self.Binslowedge)
-        self.htot_TTJetsWnonresT  = ROOT.TH1F("htot_TTJetsWnonresT","htot_TTJetsWnonresT",len(self.Binslowedge)-1,self.Binslowedge)
-        self.htot_TTJetsresTresW= ROOT.TH1F("htot_TTJetsresTresW","htot_TTJetsresTresW",len(self.Binslowedge)-1,self.Binslowedge)
-        self.htot_TTJetsresWresT= ROOT.TH1F("htot_TTJetsresWresT","htot_TTJetsresWresT",len(self.Binslowedge)-1,self.Binslowedge)
+        self.data = ROOT.RooDataHist("data"+axis,"data",self.args_ws,data)
+        self.htot_nonres = ROOT.TH1F("htot_nonres"+axis,"htot_nonres",len(self.Binslowedge)-1,self.Binslowedge)
+        self.htot_sig = ROOT.TH1F("htot_sig"+axis,"htot_sig",len(self.Binslowedge)-1,self.Binslowedge)
+        self.htot = ROOT.TH1F("htot"+axis,"htot",len(self.Binslowedge)-1,self.Binslowedge)
+        self.htot_Wres = ROOT.TH1F("htot_Wres"+axis,"htot_Wres",len(self.Binslowedge)-1,self.Binslowedge)
+        self.htot_Zres = ROOT.TH1F("htot_Zres"+axis,"htot_Zres",len(self.Binslowedge)-1,self.Binslowedge)
+        self.htot_TTJets = ROOT.TH1F("htot_TTJets"+axis,"htot_TTJets",len(self.Binslowedge)-1,self.Binslowedge)
+        self.htot_TTJetsTop = ROOT.TH1F("htot_TTJetsTop"+axis,"htot_TTJetsTop",len(self.Binslowedge)-1,self.Binslowedge)
+        self.htot_TTJetsW = ROOT.TH1F("htot_TTJetsW"+axis,"htot_TTJetsW",len(self.Binslowedge)-1,self.Binslowedge)
+        self.htot_TTJetsNonRes = ROOT.TH1F("htot_TTJetsNonRes"+axis,"htot_TTJetsNonRes",len(self.Binslowedge)-1,self.Binslowedge)
+        self.htot_TTJetsTnonresT = ROOT.TH1F("htot_TTJetsTnonresT"+axis,"htot_TTJetsTnonresT",len(self.Binslowedge)-1,self.Binslowedge)
+        self.htot_TTJetsWnonresT  = ROOT.TH1F("htot_TTJetsWnonresT"+axis,"htot_TTJetsWnonresT",len(self.Binslowedge)-1,self.Binslowedge)
+        self.htot_TTJetsresTresW= ROOT.TH1F("htot_TTJetsresTresW"+axis,"htot_TTJetsresTresW",len(self.Binslowedge)-1,self.Binslowedge)
+        self.htot_TTJetsresWresT= ROOT.TH1F("htot_TTJetsresWresT"+axis,"htot_TTJetsresWresT",len(self.Binslowedge)-1,self.Binslowedge)
         
         for p in pdfs:
             self.h.append( ROOT.TH1F("h_"+p.GetName(),"h_"+p.GetName(),len(self.Binslowedge)-1,self.Binslowedge))
