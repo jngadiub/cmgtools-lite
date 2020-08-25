@@ -504,7 +504,7 @@ if __name__=="__main__":
       if 'VH' in options.input: purity = 'VH_'+purity
       else: purity = 'VV_'+purity
       if options.input.find('VBF')!=-1: purity = 'VBF_'+purity  
-     if purity == '' and 'control_region' in options.input: purity = 'VH_NPHP_control_region'
+     elif purity == '' and 'control_region' in options.input: purity = 'VH_NPHP_control_region'
      else:
       print "SPECIFIED PURITY IS NOT ALLOWED!",options.input,purity
       sys.exit()  
