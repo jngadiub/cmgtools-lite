@@ -55,8 +55,9 @@ if useTriggerWeights:
     addOption = "-t"
     
 #all categories
-#categories=['VH_HPHP','VH_LPHP'] #,'VH_HPLP','VV_HPHP','VV_HPLP'] #,'VBF_VV_HPHP','VBF_VV_HPLP']
-categories=['VH_NPHP_control_region']
+categories=['VV_HPHP','VV_HPLP']
+#categories=['VH_HPHP','VH_LPHP','VH_HPLP'] #,'VV_HPHP','VV_HPLP'] #,'VBF_VV_HPHP','VBF_VV_HPLP']
+#categories=['VH_NPHP_control_region']
 #categories=['NP']
        
 #list of signal samples --> nb, radion and vbf samples to be added
@@ -267,7 +268,7 @@ if options.run.find("all")!=-1 or options.run.find("pseudoALL")!=-1:
                                                "results_"+str(period)+"/JJ_all_"+str(period)+"_TTJets_"+p+".root",
 					       "results_"+str(period)+"/save_new_shapes_"+str(period)+"_pythia_%s_3D.root"%p,
 					       "pythia","JJ_PDALL_%s.root"%p,ctx.lumi,
-					       "results_"+str(period)+"/workspace_JJ_BulkGWW_"+p+"_13TeV_"+str(period)+".root",
+					       "results_"+str(period)+"/workspace_JJ_BulkGWW_"+p+"_13TeV_"+str(period)+"_PrepPseudo.root",
 					       period,p)
 
 print " ########## I did everything I could! ###### "
