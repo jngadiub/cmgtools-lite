@@ -121,32 +121,35 @@ for sig in signals:
 
 
       print " including data or pseudodata in datacard"
-      rootFileData = resultsDir[dataset]+"/JJ_"+dataset+"_data_"+p+".root" #resultsDir[dataset]+"/pseudo40/JJ_"+p+".root"
-      histName="data"
-      scaleData=1.0
       if pseudodata=="PrepPseudo":
         rootFileData = resultsDir[dataset]+"/JJ_%s_nonRes_3D_NP.root"%(dataset) #use this only to prepare workspace for making pseudo data with vjets
         histName="histo"
         scaleData=lumi[dataset]
-      if pseudodata=="True":
+      elif pseudodata=="True":
         print "Using pseudodata with all backgrounds (QCD, V+jets and tt+jets)"
         rootFileData = resultsDir[dataset]+"/JJ_PDALL_"+p+".root" #resultsDir[dataset]+"/pseudo40/JJ_PD_"+p+".root"
         histName="data"
         scaleData=1.0
-      if pseudodata=="ttjets":
+      elif pseudodata=="ttjets":
         print "Using pseudodata with only tt+jets backgrounds"
         rootFileData = resultsDir[dataset]+"/JJ_TTJets_"+p+".root"
         histName="data_obs"
         scaleData=1.0
-      if pseudodata=="ttbar":
+      elif pseudodata=="ttbar":
         print "Using pseudodata with only tt backgrounds"
         rootFileData = resultsDir[dataset]+"/JJ_PDTT_"+p+".root"
         histName="data"
         scaleData=1.0
-      if pseudodata==sig:
+      elif pseudodata==sig:
        rootFileData = resultsDir[dataset]+"/pseudodata_sigOnly_"+dataset+"_"+sig+"_"+p+"_"+"M"+outlabel.split("_M")[1]+".root"
        histName="data_obs" 
        scaleData=1.0
+      elif pseudodata=="False":
+        rootFileData = resultsDir[dataset]+"/JJ_"+dataset+"_data_"+p+".root" #resultsDir[dataset]+"/pseudo40/JJ_"+p+".root"
+        histName="data"
+        scaleData=1.0
+
+
       Tools.AddData(card,rootFileData,histName,scaleData)
       
       Tools.AddSigSystematics(card,sig,dataset,p,1)
