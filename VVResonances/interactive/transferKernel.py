@@ -461,17 +461,17 @@ def makeNonResCard():
  print "norm"
  card.addSystematic("CMS_VV_JJ_nonRes_norm","lnN",{'nonRes':1.5}) 
  print "OPTZ"
- card.addSystematic("CMS_VV_JJ_nonRes_OPTZ_"+category_pdf,"param",[0.,1.]) #1,2
+ card.addSystematic("CMS_VV_JJ_nonRes_OPTZ_"+category_pdf,"param",[0.,2.]) #1,2
  print "OPTXY"
- card.addSystematic("CMS_VV_JJ_nonRes_OPTXY_"+category_pdf,"param",[0.,1.]) #0,2
+ card.addSystematic("CMS_VV_JJ_nonRes_OPTXY_"+category_pdf,"param",[0.,2.]) #0,2
  print "OPT3"
- card.addSystematic("CMS_VV_JJ_nonRes_OPT3_"+category_pdf,"param",[1.,1.]) #test for VH_HPHP  
+ card.addSystematic("CMS_VV_JJ_nonRes_OPT3_"+category_pdf,"param",[1.,2.]) #test for VH_HPHP  
  #print "PT"
  #card.addSystematic("CMS_VV_JJ_nonRes_PT_"+category_pdf,"param",[0.0,0.333]) #orig
  print "PTZ"
- card.addSystematic("CMS_VV_JJ_nonRes_PTZ_"+category_pdf,"param",[.0,1.]) #2,2
+ card.addSystematic("CMS_VV_JJ_nonRes_PTZ_"+category_pdf,"param",[.0,2.]) #2,2
  print "PTXY"
- card.addSystematic("CMS_VV_JJ_nonRes_PTXY_"+category_pdf,"param",[0.,1.]) #0,2
+ card.addSystematic("CMS_VV_JJ_nonRes_PTXY_"+category_pdf,"param",[0.,2.]) #0,2
   
  print " and now make card"     
  card.makeCard()
