@@ -34,7 +34,6 @@ parser.add_option("--pdfy",dest="pdfy",help="name of pdfs lie PTYUp etc",default
 parser.add_option("-s","--signal",dest="fitSignal",action="store_true",help="do S+B fit",default=False)
 parser.add_option("-t","--addTop",dest="addTop",action="store_true",help="Fit top",default=False)
 parser.add_option("--nameTT",dest="nameTT",help="Input ttonly workspace",default='workspaceTT.root')
-parser.add_option("--inputTT",dest="inputTT",help="Input pseudodata hist with ttonly",default='results_2016/JJ_PDTT_VH_NPHP_control_region.root')
 parser.add_option("-M","--mass",dest="signalMass",type=float,help="signal mass",default=1560.)
 parser.add_option("--signalScaleF",dest="signalScaleF",type=float,help="scale factor to apply to signal when drawing so its still visible!",default=100.)
 parser.add_option("--prelim",dest="prelim",help="add extra text CMS label",default="Preliminary")
@@ -126,8 +125,6 @@ if __name__=="__main__":
 
      if options.addTop==True:
         print " Getting TTbar background input values "
-        finTT = ROOT.TFile(options.inputTT,"READ");
-        hinTT = finTT.Get("data");
         print options.nameTT
         print "open file " +options.nameTT
         fTT = ROOT.TFile(options.nameTT,"READ")
@@ -215,7 +212,6 @@ if __name__=="__main__":
         print " dumped tt pdf " 
         logfileTT = open(options.output+"_TTJets_"+options.log,"a::ios::ate")
         forplottingTT = Postfitplotter.Postfitplotter(options,logfileTT,signalName)
-        print " calling forproj with hinTT ",hinTT
         forprojTT = Postfitplotter.Projection(hinMC,[options.xrange,options.yrange,options.zrange], workspaceTT,options.fit)
 
         print " forprojTT has been initialized "
@@ -224,8 +220,8 @@ if __name__=="__main__":
         if options.projection =="z" or options.projection =="xyz":
             resultsTT = []
             for year in years:
-                tmpTT = forprojTT.doProjection(dataTT[year],TTpdfsz[year],TT_expected[year],"z",TTsignalpdfs[year],signal_TTexpected[year])
-                resultsTT.append(tmpTT) 
+                tmpTTz = forprojTT.doProjection(dataTT[year],TTpdfsz[year],TT_expected[year],"z",TTsignalpdfs[year],signal_TTexpected[year])
+                resultsTT.append(tmpTTz) 
             resTT = addResults(resultsTT)
             forplottingTT.MakePlots(resTT[0],resTT[1],resTT[2],resTT[3],resTT[4],resTT[5], resTT[6],resTT[7],isTT)
         
@@ -233,16 +229,16 @@ if __name__=="__main__":
         if options.projection =="x" or options.projection =="xyz":
             resultsTT = []
             for year in years:
-                tmpTT = forprojTT.doProjection(dataTT[year],TTpdfsx[year],TT_expected[year],"x",TTsignalpdfs[year],signal_TTexpected[year])
-                resultsTT.append(tmpTT)
+                tmpTTx = forprojTT.doProjection(dataTT[year],TTpdfsx[year],TT_expected[year],"x",TTsignalpdfs[year],signal_TTexpected[year])
+                resultsTT.append(tmpTTx)
             resTT = addResults(resultsTT)
             forplottingTT.MakePlots(resTT[0],resTT[1],resTT[2],resTT[3],resTT[4],resTT[5], resTT[6],resTT[7],isTT)
         #make projections onto MJ2 axis
         if options.projection =="y" or options.projection =="xyz":
             resultsTT = []
             for year in years:
-                tmpTT = forprojTT.doProjection(dataTT[year],TTpdfsy[year],TT_expected[year],"y",TTsignalpdfs[year],signal_TTexpected[year])
-                resultsTT.append(tmpTT)
+                tmpTTy = forprojTT.doProjection(dataTT[year],TTpdfsy[year],TT_expected[year],"y",TTsignalpdfs[year],signal_TTexpected[year])
+                resultsTT.append(tmpTTy)
             resTT = addResults(resultsTT)
             forplottingTT.MakePlots(resTT[0],resTT[1],resTT[2],resTT[3],resTT[4],resTT[5], resTT[6],resTT[7],isTT)
         
