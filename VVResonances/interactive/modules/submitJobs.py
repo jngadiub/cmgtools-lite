@@ -9,7 +9,7 @@ import subprocess, thread
 from array import array
 ROOT.gROOT.SetBatch(True)
 
-timeCheck = "100"
+timeCheck = "1000"
 userName=os.environ['USER']
 
 
