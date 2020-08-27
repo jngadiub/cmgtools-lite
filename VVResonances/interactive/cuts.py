@@ -153,20 +153,19 @@ class cuts():
             self.LPSF_htag = data['htagLPSF'+self.yeartag]
             self.vtag_pt_dependence = data["vtag_pt_dependence"+self.yeartag]
             
-            self.catVtag['HP1'] = '('+self.varl1Wtag+'>'+ self.WPHPl1Wtag+')' 
-            self.catVtag['HP2'] = '('+self.varl2Wtag+'>'+ self.WPHPl2Wtag+')' 
-            self.catVtag['LP1'] = '(('+ self.varl1Wtag+'<'+ self.WPHPl1Wtag +')&&('+ self.varl1Wtag +'>'+ self.WPLPl1Wtag +'))' 
-            self.catVtag['LP2'] = '(('+ self.varl2Wtag+'<'+ self.WPHPl2Wtag +')&&('+ self.varl2Wtag +'>'+ self.WPLPl2Wtag +'))'
-            self.catVtag['NP1'] =  '('+self.varl1Wtag +'<' +self.WPLPl1Wtag + ')' 
-            self.catVtag['NP2'] =  '('+self.varl2Wtag +'<' +self.WPLPl2Wtag + ')' 
-            
-            
-            self.catHtag['HP1'] = '('+self.varl1Htag+'>'+ self.WPHPl1Htag+')' 
-            self.catHtag['HP2'] = '('+self.varl2Htag+'>'+ self.WPHPl2Htag+')' 
-            self.catHtag['LP1'] = '(('+ self.varl1Htag+'<'+ self.WPHPl1Htag +')&&('+ self.varl1Htag +'>'+ self.WPLPl1Htag +'))' 
-            self.catHtag['LP2'] = '(('+ self.varl2Htag+'<'+ self.WPHPl2Htag +')&&('+ self.varl2Htag +'>'+ self.WPLPl2Htag +'))'
-            self.catHtag['NP1'] =  '('+self.varl1Htag +'<' +self.WPLPl1Htag + ')' 
-            self.catHtag['NP2'] =  '('+self.varl2Htag +'<' +self.WPLPl2Htag + ')' 
+            self.catVtag['HP1'] =  '('+ self.varl1Wtag +'>'+ self.WPHPl1Wtag +')'
+            self.catVtag['HP2'] =  '('+ self.varl2Wtag +'>'+ self.WPHPl2Wtag +')'
+            self.catVtag['LP1'] = '(('+ self.varl1Wtag +'<'+ self.WPHPl1Wtag +')&&('+ self.varl1Wtag +'>'+ self.WPLPl1Wtag +'))' 
+            self.catVtag['LP2'] = '(('+ self.varl2Wtag +'<'+ self.WPHPl2Wtag +')&&('+ self.varl2Wtag +'>'+ self.WPLPl2Wtag +'))'
+            self.catVtag['NP1'] =  '('+ self.varl1Wtag +'<'+ self.WPLPl1Wtag +')' 
+            self.catVtag['NP2'] =  '('+ self.varl2Wtag +'<'+ self.WPLPl2Wtag +')' 
+
+            self.catHtag['HP1'] =  '('+ self.varl1Htag +'>'+ self.WPHPl1Htag +')' 
+            self.catHtag['HP2'] =  '('+ self.varl2Htag +'>'+ self.WPHPl2Htag +')' 
+            self.catHtag['LP1'] = '(('+ self.varl1Htag +'<'+ self.WPHPl1Htag +')&&('+ self.varl1Htag +'>'+ self.WPLPl1Htag +'))' 
+            self.catHtag['LP2'] = '(('+ self.varl2Htag +'<'+ self.WPHPl2Htag +')&&('+ self.varl2Htag +'>'+ self.WPLPl2Htag +'))'
+            self.catHtag['NP1'] =  '('+ self.varl1Htag +'<'+ self.WPLPl1Htag +')' 
+            self.catHtag['NP2'] =  '('+ self.varl2Htag +'<'+ self.WPLPl2Htag +')' 
             
             selections = ["common","common_VV","common_VBF","NP","res","nonres","resTT","resTT_W","nonresTT","resTnonresT","resWnonresT","resTresW","acceptance","acceptanceMJ","acceptanceMVV","acceptanceGEN","looseacceptanceMJ"]
             for sel in selections:
@@ -236,6 +235,11 @@ class cuts():
                 self.cuts['VH_all'] =  '('+  '||'.join([self.cuts['VH_HPHP'],self.cuts['VH_LPHP'],self.cuts['VH_HPLP']]) + ')'
 
                 self.cuts['VV_HPLP'] = '(' +'('+'!'+self.cuts['VH_all']+') &&' + '(' + '('+  '&&'.join([self.catVtag['HP1'],self.catVtag['LP2']]) + ')' + '||' + '(' + '&&'.join([self.catVtag['HP2'],self.catVtag['LP1']]) + ')' + ')' + ')'
+
+                #control region (invert w-tag)
+                catsAll['VH_NPHP'] = '('+'&&'.join([self.catVtag['NP1'],self.catHtag['HP2']])+')'
+                catsAll['HV_HPNP'] = '('+'&&'.join([self.catHtag['HP1'],self.catVtag['NP2']])+')'
+                self.cuts['VH_NPHP_control_region'] = '('+'||'.join([catsAll['VH_NPHP'],catsAll['HV_HPNP'],catsAll['HH_HPHP']])+')'
             else:
                 print "Use b-tagging sorting"
                 self.cuts['VH_HPHP'] = '('+  '&&'.join([self.catHtag['HP1'],self.catVtag['HP2']]) + ')'

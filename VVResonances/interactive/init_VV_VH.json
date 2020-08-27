@@ -1,11 +1,14 @@
 {
-    "lumi16" : 35900.0,
-    "lumi17" : 41367.0,
-    "lumi18" : 59690.0,
+    "_comment": "lumis from https://twiki.cern.ch/twiki/bin/viewauth/CMS/TWikiLUM" ,
+    "lumi16" : 35920.0,
+    "lumi17" : 41530.0,
+    "lumi18" : 59740.0,
+    "lumi161718": 137190.0,
     "unc_lumi16": 1.025,
     "unc_lumi17": 1.023,
-    "unc_lumi18": 1.0,
-    
+    "unc_lumi18": 1.025,
+    "unc_lumi161718": 1.018,
+
     "HPSF16" :  0.937,
     "LPSF16" :  1.006,
     "HPSF17" :  0.955,
@@ -61,9 +64,9 @@
     "W_tag_unc_LP" : {"2016": 0.11, "2017": 0.13 , "2018": 0.13 },
     "H_tag_unc_HP" : {"2016": 0.21 , "2017": 0.25 , "2018": 0.25 },
     "H_tag_unc_LP" : {"2016": 0.11, "2017": 0.13 , "2018": 0.13  },
-    "vtag_pt_dependence16" : {"VV_HPHP":"((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))","VV_HPLP":"((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))","VH_HPHP":"1","VH_HPLP":"1","VH_LPHP":"1"},
-    "vtag_pt_dependence17" : {"VV_HPHP":"((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))","VV_HPLP":"((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))","VH_HPHP":"1","VH_HPLP":"1","VH_LPHP":"1"},
-    "vtag_pt_dependence18" : {"VV_HPHP":"((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))","VV_HPLP":"((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))","VH_HPHP":"1","VH_HPLP":"1","VH_LPHP":"1"},
+    "vtag_pt_dependence16" : {"VV_HPHP":"((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))","VV_HPLP":"((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))","VH_HPHP":"1","VH_HPLP":"1","VH_LPHP":"1","VH_NPHP_control_region" : "1"},
+    "vtag_pt_dependence17" : {"VV_HPHP":"((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))","VV_HPLP":"((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))","VH_HPHP":"1","VH_HPLP":"1","VH_LPHP":"1","VH_NPHP_control_region" : "1"},
+    "vtag_pt_dependence18" : {"VV_HPHP":"((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))","VV_HPLP":"((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))","VH_HPHP":"1","VH_HPLP":"1","VH_LPHP":"1","VH_NPHP_control_region" : "1"},
 
 
     "tagging_variables_and_wp" : {
@@ -86,6 +89,8 @@
     "l2Htag17" : "jj_l2_DeepBoosted_ZHbbvsQCD__XX_default_17",
     "l1Htag18" : "jj_l1_DeepBoosted_ZHbbvsQCD__XX_default_18",
     "l2Htag18" : "jj_l2_DeepBoosted_ZHbbvsQCD__XX_default_18",
+    "l1Htag161718" : "jj_l1_DeepBoosted_ZHbbvsQCD__XX_default_161718",
+    "l2Htag161718" : "jj_l2_DeepBoosted_ZHbbvsQCD__XX_default_161718",
     
     "WP_HP_Wtag16" : "0p05",
     "WP_HP_Wtag17" : "0p05",

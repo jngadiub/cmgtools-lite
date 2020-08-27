@@ -125,7 +125,7 @@ for sig in signals:
       # histName="histo"
       # scaleData=lumi[dataset]
     
-      rootFileData = resultsDir[dataset]+"/pseudo40/JJ_"+p+".root"
+      rootFileData = resultsDir[dataset]+"/JJ_"+dataset+"_"+p+".root" #resultsDir[dataset]+"/pseudo40/JJ_"+p+".root"
       histName="data"
       scaleData=1.0
       if pseudodata=="True":
