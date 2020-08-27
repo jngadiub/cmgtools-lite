@@ -220,10 +220,17 @@ if options.run.find("all")!=-1 or options.run.find("vjets")!=-1:
 
 
 if options.run.find("all")!=-1 or options.run.find("tt")!=-1:
-    #f.fitTT   ("JJ_%s_TTJets"%(period),TTemplate,1.,)
+    f.fitTT   ("JJ_%s_TTJets"%(period),TTemplate,1.,)
     #print "resT"
     #f.makeBackgroundShapesMVVKernel("TTJets","JJ_resT"+str(period),TTemplate,ctx.cuts['resTT'],"1D",0,1.,1.)
-    f.makeMinorBkgShapesMVV("TTJets","JJ_resT"+str(period),TTemplate,ctx.cuts['resTT'])
+    #f.makeMinorBkgShapesMVV("TTJets","JJ_resT"+str(period),TTemplate,ctx.cuts['resTT'],'resTT')
+    #f.makeMinorBkgShapesMVV("TTJets","JJ_resW"+str(period),TTemplate,ctx.cuts['resTT_W'],'resW')
+    #f.makeMinorBkgShapesMVV("TTJets","JJ_nonresT"+str(period),TTemplate,ctx.cuts['nonresTT'],'nonresTT')
+    #f.makeMinorBkgShapesMVV("TTJets","JJ_resTresW"+str(period),TTemplate,ctx.cuts['resTresW'],'resTresW')
+    #f.makeMinorBkgShapesMVV("TTJets","JJ_resTnonresT"+str(period),TTemplate,ctx.cuts['resTnonresT'],'resTnonresT')
+    #f.makeMinorBkgShapesMVV("TTJets","JJ_resWnonresT"+str(period),TTemplate,ctx.cuts['resWnonresT'],'resWnonresT')
+    #f.makeMinorBkgShapesMVV("ZJets","JJ_"+str(period),ZresTemplate,ctx.cuts['nonres'],"Zjets",1.,1.)
+    #f.makeMinorBkgShapesMVV("WJets","JJ_"+str(period),WresTemplate,ctx.cuts['nonres'],"Wjets",1.,1.)
     #f.makeNormalizations("TTJets","JJ_resT"+str(period),TTemplate,0,ctx.cuts['resTT'],"nRes","")
     #print "resW"
     #f.makeBackgroundShapesMVVKernel("TTJets","JJ_resW"+str(period),TTemplate,ctx.cuts['resTT_W'],"1D",0,1.,1.)

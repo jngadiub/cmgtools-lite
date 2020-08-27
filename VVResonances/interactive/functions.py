@@ -88,14 +88,21 @@ class AllFunctions():
    
    print "Done with ",resFile
 
- def makeMinorBkgShapesMVV(self,name,filename,template,addcuts="1",corrFactorW=1.,corrFactorZ=1.,VBF=False):
-  if VBF==True: cut='*'.join([self.cuts['common_VBF'],self.cuts['acceptanceMJ'],addcuts])
-  else: cut='*'.join([self.cuts['common_VV'],self.cuts['acceptanceMJ'],addcuts])
-  for c in self.categories:
-    rootFile=filename+"_"+name+"_MVV_"+c+".json"
-    print template
-    cmd='vvMakeMJJShapesMinorBkg.py {samples} -s "{template}" -c "{cut}"  -o "{outFile}"  {binsMVV}  -x {minMVV} -X {maxMVV}  --corrFactorW {corrFactorW} --corrFactorZ {corrFactorZ} '.format(template=template,cut=cut,outFile=rootFile,minMVV=self.minMVV,maxMVV=self.maxMVV,samples=self.samples,binsMVV=self.HCALbinsMVV,corrFactorW=corrFactorW,corrFactorZ=corrFactorZ)
-    os.system(cmd)
+ def makeMinorBkgShapesMVV(self,name,filename,template,addcuts="1",label="",corrFactorW=1.,corrFactorZ=1.,VBF=False):
+    #for c in self.categories: 
+        #if VBF==True:  
+            #cut='*'.join([self.cuts['common_VBF'],self.cuts['acceptanceMJ'],addcuts,self.cuts[c]])
+        #else: 
+            #cut='*'.join([self.cuts['common_VV'],self.cuts['acceptanceMJ'],addcuts,self.cuts[c]])
+        #rootFile=filename+"_"+name+"_MVV_"+c+".json"
+        if VBF==True:  
+            cut='*'.join([self.cuts['common_VBF'],self.cuts['acceptanceMJ'],addcuts])
+        else: 
+            cut='*'.join([self.cuts['common_VV'],self.cuts['acceptanceMJ'],addcuts])
+        rootFile=filename+"_"+name+"_MVV_NP_"+label+".json"
+        print template
+        cmd='vvMakeMJJShapesMinorBkg.py {samples} -s "{template}" -c "{cut}"  -o "{outFile}"  {binsMVV}  -x {minMVV} -X {maxMVV}  --corrFactorW {corrFactorW} --corrFactorZ {corrFactorZ} '.format(template=template,cut=cut,outFile=rootFile,minMVV=self.minMVV,maxMVV=self.maxMVV,samples=self.samples,binsMVV=self.HCALbinsMVV,corrFactorW=corrFactorW,corrFactorZ=corrFactorZ)
+        os.system(cmd)
  
 
  def makeBackgroundShapesMVVKernel(self,name,filename,template,addCut="1",jobName="1DMVV",wait=True,corrFactorW=1,corrFactorZ=1):
