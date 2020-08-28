@@ -55,7 +55,7 @@ if useTriggerWeights:
     addOption = "-t"
     
 #all categories
-categories=['VV_HPHP','VV_HPLP']
+categories=['VH_HPLP']
 #categories=['VH_HPHP','VH_LPHP','VH_HPLP'] #,'VV_HPHP','VV_HPLP'] #,'VBF_VV_HPHP','VBF_VV_HPLP']
 #categories=['VH_NPHP_control_region']
 #categories=['NP']
@@ -261,6 +261,13 @@ if options.run.find("all")!=-1 or options.run.find("pseudoTT")!=-1:
     for p in categories: makePseudoDataTT("results_"+str(period)+"/JJ_all_"+str(period)+"_TTJets_"+p+".root",
 					  "JJ_PDTT_%s.root"%p,ctx.lumi,
                                           period,p)
+if options.run.find("all")!=-1 or options.run.find("pseudoNOQCD")!=-1:
+    print " Do pseudodata with vjets & tt: DID YOU PRODUCE THE WORKSPACE BEFORE???"
+    from modules.submitJobs import makePseudoDataNoQCD
+    for p in categories: makePseudoDataNoQCD("results_"+str(period)+"/JJ_all_"+str(period)+"_TTJets_"+p+".root",
+					       "JJ_PDnoQCD_%s.root"%p,ctx.lumi,
+					       "results_"+str(period)+"/workspace_JJ_BulkGWW_"+p+"_13TeV_"+str(period)+"_PrepPseudo.root",
+					       period,p)
 if options.run.find("all")!=-1 or options.run.find("pseudoALL")!=-1:
     print " Do pseudodata with vjets & tt: DID YOU PRODUCE THE WORKSPACE BEFORE???"
     from modules.submitJobs import makePseudoDataVjetsTT
