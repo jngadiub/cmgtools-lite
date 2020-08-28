@@ -47,7 +47,7 @@
     "minMX"  : 1200.0,
     "maxMX"  : 8000.0,
     
-    "minGenMJ" :20.0,
+    "minGenMJ" :0.0,
     "maxGenMJ" :300.0,
     "minGenMVV" : 800.0,
     "maxGenMVV": 6000.0,
