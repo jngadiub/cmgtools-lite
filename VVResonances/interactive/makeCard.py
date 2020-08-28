@@ -10,17 +10,13 @@ import cuts
 
 parser = OptionParser()
 parser.add_option("-p","--period",dest="period",default="2016,2017",help="run period")
-parser.add_option("--pseudodata",dest="pseudodata",help="make cards with real data or differen pseudodata sets: Vjets, ZprimeZH etc",default='')
+parser.add_option("--pseudodata",dest="pseudodata",help="make cards with real data(False option) or differen pseudodata sets: Vjets, ZprimeZH etc",default='')
 parser.add_option("--signal",dest="signal",default="BulkGWW,BulkGZZ,ZprimeWW,ZprimeZH,WprimeWH,WprimeWZ",help="which signal do you want to run? options are BulkGWW, BulkGZZ, WprimeWZ, ZprimeWW, ZprimeZH")
 parser.add_option("--outlabel",dest="outlabel",help="lebel for output workspaces for example sigonly_M4500",default='')
 parser.add_option("-c","--category",dest="category",default="VV_HPLP,VV_HPHP,VH_HPLP,VH_HPHP,VH_LPHP",help="run period")
 
 
 (options,args) = parser.parse_args()
-
-
-
-
 
 
 
@@ -55,8 +51,9 @@ ctx18 = cuts.cuts("init_VV_VH.json",2018,"dijetbins_random")
 lumi = {'2016':ctx16.lumi,'2017':ctx17.lumi, '2018':ctx18.lumi}
 lumi_unc = {'2016':ctx16.lumi_unc,'2017':ctx17.lumi_unc, '2018':ctx18.lumi_unc}
 
-#scales = {"2017" :[ctx17.W_HPmassscale,ctx17.W_LPmassscale], "2016":[ctx16.W_HPmassscale,ctx16.W_LPmassscale], "2018":[ctx18.W_HPmassscale,ctx18.W_LPmassscale]}
-#scalesHiggs = {"2017" :[ctx17.H_HPmassscale,ctx17.H_LPmassscale], "2016":[ctx16.H_HPmassscale,ctx16.H_LPmassscale], "2018":[ctx18.H_HPmassscale,ctx18.H_LPmassscale]}
+if pseudodata == False:
+  scales = {"2017" :[ctx17.W_HPmassscale,ctx17.W_LPmassscale], "2016":[ctx16.W_HPmassscale,ctx16.W_LPmassscale], "2018":[ctx18.W_HPmassscale,ctx18.W_LPmassscale]}
+  scalesHiggs = {"2017" :[ctx17.H_HPmassscale,ctx17.H_LPmassscale], "2016":[ctx16.H_HPmassscale,ctx16.H_LPmassscale], "2018":[ctx18.H_HPmassscale,ctx18.H_LPmassscale]}
 
 scales = {"2017" :[1,1], "2016":[1,1], "2018":[1,1]}
 scalesHiggs = {"2017" :[1,1], "2016":[1,1], "2018":[1,1]}
@@ -86,17 +83,16 @@ for sig in signals:
 
       Tools.AddSignal(card,dataset,p,sig,resultsDir[dataset],ncontrib)
       ncontrib+=1
-      if pseudodata.find("ttbar")==-1:
-        print "##########################       including W/Z jets in datacard      ######################"
-        rootFileMVV = resultsDir[dataset]+'/JJ_%s_WJets_MVV_'%dataset+p+'.root'    
-        rootFileNorm = resultsDir[dataset]+'/JJ_%s_WJets_%s.root'%(dataset,p)
-        Tools.AddWResBackground(card,dataset,p,rootFileMVV,rootFileNorm,resultsDir[dataset],ncontrib)
-        ncontrib+=1
+      print "##########################       including W/Z jets in datacard      ######################"
+      rootFileMVV = resultsDir[dataset]+'/JJ_%s_WJets_MVV_'%dataset+p+'.root'
+      rootFileNorm = resultsDir[dataset]+'/JJ_%s_WJets_%s.root'%(dataset,p)
+      Tools.AddWResBackground(card,dataset,p,rootFileMVV,rootFileNorm,resultsDir[dataset],ncontrib)
+      ncontrib+=1
       
-        rootFileMVV = resultsDir[dataset]+'/JJ_%s_ZJets_MVV_'%dataset+p+'.root'
-        rootFileNorm = resultsDir[dataset]+"/JJ_%s_ZJets_%s.root"%(dataset,p)
-        Tools.AddZResBackground(card,dataset,p,rootFileMVV,rootFileNorm,resultsDir[dataset],ncontrib)
-        ncontrib+=1
+      rootFileMVV = resultsDir[dataset]+'/JJ_%s_ZJets_MVV_'%dataset+p+'.root'
+      rootFileNorm = resultsDir[dataset]+"/JJ_%s_ZJets_%s.root"%(dataset,p)
+      Tools.AddZResBackground(card,dataset,p,rootFileMVV,rootFileNorm,resultsDir[dataset],ncontrib)
+      ncontrib+=1
         
       print "including tt+jets in datacard"
       #rootFileMVV = {"resT":resultsDir[dataset]+'/JJ_resT'+dataset+'_TTJets_MVV_NP.root', "resW":resultsDir[dataset]+"/JJ_resW"+dataset+"_TTJets_MVV_NP.root","nonresT":resultsDir[dataset]+"/JJ_nonresT"+dataset+"_TTJets_MVV_NP.root","resTnonresT":resultsDir[dataset]+"/JJ_resTnonresT"+dataset+"_TTJets_MVV_NP.root","resWnonresT":resultsDir[dataset]+"/JJ_resWnonresT"+dataset+"_TTJets_MVV_NP.root","resTresW":resultsDir[dataset]+"/JJ_resTresW"+dataset+"_TTJets_MVV_NP.root"}
@@ -110,15 +106,14 @@ for sig in signals:
       #ncontrib+=1 --> with old implementation
       ncontrib+=6 #--> with new implementation
       #ncontrib+=3 #--> with new implementation
-      if pseudodata.find("ttbar")==-1:
-        print " including QCD in datacard"
-        #rootFile3DPDF = resultsDir[dataset]+'/JJ_2016_nonRes_3D_VV_HPLP.root'
-        rootFile3DPDF = resultsDir[dataset]+"/save_new_shapes_{year}_pythia_{purity}_3D.root".format(year=dataset,purity=p)#    save_new_shapes_%s_pythia_"%dataset+"_""VVVH_all"+"_3D.root"
-        print "rootFile3DPDF ",rootFile3DPDF
-        rootFileNorm = resultsDir[dataset]+"/JJ_%s_nonRes_"%dataset+p+".root"
-        print "rootFileNorm ",rootFileNorm
-        Tools.AddNonResBackground(card,dataset,p,rootFile3DPDF,rootFileNorm,ncontrib)
 
+      print " including QCD in datacard"
+      #rootFile3DPDF = resultsDir[dataset]+'/JJ_2016_nonRes_3D_VV_HPLP.root'
+      rootFile3DPDF = resultsDir[dataset]+"/save_new_shapes_{year}_pythia_{purity}_3D.root".format(year=dataset,purity=p)#    save_new_shapes_%s_pythia_"%dataset+"_""VVVH_all"+"_3D.root"
+      print "rootFile3DPDF ",rootFile3DPDF
+      rootFileNorm = resultsDir[dataset]+"/JJ_%s_nonRes_"%dataset+p+".root"
+      print "rootFileNorm ",rootFileNorm
+      Tools.AddNonResBackground(card,dataset,p,rootFile3DPDF,rootFileNorm,ncontrib)
 
       print " including data or pseudodata in datacard"
       if pseudodata=="PrepPseudo":
@@ -135,7 +130,12 @@ for sig in signals:
         rootFileData = resultsDir[dataset]+"/JJ_TTJets_"+p+".root"
         histName="data_obs"
         scaleData=1.0
-      elif pseudodata=="ttbar":
+      elif pseudodata=="noqcd":
+        print "Using pseudodata with only tt+jets backgrounds and no qcd"
+        rootFileData = resultsDir[dataset]+"/JJ_PDnoQCD_"+p+".root"
+        histName="data"
+        scaleData=1.0
+      elif pseudodata=="ttonly":
         print "Using pseudodata with only tt backgrounds"
         rootFileData = resultsDir[dataset]+"/JJ_PDTT_"+p+".root"
         histName="data"
