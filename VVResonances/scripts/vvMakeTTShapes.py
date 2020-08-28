@@ -10,6 +10,7 @@ from math import log
 import os, sys, re, optparse,pickle,shutil,json, copy
 ROOT.gROOT.SetBatch(True)
 ROOT.gStyle.SetOptStat(0)
+ROOT.v5.TFormula.SetMaxima(10000) #otherwise we get an error that the TFormula called by the TTree draw has too many operators when running on the CR
 from time import sleep
 from  CMGTools.VVResonances.plotting.CMS_lumi import *
 parser = optparse.OptionParser()

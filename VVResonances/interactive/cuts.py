@@ -30,6 +30,11 @@ class cuts():
     minMX = 0.
     maxMX = 0.
     
+    minGenMJ = 1.
+    maxGenMJ = 1.
+    minGenMVV = 1.
+    maxGenMVV = 1.
+
     HCALbinsMVV  = ""#" --binsMVV "
     HCALbinsMVVSignal= ""# 
     
@@ -43,15 +48,7 @@ class cuts():
     
     WPHPl1Wtag = ""
     WPLPl1Wtag = ""
-
-
-
-    minGenMJ = 1.
-    maxGenMJ = 1.
-    minGenMVV = 1.
-    maxGenMVV = 1.
-
-
+    WPNPl1Wtag = ""
 
     WPHPl1Htag = ""
     WPLPl1Htag = ""
@@ -61,13 +58,11 @@ class cuts():
     
     WPHPl2Wtag = ""
     WPLPl2Wtag = ""
+    WPNPl2Wtag = ""
     
     WPHPl2Htag = ""
     WPLPl2Htag = ""
-    
-    
-      
-    
+
     W_tag_unc_HP= 1.
     W_tag_unc_LP= 1.
     H_tag_unc_HP= 1.
@@ -125,6 +120,7 @@ class cuts():
             self.varl1Htag = data["tagging_variables_and_wp"]["varl1Htag"]
             self.WPHPl1Wtag = data["tagging_variables_and_wp"]["l1Wtag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Wtag"+self.yeartag])
             self.WPLPl1Wtag = data["tagging_variables_and_wp"]["l1Wtag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Wtag"+self.yeartag])
+            self.WPNPl1Wtag = data["tagging_variables_and_wp"]["l1Wtag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_NP_Wtag"+self.yeartag])
             self.WPHPl1Htag = data["tagging_variables_and_wp"]["l1Htag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Htag"+self.yeartag])
             self.WPLPl1Htag = data["tagging_variables_and_wp"]["l1Htag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Htag"+self.yeartag])
    
@@ -132,6 +128,7 @@ class cuts():
             self.varl2Htag = data["tagging_variables_and_wp"]["varl2Htag"]
             self.WPHPl2Wtag = data["tagging_variables_and_wp"]["l2Wtag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Wtag"+self.yeartag])
             self.WPLPl2Wtag = data["tagging_variables_and_wp"]["l2Wtag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Wtag"+self.yeartag])
+            self.WPNPl2Wtag = data["tagging_variables_and_wp"]["l2Wtag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_NP_Wtag"+self.yeartag])
             self.WPHPl2Htag = data["tagging_variables_and_wp"]["l2Htag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Htag"+self.yeartag])
             self.WPLPl2Htag = data["tagging_variables_and_wp"]["l2Htag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Htag"+self.yeartag])
             
@@ -157,8 +154,8 @@ class cuts():
             self.catVtag['HP2'] =  '('+ self.varl2Wtag +'>'+ self.WPHPl2Wtag +')'
             self.catVtag['LP1'] = '(('+ self.varl1Wtag +'<'+ self.WPHPl1Wtag +')&&('+ self.varl1Wtag +'>'+ self.WPLPl1Wtag +'))' 
             self.catVtag['LP2'] = '(('+ self.varl2Wtag +'<'+ self.WPHPl2Wtag +')&&('+ self.varl2Wtag +'>'+ self.WPLPl2Wtag +'))'
-            self.catVtag['NP1'] =  '('+ self.varl1Wtag +'<'+ self.WPLPl1Wtag +')' 
-            self.catVtag['NP2'] =  '('+ self.varl2Wtag +'<'+ self.WPLPl2Wtag +')' 
+            self.catVtag['NP1'] =  '('+ self.varl1Wtag +'<'+ self.WPNPl1Wtag +')' 
+            self.catVtag['NP2'] =  '('+ self.varl2Wtag +'<'+ self.WPNPl2Wtag +')' 
 
             self.catHtag['HP1'] =  '('+ self.varl1Htag +'>'+ self.WPHPl1Htag +')' 
             self.catHtag['HP2'] =  '('+ self.varl2Htag +'>'+ self.WPHPl2Htag +')' 
@@ -232,14 +229,17 @@ class cuts():
                 catsAll['HV_LPHP'] = '('+'&&'.join([self.catHtag['LP1'],self.catVtag['HP2']])+')'
                 self.cuts['VH_HPLP'] = '('+'('+'!'+self.cuts['VH_LPHP']+'&&!'+self.cuts['VH_HPHP']+'&&!'+self.cuts['VV_HPHP']+')&&('+'||'.join([catsAll['VH_HPLP'],catsAll['HV_LPHP']])+')'+')'
 
-                self.cuts['VH_all'] =  '('+  '||'.join([self.cuts['VH_HPHP'],self.cuts['VH_LPHP'],self.cuts['VH_HPLP']]) + ')'
+                self.cuts['VH_all'] =  '('+  '||'.join([self.cuts['VH_HPHP'],self.cuts['VH_LPHP'],self.cuts['VH_HPLP']]) + ')'                
 
                 self.cuts['VV_HPLP'] = '(' +'('+'!'+self.cuts['VH_all']+') &&' + '(' + '('+  '&&'.join([self.catVtag['HP1'],self.catVtag['LP2']]) + ')' + '||' + '(' + '&&'.join([self.catVtag['HP2'],self.catVtag['LP1']]) + ')' + ')' + ')'
+
+                self.cuts['VV_all'] = '('+  '||'.join([self.cuts['VV_HPHP'],self.cuts['VV_HPLP']]) + ')'
+                self.cuts['VV_VH']= '('+  '||'.join([self.cuts['VH_all'],self.cuts['VV_all']]) + ')'
 
                 #control region (invert w-tag)
                 catsAll['VH_NPHP'] = '('+'&&'.join([self.catVtag['NP1'],self.catHtag['HP2']])+')'
                 catsAll['HV_HPNP'] = '('+'&&'.join([self.catHtag['HP1'],self.catVtag['NP2']])+')'
-                self.cuts['VH_NPHP_control_region'] = '('+'||'.join([catsAll['VH_NPHP'],catsAll['HV_HPNP'],catsAll['HH_HPHP']])+')'
+                self.cuts['VH_NPHP_control_region'] = '('+'('+'||'.join([catsAll['VH_NPHP'],catsAll['HV_HPNP'],catsAll['HH_HPHP']])+')'+'&&'+'('+'!'+self.cuts['VV_VH']+')'+')'
             else:
                 print "Use b-tagging sorting"
                 self.cuts['VH_HPHP'] = '('+  '&&'.join([self.catHtag['HP1'],self.catVtag['HP2']]) + ')'

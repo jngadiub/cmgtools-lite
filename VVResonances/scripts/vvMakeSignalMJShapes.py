@@ -9,6 +9,7 @@ from CMGTools.VVResonances.statistics.Fitter import Fitter
 from math import log
 import os, sys, re, optparse,pickle,shutil,json
 ROOT.gROOT.SetBatch(True)
+ROOT.v5.TFormula.SetMaxima(10000) #otherwise we get an error that the TFormula called by the TTree draw has too many operators when running on the CR                                                                                                                          
 
 def returnString(func):
     st='0'
