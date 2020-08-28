@@ -218,6 +218,14 @@ class DatacardTools():
         card.addFixedYieldFromFile('TTJetsnonresTresT',ncontrib+4,rootFileNorm["resTnonresT"],"TTJetsnonresTresT",0.000001/2.)
         card.addFixedYieldFromFile('TTJetsWnonresT',ncontrib+5,rootFileNorm["resWnonresT"],"TTJetsWnonresT",0.000001/2.)
         card.addFixedYieldFromFile('TTJetsnonresTresW',ncontrib+6,rootFileNorm["resWnonresT"],"TTJetsnonresTresW",0.000001/2.)
+    elif self.pseudodata.find("ttonly")!=-1 or self.pseudodata.find("True")!=-1 or self.pseudodata.find("False")!=-1:
+        #test using values from VH HPLP from dani!
+	card.addFixedYieldFromFile('TTJetsW',ncontrib,rootFileNorm["resW"],"TTJets",17.5999057103/35920./0.00045176383)
+        card.addFixedYieldFromFile('TTJetsTop',ncontrib+1,rootFileNorm["resT"],"TTJets",208.063154091/35920./0.022290803)
+        card.addFixedYieldFromFile('TTJetsNonRes',ncontrib+2,rootFileNorm["nonresT"],"TTJets",672.915985062/35920./0.0030189296)
+        card.addFixedYieldFromFile('TTJetsWNonResT',ncontrib+3,rootFileNorm["resWnonresT"],"TTJets",209.01652869/35920./0.0058404893)
+        card.addFixedYieldFromFile('TTJetsResWResT',ncontrib+4,rootFileNorm["resWresT"],"TTJets",75.6328323971/35920./0.0082485381)
+        card.addFixedYieldFromFile('TTJetsTNonResT',ncontrib+5,rootFileNorm["resTnonresT"],"TTJets",1039.88165319/35920./0.022130885)
     else: 
 	card.addFixedYieldFromFile('TTJetsW',ncontrib,rootFileNorm["resW"],"TTJets")
         card.addFixedYieldFromFile('TTJetsTop',ncontrib+1,rootFileNorm["resT"],"TTJets")
@@ -248,7 +256,7 @@ class DatacardTools():
        print "outlabel "+self.outlabel
        if self.pseudodata=="" or self.pseudodata=="Vjets":
            card.addFixedYieldFromFile('Wjets',ncontrib,rootFileNorm,"WJets")
-       elif self.outlabel.find("sigOnly")!=-1 or self.outlabel.find("sigonly")!=-1:
+       elif self.outlabel.find("sigOnly")!=-1 or self.outlabel.find("sigonly")!=-1 or self.pseudodata.find("ttonly")!=-1:
            print "add small yield"
            card.addFixedYieldFromFile('Wjets',ncontrib,rootFileNorm,"WJets",0.000001)
        else:
@@ -275,7 +283,7 @@ class DatacardTools():
       
        if self.pseudodata=="" or self.pseudodata=="Vjets":
              card.addFixedYieldFromFile('Zjets',ncontrib,rootFileNorm,"ZJets") 
-       elif self.outlabel.find("sigOnly")!=-1 or self.outlabel.find("sigonly")!=-1:
+       elif self.outlabel.find("sigOnly")!=-1 or self.outlabel.find("sigonly")!=-1 or self.pseudodata.find("ttonly")!=-1:
            card.addFixedYieldFromFile('Zjets',ncontrib,rootFileNorm,"ZJets",0.000001)
        else:
              card.addFixedYieldFromFile('Zjets',ncontrib,rootFileNorm,"ZJets") 
@@ -285,7 +293,7 @@ class DatacardTools():
       
       card.addHistoShapeFromFile("nonRes",["MJ1","MJ2","MJJ"],rootFile3DPDF,"histo",['PT:CMS_VV_JJ_nonRes_PT_'+category,'OPT:CMS_VV_JJ_nonRes_OPT_'+category,'OPT3:CMS_VV_JJ_nonRes_OPT3_'+category,'altshape:CMS_VV_JJ_nonRes_altshape_'+category,'altshape2:CMS_VV_JJ_nonRes_altshape2_'+category],False,0) ,    
           
-      if self.outlabel.find("sigonly")!=-1 or self.outlabel.find("sigOnly")!=-1 or self.outlabel.find("ttbar")!=-1:
+      if self.outlabel.find("sigonly")!=-1 or self.outlabel.find("sigOnly")!=-1 or self.pseudodata.find("ttonly")!=-1:
           card.addFixedYieldFromFile("nonRes",ncontrib,rootFileNorm,"nonRes",0.0000000000001)
       else:
           card.addFixedYieldFromFile("nonRes",ncontrib,rootFileNorm,"nonRes",self.sfQCD)
