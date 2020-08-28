@@ -123,6 +123,7 @@ if __name__=="__main__":
      finMC = ROOT.TFile(options.input,"READ");
      hinMC = finMC.Get("nonRes");
 
+     '''
      if options.addTop==True:
         print " Getting TTbar background input values "
         print options.nameTT
@@ -143,9 +144,10 @@ if __name__=="__main__":
         TT_expected = {}
         signal_TTexpected= {}
         workspaceTT.var("MJJ").setVal(2000)
-        TTbkgs = ["TTJetsTop","TTJetsW","TTJetsNonRes","TTJetsWNonResT","TTJetsResWResT" ,"TTJetsTNonResT"]
+        TTbkgs = ["nonRes","Wjets","Zjets","TTJetsTop","TTJetsW","TTJetsNonRes","TTJetsWNonResT","TTJetsResWResT" ,"TTJetsTNonResT"]
+        #TTbkgs = ["TTJetsTop","TTJetsW","TTJetsNonRes","TTJetsWNonResT","TTJetsResWResT" ,"TTJetsTNonResT"]
         #print number of events before the fit
-        for year in years:
+        for year in years:   
             dataTT[year] = (workspaceTT.data("data_obs").reduce("CMS_channel==CMS_channel::JJ_"+purity+"_13TeV_"+year))
             pdf1NameTT [year] =  "pdf_binJJ_"+purity+"_13TeV_"+year+"_bonly"
             print "pdf1NameTT ",pdf1NameTT
@@ -196,7 +198,7 @@ if __name__=="__main__":
 
         
         print " Now plotting TT "
-        isTT = True     
+        extralabel = "TTonly_WZ0"     
         TTpdfsz = Postfitplotter.definefinalPDFs(options,"z",TTpdfs)
         TTpdfsx = Postfitplotter.definefinalPDFs(options,"x",TTpdfs)
         TTpdfsy = Postfitplotter.definefinalPDFs(options,"y",TTpdfs)
@@ -223,7 +225,7 @@ if __name__=="__main__":
                 tmpTTz = forprojTT.doProjection(dataTT[year],TTpdfsz[year],TT_expected[year],"z",TTsignalpdfs[year],signal_TTexpected[year])
                 resultsTT.append(tmpTTz) 
             resTT = addResults(resultsTT)
-            forplottingTT.MakePlots(resTT[0],resTT[1],resTT[2],resTT[3],resTT[4],resTT[5], resTT[6],resTT[7],isTT)
+            forplottingTT.MakePlots(resTT[0],resTT[1],resTT[2],resTT[3],resTT[4],resTT[5], resTT[6],resTT[7],extralabel)
         
         #make projections onto MJ1 axis
         if options.projection =="x" or options.projection =="xyz":
@@ -232,7 +234,7 @@ if __name__=="__main__":
                 tmpTTx = forprojTT.doProjection(dataTT[year],TTpdfsx[year],TT_expected[year],"x",TTsignalpdfs[year],signal_TTexpected[year])
                 resultsTT.append(tmpTTx)
             resTT = addResults(resultsTT)
-            forplottingTT.MakePlots(resTT[0],resTT[1],resTT[2],resTT[3],resTT[4],resTT[5], resTT[6],resTT[7],isTT)
+            forplottingTT.MakePlots(resTT[0],resTT[1],resTT[2],resTT[3],resTT[4],resTT[5], resTT[6],resTT[7],extralabel)
         #make projections onto MJ2 axis
         if options.projection =="y" or options.projection =="xyz":
             resultsTT = []
@@ -240,14 +242,16 @@ if __name__=="__main__":
                 tmpTTy = forprojTT.doProjection(dataTT[year],TTpdfsy[year],TT_expected[year],"y",TTsignalpdfs[year],signal_TTexpected[year])
                 resultsTT.append(tmpTTy)
             resTT = addResults(resultsTT)
-            forplottingTT.MakePlots(resTT[0],resTT[1],resTT[2],resTT[3],resTT[4],resTT[5], resTT[6],resTT[7],isTT)
+            forplottingTT.MakePlots(resTT[0],resTT[1],resTT[2],resTT[3],resTT[4],resTT[5], resTT[6],resTT[7],extralabel)
         
         logfileTT.close()
 
 
         print " done with TT only part "
     
-     #sys.exit()
+     sys.exit()
+     '''
+
      print " ################ working with all backgrounds ############"
      #finMC = ROOT.TFile(options.input,"READ");
      #hinMC = finMC.Get("nonRes");
