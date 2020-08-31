@@ -503,7 +503,7 @@ if __name__=="__main__":
      if options.input.find("VH_LPHP")!=-1: purity = "VH_LPHP"
      if options.input.find("VH_LPLP")!=-1: purity = "VH_LPLP"
      if options.input.find("VV_HPHP")!=-1: purity = "VV_HPHP"
-     if options.input.find("VV_extraLP")!=-1: purity = "VV_extraLP"
+     if options.input.find("NP")!=-1: purity = "NP"
      if options.input.find("VV_LPLP")!=-1: purity = "VV_LPLP"
      elif options.input.find("VV_HPLP")!=-1: purity= "VV_HPLP"
 
