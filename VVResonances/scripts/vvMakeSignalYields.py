@@ -120,9 +120,12 @@ for mass in sorted(complete_mass.keys()):
         print " fraction of lumi ",ctx.lumi[year]/luminosity_tot 
         luminosity=   ctx.lumi[year]/luminosity_tot #str(ctx.lumi[year]/luminosity_tot)
         if options.output.find("Run2") ==-1: luminosity = 1
-        taggerSF={'VV_HPLP':{year:ctx.HPSF_vtag[year]*ctx.LPSF_vtag.get(year,0) for year in ctx.LPSF_vtag.keys()},'VH_HPHP':{year:ctx.HPSF_htag[year]*ctx.HPSF_vtag.get(year,0) for year in ctx.HPSF_vtag.keys()},'VH_HPLP':{year:ctx.HPSF_htag[year]*ctx.LPSF_vtag.get(year,0) for year in ctx.LPSF_vtag.keys()},'VH_LPHP':{year:ctx.HPSF_vtag[year]*ctx.LPSF_htag.get(year,0) for year in ctx.LPSF_htag.keys()},'VH_LPLP':{year:ctx.LPSF_htag[year]*ctx.LPSF_vtag.get(year,0) for year in ctx.LPSF_vtag.keys()},'VV_HPHP':{year:ctx.HPSF_vtag[year]*ctx.HPSF_vtag.get(year,0) for year in ctx.HPSF_vtag.keys() }} 
+        taggerSF={'VV_HPLP':{year:ctx.HPSF_vtag[year]*ctx.LPSF_vtag.get(year,0) for year in ctx.LPSF_vtag.keys()},'VH_HPHP':{year:ctx.HPSF_htag[year]*ctx.HPSF_vtag.get(year,0) for year in ctx.HPSF_vtag.keys()},'VH_HPLP':{year:ctx.HPSF_htag[year]*ctx.LPSF_vtag.get(year,0) for year in ctx.LPSF_vtag.keys()},'VH_LPHP':{year:ctx.HPSF_vtag[year]*ctx.LPSF_htag.get(year,0) for year in ctx.LPSF_htag.keys()},'VH_LPLP':{year:ctx.LPSF_htag[year]*ctx.LPSF_vtag.get(year,0) for year in ctx.LPSF_vtag.keys()},'VV_HPHP':{year:ctx.HPSF_vtag[year]*ctx.HPSF_vtag.get(year,0) for year in ctx.HPSF_vtag.keys() }}
 
-        SF = taggerSF[category][year]
+        if category.find('NP')!=-1 : 
+            SF =1.
+        else:
+            SF = taggerSF[category][year]
         print "SF ",SF
         plotter.append(TreePlotter(complete_mass[mass][folder]+'.root','AnalysisTree'))
         plotter[-1].setupFromFile(complete_mass[mass][folder]+'.pck')
