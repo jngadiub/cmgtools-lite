@@ -27,6 +27,7 @@ for signal in ${signals[*]}; do
 	for period in ${periods[*]}; do
 	    echo ${period}
             echo $cmd
+            echo python ${script} -p ${period} --run ${cmd} --signal ${signal} --batch False | tee make_${cmd}_${signal}_${period}.log
             python ${script} -p ${period} --run ${cmd} --signal ${signal} --batch False | tee make_${cmd}_${signal}_${period}.log
 	done
     done
