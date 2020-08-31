@@ -162,7 +162,7 @@ class DatacardTools():
            
  
  #new implementation: split in 5 contributions W+W, T+T, nonRes+nonRes, nonRes+T, nonres+W
- def AddTTBackground3(self,card,dataset,category,rootFileMVV,rootFileNorm,resultsDir,ncontrib,uncertainty):
+ def AddTTBackground3(self,card,dataset,category,rootFileMVV,rootFileNorm,resultsDir,ncontrib,uncertainty,normjson):
     print "add TT+jets background"  
     contrib =["resT","resW","nonresT","resTnonresT","resWnonresT","resTresW"]
     for i in range(0,len(contrib)):
@@ -228,13 +228,19 @@ class DatacardTools():
         card.addFixedYieldFromFile('TTJetsnonresTresT',ncontrib+4,rootFileNorm["resTnonresT"],"TTJetsnonresTresT",0.000001/2.)
         card.addFixedYieldFromFile('TTJetsWnonresT',ncontrib+5,rootFileNorm["resWnonresT"],"TTJetsWnonresT",0.000001/2.)
         card.addFixedYieldFromFile('TTJetsnonresTresW',ncontrib+6,rootFileNorm["resWnonresT"],"TTJetsnonresTresW",0.000001/2.)
-    else: 
+    elif self.pseudodata.find("ttbar")!=-1: 
 	card.addFixedYieldFromFile('TTJetsW',ncontrib,rootFileNorm["resW"],"TTJets")
         card.addFixedYieldFromFile('TTJetsTop',ncontrib+1,rootFileNorm["resT"],"TTJets")
         card.addFixedYieldFromFile('TTJetsNonRes',ncontrib+2,rootFileNorm["nonresT"],"TTJets")
         card.addFixedYieldFromFile('TTJetsWNonResT',ncontrib+3,rootFileNorm["resWnonresT"],"TTJets")
         card.addFixedYieldFromFile('TTJetsResWResT',ncontrib+4,rootFileNorm["resWresT"],"TTJets")
         card.addFixedYieldFromFile('TTJetsTNonResT',ncontrib+5,rootFileNorm["resTnonresT"],"TTJets")
+    else:
+        norm = open(normjson,"r")
+        norms = json.load(norm)
+        mappdf = {"resT":"TTJetsTop","resW":"TTJetsW","nonresT":"TTJetsNonRes","resTnonresT":"TTJetsTNonResT","resWnonresT":"TTJetsWNonResT","resTresW":"TTJetsResWResT"}
+        for i in range(0,len(contrib)):
+            card.addYield(mappdf[contrib[i]],ncontrib+i,norms[contrib[i]])
 	          
  def AddWResBackground(self,card,dataset,category,rootFileMVV,rootFileNorm,resultsDir,ncontrib,uncertainty):
        print "add Wres background"  
@@ -359,7 +365,15 @@ class DatacardTools():
     card.addSystematic(extra_uncertainty[0],"param",[0.0,extra_uncertainty[1]])
     card.addSystematic("CMS_scale_prunedj_top","param",[0.0,0.02])
     card.addSystematic("CMS_res_prunedj_top","param",[0.0,0.08])
-    #card.addSystematic("CMS_VV_JJ_TTJets_norm","lnN",{'TTJetsW':1.2,'TTJetsTop':1.2,'TTJetsNonRes':1.2,'TTJetsWNonResT':1.2,'TTJetsResWResT':1.2,'TTJetsTNonResT':1.2})  
+    if self.pseudodata.find("ttbar")==-1:
+        card.addSystematic("CMS_VV_JJ_TTJets_norm","lnN",{'TTJetsW':1.05,'TTJetsTop':1.05,'TTJetsNonRes':1.05,'TTJetsWNonResT':1.05,'TTJetsResWResT':1.05,'TTJetsTNonResT':1.05}) 
+    else:
+        card.addSystematic("CMS_VV_JJ_TTJetsW_norm","lnN",{'TTJetsW':3.2})
+        card.addSystematic("CMS_VV_JJ_TTJetsTop_norm","lnN",{'TTJetsTop':3.2})
+        card.addSystematic("CMS_VV_JJ_TTJetsNonRes_norm","lnN",{'TTJetsNonRes':3.2})
+        card.addSystematic("CMS_VV_JJ_TTJetsWNonResT_norm","lnN",{'TTJetsWNonResT':3.2})
+        card.addSystematic("CMS_VV_JJ_TTJetsResWResT_norm","lnN",{'TTJetsResWResT':3.2})
+        card.addSystematic("CMS_VV_JJ_TTJetsTNonResT_norm","lnN",{'TTJetsTNonResT':3.2})
     
        
  def AddSigSystematics(self,card,sig,dataset,category,correlate):
@@ -397,8 +411,8 @@ class DatacardTools():
      
  def AddResBackgroundSystematics(self,card,category,extra_uncertainty):
  
-       card.addSystematic("CMS_VV_JJ_Wjets_norm","lnN",{'Wjets':1.2})
-       card.addSystematic("CMS_VV_JJ_Zjets_norm","lnN",{'Zjets':1.2}) 
+       card.addSystematic("CMS_VV_JJ_Wjets_norm","lnN",{'Wjets':1.05})
+       card.addSystematic("CMS_VV_JJ_Zjets_norm","lnN",{'Zjets':1.05}) 
        card.addSystematic(extra_uncertainty[0],"param",[0.0,extra_uncertainty[1]])
        card.addSystematic(extra_uncertainty[2],"param",[0.0,extra_uncertainty[3]])
        

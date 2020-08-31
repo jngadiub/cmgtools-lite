@@ -1925,6 +1925,10 @@ class DataCardMaker:
         pdfName="_".join([name,self.tag])
         self.contributions.append({'name':name,'pdf':pdfName,'ID':ID,'yield':events})
         self.addSystematic(nuisance,"lnN",{name:1+uncertainty})
+        
+    def addYield(self,name,ID,events):
+        pdfName="_".join([name,self.tag])
+        self.contributions.append({'name':name,'pdf':pdfName,'ID':ID,'yield':events})
 
     def addConstrainedYieldFromFile(self,name,ID,filename,histoName,nuisance,uncertainty,scale=1.):
         pdfName="_".join([name,self.tag])
