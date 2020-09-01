@@ -168,7 +168,7 @@ class DatacardTools():
     for i in range(0,len(contrib)):
 
        #load mJJ - assume same for the three contributions (preliminary)
-       jsonfile = "JJ_"+contrib[i]+"2016_TTJets_MVV_NP_"+contrib[i]
+       jsonfile = resultsDir+"/JJ_"+contrib[i]+"2016_TTJets_MVV_NP_"+contrib[i]
        if contrib[i]=="resT" or contrib[i]=="nonresT": jsonfile=jsonfile+"T"
        jsonfile= jsonfile +  ".json"
        print "load parametrisation for MVV ttbar contributions ",jsonfile,contrib[i]
@@ -307,7 +307,7 @@ class DatacardTools():
       
       card.addHistoShapeFromFile("nonRes",["MJ1","MJ2","MJJ"],rootFile3DPDF,"histo",['PT:CMS_VV_JJ_nonRes_PT_'+category,'OPT:CMS_VV_JJ_nonRes_OPT_'+category,'OPT3:CMS_VV_JJ_nonRes_OPT3_'+category,'altshape:CMS_VV_JJ_nonRes_altshape_'+category,'altshape2:CMS_VV_JJ_nonRes_altshape2_'+category],False,0) ,    
           
-      if self.outlabel.find("sigonly")!=-1 or self.outlabel.find("sigOnly")!=-1 or self.pseudodata.find("ttonly")!=-1:
+      if self.outlabel.find("sigonly")!=-1 or self.outlabel.find("sigOnly")!=-1 or self.pseudodata.find("ttbar")!=-1:
           card.addFixedYieldFromFile("nonRes",ncontrib,rootFileNorm,"nonRes",0.0000000000001)
       else:
           card.addFixedYieldFromFile("nonRes",ncontrib,rootFileNorm,"nonRes",self.sfQCD)
