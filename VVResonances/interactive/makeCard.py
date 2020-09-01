@@ -100,7 +100,7 @@ for sig in signals:
       #rootFileMVV = {"resT":resultsDir[dataset]+'/JJ_resT'+dataset+'_TTJets_MVV_NP.root', "resW":resultsDir[dataset]+"/JJ_resW"+dataset+"_TTJets_MVV_NP.root","nonresT":resultsDir[dataset]+"/JJ_nonresT"+dataset+"_TTJets_MVV_NP.root","resTnonresT":resultsDir[dataset]+"/JJ_resTnonresT"+dataset+"_TTJets_MVV_NP.root","resWnonresT":resultsDir[dataset]+"/JJ_resWnonresT"+dataset+"_TTJets_MVV_NP.root","resTresW":resultsDir[dataset]+"/JJ_resTresW"+dataset+"_TTJets_MVV_NP.root"}
       rootFileMVV = {"resT":resultsDir[dataset]+'/JJ_resT'+dataset+'_TTJets_MVV_'+p+'.root', "resW":resultsDir[dataset]+"/JJ_resW"+dataset+"_TTJets_MVV_"+p+".root","nonresT":resultsDir[dataset]+"/JJ_nonresT"+dataset+"_TTJets_MVV_"+p+".root","resTnonresT":resultsDir[dataset]+"/JJ_resTnonresT"+dataset+"_TTJets_MVV_"+p+".root","resWnonresT":resultsDir[dataset]+"/JJ_resWnonresT"+dataset+"_TTJets_MVV_"+p+".root","resTresW":resultsDir[dataset]+"/JJ_resTresW"+dataset+"_TTJets_MVV_"+p+".root"}
       rootFileNorm = {"resT" : resultsDir[dataset]+'/JJ_resT'+dataset+'_TTJets_'+p+'.root', "resW": resultsDir[dataset]+'/JJ_resW'+dataset+'_TTJets_'+p+'.root',"nonresT" : resultsDir[dataset]+'/JJ_nonresT'+dataset+'_TTJets_'+p+'.root',"resTnonresT": resultsDir[dataset]+'/JJ_resTnonresT'+dataset+'_TTJets_'+p+'.root' , "resWnonresT": resultsDir[dataset]+'/JJ_resWnonresT'+dataset+'_TTJets_'+p+'.root',"resWresT": resultsDir[dataset]+'/JJ_resTresW'+dataset+'_TTJets_'+p+'.root'}
-      jsonfileNorm = resultsDir[dataset]+'/workspace_JJ_ZprimeZH_'+p+'_13TeV_'+dataset+'ttbar.json'
+      jsonfileNorm = resultsDir[dataset]+'/workspace_JJ_'+sig+'_'+p+'_13TeV_'+dataset+'ttbar.json'
       Tools.AddTTBackground3(card,dataset,p,rootFileMVV,rootFileNorm,resultsDir[dataset],ncontrib,["CMS_VV_JJ_TTJets_slope",0.5],jsonfileNorm)
       #rootFileMVV  = resultsDir[dataset]+'/JJ_'+dataset+'_TTJets_MVV_'+p+'.root'
       #rootFileNorm = resultsDir[dataset]+'/JJ_'+dataset+'_TTJets_'+p+'.root'
@@ -124,8 +124,8 @@ for sig in signals:
         scaleData=lumi[dataset]
       elif pseudodata=="True":
         print "Using pseudodata with all backgrounds (QCD, V+jets and tt+jets)"
-        rootFileData = resultsDir[dataset]+"/pseudo40/JJ_PD_"+p+".root"
-        histName="data_obs"
+        rootFileData = resultsDir[dataset]+"/JJ_PDALL_"+p+".root"
+        histName="data"
         scaleData=1.0
       elif pseudodata=="ttjets":
         print "Using pseudodata with only tt+jets backgrounds"
