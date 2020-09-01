@@ -13,9 +13,12 @@ do
     python makeCard.py --signal BulkGWW --outlabel ttbar -c ${c} -p 2016 --pseudodata ttbar
 done
 
+outputdir=postfit/
+mkdir ${outputdir}
 for c in ${category[@]}
 do
-  python runFitPlots_vjets_signal_bigcombo_splitRes.py -n workspace_JJ_BulkGWW_${c}_13TeV_2016ttbar.root  -i  results_2016//JJ_2016_nonRes_${c}.root -M 2000  -o postfit/ --channel ${c} -l pseudoTTbar_postfit_${c} --doVjets --addTop --doFit
+  label=pseudoTTbar_postfit_${c}
+  python runFitPlots_vjets_signal_bigcombo_splitRes.py -n workspace_JJ_BulkGWW_${c}_13TeV_2016ttbar.root  -i  results_2016//JJ_2016_nonRes_${c}.root -M 2000  -o ${outputdir} --channel ${c} -l ${label} --doVjets --addTop --doFit
 done
   
 ## the fit produces output files named workspacename.json -> these are then included in the makeCard script to extract the yields if NOT pseudodata=ttbar
