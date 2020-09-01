@@ -69,7 +69,7 @@ class DataCardMaker:
                 print " make spline " + name+'spline'
                 spline=ROOT.RooSpline1D(name+'spline',name+'spline',self.w.var("MH"),len(xArr),array("d",xArr),array("d",yArr))    
                 getattr(self.w,'import')(spline,ROOT.RooFit.RenameVariable(name,name))
-                print " make uncertainty "+"expr::"+corr+"expr('"+self.physics+"_"+self.period+"_lumi"+"*(exp(log("+uncstr+")*"+corr+"',MH,"+corr+","+self.physics+"_"+self.period+"_lumi"+")"
+                
                 
                 self.w.factory("expr::"+name+"('"+self.physics+"_"+self.period+"_lumi"+"*"+name+"spline"+"*(exp(log("+uncstr+")*"+corr+"',MH,"+corr+","+self.physics+"_"+self.period+"_lumi"+")")
                 self.w.factory("expr::"+corr+"expr('"+self.physics+"_"+self.period+"_lumi"+"*(exp(log("+uncstr+")*"+corr+"',MH,"+corr+","+self.physics+"_"+self.period+"_lumi"+","+name+"spline"+")")
@@ -85,6 +85,7 @@ class DataCardMaker:
                    if self.w.function(uncsyst[0]+"expr_corr")== None:
                        self.w.factory("expr::{syst}expr_corr('{syst_str}*{corr_str}',MH,MJ1,MJ2,{syst})".format(syst=uncsyst[0],syst_str=uncstr,corr_str=info['corr_'+variablename.lower()]))
                        self.w.factory("expr::{name}('{syst_str}*{corr_str}*({spline})',MH,MJ1,MJ2,{syst},{spline})".format(syst=uncsyst[0],syst_str=uncstr,corr_str=info['corr_'+variablename.lower()],name=name,spline=name+"spline"))
+
                 else:
                    print "MVV sigma & mean will NOT be correlated to jet mass"
                    self.w.factory("expr::"+name+"('"+uncstr+"*"+name+"spline"+"',"+uncsyst[0]+","+name+"spline"+")")
@@ -524,6 +525,39 @@ class DataCardMaker:
         f.close()
         
     
+    
+    def addMVVMinorBkgParametricShape(self,name,variable,jsonFile,uncertainty,ToReplace="MJJ"):
+                 
+        MJJ=variable[0]  
+        if self.w.var(MJJ) == None: self.w.factory(MJJ+"[0,10000]")
+
+        f=open(jsonFile)
+        info=json.load(f)
+        pdfName="_".join([name,self.tag])
+        
+        #SLOPEVar=name+"_slope1"
+        self.w.factory("EXPR::{name}('TMath::Exp(-{c1}*(MJJ -1125.)/13000.-{c2}/((MJJ-1125.)/13000.))',MJJ)".format(name=pdfName+"_c1",c1=info['c1'],c2=info['c2']))
+        
+        
+        
+        if self.w.var(uncertainty[0]) == None: 
+            self.w.factory(uncertainty[0]+"[0,-"+str(uncertainty[1])+","+str(uncertainty[1])+"]")
+            self.w.var(uncertainty[0]).setConstant(1)
+        self.w.factory("EXPR::{name}('TMath::Exp(-{c3}*(1+{unc_slope})*(MJJ -1125.)/13000.)',MJJ,{unc_slope})".format(name=pdfName+"_c2",c3=info['c3'],unc_slope=uncertainty[0]))
+        
+        #self.w.factory("RooExponential::{name}({var},{SLOPE})".format(name=pdfName+"_c2",var=MJJ,SLOPE=SLOPEVar.replace("slope1","slope2")).replace("MH",ToReplace))
+        
+        n = info["N0"]
+        n1 =info["N1"]
+        print n
+        self.w.factory(pdfName+"_f["+str(n)+","+str(n)+","+str(n)+"]")
+        self.w.var(pdfName+"_f").setConstant(1)
+        self.w.factory(pdfName+"_f1["+str(n1)+","+str(n1)+","+str(n1)+"]")
+        self.w.var(pdfName+"_f1").setConstant(1)
+        self.w.factory("SUM::{name}({f}*{PDF1},{f2}*{PDF2})".format(name=pdfName,f=pdfName+"_f",f2=pdfName+"_f1",PDF1=pdfName+"_c1",PDF2=pdfName+"_c2"))
+        
+        print("SUCCESS!!!!!")
+        f.close()
 
         
     def addMJJTopMergedParametricShape(self,name,variable,jsonFile,scale ={},resolution={},fraction={},varToReplace="MH"):
@@ -1891,6 +1925,10 @@ class DataCardMaker:
         pdfName="_".join([name,self.tag])
         self.contributions.append({'name':name,'pdf':pdfName,'ID':ID,'yield':events})
         self.addSystematic(nuisance,"lnN",{name:1+uncertainty})
+        
+    def addYield(self,name,ID,events):
+        pdfName="_".join([name,self.tag])
+        self.contributions.append({'name':name,'pdf':pdfName,'ID':ID,'yield':events})
 
     def addConstrainedYieldFromFile(self,name,ID,filename,histoName,nuisance,uncertainty,scale=1.):
         pdfName="_".join([name,self.tag])

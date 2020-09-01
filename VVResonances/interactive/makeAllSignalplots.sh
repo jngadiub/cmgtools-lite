@@ -106,38 +106,41 @@ do
   for c in ${category[@]}
   do
     
-     python runFitPlots_vjets_signal_bigcombo_splitRes.py -n workspace_JJ_${model}_${c}_13TeV_2016ttbar.root  -i  ttbarmodeling/JJ_2016_nonRes_${c}.root -M 2000  -o postfitplots/ --channel ${c} -l ttbar_${c} --doVjets --addTop --doFit False --zrange 1200,1600
-    python runFitPlots_vjets_signal_bigcombo_splitRes.py -n workspace_JJ_${model}_${c}_13TeV_2016ttbar.root  -i  ttbarmodeling/JJ_2016_nonRes_${c}.root -M 2000  -o postfitplots/ --channel ${c} -l ttbarFit_${c} --doVjets --addTop --zrange 1200,1600
-    
-    
-     python runFitPlots_vjets_signal_bigcombo_splitRes.py -n workspace_JJ_${model}_${c}_13TeV_2016ttbar.root  -i  ttbarmodeling/JJ_2016_nonRes_${c}.root -M 2000  -o postfitplots/ --channel ${c} -l ttbar_${c} --doVjets --addTop --doFit False --zrange 1600,2000
-    python runFitPlots_vjets_signal_bigcombo_splitRes.py -n workspace_JJ_${model}_${c}_13TeV_2016ttbar.root  -i  ttbarmodeling/JJ_2016_nonRes_${c}.root -M 2000  -o postfitplots/ --channel ${c} -l ttbarFit_${c} --doVjets --addTop --zrange 1600,2000
-    
-    python runFitPlots_vjets_signal_bigcombo_splitRes.py -n workspace_JJ_${model}_${c}_13TeV_2016ttbar.root  -i  ttbarmodeling/JJ_2016_nonRes_${c}.root -M 2000  -o postfitplots/ --channel ${c} -l ttbar_${c} --doVjets --addTop --doFit False --zrange 2000,5000
-    python runFitPlots_vjets_signal_bigcombo_splitRes.py -n workspace_JJ_${model}_${c}_13TeV_2016ttbar.root  -i  ttbarmodeling/JJ_2016_nonRes_${c}.root -M 2000  -o postfitplots/ --channel ${c} -l ttbarFit_${c} --doVjets --addTop --zrange 2000,5000
-    
-    
-     python runFitPlots_vjets_signal_bigcombo_splitRes.py -n workspace_JJ_${model}_${c}_13TeV_2016ttbar.root  -i  ttbarmodeling/JJ_2016_nonRes_${c}.root -M 2000  -o postfitplots/ --channel ${c} -l ttbar_${c} --doVjets --addTop --doFit False --xrange 65,105
-    python runFitPlots_vjets_signal_bigcombo_splitRes.py -n workspace_JJ_${model}_${c}_13TeV_2016ttbar.root  -i  ttbarmodeling/JJ_2016_nonRes_${c}.root -M 2000  -o postfitplots/ --channel ${c} -l ttbarFit_${c} --doVjets --addTop --xrange 65,105
-    
-    
-    python runFitPlots_vjets_signal_bigcombo_splitRes.py -n workspace_JJ_${model}_${c}_13TeV_2016ttbar.root  -i  ttbarmodeling/JJ_2016_nonRes_${c}.root -M 2000  -o postfitplots/ --channel ${c} -l ttbar_${c} --doVjets --addTop --doFit False --xrange 105,215
-    python runFitPlots_vjets_signal_bigcombo_splitRes.py -n workspace_JJ_${model}_${c}_13TeV_2016ttbar.root  -i  ttbarmodeling/JJ_2016_nonRes_${c}.root -M 2000  -o postfitplots/ --channel ${c} -l ttbarFit_${c} --doVjets --addTop --xrange 105,215
-    
-    
-     python runFitPlots_vjets_signal_bigcombo_splitRes.py -n workspace_JJ_${model}_${c}_13TeV_2016ttbar.root  -i  ttbarmodeling/JJ_2016_nonRes_${c}.root -M 2000  -o postfitplots/ --channel ${c} -l ttbar_${c} --doVjets --addTop --doFit False --xrange 65,105 --yrange 65,105
-    python runFitPlots_vjets_signal_bigcombo_splitRes.py -n workspace_JJ_${model}_${c}_13TeV_2016ttbar.root  -i  ttbarmodeling/JJ_2016_nonRes_${c}.root -M 2000  -o postfitplots/ --channel ${c} -l ttbarFit_${c} --doVjets --addTop --xrange 65,105 -yrange 65,105
-    
-    
-    python runFitPlots_vjets_signal_bigcombo_splitRes.py -n workspace_JJ_${model}_${c}_13TeV_2016ttbar.root  -i  ttbarmodeling/JJ_2016_nonRes_${c}.root -M 2000  -o postfitplots/ --channel ${c} -l ttbar_${c} --doVjets --addTop --doFit False --xrange 105,215 --yrange 105,215
-    python runFitPlots_vjets_signal_bigcombo_splitRes.py -n workspace_JJ_${model}_${c}_13TeV_2016ttbar.root  -i  ttbarmodeling/JJ_2016_nonRes_${c}.root -M 2000  -o postfitplots/ --channel ${c} -l ttbarFit_${c} --doVjets --addTop --xrange 105,215 --yrange 105,215
-    
-    python runFitPlots_vjets_signal_bigcombo_splitRes.py -n workspace_JJ_${model}_${c}_13TeV_2016ttbar.root  -i  ttbarmodeling/JJ_2016_nonRes_${c}.root -M 2000  -o postfitplots/ --channel ${c} -l ttbar_${c} --doVjets --addTop --doFit False --xrange 105,215 --yrange 65,105
-    python runFitPlots_vjets_signal_bigcombo_splitRes.py -n workspace_JJ_${model}_${c}_13TeV_2016ttbar.root  -i  ttbarmodeling/JJ_2016_nonRes_${c}.root -M 2000  -o postfitplots/ --channel ${c} -l ttbarFit_${c} --doVjets --addTop --xrange 105,215 --yrange 65,105
-    
-    
-    python runFitPlots_vjets_signal_bigcombo_splitRes.py -n workspace_JJ_${model}_${c}_13TeV_2016ttbar.root  -i  ttbarmodeling/JJ_2016_nonRes_${c}.root -M 2000  -o postfitplots/ --channel ${c} -l ttbar_${c} --doVjets --addTop --doFit False
-    python runFitPlots_vjets_signal_bigcombo_splitRes.py -n workspace_JJ_${model}_${c}_13TeV_2016ttbar.root  -i  ttbarmodeling/JJ_2016_nonRes_${c}.root -M 2000  -o postfitplots/ --channel ${c} -l ttbarFit_${c} --doVjets --addTop
+#      python runFitPlots_vjets_signal_bigcombo_splitRes.py -n workspace_JJ_${model}_${c}_13TeV_2016ttbar.root  -i  ttbarmodeling/JJ_2016_nonRes_${c}.root -M 2000  -o postfitplots/ --channel ${c} -l ttbar_${c} --doVjets --addTop --doFit False --zrange 1200,1600
+#     python runFitPlots_vjets_signal_bigcombo_splitRes.py -n workspace_JJ_${model}_${c}_13TeV_2016ttbar.root  -i  ttbarmodeling/JJ_2016_nonRes_${c}.root -M 2000  -o postfitplots/ --channel ${c} -l ttbarFit_${c} --doVjets --addTop --zrange 1200,1600
+#     
+#     
+#      python runFitPlots_vjets_signal_bigcombo_splitRes.py -n workspace_JJ_${model}_${c}_13TeV_2016ttbar.root  -i  ttbarmodeling/JJ_2016_nonRes_${c}.root -M 2000  -o postfitplots/ --channel ${c} -l ttbar_${c} --doVjets --addTop --doFit False --zrange 1600,2000
+#     python runFitPlots_vjets_signal_bigcombo_splitRes.py -n workspace_JJ_${model}_${c}_13TeV_2016ttbar.root  -i  ttbarmodeling/JJ_2016_nonRes_${c}.root -M 2000  -o postfitplots/ --channel ${c} -l ttbarFit_${c} --doVjets --addTop --zrange 1600,2000
+#     
+#     python runFitPlots_vjets_signal_bigcombo_splitRes.py -n workspace_JJ_${model}_${c}_13TeV_2016ttbar.root  -i  ttbarmodeling/JJ_2016_nonRes_${c}.root -M 2000  -o postfitplots/ --channel ${c} -l ttbar_${c} --doVjets --addTop --doFit False --zrange 2000,5000
+#     python runFitPlots_vjets_signal_bigcombo_splitRes.py -n workspace_JJ_${model}_${c}_13TeV_2016ttbar.root  -i  ttbarmodeling/JJ_2016_nonRes_${c}.root -M 2000  -o postfitplots/ --channel ${c} -l ttbarFit_${c} --doVjets --addTop --zrange 2000,5000
+#     
+#     
+#      python runFitPlots_vjets_signal_bigcombo_splitRes.py -n workspace_JJ_${model}_${c}_13TeV_2016ttbar.root  -i  ttbarmodeling/JJ_2016_nonRes_${c}.root -M 2000  -o postfitplots/ --channel ${c} -l ttbar_${c} --doVjets --addTop --doFit False --xrange 65,105
+#     python runFitPlots_vjets_signal_bigcombo_splitRes.py -n workspace_JJ_${model}_${c}_13TeV_2016ttbar.root  -i  ttbarmodeling/JJ_2016_nonRes_${c}.root -M 2000  -o postfitplots/ --channel ${c} -l ttbarFit_${c} --doVjets --addTop --xrange 65,105
+#     
+#     
+#     python runFitPlots_vjets_signal_bigcombo_splitRes.py -n workspace_JJ_${model}_${c}_13TeV_2016ttbar.root  -i  ttbarmodeling/JJ_2016_nonRes_${c}.root -M 2000  -o postfitplots/ --channel ${c} -l ttbar_${c} --doVjets --addTop --doFit False --xrange 105,215
+#     python runFitPlots_vjets_signal_bigcombo_splitRes.py -n workspace_JJ_${model}_${c}_13TeV_2016ttbar.root  -i  ttbarmodeling/JJ_2016_nonRes_${c}.root -M 2000  -o postfitplots/ --channel ${c} -l ttbarFit_${c} --doVjets --addTop --xrange 105,215
+#     
+#     
+#      python runFitPlots_vjets_signal_bigcombo_splitRes.py -n workspace_JJ_${model}_${c}_13TeV_2016ttbar.root  -i  ttbarmodeling/JJ_2016_nonRes_${c}.root -M 2000  -o postfitplots/ --channel ${c} -l ttbar_${c} --doVjets --addTop --doFit False --xrange 65,105 --yrange 65,105
+#     python runFitPlots_vjets_signal_bigcombo_splitRes.py -n workspace_JJ_${model}_${c}_13TeV_2016ttbar.root  -i  ttbarmodeling/JJ_2016_nonRes_${c}.root -M 2000  -o postfitplots/ --channel ${c} -l ttbarFit_${c} --doVjets --addTop --xrange 65,105 -yrange 65,105
+#     
+#     
+#     python runFitPlots_vjets_signal_bigcombo_splitRes.py -n workspace_JJ_${model}_${c}_13TeV_2016ttbar.root  -i  ttbarmodeling/JJ_2016_nonRes_${c}.root -M 2000  -o postfitplots/ --channel ${c} -l ttbar_${c} --doVjets --addTop --doFit False --xrange 105,215 --yrange 105,215
+#     python runFitPlots_vjets_signal_bigcombo_splitRes.py -n workspace_JJ_${model}_${c}_13TeV_2016ttbar.root  -i  ttbarmodeling/JJ_2016_nonRes_${c}.root -M 2000  -o postfitplots/ --channel ${c} -l ttbarFit_${c} --doVjets --addTop --xrange 105,215 --yrange 105,215
+#     
+#     python runFitPlots_vjets_signal_bigcombo_splitRes.py -n workspace_JJ_${model}_${c}_13TeV_2016ttbar.root  -i  ttbarmodeling/JJ_2016_nonRes_${c}.root -M 2000  -o postfitplots/ --channel ${c} -l ttbar_${c} --doVjets --addTop --doFit False --xrange 105,215 --yrange 65,105
+#     python runFitPlots_vjets_signal_bigcombo_splitRes.py -n workspace_JJ_${model}_${c}_13TeV_2016ttbar.root  -i  ttbarmodeling/JJ_2016_nonRes_${c}.root -M 2000  -o postfitplots/ --channel ${c} -l ttbarFit_${c} --doVjets --addTop --xrange 105,215 --yrange 65,105
+#     
+#     
+#     python runFitPlots_vjets_signal_bigcombo_splitRes.py -n workspace_JJ_${model}_${c}_13TeV_2016ttbar.root  -i  ttbarmodeling/JJ_2016_nonRes_${c}.root -M 2000  -o postfitplots/ --channel ${c} -l ttbar_${c} --doVjets --addTop --doFit False
+#     python runFitPlots_vjets_signal_bigcombo_splitRes.py -n workspace_JJ_${model}_${c}_13TeV_2016ttbar.root  -i  ttbarmodeling/JJ_2016_nonRes_${c}.root -M 2000  -o postfitplots/ --channel ${c} -l ttbarFit_${c} --doVjets --addTop
+
+    python runFitPlots_vjets_signal_bigcombo_splitRes.py -n workspace_JJ_${model}__13TeV_2016pseudoAll.root  -i  newmodel4GeV/JJ_2016_nonRes_${c}.root -M 2000  -o postfitnewmodel4GeV/ --channel ${c} -l pseudoAll_postfit_${c} --doVjets --addTop --doFit
+
     
   done
 done
