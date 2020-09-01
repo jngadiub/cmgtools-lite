@@ -267,7 +267,7 @@ class DatacardTools():
        print "outlabel "+self.outlabel
        if self.pseudodata=="" or self.pseudodata=="Vjets":
            card.addFixedYieldFromFile('Wjets',ncontrib,rootFileNorm,"WJets")
-       elif self.outlabel.find("sigOnly")!=-1 or self.outlabel.find("sigonly")!=-1 or self.pseudodata.find("ttonly")!=-1 or self.pseudodata.find("ttbar")!=-1:
+       elif self.outlabel.find("sigOnly")!=-1 or self.outlabel.find("sigonly")!=-1 or self.pseudodata.find("ttbar")!=-1:
            print "add small yield"
            card.addFixedYieldFromFile('Wjets',ncontrib,rootFileNorm,"WJets",0.000001)
        else:
@@ -297,7 +297,7 @@ class DatacardTools():
       
        if self.pseudodata=="" or self.pseudodata=="Vjets":
              card.addFixedYieldFromFile('Zjets',ncontrib,rootFileNorm,"ZJets") 
-       elif self.outlabel.find("sigOnly")!=-1 or self.outlabel.find("sigonly")!=-1 or self.pseudodata.find("ttonly")!=-1 or self.pseudodata.find("ttbar")!=-1:
+       elif self.outlabel.find("sigOnly")!=-1 or self.outlabel.find("sigonly")!=-1 or self.pseudodata.find("ttbar")!=-1:
            card.addFixedYieldFromFile('Zjets',ncontrib,rootFileNorm,"ZJets",0.000001)
        else:
              card.addFixedYieldFromFile('Zjets',ncontrib,rootFileNorm,"ZJets") 

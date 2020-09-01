@@ -137,7 +137,7 @@ for sig in signals:
         rootFileData = resultsDir[dataset]+"/JJ_PDnoQCD_"+p+".root"
         histName="data"
         scaleData=1.0
-      elif pseudodata=="ttonly":
+      elif pseudodata=="ttbar":
         print "Using pseudodata with only tt backgrounds"
         rootFileData = resultsDir[dataset]+"/JJ_PDTT_"+p+".root"
         histName="data"
