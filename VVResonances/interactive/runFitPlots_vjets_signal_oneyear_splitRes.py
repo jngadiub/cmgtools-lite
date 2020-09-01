@@ -237,7 +237,7 @@ if __name__=="__main__":
             
       
      logfile = open(options.log,"a")
-     forplotting = PostFitTools.Postfitplotter(options,logfile,signalName)
+     forplotting = PostFitTools.Postfitplotter(parser,logfile,signalName)
      forproj = PostFitTools.Projection(hinMC,[options.xrange,options.yrange,options.zrange], workspace,options.fit)
      #make projections onto MJJ axis 
      if options.projection =="z":
