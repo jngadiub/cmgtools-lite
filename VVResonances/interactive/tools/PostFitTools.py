@@ -111,7 +111,7 @@ class Postfitplotter():
         except AttributeError:
             optparser.add_option("--channel",dest="channel",default="VH_HPHP")
             self.options = optparser.parse_args()[0]
-            print " attention channel not specifiaed default channel VH_HPHP used"
+            print " attention channel not specified default channel VH_HPHP used"
             
         try: 
             self.options.addTop
