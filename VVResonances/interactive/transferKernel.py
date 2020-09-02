@@ -25,6 +25,7 @@ parser.add_option("--pdfz",dest="pdfz",help="name of pdfs lie PTZUp etc",default
 parser.add_option("--pdfx",dest="pdfx",help="name of pdfs lie PTXUp etc",default="")
 parser.add_option("--pdfy",dest="pdfy",help="name of pdfs lie PTYUp etc",default="")
 parser.add_option("--year",dest="year",help="year",default="2017")
+parser.add_option("--channel",dest="channel",default="VH_HPHP")
 (options,args) = parser.parse_args()
 ROOT.gStyle.SetOptStat(0)
 ROOT.RooMsgService.instance().setGlobalKillBelow(ROOT.RooFit.FATAL)
