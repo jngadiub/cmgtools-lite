@@ -107,7 +107,10 @@ def writeLogfile(options,fitresult):
      	 logfile.write("#################################################\n")
      	 for k in range(0,len(params)):
      	     pf = params.at(k)
-	     print pf.GetName(), pf.getVal(), pf.getError(), "%.2f"%(pf.getVal()/pf.getError())
+             if pf.getError() !=0:
+                 print pf.GetName(), pf.getVal(), pf.getError(), "%.2f"%(pf.getVal()/pf.getError())
+             else: 
+                 print pf.GetName(), pf.getVal(), pf.getError()
      	     if not("nonRes" in pf.GetName()):
      		 continue
      	     pi = paramsinit.at(k)
