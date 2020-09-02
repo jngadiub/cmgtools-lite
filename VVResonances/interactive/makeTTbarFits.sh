@@ -9,16 +9,20 @@
 category=("VH_NPHP_control_region") # "VH_HPLP" "VH_LPHP" "VH_HPHP" "VV_HPLP" "VV_HPHP")
 for c in ${category[@]}
 do 
-    
+    echo "############### make card for category ${c} ##########"
+    echo ${c}
     python makeCard.py --signal BulkGWW --outlabel ttbar -c ${c} -p 2016 --pseudodata ttbar
 done
 
-outputdir=postfit/
+outputdir=postfitTTonly2016/
 mkdir ${outputdir}
 for c in ${category[@]}
 do
-  label=pseudoTTbar_postfit_${c}
-  python runFitPlots_vjets_signal_bigcombo_splitRes.py -n workspace_JJ_BulkGWW_${c}_13TeV_2016ttbar.root  -i  results_2016//JJ_2016_nonRes_${c}.root -M 2000  -o ${outputdir} --channel ${c} -l ${label} --doVjets --addTop --doFit
+  echo "############## make postfit for ##############"
+  label=pseudoTTbar2016_postfit_${c}
+  echo $label
+  python runFitPlots_vjets_signal_bigcombo_splitRes.py -n workspace_JJ_BulkGWW_${c}_13TeV_2016ttbar.root  -i  results_2016//JJ_2016_nonRes_${c}.root -M 2000  -o ${outputdir} --channel ${c} -l ${label} --doVjets --addTop --doFit | tee ${label}.log
+  
 done
   
 ## the fit produces output files named workspacename.json -> these are then included in the makeCard script to extract the yields if NOT pseudodata=ttbar
