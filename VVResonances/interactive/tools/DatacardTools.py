@@ -426,7 +426,7 @@ class DatacardTools():
 
       card.addSystematic("CMS_VV_JJ_nonRes_norm","lnN",{'nonRes':1.5})
       
-      card.addSystematic("CMS_VV_JJ_nonRes_PT_"+category,"param",[0.0,0.333])
+      card.addSystematic("CMS_VV_JJ_nonRes_PT_"+category,"param",[0.0,0.666])
       card.addSystematic("CMS_VV_JJ_nonRes_OPT_"+category,"param",[0.0,0.333])
       card.addSystematic('CMS_VV_JJ_nonRes_altshape2_'+category,"param",[0.0,0.333])  
       card.addSystematic('CMS_VV_JJ_nonRes_altshape_'+category,"param",[0.0,0.333])
