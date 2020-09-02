@@ -14,11 +14,114 @@ class Postfitplotter():
     options = None
     colors = [ROOT.kGray+2,ROOT.kRed,ROOT.kBlue,ROOT.kMagenta,210,ROOT.kOrange,ROOT.kViolet,ROOT.kAzure,ROOT.kTeal,ROOT.kGreen,ROOT.kBlack]
     signalName = "BulkG"
-    def __init__(self,options,logfile,signalName):
+    def __init__(self,optparser,logfile,signalName,backuplabel=""):
         print "initialize plotter"
         self.logfile = logfile
-        self.options = options
+        self.options = optparser.parse_args()[0]
         self.signalName = signalName
+        
+        
+
+        
+        try: 
+            self.options.projection
+        except AttributeError:
+            optparser.add_option("-p","--projection",dest="projection",help="choose which projection should be done",default="xyz")
+            self.options = optparser.parse_args()[0]
+
+        
+        
+        try: 
+            self.options.input
+        except AttributeError:
+            optparser.add_option("-i","--input",dest="input",help="Input nonRes histo",default='JJ_HPHP.root')
+            self.options = optparser.parse_args()[0]
+
+        
+        try: 
+            self.options.label
+        except AttributeError:
+            optparser.add_option("-l","--label",dest="label",help="add extra label such as pythia or herwig",default=backuplabel)
+            self.options = optparser.parse_args()[0]
+        
+        
+        try: 
+            self.options.output
+        except AttributeError:
+            optparser.add_option("-o","--output",dest="output",help="Output folder name",default='')
+            self.options = optparser.parse_args()[0]
+        
+
+        try: 
+            self.options.fit
+        except AttributeError:
+            optparser.add_option("--doFit",dest="fit",action="store_false",help="actually fit the the distributions",default=True)
+            self.options = optparser.parse_args()[0]
+            
+
+        try: 
+            self.options.log
+        except AttributeError:
+            optparser.add_option("--log",dest="log",help="write output in logfile given as argument here!",default="chi2.log")
+            self.options = optparser.parse_args()[0]
+            
+
+
+        try: 
+            self.options.addTop
+        except AttributeError:
+            optparser.add_option("--addTop",dest="addTop",default=False)
+            self.options = optparser.parse_args()[0]
+              
+        
+        
+        try: 
+            self.options.signalScaleF
+        except AttributeError:
+            optparser.add_option("--signalScaleF",dest="signalScaleF",type=float,help="scale factor to apply to signal when drawing so its still visible!",default=100.)
+            optparser.add_option("-s","--signal",dest="fitSignal",action="store_true",help="do S+B fit",default=False)
+            optparser.add_option("-M","--mass",dest="signalMass",type=float,help="signal mass",default=1560.)
+
+            self.options = optparser.parse_args()[0]
+            
+           
+            
+        try: 
+            self.options.prelim
+        except AttributeError:
+            optparser.add_option("--prelim",dest="prelim",default=0)
+            self.options = optparser.parse_args()[0]
+            
+        try: 
+            self.options.pdfy
+        except AttributeError:
+            optparser.add_option("--pdfz",dest="pdfz",help="name of pdfs lie PTZUp etc",default="")
+            optparser.add_option("--pdfx",dest="pdfx",help="name of pdfs lie PTXUp etc",default="")
+            optparser.add_option("--pdfy",dest="pdfy",help="name of pdfs lie PTYUp etc",default="")
+            self.options = optparser.parse_args()[0]
+            
+        try: 
+            self.options.name
+        except AttributeError:
+            optparser.add_option("--wsname",dest="name",default="")
+            self.options = optparser.parse_args()[0]
+                
+        try: 
+            self.options.channel
+        except AttributeError:
+            optparser.add_option("--channel",dest="channel",default="VH_HPHP")
+            self.options = optparser.parse_args()[0]
+            print " attention channel not specifiaed default channel VH_HPHP used"
+            
+        try: 
+            self.options.addTop
+        except AttributeError:
+            optparser.add_option("--addTop",dest="addTop",default=False)
+            optparser.add_option("-v","--doVjets",dest="doVjets",action="store_true",help="Fit top",default=False)
+            self.options = optparser.parse_args()[0]
+                
+            
+        
 
     def calculateChi2ForSig(self,hsig,pred,axis,logfile,label):
         if axis.find("z")!=-1:
@@ -441,8 +544,8 @@ class Postfitplotter():
         if errors!=None:
             leg.AddEntry(errors[0],"#pm 1#sigma unc.","f")
         if len(histos)>1:    
-            leg.AddEntry(histos[1],"W+jets","l")  ; print "Wjets ", histos[1].Integral(); nevents["Wjets"] = histos[0].Integral()
-            leg.AddEntry(histos[2],"Z+jets","l")  ; print "Zjets ", histos[2].Integral(); nevents["Zjets"] = histos[1].Integral()
+            leg.AddEntry(histos[1],"W+jets","l")  ; print "Wjets ", histos[1].Integral(); nevents["Wjets"] = histos[1].Integral()
+            leg.AddEntry(histos[2],"Z+jets","l")  ; print "Zjets ", histos[2].Integral(); nevents["Zjets"] = histos[2].Integral()
         if len(histos)>2:
             if self.options.addTop: leg.AddEntry(histos[3],"t#bar{t}","l"); print "all ttbar ", histos[3].Integral() ; nevents["TTbarall"] = histos[3].Integral()
             if self.options.addTop: leg.AddEntry(histos[4],"res Top","l") ; print "res top ", histos[4].Integral(); nevents["resT"] = histos[4].Integral()
@@ -452,10 +555,10 @@ class Postfitplotter():
             if self.options.addTop: leg.AddEntry(histos[8],"nonres Top + res W","l"); print "res W nonresT ", histos[8].Integral(); nevents["resWnonresT"] = histos[8].Integral()
             if self.options.addTop: leg.AddEntry(histos[9],"res T + res W","l") ; print "resW resT ", histos[9].Integral(); nevents["resTresW"] = histos[9].Integral()
             #if self.options.addTop: leg.AddEntry(histos[10],"res W, res T","l")
-        
-        jsonfile = open(self.options.name.replace(".root",".json"),"w")
-        json.dump(nevents,jsonfile)
-        jsonfile.close()
+        if self.options.name.find("ttbar")!=-1:
+            jsonfile = open(self.options.name.replace(".root",".json"),"w")
+            json.dump(nevents,jsonfile)
+            jsonfile.close()
         
         text = "G_{bulk} (%.1f TeV) #rightarrow WW (#times %i)"%(self.options.signalMass/1000.,scaling)
         if (self.options.signalMass%1000.)==0:
@@ -575,8 +678,8 @@ class Postfitplotter():
         #c.RedrawAxis()
         #frame = c.GetFrame()
         #frame.Draw()
-        
-        self.calculateChi2ForSig(hdata,hsig,axis,self.logfile,"\n \n projection "+extra1+"  "+extra2+" \n")
+        if self.logfile!="":
+            self.calculateChi2ForSig(hdata,hsig,axis,self.logfile,"\n \n projection "+extra1+"  "+extra2+" \n")
         if self.options.prelim==0:
             print "save plot as ", self.options.output+"PostFit"+self.options.label+"_"+htitle.replace(' ','_').replace('.','_').replace(':','_').replace(',','_')+".pdf" 
             c.SaveAs(self.options.output+"PostFit"+self.options.label+"_"+htitle.replace(' ','_').replace('.','_').replace(':','_').replace(',','_')+".png")

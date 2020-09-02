@@ -71,7 +71,8 @@ def mirror(histo,histoNominal,name,dim=1):
 		for i in range(1,histo.GetNbinsX()+1):
 			up=histo.GetBinContent(i)/intUp
 			nominal=histoNominal.GetBinContent(i)/intNominal
-			newHisto.SetBinContent(i,histoNominal.GetBinContent(i)*nominal/up)	
+                        if up!=0: newHisto.SetBinContent(i,histoNominal.GetBinContent(i)*nominal/up)
+                        else: newHisto.SetBinContent(i,histoNominal.GetBinContent(i)*nominal)
     return newHisto       
 
 def expandHisto(histo,suffix,binsMVV,binsMJ,minMVV,maxMVV,minMJ,maxMJ):
@@ -219,31 +220,31 @@ def save_shape(final_shape,norm_nonres,pTools,sample="pythia"):
     print "Done creating out histos"
 
     lv = {}
-    for xk, xv in pTools.xBins.iteritems():
+    for xk, xv in pTools.xBins_redux.iteritems():
         lv[xv] = {}
-        for yk, yv in pTools.yBins.iteritems():
+        for yk, yv in pTools.yBins_redux.iteritems():
           lv[xv][yv] = {}
-          for zk,zv in pTools.zBins.iteritems():
+          for zk,zv in pTools.zBins_redux.iteritems():
             lv[xv][yv][zv] = 0
   
     lv_xz = {}
     lv_yz = {}
-    for xk, xv in pTools.xBins.iteritems():
+    for xk, xv in pTools.xBins_redux.iteritems():
         lv_xz[xv] = {}
         lv_yz[xv] = {}
-        for zk,zv in pTools.zBins.iteritems():
+        for zk,zv in pTools.zBins_redux.iteritems():
           lv_xz[xv][zv] = 0
           lv_yz[xv][zv] = 0
 
     lv_z = []
-    for zk,zv in pTools.zBins.iteritems():
+    for zk,zv in pTools.zBins_redux.iteritems():
       lv_z.append(0)
                                
-    for xk, xv in pTools.xBins.iteritems():
+    for xk, xv in pTools.xBins_redux.iteritems():
          MJ1.setVal(xv)
-         for yk, yv in pTools.yBins.iteritems():
+         for yk, yv in pTools.yBins_redux.iteritems():
              MJ2.setVal(yv)
-             for zk,zv in pTools.zBins.iteritems():
+             for zk,zv in pTools.zBins_redux.iteritems():
                  MJJ.setVal(zv)
                  binV = pTools.zBinsWidth[zk]*pTools.xBinsWidth[xk]*pTools.yBinsWidth[yk]
                  lv[xv][yv][zv] = final_shape.getVal(argset)*binV
@@ -251,17 +252,17 @@ def save_shape(final_shape,norm_nonres,pTools,sample="pythia"):
                  lv_yz[yv][zv] += final_shape.getVal(argset)*binV
                  lv_z[zk-1] += final_shape.getVal(argset)*binV
 
-    for xk, xv in pTools.xBins.iteritems():
-     for yk, yv in pTools.yBins.iteritems():
-      for zk, zv in pTools.zBins.iteritems():
+    for xk, xv in pTools.xBins_redux.iteritems():
+     for yk, yv in pTools.yBins_redux.iteritems():
+      for zk, zv in pTools.zBins_redux.iteritems():
        histo.Fill(xv,yv,zv,lv[xv][yv][zv]*norm_nonres[0])
 
-    for xk, xv in pTools.xBins.iteritems():
-      for zk, zv in pTools.zBins.iteritems():
+    for xk, xv in pTools.xBins_redux.iteritems():
+      for zk, zv in pTools.zBins_redux.iteritems():
        histo_xz.Fill(xv,zv,lv_xz[xv][zv]*norm_nonres[0])
        histo_yz.Fill(xv,zv,lv_yz[xv][zv]*norm_nonres[0])
     
-    for zk,zv in pTools.zBins.iteritems(): histo_z.Fill(zv,lv_z[zk-1]*norm_nonres[0])    
+    for zk,zv in pTools.zBins_redux.iteritems(): histo_z.Fill(zv,lv_z[zk-1]*norm_nonres[0])    
        
     fout_z = ROOT.TFile.Open('save_new_shapes_%s_%s_%s_1D.root'%(options.year,sample,purity),'RECREATE')
     fout_z.cd()
@@ -380,55 +381,48 @@ def makeNonResCard():
  elif options.pdfIn.find("VH_HPHP")!=-1: category_pdf = "VH_HPHP" 
  elif options.pdfIn.find("VH_HPLP")!=-1: category_pdf = "VH_HPLP"
  elif options.pdfIn.find("VH_LPHP")!=-1: category_pdf = "VH_LPHP"
+ elif options.pdfIn.find("VH_LPLP")!=-1: category_pdf = "VH_LPLP"
  elif options.pdfIn.find("NP")!=-1: category_pdf = "NP"
  else: category_pdf = "VV_LPLP"  
- 
+
  dataset = options.year
  sig = 'BulkGWW' 
  doCorrelation = False
  if 'VBF' in purity: sig = 'VBF_BulkGWW'
  
- '''
  lumi = {'2016':35900,'2017':41367}
  lumi_unc = {'2016':1.025,'2017':1.023}
  scales = {"2017" :[0.983,1.08], "2016":[1.014,1.086]}
  scalesHiggs = {"2017" :[1.,1.], "2016":[1.,1.]}
 
- vtag_unc = {'VV_HPHP':{},'VV_HPLP':{},'VV_LPLP':{},'VH_HPHP':{},'VH_HPLP':{},'VH_LPHP':{}, 'VH_NPHP_control_region': {}}
+ vtag_unc = {'VV_HPHP':{},'VV_HPLP':{},'VV_LPLP':{},'VH_HPHP':{},'VH_HPLP':{},'VH_LPHP':{}, 'VV_etraLP':{}}
  vtag_unc['VV_HPHP'] = {'2016':'1.232/0.792','2017':'1.269/0.763'}
  vtag_unc['VV_HPLP'] = {'2016':'0.882/1.12','2017':'0.866/1.136'}    
  vtag_unc['VV_LPLP'] = {'2016':'1.063','2017':'1.043'}
+ vtag_unc['VV_extraLP'] = {'2016':'1.063','2017':'1.043'}
+
  vtag_unc['VBF_VV_HPHP'] = {'2016':'1.232/0.792','2017':'1.269/0.763'}
- vtag_unc['VBF_VV_HPLP'] = {'2016':'0.882/1.12','2017':'0.866/1.136'}    
+ vtag_unc['VBF_VV_HPLP'] = {'2016':'0.882/1.12','2017':'0.866/1.136'}
  vtag_unc['VBF_VV_LPLP'] = {'2016':'1.063','2017':'1.043'}
- #this is a quick fix! these values are probably wrong!!
+
+ #this is a quick fix! these values are wrong!!
  vtag_unc['VH_HPHP'] = {'2016':'1.232/0.792','2017':'1.269/0.763'}
  vtag_unc['VH_HPLP'] = {'2016':'0.882/1.12','2017':'0.866/1.136'}    
  vtag_unc['VH_LPHP'] = {'2016':'1.063','2017':'1.043'}
- vtag_unc['VH_NPHP_control_region'] = {'2016':'1.232/0.792','2017':'1.269/0.763'}
+
+ ctx16  = cuts.cuts("init_VV_VH.json","2016","random_dijetbins",False)
+ ctx17  = cuts.cuts("init_VV_VH.json","2017","random_dijetbins",False)
+ ctx18  = cuts.cuts("init_VV_VH.json","2018","random_dijetbins",False)
+ vtag_pt_dependence = {"2016" : ctx16.vtag_pt_dependence,"2017" : ctx17.vtag_pt_dependence,"2018" : ctx18.vtag_pt_dependence}
+
+# vtag_pt_dependence = {'VV_HPHP':'((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))','VV_HPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))','VV_LPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))','VH_HPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))','VH_LPHP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))','VH_HPHP':'((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))','VH_LPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))','VV_extraLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))'} #irene added fakes  for a quick test!
+# vtag_pt_dependence = {'VV_HPHP':'((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))','VV_HPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))'}
+# vtag_pt_dependence = {'VV_HPHP':'((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))','VV_HPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))',
+#                       'VBF_VV_HPHP':'((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))','VBF_VV_HPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))'}
+
  #vtag_pt_dependence = {'VV_HPHP':'((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))','VV_HPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))',
- #                      'VBF_VV_HPHP':'((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))','VBF_VV_HPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))',
- #		       'VH_NPHP_control_region':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))'}
+                       #'VBF_VV_HPHP':'((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))','VBF_VV_HPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))'}
 
- vtag_pt_dependence = {"2016" : ctx16.vtag_pt_dependence,"2017" : ctx17.vtag_pt_dependence,"2018" : ctx18.vtag_pt_dependence}
- '''
-
- sig = 'BulkGWW' 
- doCorrelation = False
- if 'VBF' in purity: sig = 'VBF_BulkGWW'
-
- dataset = str(options.year)
- ctx16 = cuts.cuts("init_VV_VH.json",2016,"dijetbins_random")
- ctx17 = cuts.cuts("init_VV_VH.json",2017,"dijetbins_random")
- ctx18 = cuts.cuts("init_VV_VH.json",2018,"dijetbins_random") 
-
- lumi = {'2016':ctx16.lumi,'2017':ctx17.lumi, '2018':ctx18.lumi}
- lumi_unc = {'2016':ctx16.lumi_unc,'2017':ctx17.lumi_unc, '2018':ctx18.lumi_unc}
- vtag_pt_dependence = {"2016" : ctx16.vtag_pt_dependence,"2017" : ctx17.vtag_pt_dependence,"2018" : ctx18.vtag_pt_dependence}
-
- scales = {"2017" :[1,1], "2016":[1,1], "2018":[1,1]}
- scalesHiggs = {"2017" :[1,1], "2016":[1,1], "2018":[1,1]}
-   
  DTools = DatacardTools(scales,scalesHiggs,vtag_pt_dependence,lumi_unc,1.0,"","",doCorrelation)
  print '##########      PURITY      :', purity 
 
@@ -439,8 +433,8 @@ def makeNonResCard():
       
 # DTools.AddSignal(card,dataset,purity,sig,'results_2016',0)
  print "Adding Signal"
- DTools.AddSignal(card,dataset,purity,sig,'results_%s'%options.year,1)
- print "Signal Added 1!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+ DTools.AddSignal(card,dataset,purity,sig,'results_%s'%options.year,0)
+ print "Signal Added !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
  hname = 'histo'
  if options.sample!='pythia': hname+=('_'+options.sample)
  fin = ROOT.TFile.Open(options.pdfIn)
@@ -449,11 +443,12 @@ def makeNonResCard():
   hname = 'histo'
  fin.Close() 
  print "adding shapes bkg"
- card.addHistoShapeFromFile("nonRes",["MJ1","MJ2","MJJ"],options.pdfIn,hname,['PTZ:CMS_VV_JJ_nonRes_PTZ_'+category_pdf,'PTXY:CMS_VV_JJ_nonRes_PTXY_'+category_pdf,'OPTXY:CMS_VV_JJ_nonRes_OPTXY_'+category_pdf,'OPTZ:CMS_VV_JJ_nonRes_OPTZ_'+category_pdf,'OPT3:CMS_VV_JJ_nonRes_OPT3_'+category_pdf],False,0) 
+ card.addHistoShapeFromFile("nonRes",["MJ1","MJ2","MJJ"],options.pdfIn,hname,['OPTXY:CMS_VV_JJ_nonRes_OPTXY_'+category_pdf,'OPTZ:CMS_VV_JJ_nonRes_OPTZ_'+category_pdf,'OPT3:CMS_VV_JJ_nonRes_OPT3_'+category_pdf],False,0) 
+ #card.addHistoShapeFromFile("nonRes",["MJ1","MJ2","MJJ"],options.pdfIn,hname,['PT:CMS_VV_JJ_nonRes_PT_'+category_pdf,'OPTXY:CMS_VV_JJ_nonRes_OPTXY_'+category_pdf,'OPTZ:CMS_VV_JJ_nonRes_OPTZ_'+category_pdf,'OPT3:CMS_VV_JJ_nonRes_OPT3_'+category_pdf],False,0) 
  print "adding yield"
  card.addFixedYieldFromFile("nonRes",1,options.input,"nonRes",1)
  print "adding data"
- DTools.AddData(card,options.input,"nonRes",lumi[dataset])
+ DTools.AddData(card,options.input,"nonRes",lumi[dataset] )
  print "adding sig sys for purity", purity
  DTools.AddSigSystematics(card,sig,dataset,purity,0)
 
@@ -461,6 +456,7 @@ def makeNonResCard():
  print "norm"
  card.addSystematic("CMS_VV_JJ_nonRes_norm","lnN",{'nonRes':1.5}) 
  print "OPTZ"
+
  card.addSystematic("CMS_VV_JJ_nonRes_OPTZ_"+category_pdf,"param",[0.,2.]) #1,2
  print "OPTXY"
  card.addSystematic("CMS_VV_JJ_nonRes_OPTXY_"+category_pdf,"param",[0.,2.]) #0,2
@@ -468,11 +464,13 @@ def makeNonResCard():
  card.addSystematic("CMS_VV_JJ_nonRes_OPT3_"+category_pdf,"param",[1.,2.]) #test for VH_HPHP  
  #print "PT"
  #card.addSystematic("CMS_VV_JJ_nonRes_PT_"+category_pdf,"param",[0.0,0.333]) #orig
- print "PTZ"
- card.addSystematic("CMS_VV_JJ_nonRes_PTZ_"+category_pdf,"param",[.0,2.]) #2,2
- print "PTXY"
- card.addSystematic("CMS_VV_JJ_nonRes_PTXY_"+category_pdf,"param",[0.,2.]) #0,2
+# print "PTZ"
+# card.addSystematic("CMS_VV_JJ_nonRes_PTZ_"+category_pdf,"param",[.0,2.]) #2,2
+# print "PTXY"
+# card.addSystematic("CMS_VV_JJ_nonRes_PTXY_"+category_pdf,"param",[0.,2.]) #0,2
   
+ 
+
  print " and now make card"     
  card.makeCard()
 
@@ -539,11 +537,11 @@ if __name__=="__main__":
      print "Observed number of events:",data.sumEntries()
           
      #################################################
-     print " ########################       PostFitTools      ###"                         
-     Tools = PostFitTools(hinMC,argset,options.xrange,options.yrange,options.zrange,purity+'_'+options.sample,options.output,data)
+     print " ########################       PostFitTools      ###"   
+     Tools = Projection(hinMC,[options.xrange,options.yrange,options.zrange],workspace,False) #Postfitplotter(optparser,logfile,signalName)#(hinMC,argset,options.xrange,options.yrange,options.zrange,purity+'_'+options.sample,options.output,data)
      
      print "x bins:"
-     print Tools.xBins
+     print Tools.xBins_redux
      print "x bins low edge:"
      print Tools.xBinslowedge
      print "x bins width:"
@@ -551,7 +549,7 @@ if __name__=="__main__":
      
      print
      print "y bins:"
-     print Tools.yBins
+     print Tools.yBins_redux
      print "y bins low edge:"
      print Tools.yBinslowedge
      print "y bins width:"
@@ -559,7 +557,7 @@ if __name__=="__main__":
      
      print 
      print "z bins:"
-     print Tools.zBins
+     print Tools.zBins_redux
      print "z bins low edge:"
      print Tools.zBinslowedge
      print "z bins width:"
@@ -570,9 +568,9 @@ if __name__=="__main__":
                   
      args  = model.getComponents()
      print "model ",model.Print()
-     print "args = model comp[onents ",args.Print()
+     print "args = model components ",args.Print()
      pdfName = "pdf_binJJ_"+purity+"_13TeV_%s_bonly"%options.year
-
+     print "pdfName ",pdfName 
      print "Expected number of QCD events:",(args[pdfName].getComponents())["n_exp_binJJ_"+purity+"_13TeV_%s_proc_nonRes"%options.year].getVal()
     
      #################################################
@@ -636,21 +634,34 @@ if __name__=="__main__":
      norm_nonres[0] = (args["pdf_binJJ_"+purity+"_13TeV_%s_bonly"%options.year].getComponents())["n_exp_binJJ_"+purity+"_13TeV_%s_proc_nonRes"%options.year].getVal()
      norm_nonres[1] = (args["pdf_binJJ_"+purity+"_13TeV_%s_bonly"%options.year].getComponents())["n_exp_binJJ_"+purity+"_13TeV_%s_proc_nonRes"%options.year].getPropagatedError(fitresult)
      print "QCD normalization after fit",norm_nonres[0],"+/-",norm_nonres[1]
-                   
      #################################################     
      save_shape(pdf_nonres_shape_postfit,norm_nonres,Tools,options.sample)
+     nevents = {"nonRes": [(args["pdf_binJJ_"+purity+"_13TeV_%s_bonly"%options.year].getComponents())["n_exp_binJJ_"+purity+"_13TeV_%s_proc_nonRes"%options.year], (args["pdf_binJJ_"+purity+"_13TeV_%s_bonly"%options.year].getComponents())["n_exp_binJJ_"+purity+"_13TeV_%s_proc_nonRes"%options.year].getPropagatedError(fitresult)]}
 
+     forplotting = Postfitplotter(parser,"","BulkGWW",options.sample+"_"+purity)
+     #make projections onto MJJ axis 
+     
+         
      #make projections onto MJJ axis
-     if options.projection =="z": Tools.doZprojection2(allpdfsz,data,norm_nonres[0])
+     if options.projection =="z": 
+         results = Tools.doProjection(data,[pdf_nonres_shape_postfit],nevents,"z",None,[0,0])
+         forplotting.MakePlots(results[0],results[1],results[2],results[3],results[4],results[5], results[6],results[7])
          
      #make projections onto MJ1 axis
-     if options.projection =="x":  Tools.doXprojection2(allpdfsx,data,norm_nonres[0])
+     if options.projection =="x":  
+         results = Tools.doProjection(data,[pdf_nonres_shape_postfit],nevents,"x",None,[0,0])
+         forplotting.MakePlots(results[0],results[1],results[2],results[3],results[4],results[5], results[6],results[7])
                   
      #make projections onto MJ2 axis
-     if options.projection =="y":  Tools.doYprojection2(allpdfsy,data,norm_nonres[0])
+     if options.projection =="y":  
+         results = Tools.doProjection(data,[pdf_nonres_shape_postfit],nevents,"y",None,[0,0])
+         forplotting.MakePlots(results[0],results[1],results[2],results[3],results[4],results[5], results[6],results[7])
          
      if options.projection =="xyz":
-         Tools.doZprojection2(allpdfsz,data,norm_nonres[0])
-         Tools.doXprojection2(allpdfsx,data,norm_nonres[0])
-         Tools.doYprojection2(allpdfsy,data,norm_nonres[0])
+         results = Tools.doProjection(data,[pdf_nonres_shape_postfit],nevents,"x",None,[0,0])
+         forplotting.MakePlots(results[0],results[1],results[2],results[3],results[4],results[5], results[6],results[7])
+         results = Tools.doProjection(data,[pdf_nonres_shape_postfit],nevents,"y",None,[0,0])
+         forplotting.MakePlots(results[0],results[1],results[2],results[3],results[4],results[5], results[6],results[7])
+         results = Tools.doProjection(data,[pdf_nonres_shape_postfit],nevents,"z",None,[0,0])
+         forplotting.MakePlots(results[0],results[1],results[2],results[3],results[4],results[5], results[6],results[7])
      
