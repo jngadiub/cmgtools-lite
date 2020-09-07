@@ -218,13 +218,21 @@ if __name__=="__main__":
      if options.fit:
         for year in years:
             expected = {}
+            norms = {}
             for bkg in bkgs:
                 if options.doVjets==False and (bkg=="Wjets" or bkg=="Zjets"): expected[bkg] = [0.,0.]; continue
                 if options.addTop==False and (bkg.find("TTJets")!=-1): expected[bkg] = [0.,0.]; continue
                 #(args[pdf1Name[year]].getComponents())["n_exp_binJJ_"+purity+"_13TeV_"+year+"_proc_"+bkg].dump()
                 expected[bkg] = [ (args[pdf1Name[year]].getComponents())["n_exp_binJJ_"+purity+"_13TeV_"+year+"_proc_"+bkg],(args[pdf1Name[year]].getComponents())["n_exp_binJJ_"+purity+"_13TeV_"+year+"_proc_"+bkg].getPropagatedError(fitresult)]
+                norms[bkg] = expected[bkg][0].getVal() 
                 print "normalization of "+bkg+" after fit:",(expected[bkg][0].getVal()), " +/- ",expected[bkg][1] ,"   ("+year+")"
             all_expected[year] = expected  
+            #save post fit ttbar only normalization to be used as prefit value when fitting all bkg
+            if options.name.find("ttbar")!=-1:
+                jsonfile = open(options.name.replace(".root",".json"),"w")
+                json.dump(norms,jsonfile)
+                jsonfile.close()
+
             if options.fitSignal:
                 signal_expected[year] = [ (args[pdf1Name[year]].getComponents())["n_exp_final_binJJ_"+purity+"_13TeV_2016_proc_"+signalName], (args[pdf1Name[year]].getComponents())["n_exp_final_binJJ_"+purity+"_13TeV_2016_proc_"+signalName].getPropagatedError(fitresult)]
                 print "Fitted signal yields:",signal_expected[year][0].getVal()," +/- ", signal_expected[year][bkg][1] ,"(",year,")"
