@@ -89,7 +89,7 @@ class Postfitplotter():
         try: 
             self.options.prelim
         except AttributeError:
-            optparser.add_option("--prelim",dest="prelim",default=0)
+            optparser.add_option("--prelim",dest="prelim",default="Preliminary")
             self.options = optparser.parse_args()[0]
             
         try: 
@@ -315,11 +315,7 @@ class Postfitplotter():
         CMS_lumi.lumi_7TeV = "4.8 fb^{-1}"
         CMS_lumi.lumi_8TeV = "18.3 fb^{-1}"
         CMS_lumi.writeExtraText = 1
-        if self.options.prelim==0:
-            CMS_lumi.extraText = " "
-        else:
-            CMS_lumi.extraText = "Preliminary"
-
+        CMS_lumi.extraText = self.options.prelim
         H_ref = 600 
         W_ref = 600 
         W = W_ref
@@ -362,12 +358,7 @@ class Postfitplotter():
         if period =="run2":  CMS_lumi.lumi_13TeV = "run2 fb^{-1}"
         CMS_lumi.writeExtraText = 1
         CMS_lumi.lumi_sqrtS = "13 TeV (2016+2017)" # used with iPeriod = 0, e.g. for simulation-only plots (default is an empty string)
-        if self.options.prelim==0:
-            CMS_lumi.extraText = " "
-        if self.options.prelim==1:
-            CMS_lumi.extraText = "Preliminary"
-        if self.options.prelim==2:
-            CMS_lumi.extraText = "Supplementary"
+        CMS_lumi.extraText = self.options.prelim
 
         CMS_lumi.lumiText = "(13 TeV)"
         iPos = 0
@@ -425,7 +416,7 @@ class Postfitplotter():
             hhtitle = self.options.channel
             xtitle = " m_{jet1} [GeV]"
             ymin = 0.02
-            ymax = hdata.GetMaximum()*3#max(hdata.GetMaximum()*1.3,maxY*1.3)
+            ymax = hdata.GetMaximum()*1.8#max(hdata.GetMaximum()*1.3,maxY*1.3)
             extra1 = yrange.split(',')[0]+' < m_{jet2} < '+ yrange.split(',')[1]+' GeV'
             extra2 = zrange.split(',')[0]+' < m_{jj} < '+ zrange.split(',')[1]+' GeV'
         elif axis=='y':
@@ -434,12 +425,13 @@ class Postfitplotter():
             hhtitle = self.options.channel
             xtitle = " m_{jet2} [GeV]"
             ymin = 0.02
-            ymax = hdata.GetMaximum()*3#max(hdata.GetMaximum()*1.3,maxY*1.3)
+            ymax = hdata.GetMaximum()*1.8#max(hdata.GetMaximum()*1.3,maxY*1.3)
             extra1 = xrange.split(',')[0]+' < m_{jet1} < '+ xrange.split(',')[1]+' GeV'
             extra2 = zrange.split(',')[0]+' < m_{jj} < '+ zrange.split(',')[1]+' GeV'
                     
         #leg = ROOT.TLegend(0.450436242,0.5531968,0.7231544,0.8553946)
-        leg = ROOT.TLegend(0.55809045,0.3063636,0.7622613,0.8520979)
+        #leg = ROOT.TLegend(0.55809045,0.3063636,0.7622613,0.8520979)
+        leg = ROOT.TLegend(0.55,0.55,0.82,0.86)
         leg.SetTextSize(0.05)
         c = self.get_canvas('c')
         pad1 = self.get_pad("pad1") #ROOT.TPad("pad1", "pad1", 0, 0.3, 1, 1.0)
@@ -548,13 +540,14 @@ class Postfitplotter():
             leg.AddEntry(histos[2],"Z+jets","l")  ; print "Zjets ", histos[2].Integral(); nevents["Zjets"] = histos[2].Integral()
         if len(histos)>2:
             if self.options.addTop: leg.AddEntry(histos[3],"t#bar{t}","l"); print "all ttbar ", histos[3].Integral() ; nevents["TTbarall"] = histos[3].Integral()
-            if self.options.addTop: leg.AddEntry(histos[4],"res Top","l") ; print "res top ", histos[4].Integral(); nevents["resT"] = histos[4].Integral()
-            if self.options.addTop: leg.AddEntry(histos[5],"res W","l") ; print "res W  ", histos[5].Integral() ; nevents["resW"] = histos[5].Integral()
-            if self.options.addTop: leg.AddEntry(histos[6],"nonres Top","l") ; print "nonres top ", histos[6].Integral() ; nevents["nonresT"] = histos[6].Integral()
-            if self.options.addTop: leg.AddEntry(histos[7],"nonres Top + res Top","l") ; print "resT nonres T ", histos[7].Integral() ; nevents["resTnonresT"] = histos[7].Integral()
-            if self.options.addTop: leg.AddEntry(histos[8],"nonres Top + res W","l"); print "res W nonresT ", histos[8].Integral(); nevents["resWnonresT"] = histos[8].Integral()
-            if self.options.addTop: leg.AddEntry(histos[9],"res T + res W","l") ; print "resW resT ", histos[9].Integral(); nevents["resTresW"] = histos[9].Integral()
-            #if self.options.addTop: leg.AddEntry(histos[10],"res W, res T","l")
+            if len(histos)>4:
+                if self.options.addTop: leg.AddEntry(histos[4],"res Top","l") ; print "res top ", histos[4].Integral(); nevents["resT"] = histos[4].Integral()
+                if self.options.addTop: leg.AddEntry(histos[5],"res W","l") ; print "res W  ", histos[5].Integral() ; nevents["resW"] = histos[5].Integral()
+                if self.options.addTop: leg.AddEntry(histos[6],"nonres Top","l") ; print "nonres top ", histos[6].Integral() ; nevents["nonresT"] = histos[6].Integral()
+                if self.options.addTop: leg.AddEntry(histos[7],"nonres Top + res Top","l") ; print "resT nonres T ", histos[7].Integral() ; nevents["resTnonresT"] = histos[7].Integral()
+                if self.options.addTop: leg.AddEntry(histos[8],"nonres Top + res W","l"); print "res W nonresT ", histos[8].Integral(); nevents["resWnonresT"] = histos[8].Integral()
+                if self.options.addTop: leg.AddEntry(histos[9],"res T + res W","l") ; print "resW resT ", histos[9].Integral(); nevents["resTresW"] = histos[9].Integral()
+                #if self.options.addTop: leg.AddEntry(histos[10],"res W, res T","l")
         
         text = "G_{bulk} (%.1f TeV) #rightarrow WW (#times %i)"%(self.options.signalMass/1000.,scaling)
         if (self.options.signalMass%1000.)==0:
@@ -605,30 +598,30 @@ class Postfitplotter():
             pt.AddText("Prob = %.3f"%ROOT.TMath.Prob(chi2[0],chi2[1]))
         #pt.Draw()
 
-        pt2 = ROOT.TPaveText(0.125,0.79,0.99,0.4,"NDC")
+        #pt2 = ROOT.TPaveText(0.125,0.79,0.99,0.4,"NDC")
         #pt2 = ROOT.TPaveText(0.55,0.35,0.99,0.32,"NDC")
+        pt2 = ROOT.TPaveText(0.6,0.38,0.99,0.58,"NDC")
         pt2.SetTextFont(42)
-        pt2.SetTextSize(0.05)
+        pt2.SetTextSize(0.04)
         pt2.SetTextAlign(12)
         pt2.SetFillColor(0)
         pt2.SetBorderSize(0)
         pt2.SetFillStyle(0)
-        pt2.AddText("category  "+self.options.channel)
-        pt2.AddText(extra1)
-        pt2.AddText(extra2)
+        pt2.AddText(self.options.channel.replace('_control_region','')+" category")
+        #pt2.AddText("category  "+self.options.channel)
         pt2.Draw()
 
-        pt3 = ROOT.TPaveText(0.65,0.39,0.99,0.52,"NDC")
+        #pt3 = ROOT.TPaveText(0.65,0.39,0.99,0.52,"NDC")
+        pt3 = ROOT.TPaveText(0.25,0.55,0.39,0.68,"NDC")
         pt3.SetTextFont(42)
-        pt3.SetTextSize(0.05)
+        pt3.SetTextSize(0.04)
         pt3.SetTextAlign(12)
         pt3.SetFillColor(0)
         pt3.SetBorderSize(0)
         pt3.SetFillStyle(0)
-        #pt3.AddText("%s category"%self.options.channel)
-        #pt3.AddText(extra1)
-        #pt3.AddText(extra2)
-        #pt3.Draw()
+        pt3.AddText(extra1)
+        pt3.AddText(extra2)
+        pt3.Draw()
 
         CMS_lumi.CMS_lumi(pad1, 4, 10)
         
@@ -860,7 +853,7 @@ class Projection():
         return result
 
 
-    def doProjection(self,data,pdfs,norms,axis,pdf_sig=None,norm_sig=0):
+    def doProjection(self,data,pdfs,norms,axis,pdf_sig=None,norm_sig=0,show_all=False):
         self.neventsPerBin_1 = {}
         self.h=[]
         self.hfinals = []
@@ -982,9 +975,9 @@ class Projection():
                         i+=1
                     if pdf_sig!=None:
                         self.lv1_sig[0][kv] += pdf_sig.getVal(self.args_ws)*binV
-        return self.fillHistos(pdfs,data,norms,pdf_sig,norm_sig)
+        return self.fillHistos(pdfs,data,norms,pdf_sig,norm_sig,show_all)
         
-    def fillHistos(self,pdfs,data,norms,pdf_sig=None,norm_sig=None):
+    def fillHistos(self,pdfs,data,norms,pdf_sig=None,norm_sig=None,show_all=False):
         print " make Projection ", self.axis
         for i in range(0,len(pdfs)):
             for ik,iv in self.Bins_redux.iteritems():
@@ -1027,12 +1020,13 @@ class Projection():
         if self.htot_Wres!=None: self.hfinals.append(self.htot_Wres)
         if self.htot_Zres!=None: self.hfinals.append(self.htot_Zres)
         if self.htot_TTJets!=None: self.hfinals.append(self.htot_TTJets)
-        if self.htot_TTJetsTop!=None: self.hfinals.append(self.htot_TTJetsTop)
-        if self.htot_TTJetsW!=None: self.hfinals.append(self.htot_TTJetsW)
-        if self.htot_TTJetsNonRes!=None: self.hfinals.append(self.htot_TTJetsNonRes)
-        if self.htot_TTJetsTnonresT!=None: self.hfinals.append(self.htot_TTJetsTnonresT)
-        if self.htot_TTJetsWnonresT!=None: self.hfinals.append(self.htot_TTJetsWnonresT)
-        if self.htot_TTJetsresTresW!=None: self.hfinals.append(self.htot_TTJetsresTresW)
+        if show_all:
+            if self.htot_TTJetsTop!=None: self.hfinals.append(self.htot_TTJetsTop)
+            if self.htot_TTJetsW!=None: self.hfinals.append(self.htot_TTJetsW)
+            if self.htot_TTJetsNonRes!=None: self.hfinals.append(self.htot_TTJetsNonRes)
+            if self.htot_TTJetsTnonresT!=None: self.hfinals.append(self.htot_TTJetsTnonresT)
+            if self.htot_TTJetsWnonresT!=None: self.hfinals.append(self.htot_TTJetsWnonresT)
+            if self.htot_TTJetsresTresW!=None: self.hfinals.append(self.htot_TTJetsresTresW)
         #for i in range(10,len(h)): hfinals.append(h[i])    
         for b,v in self.neventsPerBin_1.iteritems(): self.dh.SetBinContent(b,self.neventsPerBin_1[b]);
         self.dh.SetBinErrorOption(ROOT.TH1.kPoisson)
