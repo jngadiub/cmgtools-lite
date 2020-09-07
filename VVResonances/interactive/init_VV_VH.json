@@ -101,6 +101,9 @@
     "WP_NP_Wtag16" : "0p20",
     "WP_NP_Wtag17" : "0p20",
     "WP_NP_Wtag18" : "0p20",
+    "WP_NPLP_Wtag16" : "0p50",
+    "WP_NPLP_Wtag17" : "0p50",
+    "WP_NPLP_Wtag18" : "0p50",
     
     
     "WP_HP_Htag16" : "0p02",
@@ -109,9 +112,9 @@
     "WP_LP_Htag16" : "0p10",
     "WP_LP_Htag17" : "0p10",
     "WP_LP_Htag18" : "0p10",
-    "WP_NP_Htag16" : "0p20",
-    "WP_NP_Htag17" : "0p20",
-    "WP_NP_Htag18" : "0p20",
+    "WP_NP_Htag16" : "0p30",
+    "WP_NP_Htag17" : "0p30",
+    "WP_NP_Htag18" : "0p30",
     "WP_NPLP_Htag16" : "0p50",
     "WP_NPLP_Htag17" : "0p50",
     "WP_NPLP_Htag18" : "0p50"
