@@ -12,16 +12,16 @@ do
     echo "############### make card for category ${c} ##########"
     echo ${c}
     python makeCard.py --signal BulkGWW --outlabel ttbar -c ${c} -p 2016 --pseudodata ttbar
-done
+#done
 
-outputdir=postfitTTonly2016/
-mkdir ${outputdir}
-for c in ${category[@]}
-do
-  echo "############## make postfit for ##############"
-  label=pseudoTTbar2016_postfit_${c}
-  echo $label
-  python runFitPlots_vjets_signal_bigcombo_splitRes.py -n workspace_JJ_BulkGWW_${c}_13TeV_2016ttbar.root  -i  results_2016//JJ_2016_nonRes_${c}.root -M 2000  -o ${outputdir} --channel ${c} -l ${label} --doVjets --addTop --doFit | tee ${label}.log
+    outputdir=postfitTTonly2016/
+    mkdir ${outputdir}
+#for c in ${category[@]}
+#do
+    echo "############## make postfit for ##############"
+    label=pseudoTTbar2016_postfit_${c}
+    echo $label
+    python runFitPlots_vjets_signal_bigcombo_splitRes.py -n workspace_JJ_BulkGWW_${c}_13TeV_2016ttbar2.root  -i  results_2016//JJ_2016_nonRes_${c}.root -M 2000  -o ${outputdir} --channel ${c} -l ${label} --doVjets --addTop --doFit | tee ${label}.log
   
 done
   
