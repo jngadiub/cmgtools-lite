@@ -55,9 +55,11 @@ if useTriggerWeights:
     addOption = "-t"
     
 #all categories
-categories=['VV_HPHP']
+#categories=['VV_HPLP']
 #categories=['VH_HPHP','VH_LPHP','VH_HPLP'] #,'VV_HPHP','VV_HPLP'] #,'VBF_VV_HPHP','VBF_VV_HPLP']
-#categories=['VH_NPHP_control_region']
+#categories=['VV_VH_HCR']
+categories=['VH_NPHP_control_region','VH_HPNP_control_region']
+#categories=['VH_HPNP_control_region'] #,'VH_NPHP_control_region']
 #categories=['NP']
        
 #list of signal samples --> nb, radion and vbf samples to be added
@@ -220,7 +222,6 @@ if options.run.find("all")!=-1 or options.run.find("vjets")!=-1:
 
 if options.run.find("all")!=-1 or options.run.find("tt")!=-1:
     f.fitTT   ("JJ_%s_TTJets"%(period),TTemplate,1.,)
-    '''
     print "resT"
     f.makeMinorBkgShapesMVV("TTJets","JJ_resT"+str(period),TTemplate,ctx.cuts['resTT'],'resTT')
     print "resW"
@@ -241,7 +242,7 @@ if options.run.find("all")!=-1 or options.run.find("tt")!=-1:
     f.makeMinorBkgShapesMVV("TTJets","JJ_resWnonresT"+str(period),TTemplate,ctx.cuts['resWnonresT'],'resWnonresT')
     print "make norm for all contributions of ttbar together"
     f.makeNormalizations("TTJets","JJ_"+str(period),TTemplate,0,ctx.cuts['nonres'],"nRes","") # ... so we do not need this
-    '''
+
 if options.run.find("all")!=-1 or options.run.find("data")!=-1:
     print " Do data "
     f.makeNormalizations("data","JJ_"+str(period),dataTemplate,1,'1',"normD") #run on data. Currently run on pseudodata only (below)
