@@ -20,6 +20,7 @@ addTT = False
 parser = optparse.OptionParser()
 parser.add_option("-o","--output",dest="output",help="Output folder name",default='')
 parser.add_option("-n","--name",dest="name",help="Input workspace",default='workspace.root')
+parser.add_option("-j","--jsonname",dest="jsonname",help="write the name of the output json file, the category will be automatically inserted",default='ttbarNorm')
 parser.add_option("-i","--input",dest="input",help="Input nonRes histo",default='JJ_HPHP.root')
 parser.add_option("-x","--xrange",dest="xrange",help="set range for x bins in projection",default="0,-1")
 parser.add_option("-y","--yrange",dest="yrange",help="set range for y bins in projection",default="0,-1")
@@ -216,20 +217,21 @@ if __name__=="__main__":
      allpdfsy = PostFitTools.definefinalPDFs(options,"y",allpdfs)
      
      if options.fit:
+        bkgLabel = ["nonRes","Wjets","Zjets","resT","resW","nonresT","resWnonresT","resTresW","resTnonresT"]
         for year in years:
             expected = {}
             norms = {}
-            for bkg in bkgs:
+            for bkg,bn in zip(bkgs,bkgLabel):
                 if options.doVjets==False and (bkg=="Wjets" or bkg=="Zjets"): expected[bkg] = [0.,0.]; continue
                 if options.addTop==False and (bkg.find("TTJets")!=-1): expected[bkg] = [0.,0.]; continue
                 #(args[pdf1Name[year]].getComponents())["n_exp_binJJ_"+purity+"_13TeV_"+year+"_proc_"+bkg].dump()
                 expected[bkg] = [ (args[pdf1Name[year]].getComponents())["n_exp_binJJ_"+purity+"_13TeV_"+year+"_proc_"+bkg],(args[pdf1Name[year]].getComponents())["n_exp_binJJ_"+purity+"_13TeV_"+year+"_proc_"+bkg].getPropagatedError(fitresult)]
-                norms[bkg] = expected[bkg][0].getVal() 
+                norms[bn] = expected[bkg][0].getVal() 
                 print "normalization of "+bkg+" after fit:",(expected[bkg][0].getVal()), " +/- ",expected[bkg][1] ,"   ("+year+")"
             all_expected[year] = expected  
             #save post fit ttbar only normalization to be used as prefit value when fitting all bkg
             if options.name.find("ttbar")!=-1:
-                jsonfile = open(options.name.replace(".root",".json"),"w")
+                jsonfile = open(options.jsonname+"_"+options.channel+".json","w")
                 json.dump(norms,jsonfile)
                 jsonfile.close()
 
