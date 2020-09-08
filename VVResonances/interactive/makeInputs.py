@@ -175,9 +175,9 @@ if options.run.find("all")!=-1 or options.run.find("sig")!=-1:
 
     if options.run.find("all")!=-1 or options.run.find("norm")!=-1:
         print "fit signal norm "
-        f.makeSignalYields("JJ_"+str(signal_inuse)+"_"+str(period),signaltemplate_inuse,xsec_inuse,{'VH_HPHP':ctx.HPSF_htag*ctx.HPSF_vtag,'VH_HPLP':ctx.HPSF_htag*ctx.LPSF_vtag,'VH_LPHP':ctx.HPSF_vtag*ctx.LPSF_htag,'VH_LPLP':ctx.LPSF_htag*ctx.LPSF_vtag,'VV_HPHP':ctx.HPSF_vtag*ctx.HPSF_vtag,'VV_HPLP':ctx.HPSF_vtag*ctx.LPSF_vtag,'VH_all':ctx.HPSF_vtag*ctx.HPSF_htag+ctx.HPSF_vtag*ctx.LPSF_htag,'VH_NPHP_control_region':ctx.HPSF_vtag*ctx.LPSF_vtag},"pol2")
-        f.makeNormalizations("sigonly_M2000","JJ_"+str(period)+"_"+str(signal_inuse),signaltemplate_inuse+"narrow_2000",0,ctx.cuts['nonres'],"sig")
-        f.makeNormalizations("sigonly_M4000","JJ_"+str(period)+"_"+str(signal_inuse),signaltemplate_inuse+"narrow_4000",0,ctx.cuts['nonres'],"sig")
+        f.makeSignalYields("JJ_"+str(signal_inuse)+"_"+str(period),signaltemplate_inuse,xsec_inuse,{'VH_HPHP':ctx.HPSF_htag*ctx.HPSF_vtag,'VH_HPLP':ctx.HPSF_htag*ctx.LPSF_vtag,'VH_LPHP':ctx.HPSF_vtag*ctx.LPSF_htag,'VH_LPLP':ctx.LPSF_htag*ctx.LPSF_vtag,'VV_HPHP':ctx.HPSF_vtag*ctx.HPSF_vtag,'VV_HPLP':ctx.HPSF_vtag*ctx.LPSF_vtag,'VH_all':ctx.HPSF_vtag*ctx.HPSF_htag+ctx.HPSF_vtag*ctx.LPSF_htag,'VH_NPHP_control_region':1,'VH_HPNP_control_region':1,},"pol2")
+        #f.makeNormalizations("sigonly_M2000","JJ_"+str(period)+"_"+str(signal_inuse),signaltemplate_inuse+"narrow_2000",0,ctx.cuts['nonres'],"sig")
+        #f.makeNormalizations("sigonly_M4000","JJ_"+str(period)+"_"+str(signal_inuse),signaltemplate_inuse+"narrow_4000",0,ctx.cuts['nonres'],"sig")
 
 if options.run.find("all")!=-1 or options.run.find("detector")!=-1:
     print "make Detector response"
@@ -230,7 +230,7 @@ if options.run.find("all")!=-1 or options.run.find("tt")!=-1:
     f.makeNormalizations("TTJets","JJ_resT"+str(period),TTemplate,0,ctx.cuts['resTT'],"nRes","")
     print "nonres"
     f.makeMinorBkgShapesMVV("TTJets","JJ_nonresT"+str(period),TTemplate,ctx.cuts['nonresTT'],'nonresTT')
-    f.makeNormalizations("TTJets","JJ_nonresTT"+str(period),TTemplate,0,ctx.cuts['nonresTT'],"nRes","")
+    f.makeNormalizations("TTJets","JJ_nonresT"+str(period),TTemplate,0,ctx.cuts['nonresTT'],"nRes","")
     print "resTresW"
     f.makeMinorBkgShapesMVV("TTJets","JJ_resTresW"+str(period),TTemplate,ctx.cuts['resTresW'],'resTresW')
     f.makeNormalizations("TTJets","JJ_resTresW"+str(period),TTemplate,0,ctx.cuts['resTresW'],"nRes","")
@@ -241,7 +241,7 @@ if options.run.find("all")!=-1 or options.run.find("tt")!=-1:
     f.makeNormalizations("TTJets","JJ_resWnonresT"+str(period),TTemplate,0,ctx.cuts['resWnonresT'],"nRes","")
     f.makeMinorBkgShapesMVV("TTJets","JJ_resWnonresT"+str(period),TTemplate,ctx.cuts['resWnonresT'],'resWnonresT')
     print "make norm for all contributions of ttbar together"
-    f.makeNormalizations("TTJets","JJ_"+str(period),TTemplate,0,ctx.cuts['nonres'],"nRes","") # ... so we do not need this
+    f.makeNormalizations("TTJets","JJ_"+str(period),TTemplate,0,ctx.cuts['nonres'],"nRes","")
 
 if options.run.find("all")!=-1 or options.run.find("data")!=-1:
     print " Do data "
@@ -257,7 +257,7 @@ if options.run.find("all")!=-1 or options.run.find("pseudoVJETS")!=-1:
 if options.run.find("all")!=-1 or options.run.find("pseudoTT")!=-1:
     print " Do pseudodata with tt"
     from modules.submitJobs import makePseudoDataTT
-    for p in categories: makePseudoDataTT("results_"+str(period)+"/JJ_all_"+str(period)+"_TTJets_"+p+".root",
+    for p in categories: makePseudoDataTT("results_"+str(period)+"/JJ_"+str(period)+"_TTJets_"+p+".root",
 					  "JJ_PDTT_%s.root"%p,ctx.lumi,
                                           period,p)
 if options.run.find("all")!=-1 or options.run.find("pseudoNOQCD")!=-1:
@@ -271,7 +271,7 @@ if options.run.find("all")!=-1 or options.run.find("pseudoALL")!=-1:
     print " Do pseudodata with vjets & tt: DID YOU PRODUCE THE WORKSPACE BEFORE???"
     from modules.submitJobs import makePseudoDataVjetsTT
     for p in categories: makePseudoDataVjetsTT("results_"+str(period)+"/JJ_"+str(period)+"_nonRes_%s.root"%p,
-                                               "results_"+str(period)+"/JJ_all_"+str(period)+"_TTJets_"+p+".root",
+                                               "results_"+str(period)+"/JJ_"+str(period)+"_TTJets_"+p+".root",
 					       "results_"+str(period)+"/save_new_shapes_"+str(period)+"_pythia_%s_3D.root"%p,
 					       "pythia","JJ_PDALL_%s.root"%p,ctx.lumi,
 					       "results_"+str(period)+"/workspace_JJ_BulkGWW_"+p+"_13TeV_"+str(period)+"_PrepPseudo.root",
