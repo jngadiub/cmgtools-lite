@@ -11,8 +11,10 @@ import cuts
 # python makeCard.py -p "2016" --signal "BulkGWW" -c "VH_NPHP_control_region,VH_HPNP_control_region" --outlabel "_ttbar" --pseudodata "ttbar"
 # produce the preparatory workspace to make the pseudodata with all workspace
 # python makeCard.py -p "2016" --signal "BulkGWW" -c "VH_HPNP_control_region" --outlabel "_PrepPseudo" --pseudodata "PrepPseudo"
-# produce the workspace with all background and pseudodata
+# produce the workspace with all backgrounds and pseudodata
 # python makeCard.py -p "2016" --signal "BulkGWW" -c "VH_HPNP_control_region,VH_NPHP_control_region" --outlabel "_pseudodata" --pseudodata "True"
+# produce the workspace with all backgrounds and data
+# python makeCard.py -p "2016" --signal "BulkGWW" -c "VH_NPHP_control_region,VH_HPNP_control_region" --outlabel "_data" --pseudodata "False"
 
 parser = OptionParser()
 parser.add_option("-p","--period",dest="period",default="2016,2017",help="run period")
