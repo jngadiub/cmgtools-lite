@@ -55,11 +55,8 @@ if useTriggerWeights:
     addOption = "-t"
     
 #all categories
-#categories=['VV_HPLP']
 #categories=['VH_HPHP','VH_LPHP','VH_HPLP'] #,'VV_HPHP','VV_HPLP'] #,'VBF_VV_HPHP','VBF_VV_HPLP']
-#categories=['VV_VH_HCR']
-categories=['VH_NPHP_control_region','VH_HPNP_control_region']
-#categories=['VH_HPNP_control_region'] #,'VH_NPHP_control_region']
+categories=['VH_HPNP_control_region','VH_NPHP_control_region']
 #categories=['NP']
        
 #list of signal samples --> nb, radion and vbf samples to be added
