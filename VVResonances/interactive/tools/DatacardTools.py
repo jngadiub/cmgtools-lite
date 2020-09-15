@@ -366,7 +366,8 @@ class DatacardTools():
     card.addSystematic("CMS_scale_prunedj_top","param",[0.0,0.02])
     card.addSystematic("CMS_res_prunedj_top","param",[0.0,0.08])
     if self.pseudodata.find("ttbar")==-1:
-        card.addSystematic("CMS_VV_JJ_TTJets_norm","lnN",{'TTJetsW':1.05,'TTJetsTop':1.05,'TTJetsNonRes':1.05,'TTJetsWNonResT':1.05,'TTJetsResWResT':1.05,'TTJetsTNonResT':1.05}) 
+        card.addSystematic("CMS_VV_JJ_TTJets_norm","lnN",{'TTJetsW':1.2,'TTJetsTop':1.2,'TTJetsNonRes':1.2,'TTJetsWNonResT':1.2,'TTJetsResWResT':1.2,'TTJetsTNonResT':1.2}) 
+        #card.addSystematic("CMS_VV_JJ_TTJets_norm","lnN",{'TTJetsW':1.05,'TTJetsTop':1.05,'TTJetsNonRes':1.05,'TTJetsWNonResT':1.05,'TTJetsResWResT':1.05,'TTJetsTNonResT':1.05}) 
     else:
         card.addSystematic("CMS_VV_JJ_TTJetsW_norm","lnN",{'TTJetsW':3.2})
         card.addSystematic("CMS_VV_JJ_TTJetsTop_norm","lnN",{'TTJetsTop':3.2})
