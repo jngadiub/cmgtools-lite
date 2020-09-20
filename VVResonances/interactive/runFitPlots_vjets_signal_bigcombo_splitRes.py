@@ -45,6 +45,10 @@ parser.add_option("-v","--doVjets",dest="doVjets",action="store_true",help="Fit 
 ROOT.gStyle.SetOptStat(0)
 ROOT.RooMsgService.instance().setGlobalKillBelow(ROOT.RooFit.FATAL)
 
+period = "2016"
+if options.name.find("2017")!=-1: period = "2017"
+if options.name.find("2018")!=-1: period = "2018"
+if options.name.find("Run2")!=-1: period = "Run2"
 
 
 signalName = "ZprimeZH"
@@ -132,7 +136,7 @@ if __name__=="__main__":
      workspace.var("MH").setConstant(1)
      f.Close()
      #workspace.Print()
-     years = ["2016"]#,"2017"]
+     #years = ["2016"]#,"2017"]
      model = workspace.pdf("model_b")
      model_b = workspace.pdf("model_b")
      if options.fitSignal: model = workspace.pdf("model_s")
@@ -146,26 +150,26 @@ if __name__=="__main__":
      workspace.var("MJJ").setVal(2000)
      bkgs = ["nonRes","Wjets","Zjets","TTJetsTop","TTJetsW","TTJetsNonRes","TTJetsWNonResT","TTJetsResWResT" ,"TTJetsTNonResT"]
      #print number of events before the fit
-     for year in years:
-        data[year] = (workspace.data("data_obs").reduce("CMS_channel==CMS_channel::JJ_"+purity+"_13TeV_"+year))
-        pdf1Name [year] =  "pdf_binJJ_"+purity+"_13TeV_"+year+"_bonly"
-        if options.fitSignal: pdf1Name [year] =  "pdf_binJJ_"+purity+"_13TeV_"+year
-        print "pdf1Name ",pdf1Name
-        print
-        print "Observed number of events in",purity,"category:"
-        print data[year].sumEntries() ,"   ("+year+")"
-        expected = {}
-        for bkg in bkgs:
-            if options.doVjets==False and (bkg=="Wjets" or bkg=="Zjets"): expected[bkg] = [None,None]; continue
-            if options.addTop==False and (bkg.find("TTJets")!=-1): expected[bkg] = [None,None]; continue
-            expected[bkg] = [ (args[pdf1Name[year]].getComponents())["n_exp_binJJ_"+purity+"_13TeV_"+year+"_proc_"+bkg],0.]
-            print "Expected number of "+bkg+" events:",(expected[bkg][0].getVal()),"   ("+year+")"
-        all_expected[year] = expected 
-        if options.fitSignal:
-            print "Expected signal yields:",(args[pdf1Name[year]].getComponents())["n_exp_final_binJJ_"+purity+"_13TeV_2016_proc_"+signalName].getVal(),"(",year,")"
-            signal_expected[year] = [ (args[pdf1Name[year]].getComponents())["n_exp_final_binJJ_"+purity+"_13TeV_2016_proc_"+signalName], 0.]
-        else: signal_expected[year] = [0.,0.]
-        print 
+     #for year in years:
+     data[period] = (workspace.data("data_obs").reduce("CMS_channel==CMS_channel::JJ_"+purity+"_13TeV_"+period))
+     pdf1Name [period] =  "pdf_binJJ_"+purity+"_13TeV_"+period+"_bonly"
+     if options.fitSignal: pdf1Name [period] =  "pdf_binJJ_"+purity+"_13TeV_"+period
+     print "pdf1Name ",pdf1Name
+     print
+     print "Observed number of events in",purity,"category:"
+     print data[period].sumEntries() ,"   ("+period+")"
+     expected = {}
+     for bkg in bkgs:
+         if options.doVjets==False and (bkg=="Wjets" or bkg=="Zjets"): expected[bkg] = [None,None]; continue
+         if options.addTop==False and (bkg.find("TTJets")!=-1): expected[bkg] = [None,None]; continue
+         expected[bkg] = [ (args[pdf1Name[period]].getComponents())["n_exp_binJJ_"+purity+"_13TeV_"+period+"_proc_"+bkg],0.]
+         print "Expected number of "+bkg+" events:",(expected[bkg][0].getVal()),"   ("+period+")"
+     all_expected[period] = expected 
+     if options.fitSignal:
+        print "Expected signal yields:",(args[pdf1Name[period]].getComponents())["n_exp_final_binJJ_"+purity+"_13TeV_2016_proc_"+signalName].getVal(),"(",period,")"
+        signal_expected[period] = [ (args[pdf1Name[period]].getComponents())["n_exp_final_binJJ_"+purity+"_13TeV_2016_proc_"+signalName], 0.]
+     else: signal_expected[period] = [0.,0.]
+     print 
      
    
         
@@ -188,57 +192,55 @@ if __name__=="__main__":
      ########### lets add all the pdfs we need ################
      allpdfs = {}
      allsignalpdfs={}
-     for year in years:
-        allpdfs[year] = []
-        allsignalpdfs[year] = None
-        for bkg in bkgs:
-                if options.doVjets==False and (bkg=="Wjets" or bkg=="Zjets"): continue
-                if options.addTop==False and (bkg.find("TTJets")!=-1): continue
-                allpdfs[year].append(args["shapeBkg_"+bkg+"_JJ_"+purity+"_13TeV_"+year])
-                print year, " shape ", bkg, " :"
-                allpdfs[year][-1].Print()
-                #allpdfs[year][-1].funcList().Print()
-                #allpdfs[year][-1].coefList().Print()
-        if options.fitSignal:
-            allsignalpdfs[year] = args["shapeSig_"+signalName+"_JJ_"+purity+"_13TeV_"+year]
-        else: allsignalpdfs[year] =None
+     allpdfs[period] = []
+     allsignalpdfs[period] = None
+     for bkg in bkgs:
+         if options.doVjets==False and (bkg=="Wjets" or bkg=="Zjets"): continue
+         if options.addTop==False and (bkg.find("TTJets")!=-1): continue
+         allpdfs[period].append(args["shapeBkg_"+bkg+"_JJ_"+purity+"_13TeV_"+period])
+         print period, " shape ", bkg, " :"
+         allpdfs[period][-1].Print()
+         #allpdfs[period][-1].funcList().Print()
+         #allpdfs[period][-1].coefList().Print()
+     if options.fitSignal:
+            allsignalpdfs[period] = args["shapeSig_"+signalName+"_JJ_"+purity+"_13TeV_"+period]
+     else: allsignalpdfs[period] =None
         
         
-        print 
-        print year+" Prefit nonRes pdf:"
-        pdf1_nonres_shape_prefit = args["nonResNominal_JJ_"+purity+"_13TeV_"+year]
-        pdf1_nonres_shape_prefit.Print()
-        print "Full "+year+" post-fit pdf:"     
-        allpdfs[year].append( args[pdf1Name[year]+"_nuis"])
-        allpdfs[year][-1].Print()
-		    
+     print 
+     print period+" Prefit nonRes pdf:"
+     pdf1_nonres_shape_prefit = args["nonResNominal_JJ_"+purity+"_13TeV_"+period]
+     pdf1_nonres_shape_prefit.Print()
+     print "Full "+period+" post-fit pdf:"     
+     allpdfs[period].append( args[pdf1Name[period]+"_nuis"])
+     allpdfs[period][-1].Print()
+     
      allpdfsz = PostFitTools.definefinalPDFs(options,"z",allpdfs)
      allpdfsx = PostFitTools.definefinalPDFs(options,"x",allpdfs)
      allpdfsy = PostFitTools.definefinalPDFs(options,"y",allpdfs)
      
      if options.fit:
         bkgLabel = ["nonRes","Wjets","Zjets","resT","resW","nonresT","resWnonresT","resTresW","resTnonresT"]
-        for year in years:
-            expected = {}
-            norms = {}
-            for bkg,bn in zip(bkgs,bkgLabel):
+        expected = {}
+        norms = {}
+        for bkg,bn in zip(bkgs,bkgLabel):
                 if options.doVjets==False and (bkg=="Wjets" or bkg=="Zjets"): expected[bkg] = [0.,0.]; continue
                 if options.addTop==False and (bkg.find("TTJets")!=-1): expected[bkg] = [0.,0.]; continue
-                #(args[pdf1Name[year]].getComponents())["n_exp_binJJ_"+purity+"_13TeV_"+year+"_proc_"+bkg].dump()
-                expected[bkg] = [ (args[pdf1Name[year]].getComponents())["n_exp_binJJ_"+purity+"_13TeV_"+year+"_proc_"+bkg],(args[pdf1Name[year]].getComponents())["n_exp_binJJ_"+purity+"_13TeV_"+year+"_proc_"+bkg].getPropagatedError(fitresult)]
+                #(args[pdf1Name[period]].getComponents())["n_exp_binJJ_"+purity+"_13TeV_"+period+"_proc_"+bkg].dump()
+                expected[bkg] = [ (args[pdf1Name[period]].getComponents())["n_exp_binJJ_"+purity+"_13TeV_"+period+"_proc_"+bkg],(args[pdf1Name[period]].getComponents())["n_exp_binJJ_"+purity+"_13TeV_"+period+"_proc_"+bkg].getPropagatedError(fitresult)]
                 norms[bn] = expected[bkg][0].getVal() 
-                print "normalization of "+bkg+" after fit:",(expected[bkg][0].getVal()), " +/- ",expected[bkg][1] ,"   ("+year+")"
-            all_expected[year] = expected  
-            #save post fit ttbar only normalization to be used as prefit value when fitting all bkg
-            if options.name.find("ttbar")!=-1:
+                print "normalization of "+bkg+" after fit:",(expected[bkg][0].getVal()), " +/- ",expected[bkg][1] ,"   ("+period+")"
+        all_expected[period] = expected  
+        #save post fit ttbar only normalization to be used as prefit value when fitting all bkg
+        if options.name.find("ttbar")!=-1:
                 jsonfile = open(options.jsonname+"_"+options.channel+".json","w")
                 json.dump(norms,jsonfile)
                 jsonfile.close()
 
-            if options.fitSignal:
-                signal_expected[year] = [ (args[pdf1Name[year]].getComponents())["n_exp_final_binJJ_"+purity+"_13TeV_2016_proc_"+signalName], (args[pdf1Name[year]].getComponents())["n_exp_final_binJJ_"+purity+"_13TeV_2016_proc_"+signalName].getPropagatedError(fitresult)]
-                print "Fitted signal yields:",signal_expected[year][0].getVal()," +/- ", signal_expected[year][bkg][1] ,"(",year,")"
-            print 
+        if options.fitSignal:
+                signal_expected[period] = [ (args[pdf1Name[period]].getComponents())["n_exp_final_binJJ_"+purity+"_13TeV_2016_proc_"+signalName], (args[pdf1Name[period]].getComponents())["n_exp_final_binJJ_"+purity+"_13TeV_2016_proc_"+signalName].getPropagatedError(fitresult)]
+                print "Fitted signal yields:",signal_expected[period][0].getVal()," +/- ", signal_expected[period][bkg][1] ,"(",period,")"
+        print 
           	 	 	
          
      logfile = open(options.output+options.log,"a::ios::ate")
@@ -247,47 +249,42 @@ if __name__=="__main__":
      #make projections onto MJJ axis 
      if options.projection =="z":
          results = []
-         for year in years:
-            tmp = forproj.doProjection(data[year],allpdfsz[year],all_expected[year],"z",allsignalpdfs[year],signal_expected[year])
-            results.append(tmp) 
+         tmp = forproj.doProjection(data[period],allpdfsz[period],all_expected[period],"z",allsignalpdfs[period],signal_expected[period])
+         results.append(tmp) 
          res = addResults(results)
          forplotting.MakePlots(res[0],res[1],res[2],res[3],res[4],res[5], res[6],res[7])
      #make projections onto MJ1 axis
      if options.projection =="x":
          results = []
-         for year in years:
-            tmp = forproj.doProjection(data[year],allpdfsx[year],all_expected[year],"x",allsignalpdfs[year],signal_expected[year])
-            results.append(tmp)
+         tmp = forproj.doProjection(data[period],allpdfsx[period],all_expected[period],"x",allsignalpdfs[period],signal_expected[period])
+         results.append(tmp)
          res = addResults(results)
          forplotting.MakePlots(res[0],res[1],res[2],res[3],res[4],res[5], res[6],res[7])
      #make projections onto MJ2 axis
      if options.projection =="y":
          results = []
-         for year in years:
-            tmp = forproj.doProjection(data[year],allpdfsy[year],all_expected[year],"y",allsignalpdfs[year],signal_expected[year])
-            results.append(tmp)
+         tmp = forproj.doProjection(data[period],allpdfsy[period],all_expected[period],"y",allsignalpdfs[period],signal_expected[period])
+         results.append(tmp)
          res = addResults(results)
          forplotting.MakePlots(res[0],res[1],res[2],res[3],res[4],res[5], res[6],res[7])
 
      if options.projection =="xyz":
          results = []
-         for year in years:
-            print data[year],allpdfsz[year],all_expected[year],"z",allsignalpdfs[year],signal_expected[year]
-            tmp = forproj.doProjection(data[year],allpdfsz[year],all_expected[year],"z",allsignalpdfs[year],signal_expected[year])
-            results.append(tmp) 
+         print data[period],allpdfsz[period],all_expected[period],"z",allsignalpdfs[period],signal_expected[period]
+         tmp = forproj.doProjection(data[period],allpdfsz[period],all_expected[period],"z",allsignalpdfs[period],signal_expected[period])
+         results.append(tmp) 
          res = addResults(results)
          forplotting.MakePlots(res[0],res[1],res[2],res[3],res[4],res[5], res[6],res[7])
     
          results = []
-         for year in years:
-            tmp = forproj.doProjection(data[year],allpdfsx[year],all_expected[year],"x",allsignalpdfs[year],signal_expected[year])
-            results.append(tmp)
+         tmp = forproj.doProjection(data[period],allpdfsx[period],all_expected[period],"x",allsignalpdfs[period],signal_expected[period])
+         results.append(tmp)
          res = addResults(results)
          forplotting.MakePlots(res[0],res[1],res[2],res[3],res[4],res[5], res[6],res[7])
          results = []
-         for year in years:
-            tmp = forproj.doProjection(data[year],allpdfsy[year],all_expected[year],"y",allsignalpdfs[year],signal_expected[year])
-            results.append(tmp)
+         
+         tmp = forproj.doProjection(data[period],allpdfsy[period],all_expected[period],"y",allsignalpdfs[period],signal_expected[period])
+         results.append(tmp)
          res = addResults(results)
          forplotting.MakePlots(res[0],res[1],res[2],res[3],res[4],res[5], res[6],res[7])
 
