@@ -48,7 +48,7 @@ sf_qcd=1.
 if outlabel.find("sigonly")!=-1 or outlabel.find("qcdonly")!=-1: doVjets = False
 if outlabel.find("sigonly")!=-1 or outlabel.find("Vjetsonly")!=-1: sf_qcd = 0.00001
 
-resultsDir = {'2016':'results_2016','2017':'results_2017'}#'2016':'ttbarmodeling''2016':'newmodel4GeV'
+resultsDir = {'2016':'results_2016','2017':'results_2017','2018':'results_2018'}#'2016':'ttbarmodeling''2016':'newmodel4GeV'
 
 # vtag uncertainty is added through the migrationunc.json file 
 # all other uncertainties and SF from one place: defined in init_VV_VH.json imported via the class defined in cuts.py
