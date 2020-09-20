@@ -168,7 +168,7 @@ class DatacardTools():
     for i in range(0,len(contrib)):
 
        #load mJJ - assume same for the three contributions (preliminary)
-       jsonfile = resultsDir+"/JJ_"+contrib[i]+"2016_TTJets_MVV_NP_"+contrib[i]
+       jsonfile = resultsDir+"/JJ_"+contrib[i]+dataset+"_TTJets_MVV_NP_"+contrib[i]
        if contrib[i]=="resT" or contrib[i]=="nonresT": jsonfile=jsonfile+"T"
        jsonfile= jsonfile +  ".json"
        print "load parametrisation for MVV ttbar contributions ",jsonfile,contrib[i]
@@ -182,8 +182,10 @@ class DatacardTools():
     card.addMJJTTJetsParametricShapeResW("TTJetsW_mjetRes_l1","MJ1",resultsDir+"/JJ_%s_TTJets_%s.json"%(dataset,category),{'CMS_scale_prunedj':1.},{'CMS_res_prunedj':1.},self.scales[dataset])#,{'CMS_f_g1':1.},{'CMS_f_res':1.})
     card.addMJJTTJetsParametricShapeResW("TTJetsW_mjetRes_l2","MJ2",resultsDir+"/JJ_%s_TTJets_%s.json"%(dataset,category),{'CMS_scale_prunedj':1.},{'CMS_res_prunedj':1.},self.scales[dataset])#,{'CMS_f_g1':1.},{'CMS_f_res':1.})
     
-    card.addMJJTTJetsParametricShapeResT("TTJetsTop_mjetRes_l1","MJ1",resultsDir+"/JJ_%s_TTJets_%s.json"%(dataset,category),{'CMS_scale_prunedj_top':1.},{'CMS_res_prunedj_top':1.})#,{'CMS_f_g1':1.},{'CMS_f_res':1.})
-    card.addMJJTTJetsParametricShapeResT("TTJetsTop_mjetRes_l2","MJ2",resultsDir+"/JJ_%s_TTJets_%s.json"%(dataset,category),{'CMS_scale_prunedj_top':1.},{'CMS_res_prunedj_top':1.})#,{'CMS_f_g1':1.},{'CMS_f_res':1.})
+#    card.addMJJTTJetsParametricShapeResT("TTJetsTop_mjetRes_l1","MJ1",resultsDir+"/JJ_%s_TTJets_%s.json"%(dataset,category),{'CMS_scale_prunedj_top':1.},{'CMS_res_prunedj_top':1.})#,{'CMS_f_g1':1.},{'CMS_f_res':1.})
+#    card.addMJJTTJetsParametricShapeResT("TTJetsTop_mjetRes_l2","MJ2",resultsDir+"/JJ_%s_TTJets_%s.json"%(dataset,category),{'CMS_scale_prunedj_top':1.},{'CMS_res_prunedj_top':1.})#,{'CMS_f_g1':1.},{'CMS_f_res':1.})
+    card.addMJJTTJetsParametricShapeResT("TTJetsTop_mjetRes_l1","MJ1",resultsDir+"/JJ_%s_TTJets_%s.json"%(dataset,category),{'CMS_scale_prunedj':1.},{'CMS_res_prunedj':1.})#,{'CMS_f_g1':1.},{'CMS_f_res':1.})
+    card.addMJJTTJetsParametricShapeResT("TTJetsTop_mjetRes_l2","MJ2",resultsDir+"/JJ_%s_TTJets_%s.json"%(dataset,category),{'CMS_scale_prunedj':1.},{'CMS_res_prunedj':1.})#,{'CMS_f_g1':1.},{'CMS_f_res':1.})
     
     card.addMJJTTJetsParametricShapeNonRes("TTJetsNonRes_mjetRes_l1","MJ1",resultsDir+"/JJ_%s_TTJets_%s.json"%(dataset,category),{'CMS_scale_prunedj':1.},{'CMS_res_prunedj':1.})#,{'CMS_f_g1':1.},{'CMS_f_res':1.})
     card.addMJJTTJetsParametricShapeNonRes("TTJetsNonRes_mjetRes_l2","MJ2",resultsDir+"/JJ_%s_TTJets_%s.json"%(dataset,category),{'CMS_scale_prunedj':1.},{'CMS_res_prunedj':1.})#,{'CMS_f_g1':1.},{'CMS_f_res':1.})
@@ -343,8 +345,10 @@ class DatacardTools():
  def AddTTSystematics3(self,card,sig,dataset,category):
     card.addSystematic("CMS_f_g1","param",[0.0,0.02])
     card.addSystematic("CMS_f_res","param",[0.0,0.08])
-    card.addSystematic("CMS_scale_prunedj_top","param",[0.0,0.02])
-    card.addSystematic("CMS_res_prunedj_top","param",[0.0,0.08])
+    #   card.addSystematic("CMS_scale_prunedj_top","param",[0.0,0.02])
+    #    card.addSystematic("CMS_res_prunedj_top","param",[0.0,0.08])
+    card.addSystematic("CMS_scale_prunedj","param",[0.0,0.02])
+    card.addSystematic("CMS_res_prunedj","param",[0.0,0.08])
     card.addSystematic("CMS_VV_JJ_TTJets_norm","lnN",{'TTJetsW':1.2,'TTJetsTop':1.2,'TTJetsNonRes':1.2,'TTJetsWNonResT':1.2,'TTJetsResWResT':1.2,'TTJetsTNonResT':1.2})  
     #card.addSystematic("CMS_VV_JJ_TTJets_norm","lnN",{'TTJets':1.2})  
     card.addSystematic("CMS_VV_JJ_TTJetsTop_PTZ_"+category,"param",[0,0.333]) #0.333
@@ -363,11 +367,13 @@ class DatacardTools():
     card.addSystematic("CMS_f_res","param",[0.0,0.08])
     #card.addSystematic("CMS_VV_JJ_TTJets_norm","lnN",{'TTJets':1.2})  
     card.addSystematic(extra_uncertainty[0],"param",[0.0,extra_uncertainty[1]])
-    card.addSystematic("CMS_scale_prunedj_top","param",[0.0,0.02])
-    card.addSystematic("CMS_res_prunedj_top","param",[0.0,0.08])
+    card.addSystematic("CMS_scale_prunedj","param",[0.0,0.02])
+    card.addSystematic("CMS_res_prunedj","param",[0.0,0.08])
+    #card.addSystematic("CMS_scale_prunedj_top","param",[0.0,0.02])
+    #card.addSystematic("CMS_res_prunedj_top","param",[0.0,0.08])
     if self.pseudodata.find("ttbar")==-1:
-        card.addSystematic("CMS_VV_JJ_TTJets_norm","lnN",{'TTJetsW':1.2,'TTJetsTop':1.2,'TTJetsNonRes':1.2,'TTJetsWNonResT':1.2,'TTJetsResWResT':1.2,'TTJetsTNonResT':1.2}) 
-        #card.addSystematic("CMS_VV_JJ_TTJets_norm","lnN",{'TTJetsW':1.05,'TTJetsTop':1.05,'TTJetsNonRes':1.05,'TTJetsWNonResT':1.05,'TTJetsResWResT':1.05,'TTJetsTNonResT':1.05}) 
+        #card.addSystematic("CMS_VV_JJ_TTJets_norm","lnN",{'TTJetsW':1.2,'TTJetsTop':1.2,'TTJetsNonRes':1.2,'TTJetsWNonResT':1.2,'TTJetsResWResT':1.2,'TTJetsTNonResT':1.2}) 
+        card.addSystematic("CMS_VV_JJ_TTJets_norm","lnN",{'TTJetsW':1.05,'TTJetsTop':1.05,'TTJetsNonRes':1.05,'TTJetsWNonResT':1.05,'TTJetsResWResT':1.05,'TTJetsTNonResT':1.05}) 
     else:
         card.addSystematic("CMS_VV_JJ_TTJetsW_norm","lnN",{'TTJetsW':3.2})
         card.addSystematic("CMS_VV_JJ_TTJetsTop_norm","lnN",{'TTJetsTop':3.2})
