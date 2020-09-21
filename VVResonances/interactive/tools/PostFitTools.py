@@ -65,6 +65,11 @@ class Postfitplotter():
             optparser.add_option("--log",dest="log",help="write output in logfile given as argument here!",default="chi2.log")
             self.options = optparser.parse_args()[0]
             
+        try:
+            self.options.blind
+        except AttributeError:
+            optparser.add_option("--blind",dest="blind",help="Use to blind data in control region",action="store_true",default=False)
+            self.options = optparser.parse_args()[0]
 
 
         try: 
@@ -401,6 +406,18 @@ class Postfitplotter():
         if self.options.xrange == '0,-1': xrange = '55,215'
         if self.options.yrange == '0,-1': yrange = '55,215'
         if self.options.zrange == '0,-1': zrange = '1126,5500'
+        xlow = xrange.split(',')[0]
+        xhigh = xrange.split(',')[1]
+        ylow = yrange.split(',')[0]
+        yhigh = yrange.split(',')[1]
+        if self.options.blind == True:
+            if len(xrange.split(',')) == 4:
+                xlow2 = xrange.split(',')[2]
+                xhigh2 = xrange.split(',')[3]
+            if len(yrange.split(',')) == 4:
+                ylow2 = yrange.split(',')[2]
+                yhigh2 = yrange.split(',')[3]
+
         if axis=='z':
             print "make Z projection"
             htitle = "Z-Proj. x : "+self.options.xrange+" y : "+self.options.yrange
@@ -409,7 +426,11 @@ class Postfitplotter():
             ymin = 0.2
             ymax = max(hdata.GetMaximum()*5000,maxY*5000)
             extra1 = xrange.split(',')[0]+' < m_{jet1} < '+ xrange.split(',')[1]+' GeV'
+            if self.options.blind == True and len(xrange.split(',')) == 4:
+                extra1 = 'Blind '+xhigh+' < m_{jet1} < '+xlow2+' GeV'        #xlow+' < m_{jet1} < '+xhigh+' & '+xlow2+' < m_{jet1} < '+xhigh2+' GeV'
             extra2 = yrange.split(',')[0]+' < m_{jet2} < '+ yrange.split(',')[1]+' GeV'
+            if self.options.blind == True and len(yrange.split(',')) == 4:
+                extra2 = 'Blind '+yhigh+' < m_{jet2} < '+ylow2+' GeV'  #extra2 = ylow+' < m_{jet2} < '+yhigh+' & '+ylow2+' < m_{jet2} < '+yhigh2+' GeV'
         elif axis=='x':
             print "make X projection"
             htitle = "X-Proj. y : "+self.options.yrange+" z : "+self.options.zrange
@@ -418,6 +439,8 @@ class Postfitplotter():
             ymin = 0.02
             ymax = hdata.GetMaximum()*1.8#max(hdata.GetMaximum()*1.3,maxY*1.3)
             extra1 = yrange.split(',')[0]+' < m_{jet2} < '+ yrange.split(',')[1]+' GeV'
+            if self.options.blind == True and len(yrange.split(',')) == 4:
+                extra1 = 'Blind '+yhigh+' < m_{jet2} < '+ylow2+' GeV'  #extra1 = ylow+' < m_{jet2} < '+yhigh+' & '+ylow2+' < m_{jet2} < '+yhigh2+' GeV'
             extra2 = zrange.split(',')[0]+' < m_{jj} < '+ zrange.split(',')[1]+' GeV'
         elif axis=='y':
             print "make Y projection"
@@ -427,6 +450,8 @@ class Postfitplotter():
             ymin = 0.02
             ymax = hdata.GetMaximum()*1.8#max(hdata.GetMaximum()*1.3,maxY*1.3)
             extra1 = xrange.split(',')[0]+' < m_{jet1} < '+ xrange.split(',')[1]+' GeV'
+            if self.options.blind == True and len(xrange.split(',')) == 4:
+                extra1 = 'Blind '+xhigh+' < m_{jet1} < '+xlow2+' GeV'  #extra1 = xlow+' < m_{jet1} < '+xhigh+' & '+xlow2+' < m_{jet1} < '+xhigh2+' GeV'
             extra2 = zrange.split(',')[0]+' < m_{jj} < '+ zrange.split(',')[1]+' GeV'
                     
         #leg = ROOT.TLegend(0.450436242,0.5531968,0.7231544,0.8553946)
@@ -482,7 +507,7 @@ class Postfitplotter():
         hdata.SetMarkerColor(ROOT.kBlack)
         hdata.SetLineColor(ROOT.kBlack)
         hdata.SetMarkerSize(0.7)
-        
+
         if errors!=None:
             errors[0].SetFillColor(self.colors[0])
             errors[0].SetFillStyle(3001)
@@ -612,7 +637,7 @@ class Postfitplotter():
         pt2.Draw()
 
         #pt3 = ROOT.TPaveText(0.65,0.39,0.99,0.52,"NDC")
-        pt3 = ROOT.TPaveText(0.25,0.55,0.39,0.68,"NDC")
+        pt3 = ROOT.TPaveText(0.18,0.55,0.39,0.68,"NDC")
         pt3.SetTextFont(42)
         pt3.SetTextSize(0.04)
         pt3.SetTextAlign(12)
@@ -738,7 +763,7 @@ class Projection():
     maxYaxis = 0
     
     
-    def __init__(self,hinMC,opt_range,workspace,doFit):
+    def __init__(self,hinMC,opt_range,workspace,doFit,isBlinded=False):
         self.workspace = workspace
         #################################################
         xBins= self.getListOfBins(hinMC,"x")
@@ -755,9 +780,9 @@ class Projection():
         ################################################# 
         
         #################################################
-        x = self.getListFromRange(opt_range[0])
-        y = self.getListFromRange(opt_range[1])
-        z = self.getListFromRange(opt_range[2])     
+        x = self.getListFromRange(opt_range[0],isBlinded)
+        y = self.getListFromRange(opt_range[1],isBlinded)
+        z = self.getListFromRange(opt_range[2],isBlinded)
         
         self.xBins_redux = self.reduceBinsToRange(xBins,x)
         self.yBins_redux = self.reduceBinsToRange(yBins,y)
@@ -765,11 +790,18 @@ class Projection():
 
         ################################################# 
     
-    def getListFromRange(self,xyzrange):
+    def getListFromRange(self,xyzrange,isBlinded):
         r=[]
-        a,b = xyzrange.split(",")
-        r.append(float(a))
-        r.append(float(b))
+        if isBlinded == True and len(xyzrange.split(","))==4:
+            a,b,c,d = xyzrange.split(",")
+            r.append(float(a))
+            r.append(float(b))
+            r.append(float(c))
+            r.append(float(d))
+        else:
+            a,b = xyzrange.split(",")
+            r.append(float(a))
+            r.append(float(b))
         return r
 
 
@@ -815,7 +847,7 @@ class Projection():
         mmax = axis.GetXmax()
         r=[]
         for i in range(1,N+2): r.append(axis.GetBinLowEdge(i)) 
-        
+
         return array("d",r)
 
 
@@ -850,6 +882,10 @@ class Projection():
         for key, value in Bins.iteritems():
             if value >= r[0] and value <=r[1]:
                 result[key]=value
+            if len(r)==4:
+                if value >= r[2] and value <=r[3]:
+                    result[key]=value
+
         return result
 
 
