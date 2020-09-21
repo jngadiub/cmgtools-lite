@@ -29,6 +29,7 @@ parser.add_option("-p","--projection",dest="projection",help="choose which proje
 parser.add_option("-d","--data",dest="data",action="store_true",help="make also postfit plots",default=True)
 parser.add_option("-l","--label",dest="label",help="add extra label such as pythia or herwig",default="")
 parser.add_option("--log",dest="log",help="write fit result to log file",default="fit_results.log")
+parser.add_option("--blind",dest="blind",action="store_true",help="Use to blind data in control region",default=False) 
 parser.add_option("--pdfz",dest="pdfz",help="name of pdfs lie PTZUp etc",default="")
 parser.add_option("--pdfx",dest="pdfx",help="name of pdfs lie PTXUp etc",default="")
 parser.add_option("--pdfy",dest="pdfy",help="name of pdfs lie PTYUp etc",default="")
@@ -245,7 +246,7 @@ if __name__=="__main__":
          
      logfile = open(options.output+options.log,"a::ios::ate")
      forplotting = PostFitTools.Postfitplotter(parser,logfile,signalName)
-     forproj = PostFitTools.Projection(hinMC,[options.xrange,options.yrange,options.zrange], workspace,options.fit)
+     forproj = PostFitTools.Projection(hinMC,[options.xrange,options.yrange,options.zrange], workspace,options.fit,options.blind)
      #make projections onto MJJ axis 
      if options.projection =="z":
          results = []
