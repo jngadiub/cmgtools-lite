@@ -26,6 +26,7 @@ parser.add_option("--batch",action="store_false",dest="batch",help="submit to ba
 parser.add_option("--trigg",action="store_true",dest="trigg",help="add trigger weights or not ",default=False)
 parser.add_option("--run",dest="run",help="decide which parts of the code should be run right now possible optoins are: all : run everything, sigmvv: run signal mvv fit sigmj: run signal mj fit, signorm: run signal norm, vjets: run vjets, tt: run ttbar , qcdtemplates: run qcd templates, qcdkernel: run qcd kernel, qcdnorm: run qcd merge and norm, detector: run detector fit , data : run the data or pseudodata scripts ",default="all")
 parser.add_option("--signal",dest="signal",default="BGWW",help="which signal do you want to run? options are BulkGWW, BulkGZZ, WprimeWZ, ZprimeWW, ZprimeZH")
+parser.add_option("--fitvjetsmjj",dest="fitvjetsmjj",default=False,action="store_true",help="True makes fits for mjj of vjets, False uses hists")
 
 
 (options,args) = parser.parse_args()
@@ -55,8 +56,10 @@ if useTriggerWeights:
     addOption = "-t"
     
 #all categories
-#categories=['VH_HPHP','VH_LPHP','VH_HPLP'] #,'VV_HPHP','VV_HPLP'] #,'VBF_VV_HPHP','VBF_VV_HPLP']
-categories=['VH_HPNP_control_region','VH_NPHP_control_region']
+#categories=['VH_HPHP','VH_LPHP','VV_HPHP'] #,'VBF_VV_HPHP','VBF_VV_HPLP']
+categories=['VH_HPHP','VH_LPHP','VH_HPLP','VV_HPHP','VV_HPLP'] #,'VBF_VV_HPHP','VBF_VV_HPLP']
+#categories=['VH_HPNP_control_region'] #,'VH_NPHP_control_region']
+#categories=['VV_HPLP'] 
 #categories=['NP']
        
 #list of signal samples --> nb, radion and vbf samples to be added
@@ -207,9 +210,15 @@ if options.run.find("all")!=-1 or options.run.find("vjets")!=-1:
     print "for V+jets"
     print "first we fit"
     f.fitVJets("JJ_WJets",resTemplate,1.,1.)
-    print "and then we fit mvv"
-    f.makeMinorBkgShapesMVV("ZJets","JJ_"+str(period),ZresTemplate,ctx.cuts['nonres'],"Zjets",1.,1.)
-    f.makeMinorBkgShapesMVV("WJets","JJ_"+str(period),WresTemplate,ctx.cuts['nonres'],"Wjets",1.,1.)
+    if options.fitvjetsmjj == True:
+        print "and then we fit mvv"
+        f.makeMinorBkgShapesMVV("ZJets","JJ_"+str(period),ZresTemplate,ctx.cuts['nonres'],"Zjets",1.,1.)
+        f.makeMinorBkgShapesMVV("WJets","JJ_"+str(period),WresTemplate,ctx.cuts['nonres'],"Wjets",1.,1.)
+    else :
+        print "first kernel W"
+        f.makeBackgroundShapesMVVKernel("WJets","JJ_"+str(period),WresTemplate,ctx.cuts['nonres'],"1D",0,1.,1.)
+        print "then kernel Z"
+        f.makeBackgroundShapesMVVKernel("ZJets","JJ_"+str(period),ZresTemplate,ctx.cuts['nonres'],"1D",0,1.,1.)
     print "make norm W"
     f.makeNormalizations("WJets","JJ_"+str(period),WresTemplate,0,ctx.cuts['nonres'],"nRes","",ctx.HPSF_vtag,ctx.LPSF_vtag)
     print "then norm Z"
@@ -221,10 +230,10 @@ if options.run.find("all")!=-1 or options.run.find("tt")!=-1:
     f.fitTT   ("JJ_%s_TTJets"%(period),TTemplate,1.,)
     print "resT"
     f.makeMinorBkgShapesMVV("TTJets","JJ_resT"+str(period),TTemplate,ctx.cuts['resTT'],'resTT')
+    f.makeNormalizations("TTJets","JJ_resT"+str(period),TTemplate,0,ctx.cuts['resTT'],"nRes","")
     print "resW"
     f.makeMinorBkgShapesMVV("TTJets","JJ_resW"+str(period),TTemplate,ctx.cuts['resTT_W'],'resW')
     f.makeNormalizations("TTJets","JJ_resW"+str(period),TTemplate,0,ctx.cuts['resTT_W'],"nRes","")
-    f.makeNormalizations("TTJets","JJ_resT"+str(period),TTemplate,0,ctx.cuts['resTT'],"nRes","")
     print "nonres"
     f.makeMinorBkgShapesMVV("TTJets","JJ_nonresT"+str(period),TTemplate,ctx.cuts['nonresTT'],'nonresTT')
     f.makeNormalizations("TTJets","JJ_nonresT"+str(period),TTemplate,0,ctx.cuts['nonresTT'],"nRes","")
@@ -235,8 +244,8 @@ if options.run.find("all")!=-1 or options.run.find("tt")!=-1:
     f.makeMinorBkgShapesMVV("TTJets","JJ_resTnonresT"+str(period),TTemplate,ctx.cuts['resTnonresT'],'resTnonresT')
     f.makeNormalizations("TTJets","JJ_resTnonresT"+str(period),TTemplate,0,ctx.cuts['resTnonresT'],"nRes","")
     print "resWnonresT"
-    f.makeNormalizations("TTJets","JJ_resWnonresT"+str(period),TTemplate,0,ctx.cuts['resWnonresT'],"nRes","")
     f.makeMinorBkgShapesMVV("TTJets","JJ_resWnonresT"+str(period),TTemplate,ctx.cuts['resWnonresT'],'resWnonresT')
+    f.makeNormalizations("TTJets","JJ_resWnonresT"+str(period),TTemplate,0,ctx.cuts['resWnonresT'],"nRes","")
     print "make norm for all contributions of ttbar together"
     f.makeNormalizations("TTJets","JJ_"+str(period),TTemplate,0,ctx.cuts['nonres'],"nRes","")
 

@@ -4,7 +4,7 @@ import json
 import ROOT
 class DatacardTools():
 
- def __init__(self,scales,scalesHiggs,vtag_pt_dependence,lumi_unc,sfQCD,pseudodata,outlabel,doCorrelation=True):
+ def __init__(self,scales,scalesHiggs,vtag_pt_dependence,lumi_unc,sfQCD,pseudodata,outlabel,doCorrelation=True,fitvjetsmjj=False):
   
   self.scales=scales
   self.vtag_pt_dependence=vtag_pt_dependence
@@ -14,7 +14,7 @@ class DatacardTools():
   self.outlabel = outlabel
   self.scalesHiggs=scalesHiggs
   self.doCorrelation= doCorrelation
- 
+  self.fitvjetsmjj = fitvjetsmjj
  
 
  def AddSignal(self,card,dataset,category,sig,resultsDir,ncontrib):
@@ -244,26 +244,33 @@ class DatacardTools():
         for i in range(0,len(contrib)):
             card.addYield(mappdf[contrib[i]],ncontrib+i,norms[contrib[i]])
 	          
- def AddWResBackground(self,card,dataset,category,rootFileMVV,rootFileNorm,resultsDir,ncontrib,uncertainty):
+ def AddWResBackground(self,card,dataset,category,rootFileMVV,rootFileNorm,resultsDir,ncontrib,uncertainty=[]):
        print "add Wres background"  
        sys.path.append(resultsDir)
        module_name = 'JJ_WJets_%s'%category
        module = __import__(module_name)  
        print module_name
        # W+jets 
-       #card.addHistoShapeFromFile("Wjets_mjj_c1",["MJJ"],rootFileMVV,"histo_nominal",['PT:CMS_VV_JJ_Wjets_PTZ_'+category,'OPT:CMS_VV_JJ_Wjets_OPTZ_'+category],False,0)
-       #card.addMVVMinorBkgParametricShape("Wjets_mjj_c1",["MJJ"],rootFileMVV,uncertainty)
-       card.addMVVMinorBkgParametricShape("Wjets_mjj",["MJJ"],rootFileMVV,uncertainty)
+       if self.fitvjetsmjj == True:
+        card.addMVVMinorBkgParametricShape("Wjets_mjj",["MJJ"],rootFileMVV,uncertainty)
+       else:
+        card.addHistoShapeFromFile("Wjets_mjj_c1",["MJJ"],rootFileMVV,"histo_nominal",['PT:CMS_VV_JJ_Wjets_PTZ_'+category,'OPT:CMS_VV_JJ_Wjets_OPTZ_'+category],False,0)
        card.addMJJSignalShapeNOEXP("Wjets_mjetRes_l1","MJ1","",getattr(module,'Wjets_TTbar_%s_Res'%category),{'CMS_scale_prunedj':1.},{'CMS_res_prunedj':1.},self.scales[dataset])
        card.addGaussianShape("Wjets_mjetNonRes_l2","MJ2",getattr(module,'Wjets_TTbar_%s_nonRes'%category))
-       card.product3D("Wjets_c1","Wjets_mjetRes_l1","Wjets_mjetNonRes_l2","Wjets_mjj")
+       if self.fitvjetsmjj == True:
+        card.product3D("Wjets_c2","Wjets_mjetRes_l2","Wjets_mjetNonRes_l1","Wjets_mjj")
+       else:
+        card.product3D("Wjets_c1","Wjets_mjetRes_l1","Wjets_mjetNonRes_l2","Wjets_mjj_c1")
       
        # jets + W
-       #card.addHistoShapeFromFile("Wjets_mjj_c2",["MJJ"],rootFileMVV,"histo_nominal",['PT:CMS_VV_JJ_Wjets_PTZ_'+category,'OPT:CMS_VV_JJ_Wjets_OPTZ_'+category],False,0)
-       #card.addMVVMinorBkgParametricShape("Wjets_mjj_c2",["MJJ"],rootFileMVV,uncertainty)
+       if self.fitvjetsmjj == False:
+        card.addHistoShapeFromFile("Wjets_mjj_c2",["MJJ"],rootFileMVV,"histo_nominal",['PT:CMS_VV_JJ_Wjets_PTZ_'+category,'OPT:CMS_VV_JJ_Wjets_OPTZ_'+category],False,0)
        card.addMJJSignalShapeNOEXP("Wjets_mjetRes_l2","MJ2","",getattr(module,'Wjets_TTbar_%s_Res'%category),{'CMS_scale_prunedj':1.},{'CMS_res_prunedj':1.},self.scales[dataset])
        card.addGaussianShape("Wjets_mjetNonRes_l1","MJ1",getattr(module,'Wjets_TTbar_%s_nonRes'%category))
-       card.product3D("Wjets_c2","Wjets_mjetRes_l2","Wjets_mjetNonRes_l1","Wjets_mjj")
+       if self.fitvjetsmjj == True:
+        card.product3D("Wjets_c2","Wjets_mjetRes_l2","Wjets_mjetNonRes_l1","Wjets_mjj")
+       else:
+        card.product3D("Wjets_c2","Wjets_mjetRes_l2","Wjets_mjetNonRes_l1","Wjets_mjj_c2")
        card.sumPdf('Wjets',"Wjets_c1","Wjets_c2","CMS_ratio_Wjets_"+category)
      
        print "outlabel "+self.outlabel
@@ -275,26 +282,34 @@ class DatacardTools():
        else:
            card.addFixedYieldFromFile('Wjets',ncontrib,rootFileNorm,"WJets")
 
- def AddZResBackground(self,card,dataset,category,rootFileMVV,rootFileNorm,resultsDir,ncontrib,uncertainty):  
+ def AddZResBackground(self,card,dataset,category,rootFileMVV,rootFileNorm,resultsDir,ncontrib,uncertainty=[]):
        print "add Zres background"
        sys.path.append(resultsDir)
        module_name = 'JJ_WJets_%s'%category
        module = __import__(module_name)   
             
        # Z+jets 
-       #card.addHistoShapeFromFile("Zjets_mjj_c1",["MJJ"],rootFileMVV,"histo_nominal",['PT:CMS_VV_JJ_Zjets_PTZ_'+category,'OPT:CMS_VV_JJ_Zjets_OPTZ_'+category],False,0)
-       #card.addMVVMinorBkgParametricShape("Zjets_mjj_c1",["MJJ"],rootFileMVV,uncertainty)
-       card.addMVVMinorBkgParametricShape("Zjets_mjj",["MJJ"],rootFileMVV,uncertainty)
+       if self.fitvjetsmjj == True:
+        #card.addMVVMinorBkgParametricShape("Zjets_mjj_c1",["MJJ"],rootFileMVV,uncertainty)
+        card.addMVVMinorBkgParametricShape("Zjets_mjj",["MJJ"],rootFileMVV,uncertainty)
+       else:
+        card.addHistoShapeFromFile("Zjets_mjj_c1",["MJJ"],rootFileMVV,"histo_nominal",['PT:CMS_VV_JJ_Zjets_PTZ_'+category,'OPT:CMS_VV_JJ_Zjets_OPTZ_'+category],False,0)
        card.addMJJSignalShapeNOEXP("Zjets_mjetRes_l1","MJ1","",getattr(module,'Zjets_%s_Res'%category),{'CMS_scale_prunedj':1.},{'CMS_res_prunedj':1.},self.scales[dataset])
        card.addGaussianShape("Zjets_mjetNonRes_l2","MJ2",getattr(module,'Zjets_%s_nonRes'%category))
-       card.product3D("Zjets_c1","Zjets_mjetRes_l1","Zjets_mjetNonRes_l2","Zjets_mjj")
+       if self.fitvjetsmjj == True:
+        card.product3D("Zjets_c1","Zjets_mjetRes_l1","Zjets_mjetNonRes_l2","Zjets_mjj")
+       else:
+        card.product3D("Zjets_c1","Zjets_mjetRes_l1","Zjets_mjetNonRes_l2","Zjets_mjj_c1")
            
        # jets + Z
-       #card.addHistoShapeFromFile("Zjets_mjj_c2",["MJJ"],rootFileMVV,"histo_nominal",['PT:CMS_VV_JJ_Zjets_PTZ_'+category,'OPT:CMS_VV_JJ_Zjets_OPTZ_'+category],False,0)
-       #card.addMVVMinorBkgParametricShape("Zjets_mjj_c2",["MJJ"],rootFileMVV,uncertainty)
+       if self.fitvjetsmjj == False:
+        card.addHistoShapeFromFile("Zjets_mjj_c2",["MJJ"],rootFileMVV,"histo_nominal",['PT:CMS_VV_JJ_Zjets_PTZ_'+category,'OPT:CMS_VV_JJ_Zjets_OPTZ_'+category],False,0)
        card.addMJJSignalShapeNOEXP("Zjets_mjetRes_l2","MJ2","",getattr(module,'Zjets_%s_Res'%category),{'CMS_scale_prunedj':1.},{'CMS_res_prunedj':1.},self.scales[dataset])
        card.addGaussianShape("Zjets_mjetNonRes_l1","MJ1",getattr(module,'Zjets_%s_nonRes'%category))
-       card.product3D("Zjets_c2","Zjets_mjetRes_l2","Zjets_mjetNonRes_l1","Zjets_mjj")
+       if self.fitvjetsmjj == True:
+        card.product3D("Zjets_c2","Zjets_mjetRes_l2","Zjets_mjetNonRes_l1","Zjets_mjj")
+       else:
+        card.product3D("Zjets_c2","Zjets_mjetRes_l2","Zjets_mjetNonRes_l1","Zjets_mjj_c2")
        card.sumPdf('Zjets',"Zjets_c1","Zjets_c2","CMS_ratio_Zjets_"+category)
       
        if self.pseudodata=="" or self.pseudodata=="Vjets":
@@ -416,12 +431,13 @@ class DatacardTools():
      card.addSystematic("CMS_VV_JJ_DeepJet_Vtag_eff","lnN",{'%s'%signal: str(uncup)+"/"+ str(uncdown),'Wjets': str(uncup)+"/"+ str(uncdown),'Zjets': str(uncup)+"/"+ str(uncdown)})
      
      
- def AddResBackgroundSystematics(self,card,category,extra_uncertainty):
+ def AddResBackgroundSystematics(self,card,category,extra_uncertainty=[]):
  
        card.addSystematic("CMS_VV_JJ_Wjets_norm","lnN",{'Wjets':1.05})
        card.addSystematic("CMS_VV_JJ_Zjets_norm","lnN",{'Zjets':1.05}) 
-       card.addSystematic(extra_uncertainty[0],"param",[0.0,extra_uncertainty[1]])
-       card.addSystematic(extra_uncertainty[2],"param",[0.0,extra_uncertainty[3]])
+       if self.fitvjetsmjj == True:
+        card.addSystematic(extra_uncertainty[0],"param",[0.0,extra_uncertainty[1]])
+        card.addSystematic(extra_uncertainty[2],"param",[0.0,extra_uncertainty[3]])
        
        #card.addSystematic("CMS_VV_JJ_Wjets_PTZ_"+category,"param",[0,0.1]) #0.333
        #card.addSystematic("CMS_VV_JJ_Wjets_OPTZ_"+category,"param",[0,0.1]) #0.333
