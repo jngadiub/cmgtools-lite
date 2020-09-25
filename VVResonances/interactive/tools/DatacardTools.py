@@ -438,11 +438,11 @@ class DatacardTools():
        if self.fitvjetsmjj == True:
         card.addSystematic(extra_uncertainty[0],"param",[0.0,extra_uncertainty[1]])
         card.addSystematic(extra_uncertainty[2],"param",[0.0,extra_uncertainty[3]])
-       
-       #card.addSystematic("CMS_VV_JJ_Wjets_PTZ_"+category,"param",[0,0.1]) #0.333
-       #card.addSystematic("CMS_VV_JJ_Wjets_OPTZ_"+category,"param",[0,0.1]) #0.333
-       #card.addSystematic("CMS_VV_JJ_Zjets_PTZ_"+category,"param",[0,0.1]) #0.333
-       #card.addSystematic("CMS_VV_JJ_Zjets_OPTZ_"+category,"param",[0,0.1]) #0.333
+       else:
+        card.addSystematic("CMS_VV_JJ_Wjets_PTZ_"+category,"param",[0,0.1]) #0.333
+        card.addSystematic("CMS_VV_JJ_Wjets_OPTZ_"+category,"param",[0,0.1]) #0.333
+        card.addSystematic("CMS_VV_JJ_Zjets_PTZ_"+category,"param",[0,0.1]) #0.333
+        card.addSystematic("CMS_VV_JJ_Zjets_OPTZ_"+category,"param",[0,0.1]) #0.333
        
 
  def AddNonResBackgroundSystematics(self,card,category):
