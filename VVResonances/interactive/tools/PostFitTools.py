@@ -761,9 +761,11 @@ class Projection():
     doFit = False
     axis = ""
     maxYaxis = 0
+    fitres = None
     
-    
-    def __init__(self,hinMC,opt_range,workspace,doFit,isBlinded=False):
+    def __init__(self,hinMC,opt_range,workspace,fitres,doFit,isBlinded=False):
+        self.doFit = doFit
+        self.fitres = fitres
         self.workspace = workspace
         #################################################
         xBins= self.getListOfBins(hinMC,"x")
@@ -1067,74 +1069,70 @@ class Projection():
         for b,v in self.neventsPerBin_1.iteritems(): self.dh.SetBinContent(b,self.neventsPerBin_1[b]);
         self.dh.SetBinErrorOption(ROOT.TH1.kPoisson)
         if self.doFit:
-            errors = self.draw_error_band(norms,pdfs[-1])
+            errors = self.draw_error_band(norms,pdfs[-1],pdf_sig)
         else: errors =  None
         return [self.hfinals,self.dh, self.htot_sig,self.axis,self.Binslowedge,self.maxYaxis, norm_sig[0],errors]
         
     
-    def draw_error_band(self,norms,rpdf1):
+    def draw_error_band(self,norms,rpdf1,pdf_sig):
         histo_central = self.htot
-        norm1 = norms["nonRes"][0]+norms["Wjets"][0]+norms["Zjets"][0]+norms["TTJets"][0]
-        err_norm1 = math.sqrt(norms["nonRes"][1]*norms["nonRes"][1]+norms["Wjets"][1]*norms["Wjets"][1]+norms["Zjets"][1]*norms["Zjets"][1]+norms["TTJets"][1]*norms["TTJets"][1])
+        norm1 = norms["nonRes"][0].getVal()+norms["Wjets"][0].getVal()+norms["Zjets"][0].getVal()+norms["TTJetsTNonResT"][0].getVal()+norms["TTJetsWNonResT"][0].getVal()+norms["TTJetsW"][0].getVal()+norms["TTJetsNonRes"][0].getVal()+norms["TTJetsResWResT"][0].getVal()+norms["TTJetsTop"][0].getVal()
+        err_norm1 = math.sqrt(norms["nonRes"][1]*norms["nonRes"][1]+norms["Wjets"][1]*norms["Wjets"][1]+norms["Zjets"][1]*norms["Zjets"][1]+norms["TTJetsTNonResT"][1]*norms["TTJetsTNonResT"][1]+norms["TTJetsWNonResT"][1]*norms["TTJetsWNonResT"][1]+norms["TTJetsW"][1]*norms["TTJetsW"][1]+norms["TTJetsNonRes"][1]*norms["TTJetsNonRes"][1]+norms["TTJetsResWResT"][1]*norms["TTJetsResWResT"][1]+norms["TTJetsTop"][1]*norms["TTJetsTop"][1])
         x_min = self.Binslowedge
         proj = self.axis
         rand = ROOT.TRandom3(1234);
-        number_errorband = 5
+        number_errorband = 100
         syst = [0 for i in range(number_errorband)]
       
         value = [0 for x in range(len(x_min))]  
         number_point = len(value)
-    
         par_pdf1 = rpdf1.getParameters(self.args_ws)  
         iter = par_pdf1.createIterator()
         var = iter.Next()
         print var.GetName()
         for j in range(number_errorband):
             syst[j] = ROOT.TGraph(number_point+1);
-        #paramters value are randomized using rfres and this can be done also if they are not decorrelate
-        if self.options.label.find("sigonly")==-1:
-            par_tmp = ROOT.RooArgList(fitresult_bkg_only.randomizePars())
-        else:
-            par_tmp = ROOT.RooArgList(fitresult.randomizePars())
-        iter = par_pdf1.createIterator()
-        var = iter.Next()
-
-        while var:
-            index = par_tmp.index(var.GetName())
-            if index != -1:
-                #print "pdf1",var.GetName(), var.getVal()
-                var.setVal(par_tmp.at(index).getVal())     
-                #print " ---> new value: ",var.getVal()
+            #paramters value are randomized using rfres and this can be done also if they are not decorrelate
+            par_tmp = ROOT.RooArgList(self.fitres.randomizePars())
+            iter = par_pdf1.createIterator()
             var = iter.Next()
-      
-        norm1_tmp = rand.Gaus(norm1,err_norm1); #new poisson random number of events
-        value = [0 for i in range(number_point)]
-        for ik, iv in self.Bins_redux.iteritems():
-            self.M1.setVal(iv)
-            for jk, jv in self.Bins_redux_1.iteritems():
-                self.M2.setVal(jv)
-                for kk,kv in self.Bins_redux_2.iteritems():
-                    self.M3.setVal(kv)
-                    binV = self.BinsWidth_1[ik]*self.BinsWidth_2[jk]*self.BinsWidth_3[kk]
-                    value[ik-1] += (norm1_tmp*rpdf1.getVal( self.args_ws )*binV)
-                   
-        for ix,x in enumerate(x_min): 
-            syst[j].SetPoint(ix, x, value[ix])
 
-            #Try to build and find max and minimum for each point --> not the curve but the value to do a real envelope -> take one 2sigma interval        
-            errorband = ROOT.TGraphAsymmErrors()#ROOT.TH1F("errorband","errorband",len(x_min)-1,x_min)
+            while var:
+                index = par_tmp.index(var.GetName())
+                if index != -1:
+                    #print "pdf1",var.GetName(), var.getVal(), var.getError()
+                    var.setVal(par_tmp.at(index).getVal())
+                    #print " ---> new value: ",var.getVal()
+                var = iter.Next()
 
-            val = [0 for i in range(number_errorband)]
+            norm1_tmp = rand.Gaus(norm1,err_norm1); #new poisson random number of events
+            value = [0 for i in range(number_point)]
+            for ik, iv in self.Bins_redux.iteritems():
+                self.M1.setVal(iv)
+                for jk, jv in self.Bins_redux_1.iteritems():
+                    self.M2.setVal(jv)
+                    for kk,kv in self.Bins_redux_2.iteritems():
+                        self.M3.setVal(kv)
+                        binV = self.BinsWidth_1[ik]*self.BinsWidth_2[jk]*self.BinsWidth_3[kk]
+                        value[ik-1] += (norm1_tmp*rpdf1.getVal( self.args_ws )*binV)
+
             for ix,x in enumerate(x_min):
+                syst[j].SetPoint(ix, x, value[ix])
+
+        #Try to build and find max and minimum for each point --> not the curve but the value to do a real envelope -> take one 2sigma interval
+        errorband = ROOT.TGraphAsymmErrors()#ROOT.TH1F("errorband","errorband",len(x_min)-1,x_min)
+
+        val = [0 for i in range(number_errorband)]
+        for ix,x in enumerate(x_min):
     
-                for j in range(number_errorband):
-                    val[j]=(syst[j]).GetY()[ix]
-                val.sort()
-                errorband.SetPoint(ix,x_min[ix]+histo_central.GetBinWidth(ix+1)/2.,histo_central.GetBinContent(ix+1))
-                errup = (val[int(0.84*number_errorband)]-histo_central.GetBinContent(ix+1)) #ROOT.TMath.Abs
-                errdn = ( histo_central.GetBinContent(ix+1)-val[int(0.16*number_errorband)])
-                print "error up "+str(errup)+" error down "+str(errdn)
-                errorband.SetPointError(ix,histo_central.GetBinWidth(ix+1)/2.,histo_central.GetBinWidth(ix+1)/2.,ROOT.TMath.Abs(errdn),ROOT.TMath.Abs(errup))
+            for j in range(number_errorband):
+                val[j]=(syst[j]).GetY()[ix]
+            val.sort()
+            errorband.SetPoint(ix,x_min[ix]+histo_central.GetBinWidth(ix+1)/2.,histo_central.GetBinContent(ix+1))
+            errup = (val[int(0.84*number_errorband)]-histo_central.GetBinContent(ix+1)) #ROOT.TMath.Abs
+            errdn = ( histo_central.GetBinContent(ix+1)-val[int(0.16*number_errorband)])
+            #print "error up "+str(errup)+" error down "+str(errdn)
+            errorband.SetPointError(ix,histo_central.GetBinWidth(ix+1)/2.,histo_central.GetBinWidth(ix+1)/2.,ROOT.TMath.Abs(errdn),ROOT.TMath.Abs(errup))
         errorband.SetFillColor(ROOT.kBlack)
         errorband.SetFillStyle(3008)
         errorband.SetLineColor(ROOT.kGreen)

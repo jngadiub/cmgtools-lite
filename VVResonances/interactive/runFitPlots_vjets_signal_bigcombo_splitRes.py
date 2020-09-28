@@ -92,7 +92,7 @@ def addResults(results): #self.hfinals,self.dh, self.htot_sig,self.axis,self.Bin
     errs = []
     for i in range(0,len(results)):
         errs.append(results[i][7])
-    errors = addGraph(errs)
+    errors = addGraph(results[0][7]) # errs)
     for j in range(1,len(results)):
         dh.Add(results[j][1])
         hsig.Add(results[j][2])
@@ -165,7 +165,7 @@ if __name__=="__main__":
          if options.addTop==False and (bkg.find("TTJets")!=-1): expected[bkg] = [None,None]; continue
          expected[bkg] = [ (args[pdf1Name[period]].getComponents())["n_exp_binJJ_"+purity+"_13TeV_"+period+"_proc_"+bkg],0.]
          print "Expected number of "+bkg+" events:",(expected[bkg][0].getVal()),"   ("+period+")"
-     all_expected[period] = expected 
+     all_expected[period] = expected
      if options.fitSignal:
         print "Expected signal yields:",(args[pdf1Name[period]].getComponents())["n_exp_final_binJJ_"+purity+"_13TeV_2016_proc_"+signalName].getVal(),"(",period,")"
         signal_expected[period] = [ (args[pdf1Name[period]].getComponents())["n_exp_final_binJJ_"+purity+"_13TeV_2016_proc_"+signalName], 0.]
@@ -231,7 +231,7 @@ if __name__=="__main__":
                 expected[bkg] = [ (args[pdf1Name[period]].getComponents())["n_exp_binJJ_"+purity+"_13TeV_"+period+"_proc_"+bkg],(args[pdf1Name[period]].getComponents())["n_exp_binJJ_"+purity+"_13TeV_"+period+"_proc_"+bkg].getPropagatedError(fitresult)]
                 norms[bn] = expected[bkg][0].getVal() 
                 print "normalization of "+bkg+" after fit:",(expected[bkg][0].getVal()), " +/- ",expected[bkg][1] ,"   ("+period+")"
-        all_expected[period] = expected  
+        all_expected[period] = expected
         #save post fit ttbar only normalization to be used as prefit value when fitting all bkg
         if options.name.find("ttbar")!=-1:
                 jsonfile = open(options.jsonname+"_"+options.channel+".json","w")
@@ -246,47 +246,47 @@ if __name__=="__main__":
          
      logfile = open(options.output+options.log,"a::ios::ate")
      forplotting = PostFitTools.Postfitplotter(parser,logfile,signalName)
-     forproj = PostFitTools.Projection(hinMC,[options.xrange,options.yrange,options.zrange], workspace,options.fit,options.blind)
+     forproj = PostFitTools.Projection(hinMC,[options.xrange,options.yrange,options.zrange], workspace,fitresult_bkg_only,options.fit,options.blind)
      #make projections onto MJJ axis 
      if options.projection =="z":
          results = []
-         tmp = forproj.doProjection(data[period],allpdfsz[period],all_expected[period],"z",allsignalpdfs[period],signal_expected[period])
-         results.append(tmp) 
-         res = addResults(results)
+         res = forproj.doProjection(data[period],allpdfsz[period],all_expected[period],"z",allsignalpdfs[period],signal_expected[period])
+         #results.append(tmp) 
+         #res = addResults(results)
          forplotting.MakePlots(res[0],res[1],res[2],res[3],res[4],res[5], res[6],res[7])
      #make projections onto MJ1 axis
      if options.projection =="x":
          results = []
-         tmp = forproj.doProjection(data[period],allpdfsx[period],all_expected[period],"x",allsignalpdfs[period],signal_expected[period])
-         results.append(tmp)
-         res = addResults(results)
+         res = forproj.doProjection(data[period],allpdfsx[period],all_expected[period],"x",allsignalpdfs[period],signal_expected[period])
+         #results.append(tmp)
+         #res = addResults(results)
          forplotting.MakePlots(res[0],res[1],res[2],res[3],res[4],res[5], res[6],res[7])
      #make projections onto MJ2 axis
      if options.projection =="y":
          results = []
-         tmp = forproj.doProjection(data[period],allpdfsy[period],all_expected[period],"y",allsignalpdfs[period],signal_expected[period])
-         results.append(tmp)
-         res = addResults(results)
+         res = forproj.doProjection(data[period],allpdfsy[period],all_expected[period],"y",allsignalpdfs[period],signal_expected[period])
+         #results.append(tmp)
+         #res = addResults(results)
          forplotting.MakePlots(res[0],res[1],res[2],res[3],res[4],res[5], res[6],res[7])
 
      if options.projection =="xyz":
          results = []
          print data[period],allpdfsz[period],all_expected[period],"z",allsignalpdfs[period],signal_expected[period]
-         tmp = forproj.doProjection(data[period],allpdfsz[period],all_expected[period],"z",allsignalpdfs[period],signal_expected[period])
-         results.append(tmp) 
-         res = addResults(results)
+         res = forproj.doProjection(data[period],allpdfsz[period],all_expected[period],"z",allsignalpdfs[period],signal_expected[period])
+         #results.append(tmp)
+         #res = addResults(results)
          forplotting.MakePlots(res[0],res[1],res[2],res[3],res[4],res[5], res[6],res[7])
     
          results = []
-         tmp = forproj.doProjection(data[period],allpdfsx[period],all_expected[period],"x",allsignalpdfs[period],signal_expected[period])
-         results.append(tmp)
-         res = addResults(results)
+         res = forproj.doProjection(data[period],allpdfsx[period],all_expected[period],"x",allsignalpdfs[period],signal_expected[period])
+         #results.append(tmp)
+         #res = addResults(results)
          forplotting.MakePlots(res[0],res[1],res[2],res[3],res[4],res[5], res[6],res[7])
          results = []
          
-         tmp = forproj.doProjection(data[period],allpdfsy[period],all_expected[period],"y",allsignalpdfs[period],signal_expected[period])
-         results.append(tmp)
-         res = addResults(results)
+         res = forproj.doProjection(data[period],allpdfsy[period],all_expected[period],"y",allsignalpdfs[period],signal_expected[period])
+         #results.append(tmp)
+         #res = addResults(results)
          forplotting.MakePlots(res[0],res[1],res[2],res[3],res[4],res[5], res[6],res[7])
 
         
