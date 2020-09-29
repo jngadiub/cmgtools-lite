@@ -1523,7 +1523,7 @@ def makePseudoData(input="JJ_nonRes_LPLP.root",kernel="JJ_nonRes_3D_LPLP.root",m
 
  pwd = os.getcwd()
  
- ROOT.gRandom.SetSeed(0)
+ ROOT.gRandom.SetSeed(123)
  
  finmc = ROOT.TFile.Open(pwd+'/'+input,'READ')
  hmcin = finmc.Get('nonRes')
@@ -1707,7 +1707,7 @@ def makePseudoDataVjets(input,kernel,mc,output,lumi,workspace,year,purity):
  
  pwd = os.getcwd()
  pwd = "/"
- ROOT.gRandom.SetSeed(0)
+ ROOT.gRandom.SetSeed(123)
  
  finmc = ROOT.TFile.Open(pwd+'/'+input,'READ')
  hmcin = finmc.Get('nonRes')
@@ -1817,7 +1817,7 @@ def makePseudoDataVjetsTT(input,input_tt,kernel,mc,output,lumi,workspace,year,pu
  
  pwd = os.getcwd()
  pwd = "/"
- ROOT.gRandom.SetSeed(0)
+ ROOT.gRandom.SetSeed(123)
  
  finmc = ROOT.TFile.Open(pwd+'/'+input,'READ')
  hmcin = finmc.Get('nonRes')
@@ -1929,7 +1929,7 @@ def makePseudoDataNoQCD(input_tt,output,lumi,workspace,year,purity):
  
  pwd = os.getcwd()
  pwd = "/"
- ROOT.gRandom.SetSeed(0)
+ ROOT.gRandom.SetSeed(123)
  
  fout = ROOT.TFile.Open(output,'RECREATE')
  #hmcin.Scale(10.)
@@ -2022,7 +2022,7 @@ def makePseudoDataTT(input_tt,output,lumi,year,purity):
  
  pwd = os.getcwd()
  pwd = "/"
- ROOT.gRandom.SetSeed(0)
+ ROOT.gRandom.SetSeed(123)
  fout = ROOT.TFile.Open(output,'RECREATE')
  
  ftt = ROOT.TFile.Open(input_tt,'READ')
