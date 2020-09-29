@@ -176,7 +176,7 @@ for sig in signals:
         Tools.AddResBackgroundSystematics(card,p)
       Tools.AddNonResBackgroundSystematics(card,p)
       #Tools.AddTaggingSystematics(card,sig,dataset,p,resultsDir[dataset]+'/migrationunc.json')
-      Tools.AddTTSystematics4(card,["CMS_VV_JJ_TTJets_slope",0.05])
+      Tools.AddTTSystematics4(card,["CMS_VV_JJ_TTJets_slope",0.05],dataset)
       #Tools.AddTTSystematics2(card,sig,dataset,p,resultsDir[dataset])
       card.makeCard()
 

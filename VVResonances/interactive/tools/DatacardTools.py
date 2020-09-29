@@ -165,14 +165,15 @@ class DatacardTools():
  def AddTTBackground3(self,card,dataset,category,rootFileMVV,rootFileNorm,resultsDir,ncontrib,uncertainty,normjson):
     print "add TT+jets background"  
     contrib =["resT","resW","nonresT","resTnonresT","resWnonresT","resTresW"]
+    mappdf = {"resT":"TTJetsTop","resW":"TTJetsW","nonresT":"TTJetsNonRes","resTnonresT":"TTJetsTNonResT","resWnonresT":"TTJetsWNonResT","resTresW":"TTJetsResWResT"}
+    uncjsonfile=open(resultsDir+"/JJ_"+dataset+"_TTJets_MjjUnc_NP.json")
+    unc = json.load(uncjsonfile)
     for i in range(0,len(contrib)):
 
        #load mJJ - assume same for the three contributions (preliminary)
-       jsonfile = resultsDir+"/JJ_"+contrib[i]+dataset+"_TTJets_MVV_NP_"+contrib[i]
-       if contrib[i]=="resT" or contrib[i]=="nonresT": jsonfile=jsonfile+"T"
-       jsonfile= jsonfile +  ".json"
+       jsonfile = resultsDir+"/JJ_"+contrib[i]+dataset+"_TTJets_MVV_NP.json"
        print "load parametrisation for MVV ttbar contributions ",jsonfile,contrib[i]
-       card.addMVVMinorBkgParametricShape("TTJets"+contrib[i]+"_mjj",["MJJ"],jsonfile,uncertainty)
+       card.addMVVMinorBkgParametricShape("TTJets"+contrib[i]+"_mjj",["MJJ"],jsonfile,[uncertainty[0].replace("TTJets",mappdf[contrib[i]]),unc[contrib[i]]])
 
        #print "load ", rootFileMVV[contrib[i]], " for ttbar contribution"
        #f = ROOT.TFile(rootFileMVV[contrib[i]],"READ")
@@ -377,18 +378,25 @@ class DatacardTools():
     card.addSystematic("CMS_VV_JJ_TTJetsWnonresT_PTZ_"+category,"param",[0,0.333]) #0.333
     card.addSystematic("CMS_VV_JJ_TTJetsWnonresT_OPTZ_"+category,"param",[0,0.333]) #0.333
     
- def AddTTSystematics4(self,card,extra_uncertainty):
+ def AddTTSystematics4(self,card,extra_uncertainty,dataset):
     card.addSystematic("CMS_f_g1","param",[0.0,0.02])
     card.addSystematic("CMS_f_res","param",[0.0,0.08])
     #card.addSystematic("CMS_VV_JJ_TTJets_norm","lnN",{'TTJets':1.2})  
-    card.addSystematic(extra_uncertainty[0],"param",[0.0,extra_uncertainty[1]])
     card.addSystematic("CMS_scale_prunedj","param",[0.0,0.02])
     card.addSystematic("CMS_res_prunedj","param",[0.0,0.08])
+    contrib =["resT","resW","nonresT","resTnonresT","resWnonresT","resTresW"]
+    mappdf = {"resT":"TTJetsTop","resW":"TTJetsW","nonresT":"TTJetsNonRes","resTnonresT":"TTJetsTNonResT","resWnonresT":"TTJetsWNonResT","resTresW":"TTJetsResWResT"}
+    uncjsonfile=open('results_'+dataset+"/JJ_"+dataset+"_TTJets_MjjUnc_NP.json")
+    unc = json.load(uncjsonfile)
+    for i in range(0,len(contrib)):
+       card.addSystematic(extra_uncertainty[0].replace("TTJets",mappdf[contrib[i]]),"param",[0.0,float("{:.3f}".format(unc[contrib[i]]))])
+
     #card.addSystematic("CMS_scale_prunedj_top","param",[0.0,0.02])
     #card.addSystematic("CMS_res_prunedj_top","param",[0.0,0.08])
     if self.pseudodata.find("ttbar")==-1:
         #card.addSystematic("CMS_VV_JJ_TTJets_norm","lnN",{'TTJetsW':1.2,'TTJetsTop':1.2,'TTJetsNonRes':1.2,'TTJetsWNonResT':1.2,'TTJetsResWResT':1.2,'TTJetsTNonResT':1.2}) 
         card.addSystematic("CMS_VV_JJ_TTJets_norm","lnN",{'TTJetsW':1.05,'TTJetsTop':1.05,'TTJetsNonRes':1.05,'TTJetsWNonResT':1.05,'TTJetsResWResT':1.05,'TTJetsTNonResT':1.05}) 
+        #card.addSystematic(extra_uncertainty[0],"param",[0.0,extra_uncertainty[1]])
     else:
         card.addSystematic("CMS_VV_JJ_TTJetsW_norm","lnN",{'TTJetsW':3.2})
         card.addSystematic("CMS_VV_JJ_TTJetsTop_norm","lnN",{'TTJetsTop':3.2})
