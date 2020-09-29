@@ -763,7 +763,7 @@ class Projection():
     maxYaxis = 0
     fitres = None
     
-    def __init__(self,hinMC,opt_range,workspace,fitres,doFit,isBlinded=False):
+    def __init__(self,hinMC,opt_range,workspace,doFit,isBlinded=False,fitres=None):
         self.doFit = doFit
         self.fitres = fitres
         self.workspace = workspace

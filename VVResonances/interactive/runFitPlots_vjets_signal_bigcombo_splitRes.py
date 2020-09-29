@@ -246,7 +246,9 @@ if __name__=="__main__":
          
      logfile = open(options.output+options.log,"a::ios::ate")
      forplotting = PostFitTools.Postfitplotter(parser,logfile,signalName)
-     forproj = PostFitTools.Projection(hinMC,[options.xrange,options.yrange,options.zrange], workspace,fitresult_bkg_only,options.fit,options.blind)
+     if options.fit:
+         forproj = PostFitTools.Projection(hinMC,[options.xrange,options.yrange,options.zrange], workspace,options.fit,options.blind,fitresult_bkg_only)
+     else: forproj = PostFitTools.Projection(hinMC,[options.xrange,options.yrange,options.zrange], workspace,options.fit,options.blind)
      #make projections onto MJJ axis 
      if options.projection =="z":
          results = []
