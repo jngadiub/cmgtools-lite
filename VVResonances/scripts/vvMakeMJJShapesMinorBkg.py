@@ -170,7 +170,7 @@ def doPlot(data,finalFit,sampleTypes,outlabel,mvv_nominal_w=None):
     if options.output.find('VV_HPHP')!=-1: tmplabel+='VV_HPHP'
     if options.output.find('VH_HPLP')!=-1: tmplabel+='VH_HPLP'
     if options.output.find('VH_HPHP')!=-1: tmplabel+='VH_HPHP'
-    if options.output.find('VH_LPHP')!=-1: tmplabel+='VV_LPHP'
+    if options.output.find('VH_LPHP')!=-1: tmplabel+='VH_LPHP'
     if 'W' in sampleTypes: tmplabel="W"+tmplabel
     if 'Z' in sampleTypes: tmplabel="Z"+tmplabel
     text = ROOT.TLatex()
@@ -364,7 +364,7 @@ finalFit = doFit(mvv_nominal,((options.output).split("_")[-1]).split(".")[0])
 
 print "************************ do debugging plots *******************"
 
-doPlot(mvv_nominal,finalFit,sampleTypes,((options.output).split("_")[-1]).split(".")[0],mvv_nominal_w)
+doPlot(mvv_nominal,finalFit,sampleTypes,((options.output).split("_")[1]).split(".")[0],mvv_nominal_w)
 
 print " **************************** write fit to json ***************"
 print " open json file ",options.output
@@ -381,7 +381,7 @@ if options.samples.find("TT")!=-1:
 
     print "************************ do plots *******************"
 
-    doPlot(mvv_nominal,noreweightFit,sampleTypes,((options.output).split("_")[-1]).split(".")[0]+"_noreweight",mvv_nominal_w)
+    doPlot(mvv_nominal,noreweightFit,sampleTypes,((options.output).split("_")[1]).split(".")[0]+"_noreweight",mvv_nominal_w)
 
     print " **************************** write fit to json ***************"
     jsonname="noreweight_"+options.output
@@ -389,9 +389,6 @@ if options.samples.find("TT")!=-1:
     f=open(jsonname,"w")
     parametrization = getParametrization(noreweightFit)
     json.dump(parametrization,f)
-
-
-
 
 
 #print " ********** Make PT reweighted histograms ********************"
