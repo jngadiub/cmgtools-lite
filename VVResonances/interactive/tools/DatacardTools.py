@@ -169,6 +169,13 @@ class DatacardTools():
     #uncjsonfile=open(resultsDir+"/JJ_"+dataset+"_TTJets_MjjUnc_"+category+".json")
     uncjsonfile=open(resultsDir+"/JJ_"+dataset+"_TTJets_MjjUnc_NP.json")
     unc = json.load(uncjsonfile)
+    allunc = []
+    for i in range(0,len(contrib)):
+     allunc.append(unc[contrib[i]])
+    print " allunc ",allunc
+    maxunc = max(allunc)
+    print " max unc is ",maxunc
+
     for i in range(0,len(contrib)):
      if self.pseudodata.find("ttbar")!=-1:
 
@@ -187,7 +194,9 @@ class DatacardTools():
       slopejson= normjson.replace("Norm","NormSlopes")
       print "load parametrisation for MVV ttbar contributions ",jsonfile,contrib[i],slopejson
       #card.addMVVMinorBkgParametricShape("TTJets"+contrib[i]+"_mjj",["MJJ"],jsonfile,[uncertainty[0].replace("TTJets",mappdf[contrib[i]])+"_"+category,unc[contrib[i]]])
-      card.addMVVMinorBkgParametricShape("TTJets"+contrib[i]+"_mjj",["MJJ"],jsonfile,[uncertainty[0].replace("TTJets",mappdf[contrib[i]]),unc[contrib[i]]],slopejson)
+      #card.addMVVMinorBkgParametricShape("TTJets"+contrib[i]+"_mjj",["MJJ"],jsonfile,[uncertainty[0].replace("TTJets",mappdf[contrib[i]]),unc[contrib[i]]],slopejson)
+      # have only one slope variation for all 6 contributions, the largest
+      card.addMVVMinorBkgParametricShape("TTJets"+contrib[i]+"_mjj",["MJJ"],jsonfile,[uncertainty[0],maxunc],slopejson)
 
 
     card.addMJJTTJetsParametricShapeResW("TTJetsW_mjetRes_l1","MJ1",resultsDir+"/JJ_%s_TTJets_%s.json"%(dataset,category),{'CMS_scale_prunedj':1.},{'CMS_res_prunedj':1.},self.scales[dataset])#,{'CMS_f_g1':1.},{'CMS_f_res':1.})
@@ -416,9 +425,9 @@ class DatacardTools():
     #uncjsonfile=open('results_'+dataset+"/JJ_"+dataset+"_TTJets_MjjUnc_"+category+".json")
     uncjsonfile=open('results_'+dataset+"/JJ_"+dataset+"_TTJets_MjjUnc_NP.json")
     unc = json.load(uncjsonfile)
+    allunc = []
     for i in range(0,len(contrib)):
-       #card.addSystematic(extra_uncertainty[0].replace("TTJets",mappdf[contrib[i]])+"_"+category,"param",[0.0,float("{:.3f}".format(unc[contrib[i]]))])
-       card.addSystematic(extra_uncertainty[0].replace("TTJets",mappdf[contrib[i]]),"param",[0.0,float("{:.3f}".format(unc[contrib[i]]))])
+       allunc.append(unc[contrib[i]])
 
     #card.addSystematic("CMS_scale_prunedj_top","param",[0.0,0.02])
     #card.addSystematic("CMS_res_prunedj_top","param",[0.0,0.08])
@@ -426,13 +435,13 @@ class DatacardTools():
         #card.addSystematic("CMS_VV_JJ_TTJets_norm","lnN",{'TTJetsW':1.2,'TTJetsTop':1.2,'TTJetsNonRes':1.2,'TTJetsWNonResT':1.2,'TTJetsResWResT':1.2,'TTJetsTNonResT':1.2}) 
         card.addSystematic("CMS_VV_JJ_TTJets_norm","lnN",{'TTJetsW':1.05,'TTJetsTop':1.05,'TTJetsNonRes':1.05,'TTJetsWNonResT':1.05,'TTJetsResWResT':1.05,'TTJetsTNonResT':1.05}) 
         #card.addSystematic(extra_uncertainty[0],"param",[0.0,extra_uncertainty[1]])
+        #card.addSystematic(extra_uncertainty[0].replace("TTJets",mappdf[contrib[i]])+"_"+category,"param",[0.0,float("{:.3f}".format(unc[contrib[i]]))])
+        card.addSystematic(extra_uncertainty[0],"param",[0.0,float("{:.3f}".format(max(allunc)))])
     else:
-        card.addSystematic("CMS_VV_JJ_TTJetsW_norm","lnN",{'TTJetsW':3.2})
-        card.addSystematic("CMS_VV_JJ_TTJetsTop_norm","lnN",{'TTJetsTop':3.2})
-        card.addSystematic("CMS_VV_JJ_TTJetsNonRes_norm","lnN",{'TTJetsNonRes':3.2})
-        card.addSystematic("CMS_VV_JJ_TTJetsWNonResT_norm","lnN",{'TTJetsWNonResT':3.2})
-        card.addSystematic("CMS_VV_JJ_TTJetsResWResT_norm","lnN",{'TTJetsResWResT':3.2})
-        card.addSystematic("CMS_VV_JJ_TTJetsTNonResT_norm","lnN",{'TTJetsTNonResT':3.2})
+        for i in range(0,len(contrib)):
+         #card.addSystematic(extra_uncertainty[0].replace("TTJets",mappdf[contrib[i]])+"_"+category,"param",[0.0,float("{:.3f}".format(unc[contrib[i]]))])
+         card.addSystematic("CMS_VV_JJ_"+mappdf[contrib[i]]+"_norm","lnN",{mappdf[contrib[i]]:3.2})
+         card.addSystematic(extra_uncertainty[0].replace("TTJets",mappdf[contrib[i]]),"param",[0.0,float("{:.3f}".format(unc[contrib[i]]))])
     
        
  def AddSigSystematics(self,card,sig,dataset,category,correlate):
