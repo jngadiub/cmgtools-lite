@@ -7,6 +7,9 @@ from CMGTools.VVResonances.plotting.MergedPlotter import MergedPlotter
 from math import log
 import os, sys, re, optparse,pickle,shutil,json
 ROOT.v5.TFormula.SetMaxima(10000) #otherwise we get an error that the TFormula called by the TTree draw has too many operators when running on the CR
+sys.path.insert(0, "../interactive/")
+import cuts
+
 
 parser = optparse.OptionParser()
 parser.add_option("-s","--samples",dest="samples",default='',help="Type of sample")
@@ -38,8 +41,26 @@ def getBinning(binsMVV):
 sampleTypes=options.samples.split(',')
 
 dataPlotters=[]
+category=options.output.split("/")[-1].split(".")[0].split("_")[3]+"_"+options.output.split("/")[-1].split(".")[0].split("_")[4]
+print " cat ",category
+
+
+
+print "args[0] "+str(args[0])
+try: year=str(args[0]).split("/")[-2]
+except: year=options.output.split("_")[1]
+print "year ",year
+print "now working with cuts "
+ctx = cuts.cuts("init_VV_VH.json",year,"dijetbins_random")
+print "lumi for year "+year+" = ",ctx.lumi[year]
+luminosity = ctx.lumi[year]/ctx.lumi["Run2"]  #int(ctx.lumi[year]/ctx.lumi["Run2"])
+if options.output.find("Run2") ==-1 or options.name.find("data")!=-1 : luminosity = 1
+print " lumi rewight ",luminosity
 
 for filename in os.listdir(args[0]):
+    if filename.find(".")==-1:
+        print "in "+str(filename)+"the separator . was not found. -> continue!"
+        continue
     for sampleType in sampleTypes:
         if filename.find(sampleType)!=-1:
             fnameParts=filename.split('.')
@@ -53,6 +74,7 @@ for filename in os.listdir(args[0]):
                 dataPlotters[-1].addCorrectionFactor('xsec','tree')
                 dataPlotters[-1].addCorrectionFactor('genWeight','tree')
                 dataPlotters[-1].addCorrectionFactor('puWeight','tree')
+                dataPlotters[-1].addCorrectionFactor(luminosity,'flat')
                 if fname.find("QCD_Pt_") !=-1 or fname.find("QCD_HT") !=-1:
                     print "going to apply spikekiller for ",fname
                     dataPlotters[-1].addCorrectionFactor('b_spikekiller','tree')
@@ -62,12 +84,16 @@ for filename in os.listdir(args[0]):
                 if fname.find("TT") !=-1:
                     print "applying top pt reweight"
                     dataPlotters[-1].addCorrectionFactor('TopPTWeight','tree')
-            corrFactors = options.factors.split(',')
-	    for c in corrFactors:
-	     if len(c.split(':')) < 2: continue
-	     if c.split(':')[0] in fname:
-	      print "Add correction factor:",fname,c.split(':')[1]
-	      dataPlotters[-1].addCorrectionFactor(float(c.split(':')[1]),'flat')
+                if fname.find("Jets") !=-1:
+                    print "applying tagging SF"
+                    taggerSF={'VV_HPLP':{year:ctx.HPSF_vtag[year]*ctx.LPSF_vtag.get(year,0) for year in ctx.LPSF_vtag.keys()},'VH_HPHP':{year:ctx.HPSF_htag[year]*ctx.HPSF_vtag.get(year,0) for year in ctx.HPSF_vtag.keys()},'VH_HPLP':{year:ctx.HPSF_htag[year]*ctx.LPSF_vtag.get(year,0) for year in ctx.LPSF_vtag.keys()},'VH_LPHP':{year:ctx.HPSF_vtag[year]*ctx.LPSF_htag.get(year,0) for year in ctx.LPSF_htag.keys()},'VH_LPLP':{year:ctx.LPSF_htag[year]*ctx.LPSF_vtag.get(year,0) for year in ctx.LPSF_vtag.keys()},'VV_HPHP':{year:ctx.HPSF_vtag[year]*ctx.HPSF_vtag.get(year,0) for year in ctx.HPSF_vtag.keys() }}
+
+                    if category.find("NP")!=-1: 
+                        SF =1.
+                    else:
+                        SF = taggerSF[category][year]
+                    print "SF ",SF
+                    dataPlotters[-1].addCorrectionFactor(SF,'flat')
 
 
 

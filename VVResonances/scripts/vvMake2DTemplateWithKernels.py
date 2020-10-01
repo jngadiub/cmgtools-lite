@@ -10,6 +10,8 @@ from CMGTools.VVResonances.plotting.tdrstyle import *
 setTDRStyle()
 from CMGTools.VVResonances.plotting.TreePlotter import TreePlotter
 from CMGTools.VVResonances.plotting.MergedPlotter import MergedPlotter
+sys.path.insert(0, "../interactive/")
+import cuts
 ROOT.gSystem.Load("libCMGToolsVVResonances")
 ROOT.v5.TFormula.SetMaxima(10000) #otherwise we get an error that the TFormula called by the TTree draw has too many operators when running on the CR
 
@@ -109,20 +111,33 @@ print "Creating datasets for samples: " ,sampleTypes
 
 dataPlotters=[]
 dataPlottersNW=[]
+print "args[0] ",args[0]
+folder = args[0] #.split(',')                                                                                                                                                                                                     
+print "folder ",folder
+print "split ",folder.split("/")
+year=folder.split("/")[-2]
+print "year ",year
+print "now working with cuts "
+ctx = cuts.cuts("init_VV_VH.json",year,"dijetbins_random")
+print "lumi for year "+year+" = ",ctx.lumi[year]
+luminosity = ctx.lumi[year]/ctx.lumi["Run2"]
+if options.output.find("Run2") ==-1: luminosity = 1
 
-for filename in os.listdir(args[0]):
+for filename in os.listdir(folder):
  for sampleType in sampleTypes:
   if filename.find(sampleType)!=-1:
    fnameParts=filename.split('.')
    fname=fnameParts[0]
+   print "fname ",fname
    ext=fnameParts[1]
    if ext.find("root") ==-1:
        continue
-   dataPlotters.append(TreePlotter(args[0]+'/'+fname+'.root','AnalysisTree'))
-   dataPlotters[-1].setupFromFile(args[0]+'/'+fname+'.pck')
+   dataPlotters.append(TreePlotter(folder+'/'+fname+'.root','AnalysisTree'))
+   dataPlotters[-1].setupFromFile(folder+'/'+fname+'.pck')
    dataPlotters[-1].addCorrectionFactor('xsec','tree')
    dataPlotters[-1].addCorrectionFactor('genWeight','tree')
    dataPlotters[-1].addCorrectionFactor('puWeight','tree')
+   dataPlotters[-1].addCorrectionFactor(luminosity,'flat')
    if fname.find("QCD_Pt_") !=-1 or fname.find("QCD_HT") !=-1:
        print "going to apply spikekiller for ",fname
        dataPlotters[-1].addCorrectionFactor('b_spikekiller','tree')
@@ -130,7 +145,7 @@ for filename in os.listdir(args[0]):
    for w in weights_:
     if w != '': dataPlotters[-1].addCorrectionFactor(w,'branch')
    dataPlotters[-1].filename=fname
-   dataPlottersNW.append(TreePlotter(args[0]+'/'+fname+'.root','AnalysisTree'))
+   dataPlottersNW.append(TreePlotter(folder+'/'+fname+'.root','AnalysisTree'))
    dataPlottersNW[-1].addCorrectionFactor('puWeight','tree')
    dataPlottersNW[-1].addCorrectionFactor('genWeight','tree')
    if fname.find("QCD_Pt_") !=-1 or fname.find("QCD_HT") !=-1:
@@ -139,6 +154,7 @@ for filename in os.listdir(args[0]):
    if options.triggerW: dataPlottersNW[-1].addCorrectionFactor('triggerWeight','tree')
    for w in weights_: 
     if w != '': dataPlottersNW[-1].addCorrectionFactor(w,'branch')
+   dataPlottersNW[-1].addCorrectionFactor(luminosity,'flat')
    dataPlottersNW[-1].filename=fname
 
 data=MergedPlotter(dataPlotters)

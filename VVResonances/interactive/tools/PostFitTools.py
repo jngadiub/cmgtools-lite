@@ -405,7 +405,7 @@ class Postfitplotter():
         zrange = self.options.zrange
         if self.options.xrange == '0,-1': xrange = '55,215'
         if self.options.yrange == '0,-1': yrange = '55,215'
-        if self.options.zrange == '0,-1': zrange = '1126,5500'
+        if self.options.zrange == '0,-1': zrange = '1126,7600' #5500'
         xlow = xrange.split(',')[0]
         xhigh = xrange.split(',')[1]
         ylow = yrange.split(',')[0]
@@ -991,24 +991,23 @@ class Projection():
                     i=0
                     binV = self.BinsWidth_2[ik]*self.BinsWidth_3[jk]*self.BinsWidth_1[kk]
                     for p in pdfs:
-                        if "nonRes" in str(p.GetName()) : 
+                        if "nonRes" in str(p.GetName()) :
                             self.lv[i][kv] += p.getVal(self.args_ws)*binV*norms["nonRes"][0].getVal()
-                        if "Wjets" in str(p.GetName()) : 
+                        if "Wjets" in str(p.GetName()) :
                             self.lv[i][kv] += p.getVal(self.args_ws)*binV*norms["Wjets"][0].getVal()
-                        if "Zjets" in str(p.GetName()) : 
+                        if "Zjets" in str(p.GetName()) :
                             self.lv[i][kv] += p.getVal(self.args_ws)*binV*norms["Zjets"][0].getVal()
-                        if "TTJetsTop_" in str(p.GetName()) : 
+                        if "TTJetsTop_" in str(p.GetName()) :
                             self.lv[i][kv] += p.getVal(self.args_ws)*binV*norms["TTJetsTop"][0].getVal()
-                        if "TTJetsW_" in str(p.GetName()) : 
+                        if "TTJetsW_" in str(p.GetName()) :
                             self.lv[i][kv] += p.getVal(self.args_ws)*binV*norms["TTJetsW"][0].getVal()
-                        if "TTJetsNonRes_" in str(p.GetName()) : 
+                        if "TTJetsNonRes_" in str(p.GetName()) :
                             self.lv[i][kv] += p.getVal(self.args_ws)*binV*norms["TTJetsNonRes"][0].getVal()
-                        if "TTJetsTNonResT_" in str(p.GetName()) : 
+                        if "TTJetsTNonResT_" in str(p.GetName()) :
                             self.lv[i][kv] += p.getVal(self.args_ws)*binV*norms["TTJetsTNonResT"][0].getVal()
-                   
-                        if "TTJetsWNonResT_" in str(p.GetName()) : 
+                        if "TTJetsWNonResT_" in str(p.GetName()) :
                             self.lv[i][kv] += p.getVal(self.args_ws)*binV*norms["TTJetsWNonResT"][0].getVal()
-                        if "TTJetsResWResT_" in str(p.GetName()) : 
+                        if "TTJetsResWResT_" in str(p.GetName()) :
                             self.lv[i][kv] += p.getVal(self.args_ws)*binV*norms["TTJetsResWResT"][0].getVal()    #; print norms["TTJetsResWResT"][0].getVal()
                         i+=1
                     if pdf_sig!=None:

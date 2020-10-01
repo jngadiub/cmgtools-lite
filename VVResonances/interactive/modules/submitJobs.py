@@ -81,13 +81,20 @@ def waitForBatchJobs( jobname, remainingjobs, listOfJobs, userName, timeCheck="3
         
 def submitJobs(minEv,maxEv,cmd,OutputFileNames,queue,jobname,path):
     joblist = []
+    print "minEv ",minEv
+    print " iteritems() ",minEv.iteritems()
+    i=0
     for k,v in minEv.iteritems():
-
+      removefile=k[k.rindex("/")+1:]
+      directory = str(k).split(removefile)[0]
+      year=directory.split("/")[-2]
+      template = str(k).split("/")[-1]
       for j in range(len(v)):
-       os.system("mkdir tmp"+jobname+"/"+str(k).replace(".root","")+"_"+str(j+1))
-       os.chdir("tmp"+jobname+"/"+str(k).replace(".root","")+"_"+str(j+1))
-      
-       with open('job_%s_%i.sh'%(k.replace(".root",""),j+1), 'w') as fout:
+       os.system("mkdir tmp"+jobname+"/"+year+"_"+template.replace(".root","")+"_"+str(i+1))
+       os.chdir("tmp"+jobname+"/"+year+"_"+template.replace(".root","")+"_"+str(i+1))
+
+       with open('job_%s_%i.sh'%(year+"_"+template.replace(".root",""),i+1), 'w') as fout:
+          print " fout" , fout
           fout.write("#!/bin/sh\n")
           fout.write("echo\n")
           fout.write("echo\n")
@@ -99,50 +106,52 @@ def submitJobs(minEv,maxEv,cmd,OutputFileNames,queue,jobname,path):
           fout.write("cd "+str(path)+"\n")
           fout.write("cmsenv\n")
           if runinKA==True: fout.write("mkdir -p /tmp/${USER}/\n")
-          fout.write(cmd+" -o res"+jobname+"/"+OutputFileNames+"_"+str(j+1)+"_"+k+" -s "+k+" -e "+str(minEv[k][j])+" -E "+str(maxEv[k][j])+"\n")
+          fout.write(cmd+" -o res"+jobname+"/"+OutputFileNames+"_"+str(i+1)+"_"+year+"_"+template+" -e "+str(minEv[k][j])+" -E "+str(maxEv[k][j])+" "+directory+" -s "+template+"\n")
           fout.write("echo 'STOP---------------'\n")
           fout.write("echo\n")
           fout.write("echo\n")
-
+        
        if useCondorBatch:
                os.system("mv  job_*.sh "+jobname+".sh")
                makeSubmitFileCondor(jobname+".sh",jobname,"workday")
                os.system("condor_submit submit.sub")
        else:
-               os.system("chmod 755 job_%s_%i.sh"%(k.replace(".root",""),j+1) )
-               os.system("bsub -q "+queue+" -o logs job_%s_%i.sh -J %s"%(k.replace(".root",""),j+1,jobname))
-       print "job nr " + str(j+1) + " file " + k + " being submitted"
-       joblist.append("%s_%i"%(k.replace(".root",""),j+1))
+               os.system("chmod 755 job_%s_%i.sh"%(k.replace(".root",""),i+1) )
+               os.system("bsub -q "+queue+" -o logs job_%s_%i.sh -J %s"%(k.replace(".root",""),i+1,jobname))
+       print "job nr " + str(i+1) + " file " + k + " being submitted"
+       joblist.append("%s_%i"%(year+"_"+template.replace(".root",""),i+1))
        os.chdir("../..")
+       i+=1
     return joblist     
 
 def getEvents(template,samples):
     files = []
     sampleTypes = template.split(',')
-    for f in os.listdir(samples):
-        for t in sampleTypes:
-            if f.find('.root') != -1 and f.find(t) != -1: files.append(f)
+    for dirs in samples:
+        for f in os.listdir(dirs):
+            for t in sampleTypes:
+                if f.find('.root') != -1 and f.find(t) != -1: files.append(dirs+f)
 
     minEv = {}
     maxEv = {}
 
     for f in files:
-     inf = ROOT.TFile('%s/'%samples+f,'READ')
-     print "opening file "+str(samples+f)
-     minEv[f] = []
-     maxEv[f] = []
-     intree = inf.Get('AnalysisTree')
-     nentries = intree.GetEntries()
-     print f,nentries,nentries/500000
-     if nentries/500000 == 0:
-      minEv[f].append(0)
-      maxEv[f].append(500000)
-     else:
-      for i in range(nentries/500000):
-       minEv[f].append(i*500000)
-       maxEv[f].append(499999)
-
-
+        inf = ROOT.TFile(f,'READ')
+        print "opening file "+str(f)
+        minEv[f] = []
+        maxEv[f] = []
+        intree = inf.Get('AnalysisTree')
+        nentries = intree.GetEntries()
+        print f,nentries,nentries/500000
+        if nentries/500000 == 0:
+            minEv[f].append(0)
+            maxEv[f].append(500000)
+        else:
+            for i in range(nentries/500000):
+                minEv[f].append(i*500000)
+                maxEv[f].append(499999)
+                
+                
     NumberOfJobs = 0
     for k in maxEv.keys():
      NumberOfJobs += len(maxEv[k])
@@ -159,7 +168,8 @@ def Make2DDetectorParam(rootFile,template,cut,samples,jobname="DetPar",bins="200
     print "cut      = %s" %cut       
     print "samples  = %s" %samples   
     print "jobname  = %s" %jobname 
-    
+    print "bins     = %s" %bins
+
     if leg == "l1": cmd='vvMake2DDetectorParam.py  -c "{cut}"  -v "jj_LV_mass,jj_l1_softDrop_mass"  -g "jj_gen_partialMass,jj_l1_gen_softDrop_mass,jj_l1_gen_pt"  -b {bins}   {infolder}'.format(rootFile=rootFile,samples=template,cut=cut,bins=bins,infolder=samples)
     if leg == "l2": cmd='vvMake2DDetectorParam.py  -c "{cut}"  -v "jj_LV_mass,jj_l2_softDrop_mass"  -g "jj_gen_partialMass,jj_l2_gen_softDrop_mass,jj_l2_gen_pt"  -b {bins}   {infolder}'.format(rootFile=rootFile,samples=template,cut=cut,bins=bins,infolder=samples)
     OutputFileNames = rootFile.replace(".root","") # base of the output file name, they will be saved in res directory
@@ -249,23 +259,33 @@ def Make1DMVVTemplateWithKernels(rootFile,template,cut,resFile,binsMVV,minMVV,ma
     print "samples  = %s" %samples   
     print "jobName  = %s" %jobName 
     print
-    minEv, maxEv, NumberOfJobs, files = getEvents(template,samples) 
-    print "Submitting %i number of jobs "  ,NumberOfJobs
+    folders = samples.split(",")
+    print "folders ",folders
+    minEv, maxEv, NumberOfJobs, files = getEvents(template,folders) 
+    print "Submitting %i number of jobs "%(NumberOfJobs)
+    print "files involved are ", files
+    print "minEv ",minEv
+    print "maxEv ",maxEv
     print
 
-    cmd='vvMake1DMVVTemplateWithKernels.py -H "x" -c "{cut}"  -v "jj_gen_partialMass" {binning} -b {binsMVV}  -x {minMVV} -X {maxMVV} -r {res} {addOption} {infolder} '.format(rootFile=rootFile,cut=cut,res=resFile,binsMVV=binsMVV,minMVV=minMVV,maxMVV=maxMVV,infolder=samples,binning=binning,addOption=addOption)
+    #cmd='vvMake1DMVVTemplateWithKernels.py -H "x" -c "{cut}"  -v "jj_gen_partialMass" {binning} -b {binsMVV}  -x {minMVV} -X {maxMVV} -r {res} {addOption} -d {infolder} '.format(rootFile=rootFile,cut=cut,res=resFile,binsMVV=binsMVV,minMVV=minMVV,maxMVV=maxMVV,infolder=samples,binning=binning,addOption=addOption)
+    cmd='vvMake1DMVVTemplateWithKernels.py -H "x" -c "{cut}"  -v "jj_gen_partialMass" {binning} -b {binsMVV}  -x {minMVV} -X {maxMVV} -r {res} {addOption} '.format(rootFile=rootFile,cut=cut,res=resFile,binsMVV=binsMVV,minMVV=minMVV,maxMVV=maxMVV,binning=binning,addOption=addOption)
+    print "cmd ",cmd 
     OutputFileNames = rootFile.replace(".root","") # base of the output file name, they will be saved in res directory
+    print "OutputFileNames ",OutputFileNames
     queue = "8nh" # give bsub queue -- 8nm (8 minutes), 1nh (1 hour), 8nh, 1nd (1day), 2nd, 1nw (1 week), 2nw 
     
     path = os.getcwd()
     try: os.system("rm -r tmp"+jobName)
-    except: print "No tmp/ directory"
+    except: print "No tmp"+jobName+"/ directory"
     os.system("mkdir tmp"+jobName)
-    try: os.stat("res"+jobName) 
+    try: os.stat("res"+jobName)
     except: os.mkdir("res"+jobName)
 
     #### Creating and sending jobs #####
+    print " Creating and sending jobs "
     joblist = submitJobs(minEv,maxEv,cmd,OutputFileNames,queue,jobName,path)
+    print "job list made "
     with open('tmp'+jobName+'_joblist.txt','w') as outfile:
         outfile.write("jobList = %s\n" % joblist)
         outfile.write("files = %s\n" % files)
@@ -304,19 +324,22 @@ def Make2DTemplateWithKernels(rootFile,template,cut,leg,binsMVV,minMVV,maxMVV,re
     print "samples   = %s" %samples   
     print "jobName   = %s" %jobName   
     print
-    minEv, maxEv, NumberOfJobs, files = getEvents(template,samples) 
-    print "Submitting %i number of jobs "  ,NumberOfJobs
+    folders = samples.split(",")
+    print "folders ",folders
+    minEv, maxEv, NumberOfJobs, files = getEvents(template,folders) 
+    print "Submitting %i number of jobs "%(NumberOfJobs)
+    print "files involved are ", files
     print
 
-    cmd='vvMake2DTemplateWithKernels.py -c "{cut}"  -v "jj_{leg}_gen_softDrop_mass,jj_gen_partialMass" {binning}  -b {binsMJ} -B {binsMVV} -x {minMJ} -X {maxMJ} -y {minMVV} -Y {maxMVV}  -r {res} {addOption} {infolder}'.format(rootFile=rootFile,samples=template,cut=cut,leg=leg,binsMVV=binsMVV,minMVV=minMVV,maxMVV=maxMVV,res=resFile,binsMJ=binsMJ,minMJ=minMJ,maxMJ=maxMJ,infolder=samples,binning=binning,addOption=addOption)
+    cmd='vvMake2DTemplateWithKernels.py -c "{cut}"  -v "jj_{leg}_gen_softDrop_mass,jj_gen_partialMass" {binning}  -b {binsMJ} -B {binsMVV} -x {minMJ} -X {maxMJ} -y {minMVV} -Y {maxMVV}  -r {res} {addOption} -s {samples}'.format(rootFile=rootFile,samples=template,cut=cut,leg=leg,binsMVV=binsMVV,minMVV=minMVV,maxMVV=maxMVV,res=resFile,binsMJ=binsMJ,minMJ=minMJ,maxMJ=maxMJ,binning=binning,addOption=addOption)
     OutputFileNames = rootFile.replace(".root","") # base of the output file name, they will be saved in res directory
     queue = "8nh" # give bsub queue -- 8nm (8 minutes), 1nh (1 hour), 8nh, 1nd (1day), 2nd, 1nw (1 week), 2nw 
     
     path = os.getcwd()
     try: os.system("rm -r tmp"+jobName)
-    except: print "No tmp/ directory"
+    except: print "No tmp"+jobName+"/ directory"
     os.system("mkdir tmp"+jobName)
-    try: os.stat("res"+jobName) 
+    try: os.stat("res"+jobName)
     except: os.mkdir("res"+jobName)
 
     #### Creating and sending jobs #####
@@ -378,12 +401,19 @@ def mirror(histo,histoNominal,name,dim=1):
     if dim == 2:
 		for i in range(1,histo.GetNbinsX()+1):
 			for j in range(1,histo.GetNbinsY()+1):
-				up=histo.GetBinContent(i,j)/intUp
-				nominal=histoNominal.GetBinContent(i,j)/intNominal
+                                if intUp !=0: up=histo.GetBinContent(i,j)/intUp
+                                else:
+                                    up=histo.GetBinContent(i,j)
+                                    print " ************* up hist not divided by intUp beacuse intUp =0 !!!!!! *******"
+				if intNominal !=0 :  nominal=histoNominal.GetBinContent(i,j)/intNominal
+                                else :
+                                    nominal=histoNominal.GetBinContent(i,j)
+                                    print " ************* nominal hist not divided by intNominal beacuse intNominal =0 !!!!!! *******"
 				if up != 0: newHisto.SetBinContent(i,j,histoNominal.GetBinContent(i,j)*nominal/up)
     else:
 		for i in range(1,histo.GetNbinsX()+1):
-			up=histo.GetBinContent(i)/intUp
+                        if intUp !=0: up=histo.GetBinContent(i)/intUp
+                        else:	      up=histo.GetBinContent(i)
 			nominal=histoNominal.GetBinContent(i)/intNominal
 			if up!= 0: newHisto.SetBinContent(i,histoNominal.GetBinContent(i)*nominal/up)
 			else: newHisto.SetBinContent(i,0)  	
@@ -422,15 +452,20 @@ def conditional(hist):
             hist.SetBinContent(j,i,hist.GetBinContent(j,i)/integral)
 
 def getJobs(files,jobList,outdir,purity):
+        print "getting jobs"
 	resubmit = []
 	jobsPerSample = {}
 	exit_flag = False
-
+        
 	for s in files:
+         y = s.split("/")[-2] 
+         s = s.split("/")[-1]
 	 s = s.replace('.root','')
+         s = y+"_"+s
 	 filelist = []
 	 for t in jobList:
-	  if t.find(s) == -1: continue
+	  if t.find(s) == -1: 
+              continue
 	  jobid = t.split("_")[-1]
 	  found = False
 	  for o in os.listdir(outdir):
@@ -444,6 +479,31 @@ def getJobs(files,jobList,outdir,purity):
 	   resubmit.append(s+"_"+jobid)
 	 if len(filelist) > 0: jobsPerSample[s] = filelist
 	return resubmit, jobsPerSample,exit_flag	 
+
+def getNormJobs(files,jobList,outdir,purity):
+	resubmit = []
+	jobsPerSample = {}
+	exit_flag = False
+
+	for s in files:
+	 s = s.replace('.root','')
+	 filelist = []
+	 for t in jobList:
+	  if t.find(s) == -1: continue
+	  jobid = t
+	  found = False
+	  for o in os.listdir(outdir):
+	   if o.find(s) != -1 and o.find(jobid) != -1 and o.find(purity)!=-1:
+	    found = True
+	    filelist.append(outdir+"/"+o)
+	    break
+	  if not found:
+	   print "SAMPLE ",s," JOBID ",jobid," NOT FOUND"
+	   exit_flag = True
+	   resubmit.append(s+"_"+jobid)
+	 if len(filelist) > 0: jobsPerSample[s] = filelist
+	return resubmit, jobsPerSample,exit_flag	 
+
 	
 def reSubmit(jobdir,resubmit,jobname):
  jobs = []
@@ -465,15 +525,46 @@ def reSubmit(jobdir,resubmit,jobname):
 			 os.chdir("../..")
  return jobs
 
-def merge2DDetectorParam(resFile,binsxStr,jobname,template="QCD_Pt_"):
+def merge2DDetectorParam(jobList,files,resFile,binsxStr,jobname,template="QCD_Pt_"):
     
     print "Merging 2D detector parametrization"
 
     outdir = 'res'+jobname
     jobdir = 'tmp'+jobname
-    
+    print "jobname "+str(jobname)
+    print "outdir "+str(outdir)
+    print "jobdir "+str(jobdir)
    
+    print "Jobs to merge :   " ,jobList
+    print "Files ran over:   " ,files
+
+    resubmit, jobsPerSample,exit_flag = getJobs(files,jobList,outdir,"")
+    
+    if exit_flag:
+         submit = raw_input("The following files are missing: %s. Do you  want to resubmit the jobs to the batch system before merging? [y/n] "%resubmit)
+         if submit == 'y' or submit=='Y':
+             print "Resubmitting jobs:"
+             jobs = reSubmit(jobdir,resubmit,jobname)
+             waitForBatchJobs(jobname,len(resubmit),len(resubmit), userName, timeCheck)
+             resubmit, jobsPerSample,exit_flag = getJobs(files,jobList,outdir,purity)
+             if exit_flag: 
+                 print "Job crashed again! Please resubmit manually before attempting to merge again"
+                 for j in jobs: print j 
+                 sys.exit()
+         else:
+             submit = raw_input("Some files are missing. [y] == Exit without merging, [n] == continue ? ")
+             if submit == 'y' or submit=='Y':
+                 print "Exit without merging!"
+                 sys.exit()
+             else:
+                 print "Continuing merge!"
+    
+
+
     filelist = os.listdir('./res'+jobname+'/')
+    print "filelist "+str(filelist)
+
+
 
     pythia_files = []
     herwig_files = []
@@ -491,6 +582,7 @@ def merge2DDetectorParam(resFile,binsxStr,jobname,template="QCD_Pt_"):
     #now hadd them
     tmp_files = []
     if len(pythia_files) > 0:
+        print "doing pythia"
         cmd = 'hadd -f tmp_nominal.root '
         for f in pythia_files:
          cmd += f
@@ -500,6 +592,7 @@ def merge2DDetectorParam(resFile,binsxStr,jobname,template="QCD_Pt_"):
         tmp_files.append('tmp_nominal.root')
         
     if len(mg_files) > 0:
+        print "doing mg"
         cmd = 'hadd -f tmp_altshape2.root '
         for f in mg_files:
          cmd += f
@@ -509,6 +602,7 @@ def merge2DDetectorParam(resFile,binsxStr,jobname,template="QCD_Pt_"):
         tmp_files.append('tmp_altshape2.root')  
 
     if len(herwig_files) > 0:
+        print "doing herwig"
         cmd = 'hadd -f tmp_altshapeUp.root '
         for f in herwig_files:
          cmd += f
@@ -533,6 +627,7 @@ def merge2DDetectorParam(resFile,binsxStr,jobname,template="QCD_Pt_"):
      for b in binsxStr.split(','):
          binsx.append(float(b))
      outname = resFile.replace(".root","")+f.split('_')[1]
+     print "outname "+str(outname)
      fout = ROOT.TFile(outname,"RECREATE")
      
      scalexHisto=ROOT.TH1F("scalexHisto","scaleHisto",len(binsx)-1,array('d',binsx))
@@ -660,276 +755,301 @@ def merge2DDetectorParam(resFile,binsxStr,jobname,template="QCD_Pt_"):
         print " outname used for copy: "+str(outname)
         os.system( 'cp %s %s'%(outname,resFile) )
 
-def merge1DMVVTemplate(jobList,files,jobname,purity,binsMVV,minMVV,maxMVV,HCALbinsMVV,name,filename):
+def merge1DMVVTemplate(jobList,files,jobname,purity,binsMVV,minMVV,maxMVV,HCALbinsMVV,name,filename): # ,samples):
 	print "Merging 1D templates"
 	print
 	print "Jobs to merge :   " ,jobList
 	print "Files ran over:   " ,files
 	
-	outdir = 'res'+jobname
-	jobdir = 'tmp'+jobname
-	
-	resubmit, jobsPerSample,exit_flag = getJobs(files,jobList,outdir,purity)
-	
-	if exit_flag:
-	 submit = raw_input("The following files are missing: %s. Do you  want to resubmit the jobs to the batch system before merging? [y/n] "%resubmit)
-	 if submit == 'y' or submit=='Y':
-		 print "Resubmitting jobs:"
-		 jobs = reSubmit(jobdir,resubmit,jobname)
-		 waitForBatchJobs(jobname,len(resubmit),len(resubmit), userName, timeCheck)
-		 resubmit, jobsPerSample,exit_flag = getJobs(files,jobList,outdir,purity)
-		 if exit_flag: 
-			 print "Job crashed again! Please resubmit manually before attempting to merge again"
-			 for j in jobs: print j 
-			 sys.exit()
-	 else:
-		 submit = raw_input("Some files are missing. [y] == Exit without merging, [n] == continue ? ")
-		 if submit == 'y' or submit=='Y':
-			 print "Exit without merging!"
-			 sys.exit()
-		 else:
-			 print "Continuing merge!"
+        outdir = 'res'+jobname
+        jobdir = 'tmp'+jobname
+
+        resubmit, jobsPerSample,exit_flag = getJobs(files,jobList,outdir,purity)
+
+        if exit_flag:
+            submit = raw_input("The following files are missing: %s. Do you  want to resubmit the jobs to the batch system before merging? [y/n] "%resubmit)
+            if submit == 'y' or submit=='Y':
+                print "Resubmitting jobs:"
+                jobs = reSubmit(jobdir,resubmit,jobname)
+                waitForBatchJobs(jobname,len(resubmit),len(resubmit), userName, timeCheck)
+                resubmit, jobsPerSample,exit_flag = getJobs(files,jobList,outdir,purity)
+                if exit_flag: 
+                    print "Job crashed again! Please resubmit manually before attempting to merge again"
+                    for j in jobs: print j 
+                    sys.exit()
+            else:
+                submit = raw_input("Some files are missing. [y] == Exit without merging, [n] == continue ? ")
+                if submit == 'y' or submit=='Y':
+                    print "Exit without merging!"
+                    sys.exit()
+                else:
+                    print "Continuing merge!"
  
-	try: 
-		os.stat(outdir+'_out') 
-		os.system('rm -r '+outdir+'_out')
-		os.mkdir(outdir+'_out')
-	except: os.mkdir(outdir+'_out')
-
-	for s in jobsPerSample.keys():
-	 factor = 1./float(len(jobsPerSample[s]))
-	 print "sample: ", s,"number of files:",len(jobsPerSample[s]),"adding histo with scale factor:",factor
- 
-	 outf = ROOT.TFile.Open(outdir+'_out/%s_%s_MVV_%s_%s.root'%(filename,name,s,purity),'RECREATE')
-  
-	 finalHistos = {}
-	 finalHistos['histo_nominal'] = ROOT.TH1F("histo_nominal_out","histo_nominal_out",binsMVV,minMVV,maxMVV)
-	 finalHistos['mvv_nominal'] = ROOT.TH1F("mvv_nominal_out","mvv_nominal_out",binsMVV,minMVV,maxMVV)
-	 if HCALbinsMVV!="":
-             a,b,bins = HCALbinsMVV.split(" ")
-             binning = getBinning(bins)
-             binning = array("f",binning)
-             finalHistos['histo_nominal'] = ROOT.TH1F("histo_nominal_out","histo_nominal_out",len(binning)-1,binning)
-             finalHistos['mvv_nominal'] = ROOT.TH1F("mvv_nominal_out","mvv_nominal_out",len(binning)-1,binning)
-    
-	 for f in jobsPerSample[s]:
-    
-	  inf = ROOT.TFile.Open(f,'READ')
-    
-	  for h in inf.GetListOfKeys():
-  
-	   if (h.GetName() == 'histo_nominal' and h.GetTitle() == 'histo_nominal') or (h.GetName() == 'mvv_nominal' and h.GetTitle() == 'mvv_nominal'):
-
-	    histo = ROOT.TH1F()
-	    histo = inf.Get(h.GetName())
-
-	    finalHistos[h.GetName()].Add(histo,factor)
-      
+        try: 
+            os.stat(outdir+'_out') 
+            os.system('rm -r '+outdir+'_out')
+            os.mkdir(outdir+'_out')
+        except: os.mkdir(outdir+'_out')
+        
+        for s in jobsPerSample.keys():
+            factor = 1./float(len(jobsPerSample[s]))
+            print "sample: ", s,"number of files:",len(jobsPerSample[s]),"adding histo with scale factor:",factor
+            
+            outf = ROOT.TFile.Open(outdir+'_out/%s_%s_MVV_%s_%s.root'%(filename,name,s,purity),'RECREATE')
+            
+            finalHistos = {}
+            finalHistos['histo_nominal'] = ROOT.TH1F("histo_nominal_out","histo_nominal_out",binsMVV,minMVV,maxMVV)
+            finalHistos['mvv_nominal'] = ROOT.TH1F("mvv_nominal_out","mvv_nominal_out",binsMVV,minMVV,maxMVV)
+            if HCALbinsMVV!="":
+                a,b,bins = HCALbinsMVV.split(" ")
+                binning = getBinning(bins)
+                binning = array("f",binning)
+                finalHistos['histo_nominal'] = ROOT.TH1F("histo_nominal_out","histo_nominal_out",len(binning)-1,binning)
+                finalHistos['mvv_nominal'] = ROOT.TH1F("mvv_nominal_out","mvv_nominal_out",len(binning)-1,binning)
+                
+            for f in jobsPerSample[s]:
+                
+                inf = ROOT.TFile.Open(f,'READ')
+                
+                for h in inf.GetListOfKeys():
+                    
+                    if (h.GetName() == 'histo_nominal' and h.GetTitle() == 'histo_nominal') or (h.GetName() == 'mvv_nominal' and h.GetTitle() == 'mvv_nominal'):
+                        
+                        histo = ROOT.TH1F()
+                        histo = inf.Get(h.GetName())
+                        
+                        finalHistos[h.GetName()].Add(histo,factor)
+                        
+                        
+            print "Write file: ",outdir+'_out/%s_%s_MVV_%s_%s.root'%(filename,name,s,purity)
    
-	 print "Write file: ",outdir+'_out/%s_%s_MVV_%s_%s.root'%(filename,name,s,purity)
+            outf.cd()  
+            finalHistos['histo_nominal'].Write('histo_nominal')
+            finalHistos['mvv_nominal'].Write('mvv_nominal')
    
-	 outf.cd()  
-	 finalHistos['histo_nominal'].Write('histo_nominal')
-	 finalHistos['mvv_nominal'].Write('mvv_nominal')
-   
-	 outf.Close()
-	 outf.Delete()
+            outf.Close()
+            outf.Delete()
 
-	# read out files
-	filelist = os.listdir('./'+outdir+'_out'+'/')
+        # read out files
+        filelist = os.listdir('./'+outdir+'_out'+'/')
 
-	mg_files = []
-	pythia_files = []
-	herwig_files = []
-	dijet_files = []
+        mg_files = []
+        pythia_files = []
+        herwig_files = []
+        dijet_files = []
 
-	for f in filelist:
-	 if f.find('QCD_HT') != -1: mg_files.append('./'+outdir+'_out'+'/'+f)
-	 elif f.find('QCD_Pt_') != -1: pythia_files.append('./'+outdir+'_out'+'/'+f)
-	 elif f.find('QCD_Pt-') != -1: herwig_files.append('./'+outdir+'_out'+'/'+f)
-	 else: dijet_files.append('./'+outdir+'_out'+'/'+f)
+        for f in filelist:
+            if f.find('QCD_HT') != -1: mg_files.append('./'+outdir+'_out'+'/'+f)
+            elif f.find('QCD_Pt_') != -1: pythia_files.append('./'+outdir+'_out'+'/'+f)
+            elif f.find('QCD_Pt-') != -1: herwig_files.append('./'+outdir+'_out'+'/'+f)
+            else: dijet_files.append('./'+outdir+'_out'+'/'+f)
 	 
-	doMadGraph = False
-	doHerwig   = False
-	doPythia   = False
-	doDijet    = False
+        doMadGraph = False
+        doHerwig   = False
+        doPythia   = False
+        doDijet    = False
 	
-	#now hadd them
-	if len(mg_files) > 0:
-		cmd = 'hadd -f %s_%s_MVV_%s_altshape2.root '%(filename,name,purity)
-		for f in mg_files:
-		 cmd += f
-		 cmd += ' '
-		print cmd
-		os.system(cmd)
+        #now hadd them
+        if len(mg_files) > 0:
+            cmd = 'hadd -f %s_%s_MVV_%s_altshape2.root '%(filename,name,purity)
+            for f in mg_files:
+                cmd += f
+                cmd += ' '
+            print cmd
+            os.system(cmd)
 		
-		fhadd_madgraph = ROOT.TFile.Open('%s_%s_MVV_%s_altshape2.root'%(filename,name,purity),'READ')
-		mvv_altshape2 = fhadd_madgraph.Get('mvv_nominal')
-		mvv_altshape2.SetName('mvv_altshape2')
-		mvv_altshape2.SetTitle('mvv_altshape2')
-		histo_altshape2Up = fhadd_madgraph.Get('histo_nominal')
-		histo_altshape2Up.SetName('histo_altshape2Up')
-		histo_altshape2Up.SetTitle('histo_altshape2Up')
+            fhadd_madgraph = ROOT.TFile.Open('%s_%s_MVV_%s_altshape2.root'%(filename,name,purity),'READ')
+            mvv_altshape2 = fhadd_madgraph.Get('mvv_nominal')
+            mvv_altshape2.SetName('mvv_altshape2')
+            mvv_altshape2.SetTitle('mvv_altshape2')
+            histo_altshape2Up = fhadd_madgraph.Get('histo_nominal')
+            histo_altshape2Up.SetName('histo_altshape2Up')
+            histo_altshape2Up.SetTitle('histo_altshape2Up')
+            
+            doMadGraph = True
 		
-		doMadGraph = True
+        if len(herwig_files) > 0:
+            cmd = 'hadd -f %s_%s_MVV_%s_altshapeUp.root '%(filename,name,purity)
+            for f in herwig_files:
+                cmd += f
+                cmd += ' '
+            print cmd
+            os.system(cmd)
 		
-	if len(herwig_files) > 0:
-		cmd = 'hadd -f %s_%s_MVV_%s_altshapeUp.root '%(filename,name,purity)
-		for f in herwig_files:
-		 cmd += f
-		 cmd += ' '
-		print cmd
-		os.system(cmd)
+            fhadd_herwig = ROOT.TFile.Open('%s_%s_MVV_%s_altshapeUp.root'%(filename,name,purity),'READ')
+            mvv_altshapeUp = fhadd_herwig.Get('mvv_nominal')
+            mvv_altshapeUp.SetName('mvv_altshapeUp')
+            mvv_altshapeUp.SetTitle('mvv_altshapeUp')
+            histo_altshapeUp = fhadd_herwig.Get('histo_nominal')
+            histo_altshapeUp.SetName('histo_altshapeUp')
+            histo_altshapeUp.SetTitle('histo_altshapeUp')
 		
-		fhadd_herwig = ROOT.TFile.Open('%s_%s_MVV_%s_altshapeUp.root'%(filename,name,purity),'READ')
-		mvv_altshapeUp = fhadd_herwig.Get('mvv_nominal')
-		mvv_altshapeUp.SetName('mvv_altshapeUp')
-		mvv_altshapeUp.SetTitle('mvv_altshapeUp')
-		histo_altshapeUp = fhadd_herwig.Get('histo_nominal')
-		histo_altshapeUp.SetName('histo_altshapeUp')
-		histo_altshapeUp.SetTitle('histo_altshapeUp')
-		
-		doHerwig = True
+            doHerwig = True
  	
-	if len(pythia_files) > 0:
-		cmd = 'hadd -f %s_%s_MVV_%s_nominal.root '%(filename,name,purity)
-		for f in pythia_files:
-		 cmd += f
-		 cmd += ' '
-		print cmd
-		os.system(cmd)
+        if len(pythia_files) > 0:
+            cmd = 'hadd -f %s_%s_MVV_%s_nominal.root '%(filename,name,purity)
+            for f in pythia_files:
+                cmd += f
+                cmd += ' '
+            print cmd
+            os.system(cmd)
 		
-		fhadd_pythia = ROOT.TFile.Open('%s_%s_MVV_%s_nominal.root'%(filename,name,purity),'READ')
-		mvv_nominal = fhadd_pythia.Get('mvv_nominal')
-		mvv_nominal.SetName('mvv_nominal')
-		mvv_nominal.SetTitle('mvv_nominal')
-		histo_nominal = fhadd_pythia.Get('histo_nominal')
-		histo_nominal.SetName('histo_nominal')
-		histo_nominal.SetTitle('histo_nominal')
+            fhadd_pythia = ROOT.TFile.Open('%s_%s_MVV_%s_nominal.root'%(filename,name,purity),'READ')
+            mvv_nominal = fhadd_pythia.Get('mvv_nominal')
+            mvv_nominal.SetName('mvv_nominal')
+            mvv_nominal.SetTitle('mvv_nominal')
+            histo_nominal = fhadd_pythia.Get('histo_nominal')
+            histo_nominal.SetName('histo_nominal')
+            histo_nominal.SetTitle('histo_nominal')
+            
+            doPythia = True
+            
+        if len(dijet_files) > 0:
+            
+            cmd = 'hadd -f %s_%s_MVV_%s.root '%(filename,name,purity)
+            for f in dijet_files:
+                cmd += f
+                cmd += ' '
+            print cmd
+            os.system(cmd)
 		
-		doPythia = True
+            fhadd_dijet = ROOT.TFile.Open('%s_%s_MVV_%s.root'%(filename,name,purity),'READ')
+            mvv_NLO = fhadd_dijet.Get('mvv_nominal')
+            mvv_NLO.SetName('mvv_nominal')
+            mvv_NLO.SetTitle('mvv_nominal')
+            histo_NLO = fhadd_dijet.Get('histo_nominal')
+            histo_NLO.SetName('histo_nominal')
+            histo_NLO.SetTitle('histo_nominal')
 
-	if len(dijet_files) > 0:
-		cmd = 'hadd -f %s_%s_MVV_%s_NLO.root '%(filename,name,purity)
-		for f in dijet_files:
-		 cmd += f
-		 cmd += ' '
-		print cmd
-		os.system(cmd)
+            doDijet = True
 		
-		fhadd_dijet = ROOT.TFile.Open('%s_%s_MVV_%s_NLO.root'%(purity),'READ')
-		mvv_NLO = fhadd_dijet.Get('mvv_nominal')
-		mvv_NLO.SetName('mvv_NLO')
-		mvv_NLO.SetTitle('mvv_NLO')
-		histo_NLO = fhadd_dijet.Get('histo_nominal')
-		histo_NLO.SetName('histo_NLO')
-		histo_NLO.SetTitle('histo_NLO')
-		
-		doDijet = True
-		
-	outf = ROOT.TFile.Open('%s_%s_MVV_%s.root'%(filename,name,purity),'RECREATE') 
-    
-	if doPythia:
-		print "doing Pythia"
-                mvv_nominal.Write('mvv_nominal')
-		histo_nominal.Scale(1./histo_nominal.Integral())
-		histo_nominal.Write('histo_nominal')
+        outf = ROOT.TFile.Open('%s_%s_MVV_%s.root'%(filename,name,purity),'RECREATE') 
+        
+        if doPythia:
+            print "doing Pythia"
+            mvv_nominal.Write('mvv_nominal')
+            if histo_nominal.Integral() !=0 : histo_nominal.Scale(1./histo_nominal.Integral())
+            else: print "************  histo_nominal.Integral() == 0 !!!!! Cannot scale!!! ************"
+            histo_nominal.Write('histo_nominal')
 			
-		print "Now pT"
-		alpha=1.5/float(maxMVV)
-		histogram_pt_up,histogram_pt_down=unequalScale(histo_nominal,"histo_nominal_PT",alpha)
-		histogram_pt_down.SetName('histo_nominal_PTDown')
-		histogram_pt_down.SetTitle('histo_nominal_PTDown')
-		histogram_pt_down.Write('histo_nominal_PTDown')
-		histogram_pt_up.SetName('histo_nominal_PTUp')
-		histogram_pt_up.SetTitle('histo_nominal_PTUp')
-		histogram_pt_up.Write('histo_nominal_PTUp')
+            print "Now pT"
+            alpha=1.5/float(maxMVV)
+            histogram_pt_up,histogram_pt_down=unequalScale(histo_nominal,"histo_nominal_PT",alpha)
+            histogram_pt_down.SetName('histo_nominal_PTDown')
+            histogram_pt_down.SetTitle('histo_nominal_PTDown')
+            histogram_pt_down.Write('histo_nominal_PTDown')
+            histogram_pt_up.SetName('histo_nominal_PTUp')
+            histogram_pt_up.SetTitle('histo_nominal_PTUp')
+            histogram_pt_up.Write('histo_nominal_PTUp')
+            
+            print "Now OPT"
+            alpha=1.5*float(minMVV)
+            histogram_opt_up,histogram_opt_down=unequalScale(histo_nominal,"histo_nominal_OPT",alpha,-1)
+            histogram_opt_down.SetName('histo_nominal_OPTDown')
+            histogram_opt_down.SetTitle('histo_nominal_OPTDown')
+            histogram_opt_down.Write('histo_nominal_OPTDown')
+            histogram_opt_up.SetName('histo_nominal_OPTUp')
+            histogram_opt_up.SetTitle('histo_nominal_OPTUp')
+            histogram_opt_up.Write('histo_nominal_OPTUp')
+            
+        if doHerwig:
+            print "doing Herwig"
+            mvv_altshapeUp.Write('mvv_altshapeUp')
+            histo_altshapeUp.Write('histo_altshapeUp')
+            
+            print "Now pT"
+            alpha=1.5/float(maxMVV)
+            histogram_altshapeUp_pt_up,histogram_altshapeUp_pt_down=unequalScale(histo_nominal,"histo_altshapeUp_PT",alpha)
+            histogram_altshapeUp_pt_down.SetName('histo_altshapeUp_PTDown')
+            histogram_altshapeUp_pt_down.SetTitle('histo_altshapeUp_PTDown')
+            histogram_altshapeUp_pt_down.Write('histo_altshapeUp_PTDown')
+            histogram_altshapeUp_pt_up.SetName('histo_altshapeUp_PTUp')
+            histogram_altshapeUp_pt_up.SetTitle('histo_altshapeUp_PTUp')
+            histogram_altshapeUp_pt_up.Write('histo_altshapeUp_PTUp')
+            
+            print "Now OPT"
+            alpha=1.5*float(minMVV)
+            histogram_altshapeUp_opt_up,histogram_altshapeUp_opt_down=unequalScale(histo_altshapeUp,"histo_altshapeUp_OPT",alpha,-1)
+            histogram_altshapeUp_opt_down.SetName('histo_altshapeUp_OPTDown')
+            histogram_altshapeUp_opt_down.SetTitle('histo_altshapeUp_OPTDown')
+            histogram_altshapeUp_opt_down.Write('histo_altshapeUp_OPTDown')
+            histogram_altshapeUp_opt_up.SetName('histo_altshapeUp_OPTUp')
+            histogram_altshapeUp_opt_up.SetTitle('histo_altshapeUp_OPTUp')
+            histogram_altshapeUp_opt_up.Write('histo_altshapeUp_OPTUp')
 
-                print "Now OPT"
-		alpha=1.5*float(minMVV)
-		histogram_opt_up,histogram_opt_down=unequalScale(histo_nominal,"histo_nominal_OPT",alpha,-1)
-		histogram_opt_down.SetName('histo_nominal_OPTDown')
-		histogram_opt_down.SetTitle('histo_nominal_OPTDown')
-		histogram_opt_down.Write('histo_nominal_OPTDown')
-		histogram_opt_up.SetName('histo_nominal_OPTUp')
-		histogram_opt_up.SetTitle('histo_nominal_OPTUp')
-		histogram_opt_up.Write('histo_nominal_OPTUp')
-				
-	if doHerwig:
-                print "doing Herwig"
-		mvv_altshapeUp.Write('mvv_altshapeUp')
-		histo_altshapeUp.Write('histo_altshapeUp')
-    
-		print "Now pT"
-		alpha=1.5/float(maxMVV)
-		histogram_altshapeUp_pt_up,histogram_altshapeUp_pt_down=unequalScale(histo_nominal,"histo_altshapeUp_PT",alpha)
-		histogram_altshapeUp_pt_down.SetName('histo_altshapeUp_PTDown')
-		histogram_altshapeUp_pt_down.SetTitle('histo_altshapeUp_PTDown')
-		histogram_altshapeUp_pt_down.Write('histo_altshapeUp_PTDown')
-		histogram_altshapeUp_pt_up.SetName('histo_altshapeUp_PTUp')
-		histogram_altshapeUp_pt_up.SetTitle('histo_altshapeUp_PTUp')
-		histogram_altshapeUp_pt_up.Write('histo_altshapeUp_PTUp')
-
-                print "Now OPT"
-		alpha=1.5*float(minMVV)
-		histogram_altshapeUp_opt_up,histogram_altshapeUp_opt_down=unequalScale(histo_altshapeUp,"histo_altshapeUp_OPT",alpha,-1)
-		histogram_altshapeUp_opt_down.SetName('histo_altshapeUp_OPTDown')
-		histogram_altshapeUp_opt_down.SetTitle('histo_altshapeUp_OPTDown')
-		histogram_altshapeUp_opt_down.Write('histo_altshapeUp_OPTDown')
-		histogram_altshapeUp_opt_up.SetName('histo_altshapeUp_OPTUp')
-		histogram_altshapeUp_opt_up.SetTitle('histo_altshapeUp_OPTUp')
-		histogram_altshapeUp_opt_up.Write('histo_altshapeUp_OPTUp')
-
-		if doPythia:
-			histogram_altshapeDown=mirror(histo_altshapeUp,histo_nominal,"histo_altshapeDown")
-			histogram_altshapeDown.SetName('histo_altshapeDown')
-			histogram_altshapeDown.SetTitle('histo_altshapeDown')
-			histogram_altshapeDown.Write('histo_altshapeDown')
+            if doPythia:
+                histogram_altshapeDown=mirror(histo_altshapeUp,histo_nominal,"histo_altshapeDown")
+                histogram_altshapeDown.SetName('histo_altshapeDown')
+                histogram_altshapeDown.SetTitle('histo_altshapeDown')
+                histogram_altshapeDown.Write('histo_altshapeDown')
 		
-	if doMadGraph:
-                print "doing Madgraph"
-		mvv_altshape2.Write('mvv_altshape2')
-		histo_altshape2Up.Write('histo_altshape2Up')
-    
-		print "Now pT"
-		alpha=1.5/float(maxMVV)
-                print " #################   careful!!! newt line are commented out because histo_nominal is missing at the moment!!! ####################"
-	        histogram_altshape2_pt_up,histogram_altshape2_pt_down=unequalScale(histo_nominal,"histo_altshape2_PT",alpha)
-	        histogram_altshape2_pt_down.SetName('histo_altshape2_PTDown')
-	        histogram_altshape2_pt_down.SetTitle('histo_altshape2_PTDown')
-	        histogram_altshape2_pt_down.Write('histo_altshape2_PTDown')
-	        histogram_altshape2_pt_up.SetName('histo_altshape2_PTUp')
-	        histogram_altshape2_pt_up.SetTitle('histo_altshape2_PTUp')
-	        histogram_altshape2_pt_up.Write('histo_altshape2_PTUp')
+        if doMadGraph:
+            print "doing Madgraph"
+            mvv_altshape2.Write('mvv_altshape2')
+            histo_altshape2Up.Write('histo_altshape2Up')
+            
+            print "Now pT"
+            alpha=1.5/float(maxMVV)
+            histogram_altshape2_pt_up,histogram_altshape2_pt_down=unequalScale(histo_nominal,"histo_altshape2_PT",alpha)
+            histogram_altshape2_pt_down.SetName('histo_altshape2_PTDown')
+            histogram_altshape2_pt_down.SetTitle('histo_altshape2_PTDown')
+            histogram_altshape2_pt_down.Write('histo_altshape2_PTDown')
+            histogram_altshape2_pt_up.SetName('histo_altshape2_PTUp')
+            histogram_altshape2_pt_up.SetTitle('histo_altshape2_PTUp')
+            histogram_altshape2_pt_up.Write('histo_altshape2_PTUp')
+            
+            print "Now OPT"
+            alpha=1.5*float(minMVV)
+            histogram_altshape2_opt_up,histogram_altshape2_opt_down=unequalScale(histo_altshape2Up,"histo_altshape2_OPT",alpha,-1)
+            histogram_altshape2_opt_down.SetName('histo_altshape2_OPTDown')
+            histogram_altshape2_opt_down.SetTitle('histo_altshape2_OPTDown')
+            histogram_altshape2_opt_down.Write('histo_altshape2_OPTDown')
+            histogram_altshape2_opt_up.SetName('histo_altshape2_OPTUp')
+            histogram_altshape2_opt_up.SetTitle('histo_altshape2_OPTUp')
+            histogram_altshape2_opt_up.Write('histo_altshape2_OPTUp')
+            
+            if doPythia:
+                histogram_altshape2Down=mirror(histo_altshape2Up,histo_nominal,"histo_altshape2Down")
+                histogram_altshape2Down.SetName('histo_altshape2Down')
+                histogram_altshape2Down.SetTitle('histo_altshape2Down')
+                histogram_altshape2Down.Write('histo_altshape2Down')
+                
+        if doDijet:
+            print "doing VJETS!!"
+            mvv_NLO.Write('mvv_nominal')
+            histo_NLO.Write('histo_nominal')
 
-                print "Now OPT"
-		alpha=1.5*float(minMVV)
-		histogram_altshape2_opt_up,histogram_altshape2_opt_down=unequalScale(histo_altshape2Up,"histo_altshape2_OPT",alpha,-1)
-		histogram_altshape2_opt_down.SetName('histo_altshape2_OPTDown')
-		histogram_altshape2_opt_down.SetTitle('histo_altshape2_OPTDown')
-		histogram_altshape2_opt_down.Write('histo_altshape2_OPTDown')
-		histogram_altshape2_opt_up.SetName('histo_altshape2_OPTUp')
-		histogram_altshape2_opt_up.SetTitle('histo_altshape2_OPTUp')
-		histogram_altshape2_opt_up.Write('histo_altshape2_OPTUp')
-    
-		if doPythia:
-			histogram_altshape2Down=mirror(histo_altshape2Up,histo_nominal,"histo_altshape2Down")
-			histogram_altshape2Down.SetName('histo_altshape2Down')
-			histogram_altshape2Down.SetTitle('histo_altshape2Down')
-			histogram_altshape2Down.Write('histo_altshape2Down')
-			
-	if doDijet:
-		mvv_NLO.Write('mvv_NLO')
-		histo_NLO.Write('histo_NLO')
-		if doPythia:
-			histogram_NLODown=mirror(histo_NLO,histo_nominal,"histo_NLODown")
-			histogram_NLODown.SetName('histo_NLODown')
-			histogram_NLODown.SetTitle('histo_NLODown')
-			histogram_NLODown.Write('histo_NLODown')
-						
-	os.system('rm -rf '+outdir+'_out/')
 
-def merge2DTemplate(jobList,files,jobname,purity,leg,binsMVV,binsMJ,minMVV,maxMVV,minMJ,maxMJ,HCALbinsMVV,name,filename):  
+            print "Now pT"
+            alpha=1.5/float(maxMVV)
+            histogram_pt_up,histogram_pt_down=unequalScale(histo_NLO,"histo_nominal_PT",alpha)
+            histogram_pt_down.SetName('histo_nominal_PTDown')
+            histogram_pt_down.SetTitle('histo_nominal_PTDown')
+            histogram_pt_down.Write('histo_nominal_PTDown')
+            histogram_pt_up.SetName('histo_nominal_PTUp')
+            histogram_pt_up.SetTitle('histo_nominal_PTUp')
+            histogram_pt_up.Write('histo_nominal_PTUp')
+
+            print "Now OPT"
+            alpha=1.5*float(minMVV)
+            histogram_opt_up,histogram_opt_down=unequalScale(histo_NLO,"histo_nominal_OPT",alpha,-1)
+            histogram_opt_down.SetName('histo_nominal_OPTDown')
+            histogram_opt_down.SetTitle('histo_nominal_OPTDown')
+            histogram_opt_down.Write('histo_nominal_OPTDown')
+            histogram_opt_up.SetName('histo_nominal_OPTUp')
+            histogram_opt_up.SetTitle('histo_nominal_OPTUp')
+            histogram_opt_up.Write('histo_nominal_OPTUp')
+
+
+            if doPythia:
+                histogram_NLODown=mirror(histo_NLO,histo_nominal,"histo_NLODown")
+                histogram_NLODown.SetName('histo_NLODown')
+                histogram_NLODown.SetTitle('histo_NLODown')
+                histogram_NLODown.Write('histo_NLODown')
+                
+        os.system('rm -rf '+outdir+'_out/')
+                
+def merge2DTemplate(jobList,files,jobname,purity,leg,binsMVV,binsMJ,minMVV,maxMVV,minMJ,maxMJ,HCALbinsMVV,name,filename,samples):  
   
   print "Merging 2D templates"
   print
@@ -938,417 +1058,417 @@ def merge2DTemplate(jobList,files,jobname,purity,leg,binsMVV,binsMJ,minMVV,maxMV
   
   outdir = 'res'+jobname
   jobdir = 'tmp'+jobname
-  
+
   resubmit, jobsPerSample,exit_flag = getJobs(files,jobList,outdir,purity)
   
   if exit_flag:
-   submit = raw_input("The following files are missing: %s. Do you  want to resubmit the jobs to the batch system before merging? [y/n] "%resubmit)
-   if submit == 'y' or submit=='Y':
-     print "Resubmitting jobs:"
-     jobs = reSubmit(jobdir,resubmit,jobname)
-     waitForBatchJobs(jobname,len(resubmit),len(resubmit), userName, timeCheck)
-     resubmit, jobsPerSample,exit_flag = getJobs(files,jobList,outdir,purity)
-     if exit_flag: 
-       print "Job crashed again! Please resubmit manually before attempting to merge again"
-       for j in jobs: print j 
-       sys.exit()
-   else:
-     submit = raw_input("Some files are missing. [y] == Exit without merging, [n] == continue ? ")
-     if submit == 'y' or submit=='Y':
-       print "Exit without merging!"
-       sys.exit()
-     else:
-       print "Continuing merge!"
+      submit = raw_input("The following files are missing: %s. Do you  want to resubmit the jobs to the batch system before merging? [y/n] "%resubmit)
+      if submit == 'y' or submit=='Y':
+          print "Resubmitting jobs:"
+          jobs = reSubmit(jobdir,resubmit,jobname)
+          waitForBatchJobs(jobname,len(resubmit),len(resubmit), userName, timeCheck)
+          resubmit, jobsPerSample,exit_flag = getJobs(files,jobList,outdir,purity)
+          if exit_flag: 
+              print "Job crashed again! Please resubmit manually before attempting to merge again"
+              for j in jobs: print j 
+              sys.exit()
+      else:
+          submit = raw_input("Some files are missing. [y] == Exit without merging, [n] == continue ? ")
+          if submit == 'y' or submit=='Y':
+              print "Exit without merging!"
+              sys.exit()
+          else:
+              print "Continuing merge!"
   
  
   try: 
-    os.stat(outdir+'_out') 
-    os.system('rm -r '+outdir+'_out')
-    os.mkdir(outdir+'_out')
+      os.stat(outdir+'_out') 
+      os.system('rm -r '+outdir+'_out')
+      os.mkdir(outdir+'_out')
   except: os.mkdir(outdir+'_out')
 
   for s in jobsPerSample.keys():
 
-   factor = 1./float(len(jobsPerSample[s]))
-   print "sample: ", s,"number of files:",len(jobsPerSample[s]),"adding histo with scale factor:",factor
+        factor = 1./float(len(jobsPerSample[s]))
+        print "sample: ", s,"number of files:",len(jobsPerSample[s]),"adding histo with scale factor:",factor
  
-   outf = ROOT.TFile.Open(outdir+'_out/%s_%s_COND2D_%s_%s_%s.root'%(filename,name,s,leg,purity),'RECREATE')
+        outf = ROOT.TFile.Open(outdir+'_out/%s_%s_COND2D_%s_%s_%s.root'%(filename,name,s,leg,purity),'RECREATE')
   
-   finalHistos = {}
-   finalHistos['histo_nominal_coarse'] = ROOT.TH2F("histo_nominal_coarse_out","histo_nominal_coarse_out",binsMJ,minMJ,maxMJ,binsMVV,minMVV,maxMVV)
-   finalHistos['mjet_mvv_nominal'] = ROOT.TH2F("mjet_mvv_nominal_out","mjet_mvv_nominal_out",binsMJ,minMJ,maxMJ,binsMVV,minMVV,maxMVV)
-   finalHistos['mjet_mvv_nominal_3D'] = ROOT.TH3F("mjet_mvv_nominal_3D_out","mjet_mvv_nominal_3D_out",binsMJ,minMJ,maxMJ,binsMJ,minMJ,maxMJ,binsMVV,minMVV,maxMVV)
-   if HCALbinsMVV!="":
-       a,b,bins = HCALbinsMVV.split(" ")
-       binning = getBinning(bins)
-       binning = array("d",binning)
-       xbins = []
-       for i in range(0,binsMJ+1):
-          xbins.append(minMJ + i* (maxMJ - minMJ)/binsMJ)
-       xbins = array("d",xbins)
-       finalHistos['histo_nominal_coarse'] = ROOT.TH2F("histo_nominal_coarse_out","histo_nominal_coarse_out",len(xbins)-1,xbins,len(binning)-1,binning)
-       finalHistos['mjet_mvv_nominal'] = ROOT.TH2F("mjet_mvv_nominal_out","mjet_mvv_nominal_out",len(xbins)-1,xbins,len(binning)-1,binning)
-       finalHistos['mjet_mvv_nominal_3D'] = ROOT.TH3F("mjet_mvv_nominal_3D_out","mjet_mvv_nominal_3D_out",len(xbins)-1,xbins,len(xbins)-1,xbins,len(binning)-1,binning)
-       print "use binning "+str(binning)
-   print binsMVV
-   print finalHistos['histo_nominal_coarse'].GetNbinsY()
-   for f in jobsPerSample[s]:
+        finalHistos = {}
+        finalHistos['histo_nominal_coarse'] = ROOT.TH2F("histo_nominal_coarse_out","histo_nominal_coarse_out",binsMJ,minMJ,maxMJ,binsMVV,minMVV,maxMVV)
+        finalHistos['mjet_mvv_nominal'] = ROOT.TH2F("mjet_mvv_nominal_out","mjet_mvv_nominal_out",binsMJ,minMJ,maxMJ,binsMVV,minMVV,maxMVV)
+        finalHistos['mjet_mvv_nominal_3D'] = ROOT.TH3F("mjet_mvv_nominal_3D_out","mjet_mvv_nominal_3D_out",binsMJ,minMJ,maxMJ,binsMJ,minMJ,maxMJ,binsMVV,minMVV,maxMVV)
+        if HCALbinsMVV!="":
+            a,b,bins = HCALbinsMVV.split(" ")
+            binning = getBinning(bins)
+            binning = array("d",binning)
+            xbins = []
+            for i in range(0,binsMJ+1):
+                xbins.append(minMJ + i* (maxMJ - minMJ)/binsMJ)
+            xbins = array("d",xbins)
+            finalHistos['histo_nominal_coarse'] = ROOT.TH2F("histo_nominal_coarse_out","histo_nominal_coarse_out",len(xbins)-1,xbins,len(binning)-1,binning)
+            finalHistos['mjet_mvv_nominal'] = ROOT.TH2F("mjet_mvv_nominal_out","mjet_mvv_nominal_out",len(xbins)-1,xbins,len(binning)-1,binning)
+            finalHistos['mjet_mvv_nominal_3D'] = ROOT.TH3F("mjet_mvv_nominal_3D_out","mjet_mvv_nominal_3D_out",len(xbins)-1,xbins,len(xbins)-1,xbins,len(binning)-1,binning)
+            print "use binning "+str(binning)
+        print binsMVV
+        print finalHistos['histo_nominal_coarse'].GetNbinsY()
+        for f in jobsPerSample[s]:
 
-    inf = ROOT.TFile.Open(f,'READ')
-    #print "open file "+f
+            inf = ROOT.TFile.Open(f,'READ')
+            #print "open file "+f
     
-    for h in inf.GetListOfKeys():
+            for h in inf.GetListOfKeys():
   
-     for k in finalHistos.keys():
+                for k in finalHistos.keys():
         
-      if h.GetName() == k:
-       histo = ROOT.TH1F()
-       histo = inf.Get(h.GetName())
+                    if h.GetName() == k:
+                        histo = ROOT.TH1F()
+                        histo = inf.Get(h.GetName())
 
-       finalHistos[h.GetName()].Add(histo,factor)
+                        finalHistos[h.GetName()].Add(histo,factor)
    
-   print "Write file: ",outdir+'_out/%s_%s_COND2D_%s_%s_%s.root'%(filename,name,s,leg,purity)
+        print "Write file: ",outdir+'_out/%s_%s_COND2D_%s_%s_%s.root'%(filename,name,s,leg,purity)
    
-   outf.cd()  
+        outf.cd()  
  
-   for k in finalHistos.keys():
-    finalHistos[k].SetTitle(k)
-    finalHistos[k].Write(k)
+        for k in finalHistos.keys():
+            finalHistos[k].SetTitle(k)
+            finalHistos[k].Write(k)
    
-   outf.Close()
-   outf.Delete()
+        outf.Close()
+        outf.Delete()
 
 
-  # read out files
-  filelist = os.listdir('./'+outdir+'_out'+'/')
+        # read out files
+        filelist = os.listdir('./'+outdir+'_out'+'/')
 
-  mg_files = []
-  pythia_files = []
-  herwig_files = []
-  dijet_files = []
-
-  for f in filelist:
-   if f.find('COND2D') == -1: continue
-   if f.find('QCD_HT') != -1: mg_files.append('./'+outdir+'_out'+'/'+f)
-   elif f.find('QCD_Pt_') != -1: pythia_files.append('./'+outdir+'_out'+'/'+f)
-   elif f.find('QCD_Pt-') != -1: herwig_files.append('./'+outdir+'_out'+'/'+f)
-   else: dijet_files.append('./'+outdir+'_out'+'/'+f)
-   
-   
-  doMadGraph = False
-  doHerwig   = False
-  doPythia   = False
-  doDijet    = False
-  
-  #now hadd them
-  if len(mg_files) > 0:
-    print "doing MadGraph "
-    cmd = 'hadd -f %s_%s_COND2D_%s_%s_altshape2.root '%(filename,name,purity,leg)
-    for f in mg_files:
-     cmd += f
-     cmd += ' '
-    print cmd
-    os.system(cmd)
-
-
-    fhadd_madgraph = ROOT.TFile.Open('%s_%s_COND2D_%s_%s_altshape2.root'%(filename,name,purity,leg),'READ')
-    mjet_mvv_altshape2_3D = fhadd_madgraph.Get('mjet_mvv_nominal_3D') 
-    mjet_mvv_altshape2_3D.SetName('mjet_mvv_altshape2_3D')
-    mjet_mvv_altshape2_3D.SetTitle('mjet_mvv_altshape2_3D')
-    mjet_mvv_altshape2 = fhadd_madgraph.Get('mjet_mvv_nominal')
-    mjet_mvv_altshape2.SetName('mjet_mvv_altshape2')
-    mjet_mvv_altshape2.SetTitle('mjet_mvv_altshape2')
-    histo_altshape2Up = fhadd_madgraph.Get('histo_nominal_coarse')
-    histo_altshape2Up.SetName('histo_altshape2_coarse')
-    histo_altshape2Up.SetTitle('histo_altshape2_coarse')
-    #histo_altshape2 = fhadd_madgraph.Get('histo_nominal')
-    #histo_altshape2.SetName('histo_altshape2')
-    #histo_altshape2.SetTitle('histo_altshape2')
-
-    doMadGraph = True
-
-
-  if len(herwig_files) > 0:
-    print "doing Herwig"
-    cmd = 'hadd -f %s_%s_COND2D_%s_%s_altshapeUp.root '%(filename,name,purity,leg)
-    for f in herwig_files:
-     cmd += f
-     cmd += ' '
-    print cmd
-    os.system(cmd)
-
-    fhadd_herwig = ROOT.TFile.Open('%s_%s_COND2D_%s_%s_altshapeUp.root'%(filename,name,purity,leg),'READ')
-    mjet_mvv_altshapeUp_3D = fhadd_herwig.Get('mjet_mvv_nominal_3D') 
-    mjet_mvv_altshapeUp_3D.SetName('mjet_mvv_altshapeUp_3D')
-    mjet_mvv_altshapeUp_3D.SetTitle('mjet_mvv_altshapeUp_3D')
-    mjet_mvv_altshapeUp = fhadd_herwig.Get('mjet_mvv_nominal')
-    mjet_mvv_altshapeUp.SetName('mjet_mvv_altshapeUp')
-    mjet_mvv_altshapeUp.SetTitle('mjet_mvv_altshapeUp')
-    histo_altshapeUp = fhadd_herwig.Get('histo_nominal_coarse')
-    histo_altshapeUp.SetName('histo_altshapeUp_coarse')
-    histo_altshapeUp.SetTitle('histo_altshapeUp_coarse')
-    #histo_altshapeUp = fhadd_herwig.Get('histo_nominal')
-    #histo_altshapeUp.SetName('histo_altshapeUp')
-    #histo_altshapeUp.SetTitle('histo_altshapeUp')
-    doHerwig = True
-
-  if len(pythia_files) > 0:
-    print "doing pythia"
-    cmd = 'hadd -f %s_%s_COND2D_%s_%s_nominal.root '%(filename,name,purity,leg)
-    for f in pythia_files:
-     cmd += f
-     cmd += ' '
-    print cmd
-    os.system(cmd)
-    
-    fhadd_pythia = ROOT.TFile.Open('%s_%s_COND2D_%s_%s_nominal.root'%(filename,name,purity,leg),'READ')
-    mjet_mvv_nominal_3D = fhadd_pythia.Get('mjet_mvv_nominal_3D') 
-    mjet_mvv_nominal_3D.SetName('mjet_mvv_nominal_3D')
-    mjet_mvv_nominal_3D.SetTitle('mjet_mvv_nominal_3D')
-    mjet_mvv_nominal = fhadd_pythia.Get('mjet_mvv_nominal')
-    mjet_mvv_nominal.SetName('mjet_mvv_nominal')
-    mjet_mvv_nominal.SetTitle('mjet_mvv_nominal')
-    fhadd_pythia.Print()
-    histo_nominal = fhadd_pythia.Get('histo_nominal_coarse')
-    histo_nominal.SetName('histo_nominal_coarse')
-    histo_nominal.SetTitle('histo_nominal_coarse')
-    #histo_nominal = fhadd_pythia.Get('histo_nominal')
-    #histo_nominal.SetName('histo_nominal')
-    #histo_nominal.SetTitle('histo_nominal')
-    
-    doPythia = True
-
-  if len(dijet_files) > 0:
-    cmd = 'hadd -f %s_%s_COND2D_%s_%s_NLO.root '%(filename,name,purity,leg)
-    for f in dijet_files:
-     cmd += f
-     cmd += ' '
-    print cmd
-    os.system(cmd)
-
-    fhadd_dijet = ROOT.TFile.Open('%s_%s_COND2D_%s_%s_NLO.root'%(filename,name,purity,leg),'READ')
-    mjet_mvv_NLO_3D = fhadd_dijet.Get('mjet_mvv_nominal_3D') 
-    mjet_mvv_NLO_3D.SetName('mjet_mvv_NLO_3D')
-    mjet_mvv_NLO_3D.SetTitle('mjet_mvv_NLO_3D')
-    mjet_mvv_NLO = fhadd_dijet.Get('mjet_mvv_nominal')
-    mjet_mvv_NLO.SetName('mjet_mvv_NLO')
-    mjet_mvv_NLO.SetTitle('mjet_mvv_NLO')
-    histo_NLO = fhadd_dijet.Get('histo_nominal_coarse')
-    histo_NLO.SetName('histo_NLO_coarse')
-    histo_NLO.SetTitle('histo_NLO_coarse')
-    doDijet = True
-    
-    
-  outf = ROOT.TFile.Open('%s_%s_COND2D_%s_%s.root'%(filename,name,purity,leg),'RECREATE') 
-  finalHistograms = {}
-  
-  if doPythia:
-    mjet_mvv_nominal.Write('mjet_mvv_nominal')
-    mjet_mvv_nominal_3D.Write('mjet_mvv_nominal_3D')
-
-    histo_nominal.Write('histo_nominal_coarse')
-    print "make conditional histogram"
-    conditional(histo_nominal)
-    
-    if HCALbinsMVV!="":
-      expanded=expandHistoBinned(histo_nominal,"",xbins,binning)
-    else:
-      expanded=expandHisto(histo_nominal,"",binsMVV,binsMJ,minMVV,maxMVV,minMJ,maxMJ)
-    conditional(expanded)
-    expanded.SetName('histo_nominal')
-    expanded.SetTitle('histo_nominal')
-    expanded.Write('histo_nominal')
-    finalHistograms['histo_nominal'] = histo_nominal
-    
-    alpha=1.5/float(maxMJ)
-    histogram_pt_up,histogram_pt_down=unequalScale(finalHistograms['histo_nominal'],"histo_nominal_PT",alpha,1,2)
-    conditional(histogram_pt_down)
-    histogram_pt_down.SetName('histo_nominal_PTDown')
-    histogram_pt_down.SetTitle('histo_nominal_PTDown')
-    histogram_pt_down.Write('histo_nominal_PTDown')
-    conditional(histogram_pt_up)
-    histogram_pt_up.SetName('histo_nominal_PTUp')
-    histogram_pt_up.SetTitle('histo_nominal_PTUp')
-    histogram_pt_up.Write('histo_nominal_PTUp')
-
-    alpha=1.5*float(minMJ)
-    h1,h2=unequalScale(finalHistograms['histo_nominal'],"histo_nominal_OPT",alpha,-1,2)
-    conditional(h1)
-    h1.SetName('histo_nominal_OPTUp')
-    h1.SetTitle('histo_nominal_OPTUp')
-    h1.Write('histo_nominal_OPTUp')
-    conditional(h2)
-    h2.SetName('histo_nominal_OPTDown')
-    h2.SetTitle('histo_nominal_OPTDown')
-    h2.Write('histo_nominal_OPTDown')
-
-    alpha=float(maxMJ)*float(maxMJ)
-    histogram_pt2_up,histogram_pt2_down=unequalScale(finalHistograms['histo_nominal'],"histo_nominal_PT2",alpha,2,2)
-    conditional(histogram_pt2_down)
-    histogram_pt2_down.SetName('histo_nominal_PT2Down')
-    histogram_pt2_down.SetTitle('histo_nominal_PT2Down')
-    histogram_pt2_down.Write('histo_nominal_PT2Down')
-    conditional(histogram_pt2_up)
-    histogram_pt2_up.SetName('histo_nominal_PT2Up')
-    histogram_pt2_up.SetTitle('histo_nominal_PT2Up')
-    histogram_pt2_up.Write('histo_nominal_PT2Up')
-
-    alpha=float(minMJ)*float(minMJ)
-    histogram_opt2_up,histogram_opt2_down=unequalScale(finalHistograms['histo_nominal'],"histo_nominal_OPT2",alpha,-2,2)
-    conditional(histogram_opt2_down)
-    histogram_opt2_down.SetName('histo_nominal_OPT2Down')
-    histogram_opt2_down.SetTitle('histo_nominal_OPT2Down')
-    histogram_opt2_down.Write('histo_nominal_OPT2Down')
-    conditional(histogram_opt2_up)
-    histogram_opt2_up.SetName('histo_nominal_OPT2Up')
-    histogram_opt2_up.SetTitle('histo_nominal_OPT2Up')
-    histogram_opt2_up.Write('histo_nominal_OPT2Up')
+        mg_files = []
+        pythia_files = []
+        herwig_files = []
+        dijet_files = []
         
-  if doHerwig:
-    histo_altshapeUp.Write('histo_altshapeUp_coarse')
-    conditional(histo_altshapeUp)
-    expanded=expandHisto(histo_altshapeUp,"herwig",binsMVV,binsMJ,minMVV,maxMVV,minMJ,maxMJ)
-    if HCALbinsMVV!="":
-      expanded=expandHistoBinned(histo_altshapeUp,"",xbins,binning)
-    conditional(expanded)
-    expanded.SetName('histo_altshapeUp')
-    expanded.SetTitle('histo_altshapeUp')
-    expanded.Write('histo_altshapeUp')
-    finalHistograms['histo_altshapeUp'] = expanded
+        for f in filelist:
+           if f.find('COND2D') == -1: continue
+           if f.find('QCD_HT') != -1: mg_files.append('./'+outdir+'_out'+'/'+f)
+           elif f.find('QCD_Pt_') != -1: pythia_files.append('./'+outdir+'_out'+'/'+f)
+           elif f.find('QCD_Pt-') != -1: herwig_files.append('./'+outdir+'_out'+'/'+f)
+           else: dijet_files.append('./'+outdir+'_out'+'/'+f)
+   
+   
+        doMadGraph = False
+        doHerwig   = False
+        doPythia   = False
+        doDijet    = False
+  
+        #now hadd them
+        if len(mg_files) > 0:
+            print "doing MadGraph "
+            cmd = 'hadd -f %s_%s_COND2D_%s_%s_altshape2.root '%(filename,name,purity,leg)
+            for f in mg_files:
+                cmd += f
+                cmd += ' '
+            print cmd
+            os.system(cmd)
+
+
+            fhadd_madgraph = ROOT.TFile.Open('%s_%s_COND2D_%s_%s_altshape2.root'%(filename,name,purity,leg),'READ')
+            mjet_mvv_altshape2_3D = fhadd_madgraph.Get('mjet_mvv_nominal_3D') 
+            mjet_mvv_altshape2_3D.SetName('mjet_mvv_altshape2_3D')
+            mjet_mvv_altshape2_3D.SetTitle('mjet_mvv_altshape2_3D')
+            mjet_mvv_altshape2 = fhadd_madgraph.Get('mjet_mvv_nominal')
+            mjet_mvv_altshape2.SetName('mjet_mvv_altshape2')
+            mjet_mvv_altshape2.SetTitle('mjet_mvv_altshape2')
+            histo_altshape2Up = fhadd_madgraph.Get('histo_nominal_coarse')
+            histo_altshape2Up.SetName('histo_altshape2_coarse')
+            histo_altshape2Up.SetTitle('histo_altshape2_coarse')
+            #histo_altshape2 = fhadd_madgraph.Get('histo_nominal')
+            #histo_altshape2.SetName('histo_altshape2')
+            #histo_altshape2.SetTitle('histo_altshape2')
+            
+            doMadGraph = True
+            
+            
+        if len(herwig_files) > 0:
+            print "doing Herwig"
+            cmd = 'hadd -f %s_%s_COND2D_%s_%s_altshapeUp.root '%(filename,name,purity,leg)
+            for f in herwig_files:
+                cmd += f
+                cmd += ' '
+            print cmd
+            os.system(cmd)
+
+            fhadd_herwig = ROOT.TFile.Open('%s_%s_COND2D_%s_%s_altshapeUp.root'%(filename,name,purity,leg),'READ')
+            mjet_mvv_altshapeUp_3D = fhadd_herwig.Get('mjet_mvv_nominal_3D') 
+            mjet_mvv_altshapeUp_3D.SetName('mjet_mvv_altshapeUp_3D')
+            mjet_mvv_altshapeUp_3D.SetTitle('mjet_mvv_altshapeUp_3D')
+            mjet_mvv_altshapeUp = fhadd_herwig.Get('mjet_mvv_nominal')
+            mjet_mvv_altshapeUp.SetName('mjet_mvv_altshapeUp')
+            mjet_mvv_altshapeUp.SetTitle('mjet_mvv_altshapeUp')
+            histo_altshapeUp = fhadd_herwig.Get('histo_nominal_coarse')
+            histo_altshapeUp.SetName('histo_altshapeUp_coarse')
+            histo_altshapeUp.SetTitle('histo_altshapeUp_coarse')
+            #histo_altshapeUp = fhadd_herwig.Get('histo_nominal')
+            #histo_altshapeUp.SetName('histo_altshapeUp')
+            #histo_altshapeUp.SetTitle('histo_altshapeUp')
+            doHerwig = True
+
+        if len(pythia_files) > 0:
+            print "doing pythia"
+            cmd = 'hadd -f %s_%s_COND2D_%s_%s_nominal.root '%(filename,name,purity,leg)
+            for f in pythia_files:
+                cmd += f
+                cmd += ' '
+            print cmd
+            os.system(cmd)
     
+            fhadd_pythia = ROOT.TFile.Open('%s_%s_COND2D_%s_%s_nominal.root'%(filename,name,purity,leg),'READ')
+            mjet_mvv_nominal_3D = fhadd_pythia.Get('mjet_mvv_nominal_3D') 
+            mjet_mvv_nominal_3D.SetName('mjet_mvv_nominal_3D')
+            mjet_mvv_nominal_3D.SetTitle('mjet_mvv_nominal_3D')
+            mjet_mvv_nominal = fhadd_pythia.Get('mjet_mvv_nominal')
+            mjet_mvv_nominal.SetName('mjet_mvv_nominal')
+            mjet_mvv_nominal.SetTitle('mjet_mvv_nominal')
+            fhadd_pythia.Print()
+            histo_nominal = fhadd_pythia.Get('histo_nominal_coarse')
+            histo_nominal.SetName('histo_nominal_coarse')
+            histo_nominal.SetTitle('histo_nominal_coarse')
+            #histo_nominal = fhadd_pythia.Get('histo_nominal')
+            #histo_nominal.SetName('histo_nominal')
+            #histo_nominal.SetTitle('histo_nominal')
+            
+            doPythia = True
+            
+        if len(dijet_files) > 0:
+            cmd = 'hadd -f %s_%s_COND2D_%s_%s_NLO.root '%(filename,name,purity,leg)
+            for f in dijet_files:
+                cmd += f
+                cmd += ' '
+            print cmd
+            os.system(cmd)
+
+            fhadd_dijet = ROOT.TFile.Open('%s_%s_COND2D_%s_%s_NLO.root'%(filename,name,purity,leg),'READ')
+            mjet_mvv_NLO_3D = fhadd_dijet.Get('mjet_mvv_nominal_3D') 
+            mjet_mvv_NLO_3D.SetName('mjet_mvv_NLO_3D')
+            mjet_mvv_NLO_3D.SetTitle('mjet_mvv_NLO_3D')
+            mjet_mvv_NLO = fhadd_dijet.Get('mjet_mvv_nominal')
+            mjet_mvv_NLO.SetName('mjet_mvv_NLO')
+            mjet_mvv_NLO.SetTitle('mjet_mvv_NLO')
+            histo_NLO = fhadd_dijet.Get('histo_nominal_coarse')
+            histo_NLO.SetName('histo_NLO_coarse')
+            histo_NLO.SetTitle('histo_NLO_coarse')
+            doDijet = True
+            
     
-    alpha=1.5/float(maxMJ)
-    histogram_pt_up,histogram_pt_down=unequalScale(finalHistograms['histo_altshapeUp'],"histo_altshapeUp_PT",alpha,1,2)
-    conditional(histogram_pt_down)
-    histogram_pt_down.SetName('histo_altshapeUp_PTDown')
-    histogram_pt_down.SetTitle('histo_altshapeUp_PTDown')
-    histogram_pt_down.Write('histo_altshapeUp_PTDown')
-    conditional(histogram_pt_up)
-    histogram_pt_up.SetName('histo_altshapeUp_PTUp')
-    histogram_pt_up.SetTitle('histo_altshapeUp_PTUp')
-    histogram_pt_up.Write('histo_altshapeUp_PTUp')
-
-    alpha=1.5*float(minMJ)
-    h1,h2=unequalScale(finalHistograms['histo_altshapeUp'],"histo_altshapeUp_OPT",alpha,-1,2)
-    conditional(h1)
-    h1.SetName('histo_altshapeUp_OPTUp')
-    h1.SetTitle('histo_altshapeUp_OPTUp')
-    h1.Write('histo_altshapeUp_OPTUp')
-    conditional(h2)
-    h2.SetName('histo_altshapeUp_OPTDown')
-    h2.SetTitle('histo_altshapeUp_OPTDown')
-    h2.Write('histo_altshapeUp_OPTDown')
-
-    alpha=float(maxMJ)*float(maxMJ)
-    histogram_pt2_up,histogram_pt2_down=unequalScale(finalHistograms['histo_altshapeUp'],"histo_altshapeUp_PT2",alpha,2,2)
-    conditional(histogram_pt2_down)
-    histogram_pt2_down.SetName('histo_altshapeUp_PT2Down')
-    histogram_pt2_down.SetTitle('histo_altshapeUp_PT2Down')
-    histogram_pt2_down.Write('histo_altshapeUp_PT2Down')
-    conditional(histogram_pt2_up)
-    histogram_pt2_up.SetName('histo_altshapeUp_PT2Up')
-    histogram_pt2_up.SetTitle('histo_altshapeUp_PT2Up')
-    histogram_pt2_up.Write('histo_altshapeUp_PT2Up')
-
-    alpha=float(minMJ)*float(minMJ)
-    histogram_opt2_up,histogram_opt2_down=unequalScale(finalHistograms['histo_altshapeUp'],"histo_altshapeUp_OPT2",alpha,-2,2)
-    conditional(histogram_opt2_down)
-    histogram_opt2_down.SetName('histo_altshapeUp_OPT2Down')
-    histogram_opt2_down.SetTitle('histo_altshapeUp_OPT2Down')
-    histogram_opt2_down.Write('histo_altshapeUp_OPT2Down')
-    conditional(histogram_opt2_up)
-    histogram_opt2_up.SetName('histo_altshapeUp_OPT2Up')
-    histogram_opt2_up.SetTitle('histo_altshapeUp_OPT2Up')
-    histogram_opt2_up.Write('histo_altshapeUp_OPT2Up')
-    
-    if doPythia:
-      histogram_altshapeDown=mirror(finalHistograms['histo_altshapeUp'],finalHistograms['histo_nominal'],"histo_altshapeDown",2)
-      conditional(histogram_altshapeDown)
-      histogram_altshapeDown.SetName('histo_altshapeDown')
-      histogram_altshapeDown.SetTitle('histo_altshapeDown')
-      histogram_altshapeDown.Write()
-
-  if doMadGraph:
-    histo_altshape2Up.Write('histo_altshape2_coarse')
-    conditional(histo_altshape2Up)
-    expanded=expandHisto(histo_altshape2Up,"madgraph",binsMVV,binsMJ,minMVV,maxMVV,minMJ,maxMJ)
-    if HCALbinsMVV!="":
-      expanded=expandHistoBinned(histo_altshape2Up,"",xbins,binning)
-    conditional(expanded)
-    expanded.SetName('histo_altshape2Up')
-    expanded.SetTitle('histo_altshape2Up')
-    expanded.Write('histo_altshape2Up')
-    finalHistograms['histo_altshape2Up'] = expanded
-    
-    alpha=1.5/float(maxMJ)
-    histogram_pt_up,histogram_pt_down=unequalScale(finalHistograms['histo_altshape2Up'],"histo_altshape2_PT",alpha,1,2)
-    conditional(histogram_pt_down)
-    histogram_pt_down.SetName('histo_altshape2_PTDown')
-    histogram_pt_down.SetTitle('histo_altshape2_PTDown')
-    histogram_pt_down.Write('histo_altshape2_PTDown')
-    conditional(histogram_pt_up)
-    histogram_pt_up.SetName('histo_altshape2_PTUp')
-    histogram_pt_up.SetTitle('histo_altshape2_PTUp')
-    histogram_pt_up.Write('histo_altshape2_PTUp')
-
-    alpha=1.5*float(minMJ)
-    h1,h2=unequalScale(finalHistograms['histo_altshape2Up'],"histo_altshape2_OPT",alpha,-1,2)
-    conditional(h1)
-    h1.SetName('histo_altshape2_OPTUp')
-    h1.SetTitle('histo_altshape2_OPTUp')
-    h1.Write('histo_altshape2_OPTUp')
-    conditional(h2)
-    h2.SetName('histo_altshape2_OPTDown')
-    h2.SetTitle('histo_altshape2_OPTDown')
-    h2.Write('histo_altshape2_OPTDown')
-
-    alpha=float(maxMJ)*float(maxMJ)
-    histogram_pt2_up,histogram_pt2_down=unequalScale(finalHistograms['histo_altshape2Up'],"histo_altshape2_PT2",alpha,2,2)
-    conditional(histogram_pt2_down)
-    histogram_pt2_down.SetName('histo_altshape2_PT2Down')
-    histogram_pt2_down.SetTitle('histo_altshape2_PT2Down')
-    histogram_pt2_down.Write('histo_altshape2_PT2Down')
-    conditional(histogram_pt2_up)
-    histogram_pt2_up.SetName('histo_altshape2_PT2Up')
-    histogram_pt2_up.SetTitle('histo_altshape2_PT2Up')
-    histogram_pt2_up.Write('histo_altshape2_PT2Up')
-
-    alpha=float(minMJ)*float(minMJ)
-    histogram_opt2_up,histogram_opt2_down=unequalScale(finalHistograms['histo_altshape2Up'],"histo_altshape2_OPT2",alpha,-2,2)
-    conditional(histogram_opt2_down)
-    histogram_opt2_down.SetName('histo_altshape2_OPT2Down')
-    histogram_opt2_down.SetTitle('histo_altshape2_OPT2Down')
-    histogram_opt2_down.Write('histo_altshape2_OPT2Down')
-    conditional(histogram_opt2_up)
-    histogram_opt2_up.SetName('histo_altshape2_OPT2Up')
-    histogram_opt2_up.SetTitle('histo_altshape2_OPT2Up')
-    histogram_opt2_up.Write('histo_altshape2_OPT2Up')
-    
-    if doPythia:
-      histogram_altshape2Down=mirror(finalHistograms['histo_altshape2Up'],finalHistograms['histo_nominal'],"histo_altshape2Down",2)
-      conditional(histogram_altshape2Down)
-      histogram_altshape2Down.SetName('histo_altshape2Down')
-      histogram_altshape2Down.SetTitle('histo_altshape2Down')
-      histogram_altshape2Down.Write()
-      
-  if doDijet:
-    histo_NLO.Write('histo_NLO_coarse')
-    conditional(histo_NLO)
-    expanded=expandHisto(histo_NLO,"NLO",binsMVV,binsMJ,minMVV,maxMVV,minMJ,maxMJ)
-    if HCALbinsMVV!="":
-                    expanded=expandHistoBinned(histo_NLO,"",xbins,binning)
-    conditional(expanded)
-    expanded.SetName('histo_NLO')
-    expanded.SetTitle('histo_NLO')
-    expanded.Write('histo_NLO')
-    finalHistograms['histo_NLO'] = expanded
-    if doPythia:
-      histogram_NLODown=mirror(finalHistograms['histo_NLO'],finalHistograms['histo_nominal'],"histo_NLODown",2)
-      conditional(histogram_NLODown)
-      histogram_NLODown.SetName('histo_NLODown')
-      histogram_NLODown.SetTitle('histo_NLODown')
-      histogram_NLODown.Write()
-          
+        outf = ROOT.TFile.Open('%s_%s_COND2D_%s_%s.root'%(filename,name,purity,leg),'RECREATE') 
+        finalHistograms = {}
+  
+        if doPythia:
+            mjet_mvv_nominal.Write('mjet_mvv_nominal')
+            mjet_mvv_nominal_3D.Write('mjet_mvv_nominal_3D')
+            
+            histo_nominal.Write('histo_nominal_coarse')
+            print "make conditional histogram"
+            conditional(histo_nominal)
+            
+            if HCALbinsMVV!="":
+                expanded=expandHistoBinned(histo_nominal,"",xbins,binning)
+            else:
+                expanded=expandHisto(histo_nominal,"",binsMVV,binsMJ,minMVV,maxMVV,minMJ,maxMJ)
+            conditional(expanded)
+            expanded.SetName('histo_nominal')
+            expanded.SetTitle('histo_nominal')
+            expanded.Write('histo_nominal')
+            finalHistograms['histo_nominal'] = histo_nominal
+        
+            alpha=1.5/float(maxMJ)
+            histogram_pt_up,histogram_pt_down=unequalScale(finalHistograms['histo_nominal'],"histo_nominal_PT",alpha,1,2)
+            conditional(histogram_pt_down)
+            histogram_pt_down.SetName('histo_nominal_PTDown')
+            histogram_pt_down.SetTitle('histo_nominal_PTDown')
+            histogram_pt_down.Write('histo_nominal_PTDown')
+            conditional(histogram_pt_up)
+            histogram_pt_up.SetName('histo_nominal_PTUp')
+            histogram_pt_up.SetTitle('histo_nominal_PTUp')
+            histogram_pt_up.Write('histo_nominal_PTUp')
+            
+            alpha=1.5*float(minMJ)
+            h1,h2=unequalScale(finalHistograms['histo_nominal'],"histo_nominal_OPT",alpha,-1,2)
+            conditional(h1)
+            h1.SetName('histo_nominal_OPTUp')
+            h1.SetTitle('histo_nominal_OPTUp')
+            h1.Write('histo_nominal_OPTUp')
+            conditional(h2)
+            h2.SetName('histo_nominal_OPTDown')
+            h2.SetTitle('histo_nominal_OPTDown')
+            h2.Write('histo_nominal_OPTDown')
+            
+            alpha=float(maxMJ)*float(maxMJ)
+            histogram_pt2_up,histogram_pt2_down=unequalScale(finalHistograms['histo_nominal'],"histo_nominal_PT2",alpha,2,2)
+            conditional(histogram_pt2_down)
+            histogram_pt2_down.SetName('histo_nominal_PT2Down')
+            histogram_pt2_down.SetTitle('histo_nominal_PT2Down')
+            histogram_pt2_down.Write('histo_nominal_PT2Down')
+            conditional(histogram_pt2_up)
+            histogram_pt2_up.SetName('histo_nominal_PT2Up')
+            histogram_pt2_up.SetTitle('histo_nominal_PT2Up')
+            histogram_pt2_up.Write('histo_nominal_PT2Up')
+            
+            alpha=float(minMJ)*float(minMJ)
+            histogram_opt2_up,histogram_opt2_down=unequalScale(finalHistograms['histo_nominal'],"histo_nominal_OPT2",alpha,-2,2)
+            conditional(histogram_opt2_down)
+            histogram_opt2_down.SetName('histo_nominal_OPT2Down')
+            histogram_opt2_down.SetTitle('histo_nominal_OPT2Down')
+            histogram_opt2_down.Write('histo_nominal_OPT2Down')
+            conditional(histogram_opt2_up)
+            histogram_opt2_up.SetName('histo_nominal_OPT2Up')
+            histogram_opt2_up.SetTitle('histo_nominal_OPT2Up')
+            histogram_opt2_up.Write('histo_nominal_OPT2Up')
+            
+        if doHerwig:
+            histo_altshapeUp.Write('histo_altshapeUp_coarse')
+            conditional(histo_altshapeUp)
+            expanded=expandHisto(histo_altshapeUp,"herwig",binsMVV,binsMJ,minMVV,maxMVV,minMJ,maxMJ)
+            if HCALbinsMVV!="":
+                expanded=expandHistoBinned(histo_altshapeUp,"",xbins,binning)
+            conditional(expanded)
+            expanded.SetName('histo_altshapeUp')
+            expanded.SetTitle('histo_altshapeUp')
+            expanded.Write('histo_altshapeUp')
+            finalHistograms['histo_altshapeUp'] = expanded
+            
+            
+            alpha=1.5/float(maxMJ)
+            histogram_pt_up,histogram_pt_down=unequalScale(finalHistograms['histo_altshapeUp'],"histo_altshapeUp_PT",alpha,1,2)
+            conditional(histogram_pt_down)
+            histogram_pt_down.SetName('histo_altshapeUp_PTDown')
+            histogram_pt_down.SetTitle('histo_altshapeUp_PTDown')
+            histogram_pt_down.Write('histo_altshapeUp_PTDown')
+            conditional(histogram_pt_up)
+            histogram_pt_up.SetName('histo_altshapeUp_PTUp')
+            histogram_pt_up.SetTitle('histo_altshapeUp_PTUp')
+            histogram_pt_up.Write('histo_altshapeUp_PTUp')
+            
+            alpha=1.5*float(minMJ)
+            h1,h2=unequalScale(finalHistograms['histo_altshapeUp'],"histo_altshapeUp_OPT",alpha,-1,2)
+            conditional(h1)
+            h1.SetName('histo_altshapeUp_OPTUp')
+            h1.SetTitle('histo_altshapeUp_OPTUp')
+            h1.Write('histo_altshapeUp_OPTUp')
+            conditional(h2)
+            h2.SetName('histo_altshapeUp_OPTDown')
+            h2.SetTitle('histo_altshapeUp_OPTDown')
+            h2.Write('histo_altshapeUp_OPTDown')
+            
+            alpha=float(maxMJ)*float(maxMJ)
+            histogram_pt2_up,histogram_pt2_down=unequalScale(finalHistograms['histo_altshapeUp'],"histo_altshapeUp_PT2",alpha,2,2)
+            conditional(histogram_pt2_down)
+            histogram_pt2_down.SetName('histo_altshapeUp_PT2Down')
+            histogram_pt2_down.SetTitle('histo_altshapeUp_PT2Down')
+            histogram_pt2_down.Write('histo_altshapeUp_PT2Down')
+            conditional(histogram_pt2_up)
+            histogram_pt2_up.SetName('histo_altshapeUp_PT2Up')
+            histogram_pt2_up.SetTitle('histo_altshapeUp_PT2Up')
+            histogram_pt2_up.Write('histo_altshapeUp_PT2Up')
+            
+            alpha=float(minMJ)*float(minMJ)
+            histogram_opt2_up,histogram_opt2_down=unequalScale(finalHistograms['histo_altshapeUp'],"histo_altshapeUp_OPT2",alpha,-2,2)
+            conditional(histogram_opt2_down)
+            histogram_opt2_down.SetName('histo_altshapeUp_OPT2Down')
+            histogram_opt2_down.SetTitle('histo_altshapeUp_OPT2Down')
+            histogram_opt2_down.Write('histo_altshapeUp_OPT2Down')
+            conditional(histogram_opt2_up)
+            histogram_opt2_up.SetName('histo_altshapeUp_OPT2Up')
+            histogram_opt2_up.SetTitle('histo_altshapeUp_OPT2Up')
+            histogram_opt2_up.Write('histo_altshapeUp_OPT2Up')
+            
+            if doPythia:
+                histogram_altshapeDown=mirror(finalHistograms['histo_altshapeUp'],finalHistograms['histo_nominal'],"histo_altshapeDown",2)
+                conditional(histogram_altshapeDown)
+                histogram_altshapeDown.SetName('histo_altshapeDown')
+                histogram_altshapeDown.SetTitle('histo_altshapeDown')
+                histogram_altshapeDown.Write()
+                
+        if doMadGraph:
+            histo_altshape2Up.Write('histo_altshape2_coarse')
+            conditional(histo_altshape2Up)
+            expanded=expandHisto(histo_altshape2Up,"madgraph",binsMVV,binsMJ,minMVV,maxMVV,minMJ,maxMJ)
+            if HCALbinsMVV!="":
+                expanded=expandHistoBinned(histo_altshape2Up,"",xbins,binning)
+            conditional(expanded)
+            expanded.SetName('histo_altshape2Up')
+            expanded.SetTitle('histo_altshape2Up')
+            expanded.Write('histo_altshape2Up')
+            finalHistograms['histo_altshape2Up'] = expanded
+        
+            alpha=1.5/float(maxMJ)
+            histogram_pt_up,histogram_pt_down=unequalScale(finalHistograms['histo_altshape2Up'],"histo_altshape2_PT",alpha,1,2)
+            conditional(histogram_pt_down)
+            histogram_pt_down.SetName('histo_altshape2_PTDown')
+            histogram_pt_down.SetTitle('histo_altshape2_PTDown')
+            histogram_pt_down.Write('histo_altshape2_PTDown')
+            conditional(histogram_pt_up)
+            histogram_pt_up.SetName('histo_altshape2_PTUp')
+            histogram_pt_up.SetTitle('histo_altshape2_PTUp')
+            histogram_pt_up.Write('histo_altshape2_PTUp')
+            
+            alpha=1.5*float(minMJ)
+            h1,h2=unequalScale(finalHistograms['histo_altshape2Up'],"histo_altshape2_OPT",alpha,-1,2)
+            conditional(h1)
+            h1.SetName('histo_altshape2_OPTUp')
+            h1.SetTitle('histo_altshape2_OPTUp')
+            h1.Write('histo_altshape2_OPTUp')
+            conditional(h2)
+            h2.SetName('histo_altshape2_OPTDown')
+            h2.SetTitle('histo_altshape2_OPTDown')
+            h2.Write('histo_altshape2_OPTDown')
+            
+            alpha=float(maxMJ)*float(maxMJ)
+            histogram_pt2_up,histogram_pt2_down=unequalScale(finalHistograms['histo_altshape2Up'],"histo_altshape2_PT2",alpha,2,2)
+            conditional(histogram_pt2_down)
+            histogram_pt2_down.SetName('histo_altshape2_PT2Down')
+            histogram_pt2_down.SetTitle('histo_altshape2_PT2Down')
+            histogram_pt2_down.Write('histo_altshape2_PT2Down')
+            conditional(histogram_pt2_up)
+            histogram_pt2_up.SetName('histo_altshape2_PT2Up')
+            histogram_pt2_up.SetTitle('histo_altshape2_PT2Up')
+            histogram_pt2_up.Write('histo_altshape2_PT2Up')
+            
+            alpha=float(minMJ)*float(minMJ)
+            histogram_opt2_up,histogram_opt2_down=unequalScale(finalHistograms['histo_altshape2Up'],"histo_altshape2_OPT2",alpha,-2,2)
+            conditional(histogram_opt2_down)
+            histogram_opt2_down.SetName('histo_altshape2_OPT2Down')
+            histogram_opt2_down.SetTitle('histo_altshape2_OPT2Down')
+            histogram_opt2_down.Write('histo_altshape2_OPT2Down')
+            conditional(histogram_opt2_up)
+            histogram_opt2_up.SetName('histo_altshape2_OPT2Up')
+            histogram_opt2_up.SetTitle('histo_altshape2_OPT2Up')
+            histogram_opt2_up.Write('histo_altshape2_OPT2Up')
+            
+            if doPythia:
+                histogram_altshape2Down=mirror(finalHistograms['histo_altshape2Up'],finalHistograms['histo_nominal'],"histo_altshape2Down",2)
+                conditional(histogram_altshape2Down)
+                histogram_altshape2Down.SetName('histo_altshape2Down')
+                histogram_altshape2Down.SetTitle('histo_altshape2Down')
+                histogram_altshape2Down.Write()
+                
+        if doDijet:
+            histo_NLO.Write('histo_NLO_coarse')
+            conditional(histo_NLO)
+            expanded=expandHisto(histo_NLO,"NLO",binsMVV,binsMJ,minMVV,maxMVV,minMJ,maxMJ)
+            if HCALbinsMVV!="":
+                expanded=expandHistoBinned(histo_NLO,"",xbins,binning)
+            conditional(expanded)
+            expanded.SetName('histo_NLO')
+            expanded.SetTitle('histo_NLO')
+            expanded.Write('histo_NLO')
+            finalHistograms['histo_NLO'] = expanded
+            if doPythia:
+                histogram_NLODown=mirror(finalHistograms['histo_NLO'],finalHistograms['histo_nominal'],"histo_NLODown",2)
+                conditional(histogram_NLODown)
+                histogram_NLODown.SetName('histo_NLODown')
+                histogram_NLODown.SetTitle('histo_NLODown')
+                histogram_NLODown.Write()
+                
   os.system('rm -r '+outdir+'_out')
   # os.system('rm -r '+outdir)
   
@@ -1372,13 +1492,16 @@ def makeData(template,cut,rootFile,binsMVV,binsMJ,minMVV,maxMVV,minMJ,maxMJ,fact
     print 
     files = []
     sampleTypes = template.split(',')
-    for f in os.listdir(samples):
-        for t in sampleTypes:
-            if f.find('.root') != -1 and f.find(t) != -1: files.append(f)
- 
-    NumberOfJobs= len(files) 
+    folders = samples.split(",")
+    for folder in folders:
+        for f in os.listdir(folder):
+            for t in sampleTypes:
+                if f.find('.root') != -1 and f.find(t) != -1: files.append(folder+f)
+    print " files ",files
+    NumberOfJobs= len(files)
+    print " ###### total number of files ",NumberOfJobs 
     OutputFileNames = rootFile.replace(".root","")
-    cmd='vvMakeData.py -d {data} -c "{cut}"  -v "jj_l1_softDrop_mass,jj_l2_softDrop_mass,jj_LV_mass" {binning} -b "{bins},{bins},{BINS}" -m "{mini},{mini},{MINI}" -M "{maxi},{maxi},{MAXI}" -f {factors} -n "{name}" {addOption} {infolder} '.format(cut=cut,BINS=binsMVV,bins=binsMJ,MINI=minMVV,MAXI=maxMVV,mini=minMJ,maxi=maxMJ,factors=factors,name=name,data=data,infolder=samples,binning=binning,addOption=addOption)  
+    cmd='vvMakeData.py -d {data} -c "{cut}"  -v "jj_l1_softDrop_mass,jj_l2_softDrop_mass,jj_LV_mass" {binning} -b "{bins},{bins},{BINS}" -m "{mini},{mini},{MINI}" -M "{maxi},{maxi},{MAXI}" -f {factors} -n "{name}" {addOption} '.format(cut=cut,BINS=binsMVV,bins=binsMJ,MINI=minMVV,MAXI=maxMVV,mini=minMJ,maxi=maxMJ,factors=factors,name=name,data=data,infolder=samples,binning=binning,addOption=addOption)  
     queue = "1nd" # give bsub queue -- 8nm (8 minutes), 1nh (1 hour), 8nh, 1nd (1day), 2nd, 1nw (1 week), 2nw 
     path = os.getcwd()
     try: os.system("rm -r tmp"+jobname)
@@ -1388,16 +1511,25 @@ def makeData(template,cut,rootFile,binsMVV,binsMJ,minMVV,maxMVV,minMJ,maxMJ,fact
     except: os.mkdir("res"+jobname)
         
     
+
+
     ##### Creating and sending jobs #####
     joblist = []
     ###### loop for creating and sending jobs #####
     for x in range(1, int(NumberOfJobs)+1):
-       os.system("mkdir tmp"+jobname+"/"+str(files[x-1]).replace(".root",""))
-       os.chdir("tmp"+jobname+"/"+str(files[x-1]).replace(".root",""))
+       removefile=files[x-1][files[x-1].rindex("/")+1:]
+       directory = str(files[x-1]).split(removefile)[0]
+       print " directory ",directory
+       year=directory.split("/")[-2]
+       print "year ",year
+       template = str(files[x-1]).split("/")[-1]
+       print "template ",template
+       os.system("mkdir tmp"+jobname+"/"+year+"_"+template.replace(".root",""))
+       os.chdir("tmp"+jobname+"/"+year+"_"+template.replace(".root",""))
        #os.system("mkdir tmp"+jobname+"/"+str(files[x-1]).replace(".root",""))
        #os.chdir(path+"tmp"+jobname+"/"+str(files[x-1]).replace(".root",""))
      
-       with open('job_%s.sh'%files[x-1].replace(".root",""), 'w') as fout:
+       with open('job_%s_%s.sh'%(year,template.replace(".root","")), 'w') as fout:
           fout.write("#!/bin/sh\n")
           fout.write("echo\n")
           fout.write("echo\n")
@@ -1409,20 +1541,20 @@ def makeData(template,cut,rootFile,binsMVV,binsMJ,minMVV,maxMVV,minMJ,maxMJ,fact
           fout.write("cd "+str(path)+"\n")
           fout.write("cmsenv\n")
           if runinKA==True: fout.write("mkdir -p /tmp/${USER}/\n")
-          fout.write(cmd+" -o "+path+"/res"+jobname+"/"+OutputFileNames+"_"+files[x-1]+" -s "+files[x-1]+"\n")
+          fout.write(cmd+" -o "+path+"/res"+jobname+"/"+OutputFileNames+"_"+year+"_"+template+" -s "+template+" "+directory+"\n")
           fout.write("echo 'STOP---------------'\n")
           fout.write("echo\n")
           fout.write("echo\n")
-       os.system("chmod 755 job_%s.sh"%(files[x-1].replace(".root","")) )
+       os.system("chmod 755 job_%s.sh"%(year+"_"+template.replace(".root","")) )
 
        if useCondorBatch:
            os.system("mv  job_*.sh "+jobname+".sh")
            makeSubmitFileCondor(jobname+".sh",jobname,"workday")
            os.system("condor_submit submit.sub")
        else:
-           os.system("bsub -q "+queue+" -o logs job_%s.sh -J %s"%(files[x-1].replace(".root",""),jobname))
+           os.system("bsub -q "+queue+" -o logs job_%s.sh -J %s"%(template.replace(".root",""),jobname))
        print "job nr " + str(x) + " submitted"
-       joblist.append("%s"%(files[x-1].replace(".root","")))
+       joblist.append("%s"%(year+"_"+template.replace(".root","")))
        os.chdir("../..")
    
     print
@@ -1439,29 +1571,77 @@ def makeData(template,cut,rootFile,binsMVV,binsMJ,minMVV,maxMVV,minMJ,maxMJ,fact
     print
     return joblist, files
 
-def mergeData(jobname,purity,rootFile,filename,name):
+def mergeData(jobList, files,jobname,purity,rootFile,filename,name,year=""):
     
     print "Merging data from job " ,jobname
     print "Purity is " ,purity
+    print "Jobs to merge :   " ,jobList
+    print "Files ran over:   " ,files
+
+    outdir = 'res'+jobname
+    jobdir = 'tmp'+jobname
+
+    resubmit, jobsPerSample,exit_flag = getNormJobs(files,jobList,outdir,purity)
+
+    print "getJobs done"
+
+    if exit_flag:
+        submit = raw_input("The following files are missing: %s. Do you  want to resubmit the jobs to the batch system before merging? [y/n] "%resubmit)
+        if submit == 'y' or submit=='Y':
+            print "Resubmitting jobs:"
+            jobs = reSubmit(jobdir,resubmit,jobname)
+            waitForBatchJobs(jobname,len(resubmit),len(resubmit), userName, timeCheck)
+            resubmit, jobsPerSample,exit_flag = getNormJobs(files,jobList,outdir,purity)
+            if exit_flag:
+                print "Job crashed again! Please resubmit manually before attempting to merge again"
+                for j in jobs: print j
+                sys.exit()
+            else:
+                submit = raw_input("Some files are missing. [y] == Exit without merging, [n] == continue ? ")
+                if submit == 'y' or submit=='Y':
+                    print "Exit without merging!"
+                    sys.exit()
+                else:
+                    print "Continuing merge!"
+            
     # read out files
-    filelist = os.listdir('./res'+jobname+'/')
+    filelist = os.listdir('./'+outdir+'/')
+    print "filelist ",filelist
 
     mg_files     = []
     pythia_files = []
     herwig_files = []
     data_files   = []
+    vjets_files  = []
 
     for f in filelist:
+     if year == "":
      #if f.find('COND2D') == -1: continue
-     if f.find(purity)==-1:
+         if f.find(purity)==-1:
              continue
-     if f.find(filename)==-1:
-         continue
-     if f.find('QCD_HT')    != -1: mg_files.append('./res'+jobname+'/'+f)
-     elif f.find('QCD_Pt_') != -1: pythia_files.append('./res'+jobname+'/'+f)
-     elif f.find('JetHT')   != -1: data_files.append('./res'+jobname+'/'+f)
-     else: herwig_files.append('./res'+jobname+'/'+f)
-
+         if f.find(filename)==-1:
+             print " f.find(filename)==-1 -> continue "
+             continue
+         if f.find('QCD_HT')    != -1: mg_files.append('./res'+jobname+'/'+f)
+         elif f.find('QCD_Pt_') != -1: pythia_files.append('./res'+jobname+'/'+f)
+         elif f.find('JetHT')   != -1: data_files.append('./res'+jobname+'/'+f)
+         elif f.find('Jets')   != -1: vjets_files.append('./res'+jobname+'/'+f)
+         else: herwig_files.append('./res'+jobname+'/'+f)
+     else: 
+         filename = filename.replace("Run2",year)
+         rootFile = rootFile.replace("Run2",year)
+         if f.find(purity)==-1:
+             continue
+         elif f.find(year) !=-1:
+              print " file ",f
+              if f.find('QCD_HT')    != -1: mg_files.append('./res'+jobname+'/'+f)
+              elif f.find('QCD_Pt_') != -1: pythia_files.append('./res'+jobname+'/'+f)
+              elif f.find('JetHT')   != -1: data_files.append('./res'+jobname+'/'+f)
+              elif f.find('Jets')   != -1: vjets_files.append('./res'+jobname+'/'+f)
+              else: herwig_files.append('./res'+jobname+'/'+f)
+    
+    print "filename ",filename
+    print "rootFile ",rootFile 
     #now hadd them
     if len(mg_files) > 0:
         cmd = 'hadd -f %s_%s_%s_altshape2.root '%(filename,name,purity)
@@ -1486,6 +1666,16 @@ def mergeData(jobname,purity,rootFile,filename,name):
          cmd += ' '
         print cmd
         os.system(cmd)
+
+
+    if len(vjets_files) > 0:
+        cmd = 'hadd -f %s '%rootFile
+        for f in vjets_files:
+         cmd += f
+         cmd += ' '
+        print cmd
+        os.system(cmd)
+
     
     if len(data_files) > 0:
         cmd = 'hadd -f JJ_%s.root '%purity
@@ -1520,33 +1710,41 @@ def getListOfBinsLowEdge(hist,dim):
     return r
 
 def makePseudoData(input="JJ_nonRes_LPLP.root",kernel="JJ_nonRes_3D_LPLP.root",mc="pythia",output="JJ_LPLP.root",lumi=35900):
-
+ print " makind pseudodata with lumi ",lumi 
  pwd = os.getcwd()
  
  ROOT.gRandom.SetSeed(123)
  
  finmc = ROOT.TFile.Open(pwd+'/'+input,'READ')
  hmcin = finmc.Get('nonRes')
+ print " mc file = ",pwd+'/'+input
+ print " mc events ", hmcin.GetEntries() , " and integral ", hmcin.Integral()
 
  findata = ROOT.TFile.Open(pwd+'/'+kernel,'READ')
  #findata.ls()
  hdata = ROOT.TH3F()
+ print " data/kernel file ",pwd+'/'+kernel
  
  if   mc == 'pythia': hdata = findata.Get('histo')
  elif mc == 'herwig': hdata = findata.Get('histo_altshapeUp')
  elif mc == 'madgraph': hdata = findata.Get('histo_altshape2')
  elif mc == 'powheg': hdata = findata.Get('histo_NLO')
  
+ print "  events ", hdata.GetEntries() , " and integral ", hdata.Integral()
+
  fout = ROOT.TFile.Open(output,'RECREATE')
  #hmcin.Scale(10.)
  hmcin.Write('nonRes')
 
  xbins = array("f",getListOfBinsLowEdge(hmcin,"x"))
  zbins = array("f",getListOfBinsLowEdge(hmcin,"z"))
- hout = ROOT.TH3F('data','data',len(xbins)-1,xbins,len(xbins)-1,xbins,len(zbins)-1,zbins)
+ hout = ROOT.TH3F('datah','datah',len(xbins)-1,xbins,len(xbins)-1,xbins,len(zbins)-1,zbins)
+# hout.FillRandom(hdata,int(hmcin.Integral())) #irene making test
  hout.FillRandom(hdata,int(hmcin.Integral()*lumi))
- hout.Write('data')
+ print "hout data integral ",hout.Integral()
+ hout.Write('datah')
  print "Writing histograms nonRes and data to file ", output
+ fout.Write()
 
  finmc.Close()
  findata.Close()
@@ -1703,8 +1901,8 @@ def mergeCPs(template,jobname="CPs"):
     cmd = "hadd %s/%s.root %s/controlplots_*%s*.root" %(resDir,t,resDir,t)
     os.system(cmd)
 
-def makePseudoDataVjets(input,kernel,mc,output,lumi,workspace,year,purity):
- 
+def makePseudoDataVjets(input,kernel,mc,output,lumi,workspace,year,purity,rescale=False,rescalefactor=1.):
+ print " year ",year, " lumi ",lumi
  pwd = os.getcwd()
  pwd = "/"
  ROOT.gRandom.SetSeed(123)
@@ -1727,28 +1925,31 @@ def makePseudoDataVjets(input,kernel,mc,output,lumi,workspace,year,purity):
  xbins = array("f",getListOfBinsLowEdge(hmcin,"x"))
  zbins = array("f",getListOfBinsLowEdge(hmcin,"z"))
  hout = ROOT.TH3F('data','data',len(xbins)-1,xbins,len(xbins)-1,xbins,len(zbins)-1,zbins)
- 
- hout.FillRandom(hdata,int(hmcin.Integral()*lumi))
+ print " hmcin Integral ",hmcin.Integral(), " Entries ",hmcin.GetEntries()
+ nEventsQCD = int(hmcin.Integral()*lumi)
+ print "Expected QCD events: ",nEventsQCD
+ hout.FillRandom(hdata,nEventsQCD)
  
  ws_file = ROOT.TFile.Open(workspace,'READ')
  ws = ws_file.Get('w')
  ws_file.Close()
  ws.Print()
 
- modelWjets = ws.pdf('shapeBkg_Wjets_JJ_%s_13TeV_%i'%(purity,year))
- modelZjets = ws.pdf('shapeBkg_Zjets_JJ_%s_13TeV_%i'%(purity,year))
- category = ws.obj("CMS_channel==CMS_channel::JJ_"+purity+"_13TeV_%i"%year)
+ modelWjets = ws.pdf('shapeBkg_Wjets_JJ_%s_13TeV_%s'%(purity,year))
+ modelZjets = ws.pdf('shapeBkg_Zjets_JJ_%s_13TeV_%s'%(purity,year))
+ category = ws.obj("CMS_channel==CMS_channel::JJ_"+purity+"_13TeV_%s"%year)
 
  MJ1= ws.var("MJ1");
  MJ2= ws.var("MJ2");
  MJJ= ws.var("MJJ");
  args = ROOT.RooArgSet(MJ1,MJ2,MJJ)
  ### Wjets
- print "n_exp_binJJ_"+purity+"_13TeV_%i_proc_Wjets"%year
- o_norm_wjets = ws.obj("n_exp_binJJ_"+purity+"_13TeV_%i_proc_Wjets"%year)
+ print "n_exp_binJJ_"+purity+"_13TeV_%s_proc_Wjets"%year
+ o_norm_wjets = ws.obj("n_exp_binJJ_"+purity+"_13TeV_%s_proc_Wjets"%year)
  hout_wjets = ROOT.TH3F('wjets','wjets',len(xbins)-1,xbins,len(xbins)-1,xbins,len(zbins)-1,zbins)
  
  nEventsW = o_norm_wjets.getVal()
+ if rescale==True: nEventsW=nEventsW*rescalefactor/lumi
  print "Expected W+jets events: ",nEventsW
  wjets = modelWjets.generate(args,int(nEventsW))
  if wjets!=None:
@@ -1765,12 +1966,14 @@ def makePseudoDataVjets(input,kernel,mc,output,lumi,workspace,year,purity):
    hout_wjets.Fill(x[0],x[1],x[2])
       
  hout.Add(hout_wjets)
+
  ### Zjets
- print "n_exp_binJJ_"+purity+"_13TeV_%i_proc_Zjets"%year
- o_norm_zjets = ws.obj("n_exp_binJJ_"+purity+"_13TeV_%i_proc_Zjets"%year)
+ print "n_exp_binJJ_"+purity+"_13TeV_%s_proc_Zjets"%year
+ o_norm_zjets = ws.obj("n_exp_binJJ_"+purity+"_13TeV_%s_proc_Zjets"%year)
  hout_zjets = ROOT.TH3F('zjets','zjets',len(xbins)-1,xbins,len(xbins)-1,xbins,len(zbins)-1,zbins)
  
  nEventsZ = o_norm_zjets.getVal()
+ if rescale==True: nEventsZ=nEventsZ*rescalefactor/lumi
  print "Expected Z+jets events: ",nEventsZ
  zjets = modelZjets.generate(args,int(nEventsZ))
  if zjets!=None:
@@ -1801,7 +2004,7 @@ def makePseudoDataVjets(input,kernel,mc,output,lumi,workspace,year,purity):
  print "purity   ", purity
  print "Expected W+jets events: ",nEventsW
  print "Expected Z+jets events: ",nEventsZ
- print "Expected QCD events: ",int(hmcin.Integral()*lumi)
+ print "Expected QCD events: ",nEventsQCD
  print "Writing histograms nonRes and data to file ", output
 
  finmc.Close()

@@ -28,9 +28,9 @@ parameterization={}
 
 ff=ROOT.TFile("debug_"+options.output+".root","RECREATE")
 ff.cd()
-print graphStr
+print " graphStr ",graphStr
 for string in graphStr:
-    comps =string.split(':')      
+    comps =string.split(':')
     graph=rootFile.Get(comps[0])
     if comps[0].find("corr")==-1:
         if comps[1].find("pol")!=-1:
@@ -62,7 +62,7 @@ for string in graphStr:
         func = ROOT.TF2(comps[0]+"_func","[0] + [1]*x +[2] *y +[3]*x*y",55,215,55,215) # +[3]*x*y
         if comps[0].find("sigma")!=-1:
             func = ROOT.TF2(comps[0]+"_func","[0] + [1]*x +[2] *y ",55,215,55,215) # +[3]*x*y
-        
+    print "function ",func    
     if comps[0].find("corr")!=-1:
         graph.Fit(func,"","")
         graph.Fit(func,"","")
@@ -73,7 +73,7 @@ for string in graphStr:
         graph.Fit(func,"","",55,215)
         graph.Fit(func,"","",55,215)
     elif comps[1]=="spline":
-        print "no need to fit a spline"
+        print "Spline used, no need to fit it"
     else:
         print comps[1]
         print 'fit function '+func.GetName()
@@ -81,7 +81,7 @@ for string in graphStr:
         graph.Fit(func,"","",options.min,options.max)
         graph.Fit(func,"","",options.min,options.max)
     parameterization[comps[0]]=returnString(func,comps[1])
-    
+
     c = ROOT.TCanvas()
     graph.Draw()
     func.SetLineColor(ROOT.kRed)

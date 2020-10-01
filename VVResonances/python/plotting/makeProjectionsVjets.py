@@ -1,18 +1,12 @@
 import ROOT
 import os,sys
-from  CMGTools.VVResonances.plotting.CMS_lumi import *
-#import CMS_lumi
-#ROOT.gROOT.ProcessLine(".x tdrstyle.cc")
+import CMS_lumi
+ROOT.gROOT.ProcessLine(".x tdrstyle.cc")
 ROOT.gROOT.SetBatch(True)
 ROOT.gStyle.SetOptStat(0)
 ROOT.gStyle.SetOptTitle(0)
 ROOT.gStyle.SetLegendBorderSize(0)
 
-# usage:
-#    python makeProjections.py purity year
-# where purity can be "VV_HPHP", "VH_HPLP" and so on
-# and year can be 2016, 2017 or 2018
-path="../../plots/"
 
 def getCanvas(w=800,h=600):
  H_ref = 600 
@@ -59,7 +53,7 @@ def GetName(histname):
 
 def plotStack(backgrounds,xrange,yrange,zrange,projection,purity):
     c = getCanvas()
-    #leg = ROOT.TLegend(0.15,0.91,0.3,0.7)
+    #leg = ROOT.TLegend(0.12,0.91,0.3,0.7)
     leg = ROOT.TLegend(0.6,0.89,0.87,0.7)
     if projection == "z":
         leg = ROOT.TLegend(0.6,0.89,0.89,0.7)
@@ -133,7 +127,7 @@ def plotStack(backgrounds,xrange,yrange,zrange,projection,purity):
         else:
             addText.DrawLatexNDC(0.55,0.65,"#scale[0.8]{"+label_proj_2+"}")
             addText.DrawLatexNDC(0.55,0.6,"#scale[0.8]{"+label_proj_3+"}")
-    c.SaveAs(path+"CP_background_p"+projection+"_xrange"+str(xrange[0][1])+"-"+str(xrange[0][2])+"_yrange"+str(yrange[0][1])+"-"+str(yrange[0][2])+"zrange"+str(zrange[0][1])+"-"+str(zrange[0][2])+"_"+purity+".pdf")
+    c.SaveAs("CP_background_p"+projection+"_xrange"+str(xrange[0][1])+"-"+str(xrange[0][2])+"_yrange"+str(yrange[0][1])+"-"+str(yrange[0][2])+"zrange"+str(zrange[0][1])+"-"+str(zrange[0][2])+"_"+purity+".pdf")
 
 
 
@@ -329,10 +323,8 @@ def makeProjections(histo,range1,range2,axis,label):
 
 
 if __name__=="__main__":
-    '''
-# irene trying to make things working without QCD!
-    f_kernel = ROOT.TFile(sys.argv[1],"READ")
-    f_sample = ROOT.TFile(sys.argv[2],"READ")
+    f_kernel = ROOT.TFile(sys.argv[1],"READ") #eg JJ_2016_nonRes_3D_VV_HPHP.root 
+    f_sample = ROOT.TFile(sys.argv[2],"READ") #eg JJ_2016_nonRes_VV_HPHP.root
     print f_kernel
     print f_sample  
     
@@ -474,41 +466,28 @@ if __name__=="__main__":
     plotHistos(xrange[0],yrange[0],zrange[0],p_Z,"qcd_altenate_shapes_Z"+"_"+purity+".pdf",labels_Z,True,data_z,None,"NL")   
     
     #print kernel_varBinUp.Integral()
-    '''
     ############## make stackplots of all backgrounds ####################
-    purity = sys.argv[1] 
-    year = sys.argv[2] 
-#    f_Wjets  = ROOT.TFile("../../interactive/results_QCD_pythia_signals_2016_tau21DDT_rho_VH_HPHP_HPLP_LPHP/JJ_"+str(year)+"_WJets_"+str(purity)+".root","READ")
-#    f_Zjets  = ROOT.TFile("../../interactive/results_QCD_pythia_signals_2016_tau21DDT_rho_VH_HPHP_HPLP_LPHP/JJ_"+str(year)+"_ZJets_"+str(purity)+".root","READ")
-#    f_ttjets = ROOT.TFile("../../interactive/results_QCD_pythia_signals_2016_tau21DDT_rho_VH_HPHP_HPLP_LPHP/JJ_"+str(year)+"_TTJets_"+str(purity)+".root","READ")
-    f_Wjets  = ROOT.TFile("../../interactive/results_QCD_pythia_signals_2016_tau21DDT_rho_VV_HPHP_HPLP/JJ_"+str(year)+"_WJets_"+str(purity)+".root","READ")
-    f_Zjets  = ROOT.TFile("../../interactive/results_QCD_pythia_signals_2016_tau21DDT_rho_VV_HPHP_HPLP/JJ_"+str(year)+"_ZJets_"+str(purity)+".root","READ")
-    f_ttjets = ROOT.TFile("../../interactive/results_QCD_pythia_signals_2016_tau21DDT_rho_VV_HPHP_HPLP/JJ_"+str(year)+"_TTJets_"+str(purity)+".root","READ")
+    #purity = sys.argv[1]
+    f_Wjets  = ROOT.TFile("JJ_NLOweights_WJets_all_"+purity+".root","READ")
+    f_Zjets  = ROOT.TFile("JJ_NLOweights_ZJets_all_"+purity+".root","READ")
+    f_ttjets = ROOT.TFile("JJ_TTJets_all_"+purity+".root","READ")
     
-    #qcd = f_sample.Get("nonRes")
-    Wjets = f_Wjets.Get("WJets")
-    Zjets = f_Zjets.Get("ZJets")
-    ttbar = f_ttjets.Get("TTJets")
-    #  qcd  .SetName("nonRes")
+    qcd = f_sample.Get("nonRes")
+    Wjets = f_Wjets.Get("WJets_all")
+    Zjets = f_Zjets.Get("ZJets_all")
+    ttbar = f_ttjets.Get("TTJets_all")
+    qcd  .SetName("nonRes")
     Wjets.SetName("WJets_all")
     Zjets.SetName("ZJets_all")
     ttbar.SetName("ttbar_all")
     
-    lumi = 59690.
+    lumi = 35900.
+    qcd  .Scale(lumi)
     Wjets.Scale(lumi)
     Zjets.Scale(lumi)
-
-    if year == 2018:
-     lumi = 59690. #to be checked! https://twiki.cern.ch/twiki/bin/view/CMS/PdmV2018Analysis                                                                                                                                                                                   
-    if year == 2017:
-     lumi = 41367.
-    elif year == 2016:
-     lumi = 35900.
-
-    #   qcd  .Scale(lumi)
     ttbar.Scale(lumi)
     
-    #    print qcd
+    print qcd
     print Wjets
     print Zjets
     print ttbar
@@ -516,18 +495,18 @@ if __name__=="__main__":
     xrange = [["px0",55,215]]
     yrange = [["py0",55,215]]
     zrange = [["pz0",1126,5000]]
-
-    backgrounds = [ttbar,Zjets,Wjets] #,Zjets,Wjets]#,qcd]
-
-    plotStack(backgrounds,xrange,yrange,zrange,"x",year+"_"+purity)
-    plotStack(backgrounds,xrange,yrange,zrange,"y",year+"_"+purity)
-    plotStack(backgrounds,xrange,yrange,zrange,"z",year+"_"+purity)
+    
+    backgrounds = [ttbar,Zjets,Wjets]#,qcd]
+    
+    plotStack(backgrounds,xrange,yrange,zrange,"x",purity)
+    plotStack(backgrounds,xrange,yrange,zrange,"y",purity)
+    plotStack(backgrounds,xrange,yrange,zrange,"z",purity)
     
     
-    #irene print "qcd : "+str(qcd.Integral())+" Wjets "+str(Wjets.Integral()) + " Zjets "+str(Zjets.Integral()) + " ttbar "+str(ttbar.Integral())
-
-    #irene print " Wjets "+str(Wjets.Integral()/qcd.Integral())+ " Zjets "+str(Zjets.Integral()/qcd.Integral())+" ttbar "+str(ttbar.Integral()/qcd.Integral())
-    #irene print (Wjets.Integral()+Zjets.Integral()+ttbar.Integral())/qcd.Integral()
-
+    print "qcd : "+str(qcd.Integral())+" Wjets "+str(Wjets.Integral()) + " Zjets "+str(Zjets.Integral()) + " ttbar "+str(ttbar.Integral())
+    
+    print " Wjets "+str(Wjets.Integral()/qcd.Integral())+ " Zjets "+str(Zjets.Integral()/qcd.Integral())+" ttbar "+str(ttbar.Integral()/qcd.Integral())
+    print (Wjets.Integral()+Zjets.Integral()+ttbar.Integral())/qcd.Integral()
+    
     print "Z/ W+ttbar "+str(+Zjets.Integral()/(Wjets.Integral()+ttbar.Integral()))
 

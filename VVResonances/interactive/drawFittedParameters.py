@@ -12,6 +12,8 @@ gROOT.SetBatch(True)
 path = sys.argv[1]
 cols = [46,30]
 colors = ["#4292c6","#41ab5d","#ef3b2c","#ffd300","#D02090","#fdae61","#abd9e9","#2c7bb6"]
+#mstyle = [8,24,22,26,32]
+#linestyle=[1,2,1,2,3]
 markerstyle = [1,4,8,10,20,25]
 linestyle = [1,2,3,4,5,6,7,8,9]
 mstyle = [8,4]
@@ -114,7 +116,6 @@ def doSignalEff(directory,signals,titles,categories,ymaxrange=[0.3,0.5,0.05,0.05
             fHPHP = TF1("funcHP"+str(i),str(ftmpHPHP.GetExpFormula()).replace("func","")+"*1000.",ftmpHPHP.GetXmin(),ftmpHPHP.GetXmax())
             for o in range(0,ftmpHPHP.GetNpar()): 
                 fHPHP.SetParameter(o,ftmpHPHP.GetParameter(o))
-        
         else: fHPHP = gHPHP
         
         beautify(fHPHP ,rt.TColor.GetColor(colors[i]),linestyle[i],markerstyle[i])
@@ -150,8 +151,16 @@ def doSignalEff(directory,signals,titles,categories,ymaxrange=[0.3,0.5,0.05,0.05
     c.SaveAs(path+"signalEff"+prelim+"_"+category+".C")
     print ky
     print ymaxrange[ky]
+
     
+        canvas.Update()
+        name = path+"signalEff"+prelim+"_"+signals[s]
+        canvas.SaveAs(name+".png")
+        canvas.SaveAs(name+".pdf")
+        canvas.SaveAs(name+".C")
+
 def doJetMass(leg,signals,titles,categories):
+    print signals
     gStyle.SetOptFit(0)
  
     files=[]
@@ -257,6 +266,7 @@ def doJetMass(leg,signals,titles,categories):
     
     
     
+
     
     
     
@@ -313,6 +323,10 @@ def doYield():
         c.SaveAs(path+"signalFit/"+sys.argv[2]+"_Yield_"+var+"_fit.png")
         
 def doMVV(signals,titles,year):
+
+#    variab = ["MEAN","SIGMA","ALPHA1","ALPHA2","N1","N2"]
+#    for var in variab:
+#        print "var ",var
 
     vars = ["MEAN","SIGMA","ALPHA1","ALPHA2","N1","N2"]
     gStyle.SetOptFit(0)
@@ -373,6 +387,7 @@ def doMVV(signals,titles,year):
         if var.find("MEAN")!=-1:   datasHP[0].GetYaxis().SetRangeUser(700., 8000)
         if var.find("N1")!=-1:     datasHP[0].GetYaxis().SetRangeUser(0., 15.)
         if var.find("N2")!=-1:     datasHP[0].GetYaxis().SetRangeUser(0., 150.)
+
         datasHP[0].Draw("PA")
         print datasHP[0].Eval(1200.)
         c.Update()
@@ -390,6 +405,7 @@ def doMVV(signals,titles,year):
         c.SaveAs(path+"Signal_mVV_"+var+"_"+year+".pdf")
         c.SaveAs(path+"Signal_mVV_"+var+"_"+year+".C")
         
+
 def doMJFit():
     FHPLP = TFile("debug_JJ_"+sys.argv[2]+"_MJl1_HPHP.json.root","READ")
     FHPHP = TFile("debug_JJ_"+sys.argv[2]+"_MJl1_HPHP.json.root","READ")
@@ -810,15 +826,23 @@ def compSignalMVV():
         
 if __name__ == '__main__':
   prelim = ""
-  signals =["ZprimeWW","BulkGWW","WprimeWZ","BulkGZZ","ZprimeZH","WprimeWH"]
-  titles =  ["Z' #rightarrow WW","G_{B}#rightarrow WW","W' #rightarrow WZ","G_{B}#rightarrow ZZ","Z' #rightarrow ZH","W' #rightarrow WH"]
+#  signals = ["ZprimeWW","BulkGWW","WprimeWZ","BulkGZZ","ZprimeZH"]
+#  titles =  ["Z' #rightarrow WW","G_{B}#rightarrow WW","W' #rightarrow WZ","G_{B}#rightarrow ZZ","Z' #rightarrow ZH"]
+#  signals = ["ZprimeZH","BulkGWW"]
+#  titles =  ["Z' #rightarrow ZH","G_{B}#rightarrow WW"]
+  signals = ["BulkGWW"]
+  titles =  ["G_{B}#rightarrow WW"]
   categories = ["2016_NP"]
   doJetMass("random",signals,titles,categories)
+
+#  categories = ["2016_VV_HPHP","2016_VV_HPLP"] #,"2016_VH_HPHP","2016_VH_LPHP"]
+  categories = ["2016_VV_HPHP","2016_VV_HPLP","2016_VH_HPHP","2016_VH_HPLP","2016_VH_LPHP"]
+
+
   doMVV(signals,titles,"2016")
+
+
+
   categories = ["2016_VH_HPHP","2016_VH_HPLP","2016_VH_LPHP","2016_VV_HPHP","2016_VV_HPLP"]
   doSignalEff(sys.argv[1],signals,titles,categories,[0.3,0.03,0.06,0.2,0.05])
-  
-  
-  
-  
-  
+

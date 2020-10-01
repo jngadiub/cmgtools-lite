@@ -6,9 +6,14 @@ import CMS_lumi
 rt.gStyle.SetOptStat(0)
 rt.gStyle.SetOptTitle(0)
 rt.gROOT.SetBatch(True)
-
+from time import sleep
 
 # Run from command line with
+# python Projections3DHisto_add.py --mc control-plots-HPLP-pythia-2016-rho-kernel-VH/JJ_2016_nonRes_VV_HPLP_altshape2.root,nonRes -k control-plots-HPLP-pythia-2016-rho-kernel-VH/JJ_2016_nonRes_3D_VV_HPLP.root,histo_madgraph --cm control-plots-VV_HPLP-madgraph-2018-rho-kernel/JJ_2018_nonRes_VV_HPLP_altshape2.root,nonRes --vh control-plots-VV_HPLP-madgraph-2018-rho-kernel/JJ_2018_nonRes_3D_VV_HPLP.root,histo_madgraph -o "VV_HPLP"
+
+# python Projections3DHisto_add.py --mc control-plots-VH_HPLP-pythia-2016-rho-kernel/JJ_2016_nonRes_VH_HPLP_altshape2.root,nonRes -k control-plots-VH_HPLP-pythia-2016-rho-kernel/JJ_2016_nonRes_3D_VH_HPLP.root,histo_madgraph --cm control-plots-VH_HPLP-madgraph-2018-rho-kernel/JJ_2018_nonRes_VH_HPLP_altshape2.root,nonRes --vh control-plots-VH_HPLP-madgraph-2018-rho-kernel/JJ_2018_nonRes_3D_VH_HPLP.root,histo_madgraph -o "VH_HPLP"
+
+#python Projections3DHisto.py --mc JJ_2016_nonRes_VV_HPLP.root,nonRes -k JJ_2016_nonRes_3D_VV_HPLP.root,histo -o control-plots-HPLP-pythia
 #python Projections3DHisto.py --mc 2017/JJ_nonRes_HPLP.root,nonRes -k 2016/JJ_nonRes_3D_HPLP_2017_copy.root,histo -o control-plots-HPLP-pythia
 #python Projections3DHisto.py --mc 2017/JJ_nonRes_HPHP.root,nonRes -k 2016/JJ_nonRes_3D_HPHP_2017_copy.root,histo -o control-plots-HPHP-pythia
 #python Projections3DHisto.py --mc 2016/JJ_nonRes_LPLP_altshapeUp.root,nonRes -k 2016/JJ_nonRes_3D_LPLP_fixed.root,histo_altshapeUp -o control-plots-LPLPfixed-herwig
@@ -16,14 +21,14 @@ rt.gROOT.SetBatch(True)
 #python Projections3DHisto.py --mc 2016/JJ_nonRes_LPLP_altshapeUp.root,nonRes -k JJ_nonRes_3D_LPLP.root,histo -o control-plots-LPLPnew-herwig
 #python Projections3DHisto.py --mc JJ_nonRes_LPLP_nominal.root,nonRes -k JJ_nonRes_3D_LPLP.root,histo -o control-plots-LPLP-pythia
 
-def get_canvas(cname,period="2016"):
+def get_canvas(cname):
 
  #change the CMS_lumi variables (see CMS_lumi.py)
  CMS_lumi.lumi_7TeV = "4.8 fb^{-1}"
  CMS_lumi.lumi_8TeV = "18.3 fb^{-1}"
  CMS_lumi.writeExtraText = 1
  CMS_lumi.extraText = "Simulation"
- CMS_lumi.lumi_sqrtS = "13 TeV ("+period+")" # used with iPeriod = 0, e.g. for simulation-only plots (default is an empty string)
+ CMS_lumi.lumi_sqrtS = "13 TeV (2016)" # used with iPeriod = 0, e.g. for simulation-only plots (default is an empty string)
 
  iPos = 11
  if( iPos==0 ): CMS_lumi.relPosX = 0.12
@@ -58,9 +63,10 @@ def get_canvas(cname,period="2016"):
 parser = optparse.OptionParser()
 parser.add_option("--mc","--mc",dest="mc",help="File with mc events and histo name (separated by comma)",default='JJ_nonRes_HPHP_nominal.root,nonRes')
 parser.add_option("-k","--kernel",dest="kernel",help="File with kernel and histo name (separated by comma)",default='JJ_nonRes_3D_HPHP.root,histo')
-parser.add_option("-o","--outdir",dest="outdir",help="Output directory for plots",default='control-plots')
+parser.add_option("--cm",dest="cm",help="File to compare with mc events and histo name (separated by comma)",default='JJ_nonRes_HPHP_nominal.root,nonRes')
+parser.add_option("--vh",dest="vh",help="File to compare with kernel and histo name (separated by comma)",default='JJ_nonRes_3D_HPHP.root,histo')
+parser.add_option("-o","--outdir",dest="outdir",help="Output directory for plots",default='')
 parser.add_option("-l","--label",dest="label",help="MC type label (Pythia8, Herwig, Madgraph, Powheg)",default='Pythia8')
-parser.add_option("-p","--period",dest="period",default="2016")
 (options,args) = parser.parse_args()
 
 #void Projections3DHisto(std::string dataFile, std::string hdataName, std::string fitFile, std::string hfitName, std::string outDirName){
@@ -68,15 +74,52 @@ parser.add_option("-p","--period",dest="period",default="2016")
 os.system('rm -rf %s'%options.outdir)
 os.system('mkdir %s'%options.outdir)
 
+lumi2018 = 59690. #to be checked! https://twiki.cern.ch/twiki/bin/view/CMS/PdmV2018Analysis                                                                                                                                                                                  
+lumi2017 = 41367.
+lumi2016 = 35900.
+
+
+
+#2016 file
 kfile,kname = options.kernel.split(',')
+print "kfile "+str(kfile)
 fin = rt.TFile.Open(kfile,"READ")
+print "kname "+str(kname)
 hin = fin.Get(kname)
 hin.Scale(1./hin.Integral())
+#2018 file
+kfile2,kname2 = options.vh.split(',')
+print "kfile2 "+str(kfile2)
+fin2 = rt.TFile.Open(kfile2,"READ")
+print "kname2 "+str(kname2)
+hin2 = fin2.Get(kname2)
+hin2.Scale(1./hin2.Integral())
+hin_tot = hin.Clone()
+hin_tot.Scale(lumi2016)
+hin2.Scale(lumi2018)
+#hin_tot.Add(hin2,1./lumi2018)
+if hin_tot.Add(hin2) : #,1./lumi2018)
+ print "success"
+hin_tot.SaveAs("JJ_2016and2018_nonRes_3D_"+options.outdir+"_histo_madgraph.root")
+
+
 
 MCfile,MCname = options.mc.split(',')
 finMC = rt.TFile.Open(MCfile,"READ")
 hinMC = finMC.Get(MCname)
 hinMC.Scale(1./hinMC.Integral())
+
+MCfile2,MCname2 = options.cm.split(',')
+finMC2 = rt.TFile.Open(MCfile2,"READ")
+hinMC2 = finMC2.Get(MCname2)
+hinMC2.Scale(1./hinMC2.Integral())
+
+hinMC_tot = hinMC.Clone()
+hinMC_tot.Scale(lumi2016)
+hinMC2.Scale(lumi2018)
+hinMC_tot.Add(hinMC2)
+hinMC_tot.SaveAs("JJ_2016and2018_nonRes_"+options.outdir+"_altshape2.root")
+
 
 binsx = hin.GetNbinsX()
 xmin = hin.GetXaxis().GetXmin()
@@ -93,6 +136,7 @@ zmin = hin.GetZaxis().GetXmin()
 zmax = hin.GetZaxis().GetXmax()
 print "zmin",zmin,"zmax",zmax,"binsz",binsz
 
+'''
 hx = []
 hy = []
 hz = []
@@ -100,91 +144,102 @@ hxMC = []
 hyMC = []
 hzMC = []
 
-pullsx = []
-pullsy = []
-pullsz = []
+hx2 = []
+hy2 = []
+hz2 = []
+hxMC2 = []
+hyMC2 = []
+hzMC2 = []
 
-zbinMin = [1]
-zbinMax = [binsz]
-colors = [1,99,9,8,94]
+zbinMin = 1 #,1,hin.GetZaxis().FindBin(1530)+1,hin.GetZaxis().FindBin(2546)+1]
+zbinMax = binsz #,hin.GetZaxis().FindBin(1530),hin.GetZaxis().FindBin(2546),binsz]
+colors = 1 #,99,9,8,94]
+scale = 1. #,0.8,3.0,30.]
 
-scale = [1.,0.8,3.0,30.]
+print "Plotting mJ projections",zbinMin,zbinMax
+pname = "px"
+hin.RebinX(2)
+hx =  hin.ProjectionX(pname,1,binsy,zbinMin,zbinMax) 
+pname = "py"
+hin.RebinY(2)
+hy = hin.ProjectionY(pname,1,binsx,zbinMin,zbinMax) 
+pname = "px_MC"
+hinMC.RebinX(2)
+hxMC =  hinMC.ProjectionX(pname,1,binsy,zbinMin,zbinMax) 
+pname = "py_MC"
+hinMC.RebinY(2)
+hyMC = hinMC.ProjectionY(pname,1,binsx,zbinMin,zbinMax) 
 
-for i in range(len(zbinMin)):
+print "Plotting mJ2 projections",zbinMin,zbinMax
+pname = "px2"
+hin2.RebinX(2)
+hx2 =  hin2.ProjectionX(pname,1,binsy,zbinMin,zbinMax) 
+pname = "py2"
+hin2.RebinY(2)
+hy2 = hin2.ProjectionY(pname,1,binsx,zbinMin,zbinMax) 
+pname = "px_MC2"
+hinMC2.RebinX(2)
+hxMC2 =  hinMC2.ProjectionX(pname,1,binsy,zbinMin,zbinMax) 
+pname = "py_MC2"
+hinMC2.RebinY(2)
+hyMC2 = hinMC2.ProjectionY(pname,1,binsx,zbinMin,zbinMax) 
 
- print "Plotting mJ projections",zbinMin[i],zbinMax[i]
- pname = "px_%i"%i
- hx.append( hin.ProjectionX(pname,1,binsy,zbinMin[i],zbinMax[i]) )
- pname = "py_%i"%i
- hy.append( hin.ProjectionY(pname,1,binsx,zbinMin[i],zbinMax[i]) )
- pname = "px_MC%i"%i
- hxMC.append( hinMC.ProjectionX(pname,1,binsy,zbinMin[i],zbinMax[i]) )
- pname = "pyMC_%i"%i
- hyMC.append( hinMC.ProjectionY(pname,1,binsx,zbinMin[i],zbinMax[i]) )
-
- pname = "pullsx_%i"%i
- pullsx.append( rt.TH1F(pname,pname,40,-10,10) )
- pname = "pullsy_%i"%i
- pullsy.append( rt.TH1F(pname,pname,40,-10,10) )
-        
-for i in range(len(zbinMin)):
- for b in range(1,binsx+1):
-  if hxMC[i].GetBinContent(b) != 0: pullsx[i].Fill( (hxMC[i].GetBinContent(b)-hx[i].GetBinContent(b))/hxMC[i].GetBinError(b) )
-  if hyMC[i].GetBinContent(b) != 0: pullsy[i].Fill( (hyMC[i].GetBinContent(b)-hy[i].GetBinContent(b))/hyMC[i].GetBinError(b) )
-
-for i in range(len(zbinMin)):
-
- hx[i].Scale(scale[i])
- hy[i].Scale(scale[i])
- hxMC[i].Scale(scale[i])
- hyMC[i].Scale(scale[i])
-    
- hx[i].SetLineColor(colors[i])
- hx[i].SetMarkerColor(colors[i])
- hy[i].SetLineColor(colors[i])
- hy[i].SetMarkerColor(colors[i])
- hxMC[i].SetLineColor(colors[i])
- hxMC[i].SetMarkerColor(colors[i])
- hxMC[i].SetMarkerStyle(20)
- hxMC[i].SetMarkerSize(0.5)
- hyMC[i].SetLineColor(colors[i])
- hyMC[i].SetMarkerColor(colors[i]) 
- hyMC[i].SetMarkerStyle(20)
- hyMC[i].SetMarkerSize(0.5)
+hx.SetLineColor(colors)
+hx.SetMarkerColor(colors)
+hy.SetLineColor(colors)
+hy.SetMarkerColor(colors)
+hxMC.SetLineColor(colors)
+hxMC.SetMarkerColor(colors)
+hxMC.SetMarkerStyle(20)
+hxMC.SetMarkerSize(0.5)
+hyMC.SetLineColor(colors)
+hyMC.SetMarkerColor(colors) 
+hyMC.SetMarkerStyle(20)
+hyMC.SetMarkerSize(0.5)
  
- pullsx[i].SetLineColor(colors[i])
- pullsx[i].SetLineWidth(2)
- pullsx[i].SetMarkerSize(0)
- pullsy[i].SetLineColor(colors[i])
- pullsy[i].SetLineWidth(2)
- pullsy[i].SetMarkerSize(0)
-  
-hx[0].SetMinimum(0)
-hx[0].SetMaximum(0.06)
-hy[0].SetMinimum(0)
-hy[0].SetMaximum(0.06)
+hx.SetMinimum(0)
+hx.SetMaximum(0.05)
+hy.SetMinimum(0)
+hy.SetMaximum(0.05)
 
-for i in range(len(zbinMin)):
- hx[i].Rebin(2)
- hxMC[i].Rebin(2)
- hy[i].Rebin(2)
- hyMC[i].Rebin(2)
-  
+hx2.SetLineColor(colors)
+hx2.SetLineStyle(2)
+hx2.SetMarkerColor(colors)
+hy2.SetLineColor(colors)
+hy2.SetLineStyle(2)
+hy2.SetMarkerColor(colors)
+hxMC2.SetLineColor(colors)
+hxMC2.SetLineStyle(2)
+hxMC2.SetMarkerColor(colors)
+hxMC2.SetMarkerStyle(25)
+hxMC2.SetMarkerSize(0.5)
+hyMC2.SetLineColor(colors)
+hyMC2.SetLineStyle(2)
+hyMC2.SetMarkerColor(colors) 
+hyMC2.SetMarkerStyle(25)
+hyMC2.SetMarkerSize(0.5)
+ 
+hx2.SetMinimum(0)
+hx2.SetMaximum(0.05)
+hy2.SetMinimum(0)
+hy2.SetMaximum(0.05)
+
 #leg = rt.TLegend(0.6,0.6,0.85,0.8)
-leg = rt.TLegend(0.51,0.75,0.76,0.90)
+leg = rt.TLegend(0.51,0.60,0.76,0.85)
 leg.SetBorderSize(0)
 leg.SetTextSize(0.035)
-leg.AddEntry(hxMC[0],"Simulation (%s)"%options.label,"LP")
-leg.AddEntry(hx[0],"Template","L")
-for i in range(1,len(zbinMin)):
- leg.AddEntry(hx[i],"%.1f < m_{jj} < %.1f TeV"%( hin.GetZaxis().GetBinLowEdge(zbinMin[i])/1000.,hin.GetZaxis().GetBinUpEdge(zbinMax[i])/1000.) )
+leg.AddEntry(hxMC,"Simulation (%s) VV "%options.label,"LP")
+leg.AddEntry(hx,"Template VV","L")
+leg.AddEntry(hxMC2,"Simulation (%s) VH "%options.label,"LP")
+leg.AddEntry(hx2,"Template VH","L")
  
-cx = get_canvas("cx",options.period)
+cx = get_canvas("cx")
 cx.cd()
-for i in range(len(zbinMin)):
- hx[i].Draw("HISTsame")
- hxMC[i].Draw("PEsame")
-hx[0].GetXaxis().SetTitle("m_{jet1} (proj. x) [GeV]")
+hx.Draw("HISTsame")
+hxMC.Draw("PEsame")
+hx2.Draw("HISTsame")
+hxMC2.Draw("PEsame")
+hx.GetXaxis().SetTitle("m_{jet1} (proj. x) [GeV]")
 leg.Draw()
 
 CMS_lumi.CMS_lumi(cx, 0, 11)
@@ -195,14 +250,15 @@ frame = cx.GetFrame()
 frame.Draw()
 cx.SaveAs(options.outdir+"/cx.png","pdf")
 
-cy = get_canvas("cy",options.period)
+cy = get_canvas("cy")
 cy.cd()
-hy[0].GetXaxis().SetTitle("m_{jet2} (proj. y) [GeV]")
-hy[0].GetXaxis().SetTitleSize(hx[0].GetXaxis().GetTitleSize())
-hy[0].GetXaxis().SetTitleOffset(hx[0].GetXaxis().GetTitleOffset())
-for i in range(len(zbinMin)): 
- hy[i].Draw("HISTsame")
- hyMC[i].Draw("PEsame")
+hy.GetXaxis().SetTitle("m_{jet2} (proj. y) [GeV]")
+hy.GetXaxis().SetTitleSize(hx.GetXaxis().GetTitleSize())
+hy.GetXaxis().SetTitleOffset(hx.GetXaxis().GetTitleOffset())
+hy.Draw("HISTsame")
+hyMC.Draw("PEsame")
+hy2.Draw("HISTsame")
+hyMC2.Draw("PEsame")
 leg.Draw()
 
 CMS_lumi.CMS_lumi(cy, 0, 11)
@@ -213,131 +269,67 @@ frame = cy.GetFrame()
 frame.Draw()
 cy.SaveAs(options.outdir+"/cy.png","pdf")
 
-'''
-labelsXY = ['All m_{jj} bins']
-for i in range(1,4): labelsXY.append( "%.1f < m_{jj} < %.1f TeV"%( hin.GetZaxis().GetBinLowEdge(zbinMin[i])/1000.,hin.GetZaxis().GetBinUpEdge(zbinMax[i])/1000.) )
 
-for i in range(4):
-
- pt = rt.TPaveText(0.1436782,0.7690678,0.4224138,0.8644068,"brNDC")
- pt.SetTextFont(42)
- pt.SetTextSize(0.042)
- pt.SetTextAlign(22)
- pt.SetFillColor(0)
- pt.SetBorderSize(1)
- pt.SetFillStyle(0)
- pt.SetLineWidth(2)
- pt.AddText(labelsXY[i])
-  
- cname = "cpullsx_%i"%i
- cpullsx = get_canvas(cname)
- cpullsx.cd() 
- pullsx[i].Draw("PE")
-
- f = rt.TF1("func","gaus(0)",-10,10)
- f.SetParameter(0,10)
- f.SetParError(0,5)
- f.SetParameter(1,0)
- f.SetParError(1,0.5)
- f.SetParameter(2,4)
- f.SetParError(2,2)
- pullsx[i].Fit("func")
- 
- pt.Draw()
-
- cpullsx.SaveAs(options.outdir+"/"+cpullsx.GetName()+".png","pdf")
-
-for i in range(4):
-
- pt = rt.TPaveText(0.1436782,0.7690678,0.4224138,0.8644068,"brNDC")
- pt.SetTextFont(42)
- pt.SetTextSize(0.042)
- pt.SetTextAlign(22)
- pt.SetFillColor(0)
- pt.SetBorderSize(1)
- pt.SetFillStyle(0)
- pt.SetLineWidth(2)
- pt.AddText(labelsXY[i])
-  
- cname = "cpullsy_%i"%i
- cpullsy = get_canvas(cname)
- cpullsy.cd() 
- pullsy[i].Draw("PE")
-
- f = rt.TF1("func","gaus(0)",-10,10)
- f.SetParameter(0,10)
- f.SetParError(0,5)
- f.SetParameter(1,0)
- f.SetParError(1,0.5)
- f.SetParameter(2,4)
- f.SetParError(2,2)
- pullsy[i].Fit("func")
- 
- pt.Draw()
-
- cpullsy.SaveAs(options.outdir+"/"+cpullsy.GetName()+".png","pdf")
-'''
+#############
 
 #xbinMin[5] = {1,hin.GetXaxis().FindBin(55),hin.GetXaxis().FindBin(70),hin.GetXaxis().FindBin(100),hin.GetXaxis().FindBin(150)}
 #xbinMax[5] = {binsx,hin.GetXaxis().FindBin(70),hin.GetXaxis().FindBin(100),hin.GetXaxis().FindBin(150),binsx}
-xbinMin = [1]
-xbinMax = [binsx]
+xbinMin = 1 #,hin.GetXaxis().FindBin(55),hin.GetXaxis().FindBin(73)+1,hin.GetXaxis().FindBin(103)+1,hin.GetXaxis().FindBin(167)+1]
+xbinMax = binsx #,hin.GetXaxis().FindBin(73),hin.GetXaxis().FindBin(103),hin.GetXaxis().FindBin(167),binsx]
 #ybinMin = hin.GetXaxis().FindBin(55)
 #ybinMax = hin.GetXaxis().FindBin(73)
 #float scalez[5] = {1.,1.,0.1,0.01,0.001}
-scalez = [1.,1.,0.1,0.01,0.001]
+scalez = 1. #,1.,0.1,0.01,0.001]
 
-for i in range(len(xbinMin)):
+print "Plotting mJJ projections",xbinMin,xbinMax
+pname = "pz"
+hz =  hin.ProjectionZ(pname,xbinMin,xbinMax,xbinMin,xbinMax)
+pname = "pzMC"
+hzMC = hinMC.ProjectionZ(pname,xbinMin,xbinMax,xbinMin,xbinMax)
 
- print "Plotting mJJ projections",xbinMin[i],xbinMax[i]
- pname = "pz_%i"%i
- hz.append( hin.ProjectionZ(pname,xbinMin[i],xbinMax[i],xbinMin[i],xbinMax[i]) )
- pname = "pzMC_%i"%i
- hzMC.append( hinMC.ProjectionZ(pname,xbinMin[i],xbinMax[i],xbinMin[i],xbinMax[i]) )
+print "Plotting mJJ 2 projections",xbinMin,xbinMax
+pname = "pz2"
+hz2 =  hin2.ProjectionZ(pname,xbinMin,xbinMax,xbinMin,xbinMax)
+pname = "pzMC2"
+hzMC2 = hinMC2.ProjectionZ(pname,xbinMin,xbinMax,xbinMin,xbinMax)
 
- pname = "pullsz_%i"%i
- pullsz.append( rt.TH1F(pname,pname,40,-10,10) )
-   
-for i in range(len(xbinMin)):
- for b in range(1,binsx+1):
-  if hzMC[i].GetBinContent(b) != 0: pullsz[i].Fill( (hzMC[i].GetBinContent(b)-hz[i].GetBinContent(b))/hzMC[i].GetBinError(b) )
+hz.SetLineColor(colors)
+hz.SetMarkerColor(colors)
+hzMC.SetLineColor(colors)
+hzMC.SetMarkerColor(colors)
+hzMC.SetMarkerStyle(20)
+hzMC.SetMarkerSize(0.5)
 
-for i in range(len(xbinMin)):
- 
- hz[i].Scale(scalez[i])
- hzMC[i].Scale(scalez[i])
-   
- hz[i].SetLineColor(colors[i])
- hz[i].SetMarkerColor(colors[i])
- hzMC[i].SetLineColor(colors[i])
- hzMC[i].SetMarkerColor(colors[i])
- hzMC[i].SetMarkerStyle(20)
- hzMC[i].SetMarkerSize(0.5)
-
- pullsz[i].SetLineColor(colors[i])
- pullsz[i].SetLineWidth(2)
- pullsz[i].SetMarkerSize(0)
-
+hz2.SetLineColor(colors)
+hz2.SetLineStyle(2)
+hz2.SetMarkerColor(colors)
+hzMC2.SetLineColor(colors)
+hzMC2.SetLineStyle(2)
+hzMC2.SetMarkerColor(colors)
+hzMC2.SetMarkerStyle(22)
+hzMC2.SetMarkerSize(0.5)
 
 #leg2 = rt.TLegend(0.6,0.6,0.85,0.85)
-leg2 = rt.TLegend(0.51,0.75,0.76,0.90)
+leg2 = rt.TLegend(0.51,0.65,0.76,0.90)
 leg2.SetBorderSize(0)
 leg2.SetTextSize(0.035)
-leg2.AddEntry(hzMC[0],"Simulation (%s)"%options.label,"LP")
-leg2.AddEntry(hz[0],"Template","L")
-for i in range(1,len(xbinMin)):
- leg2.AddEntry(hz[i],"%i < m_{jet} < %i GeV"%(  hin.GetXaxis().GetBinLowEdge(xbinMin[i]),hin.GetXaxis().GetBinUpEdge(xbinMax[i])) )
- #else: leg2.AddEntry(hz[i],"%i < m_{jet} < %i GeV"%(  hin.GetXaxis().GetBinLowEdge(xbinMin[i]),hin.GetXaxis().GetBinUpEdge(xbinMax[i])) )
+leg2.AddEntry(hzMC,"Simulation (%s) VV "%options.label,"LP")
+leg2.AddEntry(hz,"Template VV ","L")
+leg2.AddEntry(hzMC2,"Simulation (%s) VH "%options.label,"LP")
+leg2.AddEntry(hz2,"Template VH ","L")
 
-cz = get_canvas("cz",options.period)
+cz = get_canvas("cz")
 cz.SetLogy()
 cz.cd()
-hz[0].SetMinimum(1E-09)
-hz[0].SetMaximum(10.0)
-for i in range(len(xbinMin)):
- hz[i].Draw("HISTsame")
- hzMC[i].Draw("PEsame")
-hz[0].GetXaxis().SetTitle("m_{jj} (proj. z) [GeV]")
+hz.SetMinimum(1E-11)
+hz.SetMaximum(50.0)
+hz2.SetMinimum(1E-11)
+hz2.SetMaximum(50.0)
+hz.Draw("HISTsame")
+hzMC.Draw("PEsame")
+hz2.Draw("HISTsame")
+hzMC2.Draw("PEsame")
+hz.GetXaxis().SetTitle("m_{jj} (proj. z) [GeV]")
 leg2.Draw()
 
 CMS_lumi.CMS_lumi(cz, 0, 11)
@@ -348,46 +340,14 @@ frame = cz.GetFrame()
 frame.Draw()
 cz.SaveAs(options.outdir+"/cz.png","pdf")
 
-labelsZ = ["All m_{jet} bins"]
-for i in range(1,len(xbinMin)):
- labelsZ.append("%i < m_{jet} < %i GeV"%(hin.GetXaxis().GetBinLowEdge(xbinMin[i]),hin.GetXaxis().GetBinUpEdge(xbinMax[i])))
-''' 
-for i in range(5):
 
- pt = rt.TPaveText(0.1436782,0.7690678,0.4224138,0.8644068,"brNDC")
- pt.SetTextFont(42)
- pt.SetTextSize(0.042)
- pt.SetTextAlign(22)
- pt.SetFillColor(0)
- pt.SetBorderSize(1)
- pt.SetFillStyle(0)
- pt.SetLineWidth(2)
- pt.AddText(labelsZ[i])
- 
 
- 
- cname = "cpullsz_%i"%i
- cpullsz = get_canvas(cname)
- cpullsz.cd() 
- pullsz[i].Draw("PE")
 
- f = rt.TF1("func","gaus(0)",-10,10)
- f.SetParameter(0,10)
- f.SetParError(0,5)
- f.SetParameter(1,0)
- f.SetParError(1,0.5)
- f.SetParameter(2,4)
- f.SetParError(2,2)
- pullsz[i].Fit("func")
- 
- pt.Draw()
-
- cpullsz.SaveAs(options.outdir+"/"+cpullsz.GetName()+".png","pdf")
-''' 
-
+'''
 #xbinMin = [hin.GetXaxis().FindBin(173)+1]
 #xbinMax = [binsx]
-  
+
+'''
 hin_PTUp = fin.Get("histo_PTUp")
 hin_PTUp.Scale(1./hin_PTUp.Integral())
 hin_PTDown = fin.Get("histo_PTDown")
@@ -450,12 +410,14 @@ hz_OPT3Down.Scale(1./hz_OPT3Down.Integral())
 
 hzMC[0].Scale(1./hzMC[0].Integral())
 hz[0].Scale(1./hz[0].Integral())
+
 #leg3 = rt.TLegend(0.6,0.55,0.95,0.8)
 leg3 = rt.TLegend(0.53,0.55,0.78,0.89)
 leg3.SetBorderSize(0)
 leg3.SetTextSize(0.035)
 leg3.AddEntry(hzMC[0],"Simulation (%s)"%(options.label),"LP")
 leg3.AddEntry(hz[0],"Template","L")
+
 leg3.AddEntry(hz_PTUp,"#propto m_{jj} up/down","L")
 leg3.AddEntry(hz_OPTUp,"#propto 1/m_{jj} up/down","L")
 leg3.AddEntry(hz_altshapeUp,"HERWIG up/down","L")
@@ -463,7 +425,7 @@ leg3.AddEntry(hz_altshape2Up,"MADGRAPH+PYTHIA up/down","L")
 #leg3.AddEntry(hz_altshape3Up,"POWHEG up/down","L")
 leg3.AddEntry(hz_OPT3Up,"m_{jj} turn-on up/down","L")
 
-czSyst = get_canvas("czSyst",options.period)
+czSyst = get_canvas("czSyst")
 czSyst.cd()
 czSyst.SetLogy()
 
@@ -497,50 +459,40 @@ czSyst.RedrawAxis()
 frame = czSyst.GetFrame()
 frame.Draw()
 czSyst.SaveAs(options.outdir+"/czSyst.png","pdf")
-
+# sleep(10000)
 hx_PTUp = hin_PTUp.ProjectionX("px_PTUp",1,binsy,zbinMin[0],zbinMax[0])
 hx_PTUp.SetLineColor(rt.kMagenta)
-hx_PTUp.Rebin(2)
 hx_PTUp.Scale(1./hx_PTUp.Integral())
 hx_PTDown = hin_PTDown.ProjectionX("px_PTDown",1,binsy,zbinMin[0],zbinMax[0])
 hx_PTDown.SetLineColor(rt.kMagenta)
-hx_PTDown.Rebin(2)
 hx_PTDown.Scale(1./hx_PTDown.Integral())
 hx_OPTUp = hin_OPTUp.ProjectionX("px_OPTUp",1,binsy,zbinMin[0],zbinMax[0])
 hx_OPTUp.SetLineColor(210)
-hx_OPTUp.Rebin(2)
 hx_OPTUp.Scale(1./hx_OPTUp.Integral())
 hx_OPTDown = hin_OPTDown.ProjectionX("px_OPTDown",1,binsy,zbinMin[0],zbinMax[0])
 hx_OPTDown.SetLineColor(210)
-hx_OPTDown.Rebin(2)
 hx_OPTDown.Scale(1./hx_OPTDown.Integral())
 hx_altshapeUp = hin_altshapeUp.ProjectionX("px_altshapeUp",1,binsy,zbinMin[0],zbinMax[0])
 hx_altshapeUp.SetLineColor(rt.kBlue)
-hx_altshapeUp.Rebin(2)
 hx_altshapeUp.Scale(1./hx_altshapeUp.Integral())
 hx_altshapeDown = hin_altshapeDown.ProjectionX("px_altshapeDown",1,binsy,zbinMin[0],zbinMax[0])
 hx_altshapeDown.SetLineColor(rt.kBlue)
-hx_altshapeDown.Rebin(2)
 hx_altshapeDown.Scale(1./hx_altshapeDown.Integral())
 hx_altshape2Up = hin_altshape2Up.ProjectionX("px_altshape2Up",1,binsy,zbinMin[0],zbinMax[0])
 hx_altshape2Up.SetLineColor(rt.kRed)
-hx_altshape2Up.Rebin(2)
 hx_altshape2Up.Scale(1./hx_altshape2Up.Integral())
 hx_altshape2Down = hin_altshape2Down.ProjectionX("px_altshape2Down",1,binsy,zbinMin[0],zbinMax[0])
 hx_altshape2Down.SetLineColor(rt.kRed)
-hx_altshape2Down.Rebin(2)
 hx_altshape2Down.Scale(1./hx_altshape2Down.Integral())
 #hx_altshape3Up = hin_altshape3Up.ProjectionX("px_altshape3Up",1,binsy,zbinMin[0],zbinMax[0])
 #hx_altshape3Up.SetLineColor(rt.kOrange+1)
 #hx_altshape3Down = hin_altshape3Down.ProjectionX("px_altshape3Down",1,binsy,zbinMin[0],zbinMax[0])
 #hx_altshape3Down.SetLineColor(rt.kOrange+1)
-hx_OPT3Up = hin_OPT3Up.ProjectionX("px_OPT3Up",xbinMin[0],xbinMax[0],zbinMin[0],zbinMax[0])
+hx_OPT3Up = hin_OPT3Up.ProjectionX("px_OPT3Up",1,binsy,zbinMin[0],zbinMax[0])
 hx_OPT3Up.SetLineColor(rt.kViolet-6)
-hx_OPT3Up.Rebin(2)
 hx_OPT3Up.Scale(1./hx_OPT3Up.Integral())
-hx_OPT3Down = hin_OPT3Down.ProjectionX("px_OPT3Down",xbinMin[0],xbinMax[0],zbinMin[0],zbinMax[0])
+hx_OPT3Down = hin_OPT3Down.ProjectionX("px_OPT3Down",1,binsy,zbinMin[0],zbinMax[0])
 hx_OPT3Down.SetLineColor(rt.kViolet-6)
-hx_OPT3Down.Rebin(2)
 hx_OPT3Down.Scale(1./hx_OPT3Down.Integral())
 
 
@@ -559,11 +511,11 @@ leg3.AddEntry(hx_altshape2Up,"MADGRAPH+PYTHIA up/down","L")
 #leg3.AddEntry(hx_altshape3Up,"POWHEG up/down","L")
 leg3.AddEntry(hx_OPT3Up,"m_{jj} turn-on up/down","L")
 
-cxSyst = get_canvas("cxSyst",options.period)
+cxSyst = get_canvas("cxSyst")
 cxSyst.cd()
 
 hx[0].SetMinimum(0)
-hx[0].SetMaximum(0.15)
+hx[0].SetMaximum(0.04)
 hx[0].Draw("HIST")
 hx_PTUp.Draw("HISTsame")
 hx_PTDown.Draw("HISTsame") 
@@ -591,35 +543,27 @@ cxSyst.SaveAs(options.outdir+"/cxSyst.png","pdf")
 
 hy_PTUp = hin_PTUp.ProjectionY("py_PTUp",1,binsy,zbinMin[0],zbinMax[0])
 hy_PTUp.SetLineColor(rt.kMagenta)
-hy_PTUp.Rebin(2)
 hy_PTUp.Scale(1./hy_PTUp.Integral())
 hy_PTDown = hin_PTDown.ProjectionY("py_PTDown",1,binsy,zbinMin[0],zbinMax[0])
 hy_PTDown.SetLineColor(rt.kMagenta)
-hy_PTDown.Rebin(2)
 hy_PTDown.Scale(1./hy_PTDown.Integral())
 hy_OPTUp = hin_OPTUp.ProjectionY("py_OPTUp",1,binsy,zbinMin[0],zbinMax[0])
 hy_OPTUp.SetLineColor(210)
-hy_OPTUp.Rebin(2)
 hy_OPTUp.Scale(1./hy_OPTUp.Integral())
 hy_OPTDown = hin_OPTDown.ProjectionY("py_OPTDown",1,binsy,zbinMin[0],zbinMax[0])
 hy_OPTDown.SetLineColor(210)
-hy_OPTDown.Rebin(2)
 hy_OPTDown.Scale(1./hy_OPTDown.Integral())
 hy_altshapeUp = hin_altshapeUp.ProjectionY("py_altshapeUp",1,binsy,zbinMin[0],zbinMax[0])
 hy_altshapeUp.SetLineColor(rt.kBlue)
-hy_altshapeUp.Rebin(2)
 hy_altshapeUp.Scale(1./hy_altshapeUp.Integral())
 hy_altshapeDown = hin_altshapeDown.ProjectionY("py_altshapeDown",1,binsy,zbinMin[0],zbinMax[0])
 hy_altshapeDown.SetLineColor(rt.kBlue)
-hy_altshapeDown.Rebin(2)
 hy_altshapeDown.Scale(1./hy_altshapeDown.Integral())
 hy_altshape2Up = hin_altshape2Up.ProjectionY("py_altshape2Up",1,binsy,zbinMin[0],zbinMax[0])
 hy_altshape2Up.SetLineColor(rt.kRed)
-hy_altshape2Up.Rebin(2)
 hy_altshape2Up.Scale(1./hy_altshape2Up.Integral())
 hy_altshape2Down = hin_altshape2Down.ProjectionY("py_altshape2Down",1,binsy,zbinMin[0],zbinMax[0])
 hy_altshape2Down.SetLineColor(rt.kRed)
-hy_altshape2Down.Rebin(2)
 hy_altshape2Down.Scale(1./hy_altshape2Down.Integral())
 #hy_altshape3Up = hin_altshape3Up.ProjectionY("py_altshape3Up",1,binsy,zbinMin[0],zbinMax[0])
 #hy_altshape3Up.SetLineColor(rt.kOrange+1)
@@ -627,11 +571,9 @@ hy_altshape2Down.Scale(1./hy_altshape2Down.Integral())
 #hy_altshape3Down.SetLineColor(rt.kOrange+1)
 hy_OPT3Up = hin_OPT3Up.ProjectionY("py_OPT3Up",xbinMin[0],xbinMax[0],zbinMin[0],zbinMax[0])
 hy_OPT3Up.SetLineColor(rt.kViolet-6)
-hy_OPT3Up.Rebin(2)
 hy_OPT3Up.Scale(1./hy_OPT3Up.Integral())
 hy_OPT3Down = hin_OPT3Down.ProjectionY("py_OPT3Down",xbinMin[0],xbinMax[0],zbinMin[0],zbinMax[0])
 hy_OPT3Down.SetLineColor(rt.kViolet-6)
-hy_OPT3Down.Rebin(2)
 hy_OPT3Down.Scale(1./hy_OPT3Down.Integral())
 
 hyMC[0].Scale(1./hyMC[0].Integral())
@@ -649,12 +591,15 @@ leg3.AddEntry(hy_altshape2Up,"MADGRAPH+PYTHIA up/down","L")
 #leg3.AddEntry(hy_altshape3Up,"POWHEG up/down","L")
 leg3.AddEntry(hy_OPT3Up,"m_{jj} turn-on up/down","L")
 
-cySyst = get_canvas("cySyst",options.period)
+
+
+cySyst = get_canvas("cySyst")
 cySyst.cd()
 
 hy[0].SetMinimum(0)
-hy[0].SetMaximum(0.15)
+hy[0].SetMaximum(0.04)
 hy[0].Draw("HIST")
+
 hy_PTUp.Draw("HISTsame")
 hy_PTDown.Draw("HISTsame") 
 hy_OPTUp.Draw("HISTsame")
@@ -668,6 +613,7 @@ hy_altshape2Down.Draw("HISTsame")
 hy_OPT3Up.Draw("HISTsame")
 hy_OPT3Down.Draw("HISTsame")
 hyMC[0].Draw("same")
+
 leg3.Draw()
 
 CMS_lumi.CMS_lumi(cySyst, 0, 11)
@@ -677,7 +623,7 @@ cySyst.RedrawAxis()
 frame = cySyst.GetFrame()
 frame.Draw()
 cySyst.SaveAs(options.outdir+"/cySyst.png","pdf")
-
+'''
 
 
 '''
@@ -696,4 +642,5 @@ hyz.Draw("COLZ")
 cyz.SaveAs(TString(outDirName)+TString("/")+TString("cyz.png"),"pdf")
 
 }
+
 '''

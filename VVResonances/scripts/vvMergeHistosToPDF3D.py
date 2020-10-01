@@ -87,9 +87,11 @@ def add_sigmoid_shape(h):
    
     hnew_up.SetBinContent(bx,by,bz,n_in*factor) 
     hnew_down.SetBinContent(bx,by,bz,n_in/(factor))    
-    
- hnew_up.Scale(1./hnew_up.Integral())
- hnew_down.Scale(1./hnew_down.Integral()) 
+
+ if hnew_up.Integral() !=0 :  hnew_up.Scale(1./hnew_up.Integral())
+ else : print "********  hnew_up.Integral() ==0 !!!! not scaled!!! *************"
+ if hnew_down.Integral() !=0 : hnew_down.Scale(1./hnew_down.Integral()) 
+ else : print "********  hnew_down.Integral() ==0 !!!! not scaled!!! *************"
  
  return hnew_up,hnew_down
  

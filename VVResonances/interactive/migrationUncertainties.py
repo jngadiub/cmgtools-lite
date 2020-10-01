@@ -133,6 +133,28 @@ def printresult(res,cats):
             #print res[str(m)+'.'+cat][0]
             tmp+='   '
         print tmp
+
+def printresultbkg(res,cats):
+    masses = []
+    for key in res.keys():
+        if (key.split('.')[1]).find(cats[0])!=-1:
+            masses.append(key.split('.')[0])
+
+    c = 'mass '
+    for cat in cats:
+        c+='              '
+        c+=cat
+    print c
+    for m in sorted(masses):
+        tmp =str(m)+'  '
+        for cat in cats:
+            if res[str(m)+'.'+cat][0]!=0 :
+                tmp+= str(res[str(m)+'.'+cat][1]/float(res[str(m)+'.'+cat][0]))+' / '+str(res[str(m)+'.'+cat][2]/res[str(m)+'.'+cat][0])
+            #print res[str(m)+'.'+cat][1]
+            #print res[str(m)+'.'+cat][0]
+            tmp+='   '
+        print tmp
+
         
 def calcfinalUnc(final,tag,cats):
     data={}
@@ -145,7 +167,7 @@ def calcfinalUnc(final,tag,cats):
     res2=final[savekeys[1]]
     for key in res.keys():
         if (key.split('.')[1]).find(cats[0])!=-1:
-            masses.append(int(key.split('.')[0]))
+            masses.append(key.split('.')[0])
     tmplistu = []
     tmplistd = []
     c = 'mass '
@@ -184,63 +206,108 @@ if __name__=="__main__":
     
     ######### first apply the usual acceptance cuts to the trees ####################
     data ={}
-    year = '2016'
-    ctx  = cuts.cuts("init_VV_VH.json",int(year),"random_dijetbins")
-    W_tag_SF_HP = ctx.HPSF_vtag
-    W_tag_SF_LP = ctx.LPSF_vtag
+    year = '2016,2017,2018'
+    masses = [1200,1400,1600,2000,2500,3000,3500,4000,4500,5000,5500,6000,6500,7000,7500,8000]
+    ctx  = cuts.cuts("init_VV_VH.json",year,"random_dijetbins")
+    if year != '2016,2017,2018' :
+        W_tag_SF_HP = ctx.HPSF_vtag[year]
+        W_tag_SF_LP = ctx.LPSF_vtag[year]
 
-    H_tag_SF_HP = ctx.HPSF_htag
-    H_tag_SF_LP = ctx.LPSF_htag
+        H_tag_SF_HP = ctx.HPSF_htag[year]
+        H_tag_SF_LP = ctx.LPSF_htag[year]
 
-    W_tag_unc_HP = ctx.W_tag_unc_HP
-    W_tag_unc_LP = ctx.W_tag_unc_LP
+        W_tag_unc_HP = ctx.W_tag_unc_HP[year]
+        W_tag_unc_LP = ctx.W_tag_unc_LP[year]
 
-    H_tag_unc_HP = ctx.H_tag_unc_HP
-    H_tag_unc_LP = ctx.H_tag_unc_LP
+        H_tag_unc_HP = ctx.H_tag_unc_HP[year]
+        H_tag_unc_LP = ctx.H_tag_unc_LP[year]
 
-    
+    else:
+        years = year.split(",")
+        W_tag_SF_HP = 0
+        W_tag_SF_LP = 0
+
+        H_tag_SF_HP = 0
+        H_tag_SF_LP = 0
+
+        W_tag_unc_HP = 0
+        W_tag_unc_LP = 0
+
+        H_tag_unc_HP = 0
+        H_tag_unc_LP = 0
+
+        for y in years:
+
+            W_tag_SF_HP += ctx.HPSF_vtag[y]*ctx.lumi[y]/ctx.lumi["Run2"]
+            W_tag_SF_LP += ctx.LPSF_vtag[y]*ctx.lumi[y]/ctx.lumi["Run2"]
+
+            H_tag_SF_HP += ctx.HPSF_htag[y]*ctx.lumi[y]/ctx.lumi["Run2"]
+            H_tag_SF_LP += ctx.LPSF_htag[y]*ctx.lumi[y]/ctx.lumi["Run2"]
+
+            W_tag_unc_HP += ctx.W_tag_unc_HP[y]*ctx.lumi[y]/ctx.lumi["Run2"]
+            W_tag_unc_LP += ctx.W_tag_unc_LP[y]*ctx.lumi[y]/ctx.lumi["Run2"]
+
+            H_tag_unc_HP += ctx.H_tag_unc_HP[y]*ctx.lumi[y]/ctx.lumi["Run2"]
+            H_tag_unc_LP += ctx.H_tag_unc_LP[y]*ctx.lumi[y]/ctx.lumi["Run2"]
+
     categories = ['VH_HPHP','VV_HPHP','VH_LPHP','VH_HPLP','VV_HPLP']
     tags = ['H_tag_HP','H_tag_LP','V_tag_HP','V_tag_LP']
-    directory = "migrationunc/"
-    
-    
-    files = ["ZprimeToZh_2016.root",'ZprimeToWW_2016.root',"WprimeToWh_2016.root","BulkGravToWW_2016.root","BulkGravToZZ_2016.root","WprimeToWZ_2016.root"]
-    trees = {"ZprimeToZh_2016.root" : ["ZprimeToZhToZhadhbb_narrow_1000","ZprimeToZhToZhadhbb_narrow_1200","ZprimeToZhToZhadhbb_narrow_1600","ZprimeToZhToZhadhbb_narrow_1800","ZprimeToZhToZhadhbb_narrow_2500","ZprimeToZhToZhadhbb_narrow_3000","ZprimeToZhToZhadhbb_narrow_3500","ZprimeToZhToZhadhbb_narrow_4000","ZprimeToZhToZhadhbb_narrow_4500"],'ZprimeToWW_2016.root':["ZprimeToWW_narrow_1000", "ZprimeToWW_narrow_1200", "ZprimeToWW_narrow_1400", "ZprimeToWW_narrow_1600", "ZprimeToWW_narrow_1800","ZprimeToWW_narrow_2000", "ZprimeToWW_narrow_2500","ZprimeToWW_narrow_3000","ZprimeToWW_narrow_3500","ZprimeToWW_narrow_4000", "ZprimeToWW_narrow_4500","ZprimeToWW_narrow_5000", "ZprimeToWW_narrow_5500","ZprimeToWW_narrow_600" , "ZprimeToWW_narrow_6000","ZprimeToWW_narrow_6500", "ZprimeToWW_narrow_7000", "ZprimeToWW_narrow_7500", "ZprimeToWW_narrow_8000"],"WprimeToWZ_2016.root": ["WprimeToWZToWhadZhad_narrow_1000","WprimeToWZToWhadZhad_narrow_1400","WprimeToWZToWhadZhad_narrow_2500","WprimeToWZToWhadZhad_narrow_3000","WprimeToWZToWhadZhad_narrow_3500","WprimeToWZToWhadZhad_narrow_4000","WprimeToWZToWhadZhad_narrow_4500","WprimeToWZToWhadZhad_narrow_600" ,"WprimeToWZToWhadZhad_narrow_800"],"WprimeToWh_2016.root": ["WprimeToWhToWhadhbb_narrow_1200", "WprimeToWhToWhadhbb_narrow_1800", "WprimeToWhToWhadhbb_narrow_2000", "WprimeToWhToWhadhbb_narrow_2500", "WprimeToWhToWhadhbb_narrow_3000", "WprimeToWhToWhadhbb_narrow_3500", "WprimeToWhToWhadhbb_narrow_4000", "WprimeToWhToWhadhbb_narrow_4500"], "BulkGravToWW_2016.root":["BulkGravToWW_narrow_1000","BulkGravToWW_narrow_1200","BulkGravToWW_narrow_1400","BulkGravToWW_narrow_1600","BulkGravToWW_narrow_1800","BulkGravToWW_narrow_2000","BulkGravToWW_narrow_2500","BulkGravToWW_narrow_3000","BulkGravToWW_narrow_3500","BulkGravToWW_narrow_4000","BulkGravToWW_narrow_4500","BulkGravToWW_narrow_600" ,"BulkGravToWW_narrow_800" ], "BulkGravToZZ_2016.root":["BulkGravToZZToZhadZhad_narrow_1000","BulkGravToZZToZhadZhad_narrow_1200","BulkGravToZZToZhadZhad_narrow_1400","BulkGravToZZToZhadZhad_narrow_1600","BulkGravToZZToZhadZhad_narrow_1800","BulkGravToZZToZhadZhad_narrow_2000","BulkGravToZZToZhadZhad_narrow_2500","BulkGravToZZToZhadZhad_narrow_3000","BulkGravToZZToZhadZhad_narrow_3500","BulkGravToZZToZhadZhad_narrow_4000","BulkGravToZZToZhadZhad_narrow_4500","BulkGravToZZToZhadZhad_narrow_500" ,"BulkGravToZZToZhadZhad_narrow_5000","BulkGravToZZToZhadZhad_narrow_5500","BulkGravToZZToZhadZhad_narrow_600" ,"BulkGravToZZToZhadZhad_narrow_6000","BulkGravToZZToZhadZhad_narrow_6500","BulkGravToZZToZhadZhad_narrow_7000","BulkGravToZZToZhadZhad_narrow_7500","BulkGravToZZToZhadZhad_narrow_800" ,"BulkGravToZZToZhadZhad_narrow_8000"]}
+    directory = "migrationunc/Run2/"
+
+    #files = ["BulkGravToWW_Run2.root"]
+    #files = ["ZprimeToZh_2016.root",'ZprimeToWW_2016.root',"WprimeToWh_2016.root","BulkGravToWW_2016.root","BulkGravToZZ_2016.root","WprimeToWZ_2016.root"]
+    files = ['WJetsToQQ_Run2.root','ZJetsToQQ_Run2.root']
+    #files = ["BulkGravToWW_2016.root"]
     final={}
-    
+
     for root_file in files:
         for tag in tags:
             
             File = ROOT.TFile(directory+root_file,"READ")
             print 'for signal '+str(root_file.replace('.root',''))
             result = {}
-            for t in trees[root_file]:
-            
-                fulltree = File.Get(t)
+            trees = []
+            if root_file.find("Jets")==-1:
+               for i in masses:
+                   trees.append(root_file.split("_")[0]+"_narrow_"+str(i))
+            else:
+                trees.append(root_file.split("_")[0])
+            print " trees ",trees
+            for t in trees:
+                try:
+                    fulltree = File.Get(t)
+                    print fulltree.GetEntries() 
+                except :
+                    print t," not found" 
+                    continue
+                print " using tree ",t 
+                if root_file.find("Jets")==-1: splitstr = t.split('narrow_')[1]
+                else:  splitstr = root_file.split("_")[0]
                 for cat in categories:
                     if tag.find('HP')!=-1:
-                        if tag.find('V')!=-1:
-                            result[t.split('narrow_')[1]+'.'+cat] = calculateMigration(fulltree,tag,W_tag_unc_HP,cat)
+                        if tag.find('V')!=--1:
+                            result[splitstr+'.'+cat] = calculateMigration(fulltree,tag,W_tag_unc_HP,cat)
                         if tag.find('H')!=-1:
-                            result[t.split('narrow_')[1]+'.'+cat] = calculateMigration(fulltree,tag,H_tag_unc_HP,cat)
+                            result[splitstr+'.'+cat] = calculateMigration(fulltree,tag,H_tag_unc_HP,cat)
                     if tag.find('LP')!=-1:
                         if tag.find('V')!=-1:
-                            result[t.split('narrow_')[1]+'.'+cat] = calculateMigration(fulltree,tag,W_tag_unc_LP,cat)
+                            result[splitstr+'.'+cat] = calculateMigration(fulltree,tag,W_tag_unc_LP,cat)
                         if tag.find('H')!=-1:
-                            result[t.split('narrow_')[1]+'.'+cat] = calculateMigration(fulltree,tag,H_tag_unc_LP,cat)
+                            result[splitstr+'.'+cat] = calculateMigration(fulltree,tag,H_tag_unc_LP,cat)
             
         
             print '###################'+tag+'######################'
-            printresult(result,categories)
+            if root_file.find("Jets")==-1: printresult(result,categories)
+            else: printresultbkg(result,categories)
             final[tag]=result
-        
+
         print 'CMS_VV_JJ_DeepJet_Htag_eff' 
         data[root_file.replace('.root','')+'_'+'CMS_VV_JJ_DeepJet_Htag_eff'] = calcfinalUnc(final,'H_tag',categories)
         print 'CMS_VV_JJ_DeepJet_Vtag_eff' 
         data[root_file.replace('.root','')+'_'+'CMS_VV_JJ_DeepJet_Vtag_eff'] = calcfinalUnc(final,'V_tag',categories)
-        
-    with open('migrationunc.json', 'w') as outfile:    
-        json.dump(data, outfile)
+
+        with open('migrationunc_'+root_file.split(".")[0]+'.json', 'w') as outfile:
+            json.dump(data, outfile)
     
     
     

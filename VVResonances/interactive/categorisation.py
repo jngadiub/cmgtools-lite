@@ -1,7 +1,8 @@
 # make tree containing genweight, other event weights, as well as is jet H/ V jet, what category is the event classified in, what V/Htag has each jet -> for each signal sample!
 #use this as input for the migrationUncertainties.py script
 import ROOT
-import os, sys, re, optparse,pickle,shutil,json
+import os, sys, re, optparse,pickle,shutil,json,time
+from collections import defaultdict
 ROOT.gROOT.SetBatch(True)
 ROOT.gStyle.SetOptStat(0)
 from array import array
@@ -14,7 +15,9 @@ from ROOT import rootlong
 import cuts
 from rootpy.tree import CharArrayCol
 
-
+# python categorisation.py -y "2016" -s WJetsToQQ -d deepAK8V2/
+# python categorisation.py -y "2016,2017,2018" -s WJetsToQQ -d deepAK8V2/
+# python categorisation.py -y "2016" -s BulkGravToWW -d deepAK8V2/
 
 parser = optparse.OptionParser()
 parser.add_option("-y","--year",dest="year",default='2016',help="year of data taking")
@@ -24,23 +27,78 @@ parser.add_option("-d","--directory",dest="directory",help="directory with signa
 (options,args) = parser.parse_args()
 
 
-def getSamplelist(directory,signal):
-    samples =[]
-    for filename in os.listdir(directory):
-      if filename.find(signal)!=-1 and filename.find('root')!=-1:
-        if filename.find("VBF")!=-1 and signal.find("VBF")==-1: continue  
-        samples.append(directory+filename)
-    print samples
+def getSamplelist(directories,signal,minMX=1200.,maxMX=8000.):
+    samples = {}
+    dirs=directories.split(",")
+    for directory in dirs:
+        for filename in os.listdir(directory):
+            if filename.find(signal)!=-1 and filename.find('root')!=-1:
+                if filename.find("VBF")!=-1 and signal.find("VBF")==-1: continue  
+                fnameParts=filename.split('.')
+                fname=fnameParts[0]
+
+                mass = float(fname.split('_')[-1])
+                if mass < minMX or mass > maxMX: continue
+                print fname 
+                if fname not in samples:         
+                    samples.update({fname : []}   )
+                    samples[fname].append(directory+fname)
+                else:
+                    samples[fname].append(directory+fname)
+                print 'found ',directory+fname,' mass',str(mass)
+
+
+    complete_mass = {} #defaultdict(dict)
+    for mass in samples.keys():
+        print mass
+        x = samples[mass]
+        if len(x) < len(dirs):    
+            print "!!!!    directories missing for mass", mass ," !!!!!!!! only ",x, "available "
+        else:
+            complete_mass.update({ mass: x})
+
+
+    print " complete ",complete_mass
+
+    return complete_mass
+
+
+
+def getBkgSamplelist(directories,signal):
+    samples = {}
+    dirs=directories.split(",")
+    for directory in dirs:
+        for filename in os.listdir(directory):
+            if filename.find(signal)!=-1 and filename.find('root')!=-1:
+                fnameParts=filename.split('.')
+                fname=fnameParts[0]
+                fpart=fnameParts[0].split("_")[0]
+                if fpart not in samples:
+                    samples.update({fpart : []}   )
+                    samples[fpart].append(directory+fname)
+                else:
+                    samples[fpart].append(directory+fname)
+                print 'found ',directory+fname
+
+    print "samples ",samples
     return samples
 
 
 
+
 def selectSignalTree(cs,sample):
-    rfile = ROOT.TFile(sample,'READ')
-    tree = rfile.Get('AnalysisTree')
-    outfile = ROOT.TFile('tmp.root','RECREATE')
-    finaltree = tree.CopyTree(cs['common']+'*'+cs['acceptance'])
-    print 'overall entries in tree '+str(tree.GetEntries())
+    print sample 
+    chain = ROOT.TChain('AnalysisTree')
+    tmpname = "tmp_"+time.strftime("%Y%m%d-%H%M%S")
+    outfile = ROOT.TFile(tmpname+'.root','RECREATE')
+    for signal in sample:
+        rfile = signal+".root"
+        chain.Add(rfile)
+        print " entries ",chain.GetEntries()
+
+
+    finaltree = chain.CopyTree(cs['common']+'*'+cs['acceptance'])
+    print 'overall entries in tree '+str(chain.GetEntries())
     print 'entries after analysis selections '+str(finaltree.GetEntries())
     signaltree_VH_HPHP = finaltree.CopyTree(cs['VH_HPHP'])
     signaltree_VV_HPHP = finaltree.CopyTree(cs['VV_HPHP'])#all other categories before are explicitly removed so that each event can only live in one category!!
@@ -52,12 +110,9 @@ def selectSignalTree(cs,sample):
     print '#event no category '+str(rest.GetEntries())
     sumcat = signaltree_VH_HPHP.GetEntries()+signaltree_VV_HPHP.GetEntries()+signaltree_VH_LPHP.GetEntries()+signaltree_VH_HPLP.GetEntries()+signaltree_VV_HPLP.GetEntries()
     print 'sum '+str(sumcat)
-    print 'overall signal efficiency after selection cut '+str(finaltree.GetEntries()/float(tree.GetEntries()))
-    print 'signal efficiency after category cuts '+str(sumcat/float(tree.GetEntries()))
+    print 'overall signal efficiency after selection cut '+str(finaltree.GetEntries()/float(chain.GetEntries()))
+    print 'signal efficiency after category cuts '+str(sumcat/float(chain.GetEntries()))
     print 'efficiency of all category cuts '+str(sumcat/float(finaltree.GetEntries()))
-    #inversetree = tree.CopyTree('!('+cuts['common']+'*'+cuts['acceptance']+')')
-    #print inversetree.GetEntries()
-    #print inversetree.GetEntries()+finaltree.GetEntries()
     signaltree_VH_HPHP.SetName('VH_HPHP')
     signaltree_VV_HPHP.SetName('VV_HPHP')
     signaltree_VH_LPHP.SetName('VH_LPHP')
@@ -70,6 +125,8 @@ def selectSignalTree(cs,sample):
     signaltree_VH_HPLP.Write()
     signaltree_VV_HPLP.Write()
     outfile.Close()
+
+    return tmpname
 
 class myTree:
     
@@ -123,8 +180,8 @@ class myTree:
      
         self.newTree.Branch("category",self.category,"category[7]/C")
         
-    def setOutputTreeBranchValues(self,cat,ctx):
-        rf = ROOT.TFile('tmp.root','READ')
+    def setOutputTreeBranchValues(self,cat,ctx,tmpname):
+        rf = ROOT.TFile(tmpname+'.root','READ')
         cattree = rf.Get(cat)
         ZHbb_branch_l1 = cattree.GetBranch(ctx.varl1Htag)
         ZHbb_leaf_l1 = ZHbb_branch_l1.GetLeaf(ctx.varl1Htag)
@@ -174,7 +231,6 @@ class myTree:
             self.jj_l2_mergedZbbTruth.ri = event.jj_l2_mergedZbbTruth
             self.category[:7] = cat 
             # this depends now on the actual cuts in the analysis!!
-            
             if ZHbb_leaf_l1.GetValue() > WPHP_ZHbb_leaf_l1.GetValue():
                 self.jj_l1_jetTag[:6] = 'HPHtag'
             elif W_leaf_l1.GetValue() > WPHP_W_leaf_l1.GetValue():
@@ -212,28 +268,47 @@ class myTree:
         self.newTree.Write()
 
 if __name__=='__main__':
-    outfile = ROOT.TFile('migrationunc/'+options.signal+'_'+options.year+'.root','RECREATE')
     if options.directory.find(options.year)== -1: print 'ATTENTION: are you sure you are using the right directory for '+options.year+' data?'    
-    ctx  = cuts.cuts("init_VV_VH.json",int(options.year),"random_dijetbins")
-    samplelist= getSamplelist(options.directory,options.signal)
-    for sample in samplelist:
+    period = options.year
+    ctx  = cuts.cuts("init_VV_VH.json",period,"random_dijetbins")
+    samples=""
+    basedir=options.directory
+    filePeriod=options.year
+
+    if options.year.find(",")!=-1:
+        period = options.year.split(',')
+        filePeriod="Run2"
+
+        for year in period:
+            print year
+            if year==period[-1]: samples+=basedir+year+"/"
+            else: samples+=basedir+year+"/,"
+    else: 
+        samples=basedir+period+"/"
+    outfile = ROOT.TFile('migrationunc/'+options.signal+'_'+filePeriod+'.root','RECREATE')
+
+    if(options.signal.find("Jets")==-1):
+        samplelist= getSamplelist(samples,options.signal,ctx.minMX,ctx.maxMX)
+    else: samplelist= getBkgSamplelist(samples,options.signal)
+
+    for sample in samplelist.keys():
         print sample
         print 'init new tree'
-        outtree = myTree(sample.split('.root')[0].replace(options.directory,''),outfile)
+        outtree = myTree(sample,outfile)
         print 'select common cuts signal tree' 
-        selectSignalTree(ctx.cuts,sample)
+        tmpfilename = selectSignalTree(ctx.cuts,samplelist[sample])
         
         #for t in signaltrees:
-        outtree.setOutputTreeBranchValues('VH_HPHP',ctx)
-        outtree.setOutputTreeBranchValues('VV_HPHP',ctx)
-        outtree.setOutputTreeBranchValues('VH_LPHP',ctx)
-        outtree.setOutputTreeBranchValues('VH_HPLP',ctx)
-        outtree.setOutputTreeBranchValues('VV_HPLP',ctx)
+        outtree.setOutputTreeBranchValues('VH_HPHP',ctx,tmpfilename)
+        outtree.setOutputTreeBranchValues('VV_HPHP',ctx,tmpfilename)
+        outtree.setOutputTreeBranchValues('VH_LPHP',ctx,tmpfilename)
+        outtree.setOutputTreeBranchValues('VH_HPLP',ctx,tmpfilename)
+        outtree.setOutputTreeBranchValues('VV_HPLP',ctx,tmpfilename)
         
         #outtree.test()
         outfile.cd()
         outtree.write()
         #tree.Write(outfile.GetName())
         
-        
+        os.system("rm "+tmpfilename+".root")
         

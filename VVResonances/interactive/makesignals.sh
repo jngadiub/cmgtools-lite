@@ -3,13 +3,16 @@
 
 script=makeInputs.py
 
-signals=("BGWW")
-#signals=("ZprimeZH" "WprimeWH" "ZprimeWW" "BGWW" "BGZZ"  "WprimeWZ")
-periods=("2018") # "2017" "2018" "2016,2017,2018")
-#periods=("2016") # "2017" "2018" "2016,2017,2018")
-'''
+
+
 commands=("sigmj" "sigmvv") 
 #sed -i '/categories=/c\categories=["NP"]' ${script}
+
+signals=("ZprimeZH" "WprimeWH" "ZprimeWW" "BGWW" "BGZZ"  "WprimeWZ")
+periods=("2016" "2017" "2018" "2016,2017,2018")
+
+commands=("sigmj" "sigmvv") 
+
 for signal in ${signals[*]}; do
     echo $signal
     for period in ${periods[*]}; do
@@ -20,7 +23,7 @@ for signal in ${signals[*]}; do
 	done
     done
 done
-'''
+
 commands=("signorm")
 #sed -i '/categories=/c\categories=["VH_HPHP","VH_HPLP","VH_LPHP","VV_HPHP","VV_HPLP"]' ${script}
 for signal in ${signals[*]}; do

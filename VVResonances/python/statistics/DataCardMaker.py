@@ -85,7 +85,6 @@ class DataCardMaker:
                    if self.w.function(uncsyst[0]+"expr_corr")== None:
                        self.w.factory("expr::{syst}expr_corr('{syst_str}*{corr_str}',MH,MJ1,MJ2,{syst})".format(syst=uncsyst[0],syst_str=uncstr,corr_str=info['corr_'+variablename.lower()]))
                        self.w.factory("expr::{name}('{syst_str}*{corr_str}*({spline})',MH,MJ1,MJ2,{syst},{spline})".format(syst=uncsyst[0],syst_str=uncstr,corr_str=info['corr_'+variablename.lower()],name=name,spline=name+"spline"))
-
                 else:
                    print "MVV sigma & mean will NOT be correlated to jet mass"
                    self.w.factory("expr::"+name+"('"+uncstr+"*"+name+"spline"+"',"+uncsyst[0]+","+name+"spline"+")")
@@ -682,7 +681,6 @@ class DataCardMaker:
         for syst,factor in resolution.iteritems():
             if self.w.var(syst) == None: self.w.factory(syst+"[0,-0.5,0.5]")
             resolutionStr=resolutionStr+"+{factor}*{syst}".format(factor=factor,syst=syst)
-
             resolutionSysts.append(syst)
        
         
@@ -786,7 +784,7 @@ class DataCardMaker:
             resolutionStr=resolutionStr+"+{factor}*{syst}".format(factor=factor,syst=syst)
             resolutionSysts.append(syst)
        
-        MJJ=variable            
+        MJJ=variable
         if self.w.var(MJJ) == None: self.w.factory(MJJ+"[0,1000]")
 
         SCALEVar="_".join(["mean",name,self.tag])
@@ -847,8 +845,12 @@ class DataCardMaker:
 	varset.Print()
 	varlist.Print()
         pdf=ROOT.RooHistPdf(pdfName,pdfName,varset,roohist,order)
-        if self.w.data(histName) == None: getattr(self.w,'import')(roohist,ROOT.RooFit.RenameVariable(histName,histName))
-        if self.w.pdf(pdfName) == None: getattr(self.w,'import')(pdf,ROOT.RooFit.RenameVariable(pdfName,pdfName))
+        if self.w.data(histName) == None: 
+            print "self.w.data(histName) == None for ",histName
+            getattr(self.w,'import')(roohist,ROOT.RooFit.RenameVariable(histName,histName))
+        if self.w.pdf(pdfName) == None: 
+            print "self.w.pdf(pdfName) == None for ",pdfName
+            getattr(self.w,'import')(pdf,ROOT.RooFit.RenameVariable(pdfName,pdfName))
         #Load SYstematics
         coeffList=ROOT.RooArgList()
         pdfList=ROOT.RooArgList(self.w.pdf(pdfName))
@@ -1707,6 +1709,7 @@ class DataCardMaker:
         self.w.factory("PROD::{name}({name1},{name2})".format(name=pdfName,name1=pdfName1,name2=pdfName2))
 
     def product3D(self,name,pdf1,pdf2,pdf3):
+        print "product3D "
         print self.tag
         print("!!!!Using product3D!!!! ")
         pdfName="_".join([name,self.tag])
@@ -1718,7 +1721,7 @@ class DataCardMaker:
         print pdfName2
         print pdfName3
         self.w.factory("PROD::{name}({name1},{name2},{name3})".format(name=pdfName,name1=pdfName1,name2=pdfName2,name3=pdfName3))
-
+        print "done product3D"
     
     def envelope(self,name,pdfs):
         catName = "envelope_"+name+"_"+self.tag
@@ -1947,10 +1950,16 @@ class DataCardMaker:
         self.addSystematic(nuisance,"lnN",{name:1+uncertainty})
 
     def addFixedYieldFromFile(self,name,ID,filename,histoName,constant=1.0):
-        pdfName="_".join([name,self.tag])
+        print " addFixedYieldFromFile ",filename
+        pdfName="_".join([name,self.tag])        
         f=ROOT.TFile(filename)
+        print "using histogram ",histoName
         histogram=f.Get(histoName)
+        print "integral ",histogram.Integral()
+        print "lumi ",self.luminosity
+        print "constant ",constant
         events=histogram.Integral()*self.luminosity*constant
+        print "events ",events
         self.contributions.append({'name':name,'pdf':pdfName,'ID':ID,'yield':events})
 
     def addYieldWithRateParameter(self,name,ID,paramName,formula,values):#jen        

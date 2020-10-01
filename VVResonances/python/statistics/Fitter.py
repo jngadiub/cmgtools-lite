@@ -1308,7 +1308,7 @@ class Fitter(object):
             histos_nonRes[key].SetFillColor(color[key])
             histos[key].SetLineColor(color[key])
             histos_nonRes[key].SetLineColor(color[key])
-        
+
         
         if 'Zjets' in histos.keys():
             histos['Wjets'].Add(histos['Zjets'])
@@ -1326,7 +1326,7 @@ class Fitter(object):
         
         
         
-        self.importBinnedData(histos['Wjets'],['x'],'data0')
+        self.importBinnedData(histos['Wjets'],['x'],'data0') 
         
         self.w.data("data0").plotOn(self.frame,ROOT.RooFit.FillColor(13),ROOT.RooFit.FillStyle(3144),ROOT.RooFit.DrawOption( "5" ),ROOT.RooFit.Name("errorbars"))
         #self.w.pdf(model).plotOn(self.frame, ROOT.RooFit.LineColor(ROOT.kBlack),ROOT.RooFit.Name("fit"))
@@ -1367,7 +1367,7 @@ class Fitter(object):
         text = ROOT.TLatex()
         text.DrawLatexNDC(0.13,0.92,"#font[62]{CMS} #font[52]{Simulation}")
         self.c.SaveAs(outname)
-        
+        self.c.SaveAs(outname.replace(".pdf",".root"))
         
         # draw non res contribution: 
         self.importBinnedData(histos_nonRes['Wjets'],['x'],'data1')
@@ -1415,6 +1415,7 @@ class Fitter(object):
         text = ROOT.TLatex()
         text.DrawLatexNDC(0.13,0.92,"#font[62]{CMS} #font[52]{Simulation}")
         self.c.SaveAs(outname.replace(".pdf","_nonRes.pdf"))
+        self.c.SaveAs(outname.replace(".pdf","_nonRes.root"))   
         
         
     def getFrame(self,model = "model",data="data",poi="x",xtitle='x',mass=1000):

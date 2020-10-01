@@ -50,8 +50,7 @@ def returnString(func,ftype):
             st+=")"
             return st    
         if ftype.find("spline")!=-1:
-            print "write json for spline function"
-            print "returns list not string!"
+            print "write json for spline function: a list and not a string will be returned in this case"
             st=[]
             nnknots = func.GetNp()
             for i in range(0,nnknots):

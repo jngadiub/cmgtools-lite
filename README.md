@@ -31,15 +31,20 @@ git fetch Diboson3D
 git checkout -b VV_VH Diboson3D/VV_VH
 scram b -j 8
 cd VVResonances/interactive
-ln -s samples_location sample
+```
+NB to run on the 3 Run2 years some changes have been made and the soft link below should point to the folder cointaining the years subfolder
+
+```
+ln -s samples_location simboliklinkname
+
 ```
 
 Current sample location with random sorting of jet1 and jet2
 
 ```
-/eos/cms/store/cmst3/group/exovv/VVtuple/FullRun2VVVHNtuple/2016_new/
-/eos/cms/store/cmst3/group/exovv/VVtuple/FullRun2VVVHNtuple/2018/
+/eos/cms/store/cmst3/group/exovv/VVtuple/FullRun2VVVHNtuple/deepAK8V2/
 ```
+Before running, initialiaze the `basedir` variable in `makeInputs.py` to your `simboliklinkname`
 
 Make the 3D templates. Several options can be specified to produce QCD, V+Jets or signal templates, normalization etc.
  
@@ -53,7 +58,6 @@ Make the 3D templates. Several options can be specified to produce QCD, V+Jets o
  python makeInputs.py -p 2016 --run "qcdnorm"
  python makeInputs.py -p 2016 --run "data"
  # python makeInputs.py -p 2016 --run "pseudo"
-
 ```
 
 Run closure test of signal fits:

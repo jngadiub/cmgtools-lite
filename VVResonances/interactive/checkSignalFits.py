@@ -31,6 +31,7 @@ parser.add_option("-e","--exp",dest="doExp",type=int,help="useExponential",defau
 parser.add_option("-r","--minMX",dest="minMX",type=float, help="smallest Mx to fit ",default=1100.0)
 parser.add_option("-R","--maxMX",dest="maxMX",type=float, help="largest Mx to fit " ,default=7000.0)
 parser.add_option("--fitResults",dest="fitResults",default="debug_JJ_BulkGWW_MJl1_HPLP.json.root",help="name of root file containing the fitted curves for each parameter")
+parser.add_option("--indir",dest="indir",default="results_2016",help="name of the directory cointaining the root file containing the fitted curves for each parameter")
 
 (options,args) = parser.parse_args()
 #define output dictionary
@@ -158,14 +159,14 @@ if __name__=="__main__":
         if ext.find("root") ==-1:
             continue
         print filename
-
         if fname.split('_')[-1] == "HT600toInf":
             mass = 1001
         else:
             mass = float(fname.split('_')[-1])
         #if mass < options.minMX or mass > options.maxMX: continue	
 
-            
+
+        print "mass ",mass    
         if mass <=1000:
             continue
         if mass >5000:
@@ -185,14 +186,19 @@ if __name__=="__main__":
     frames=[]
     tmp = []
     N=0
+
+    print "fitResults  "
     print options.fitResults
     fitfiles = (options.fitResults).split(',')
-    print fitfiles
+    print "fitfiles ",fitfiles
     File =[]
     for f in fitfiles:
-        File.append(ROOT.TFile(f,"READ"))
+        File.append(ROOT.TFile(options.indir+"/"+f,"READ"))
     histos = []
+    print samples.keys()
+    print options.mvv
     for mass in sorted(samples.keys()):
+        print mass
         c = ROOT.TCanvas("c","c",600,600)
         c.SetTickx()
         c.SetTicky()
@@ -248,6 +254,7 @@ if __name__=="__main__":
         
             
         else:
+            print " didn't find LV_mass"
             frames.append(fitters[N].w.var(xvar).frame(55,215))
             tmp.append(plotter.drawTH1(options.mvv,cuts['common']+'*'+cuts['acceptance']+'*'+cuts[options.cat],"1",20,options.mini,options.maxi))
             histos.append(ROOT.TH1F("tmp"+str(mass),"tmp"+str(mass),20,options.mini,options.maxi))
@@ -330,6 +337,7 @@ if __name__=="__main__":
         if options.sample.find("WJets")!=-1:
             fname = "WJetsToQQ.pdf"
         c.Update()
+        print "output filename ",fname
         c.SaveAs(fname)
         c.SaveAs(fname.replace(".pdf",".png"))
     print options.toy

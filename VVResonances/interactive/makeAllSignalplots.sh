@@ -1,6 +1,5 @@
 #bin/bash!
 models=("BGZZ" "WprimeWZ" "ZprimeWW" "BGWW"  "ZprimeZH" "WprimeWH")
-models=("BGZZ")
 
 # 
 # for model in ${models[@]}
@@ -97,8 +96,21 @@ models=("BGZZ")
 mkdir postfitplots/
 
 
-models=("ZprimeZH")
+
 category=( "VH_HPLP" "VH_LPHP" "VH_HPHP" "VV_HPLP" "VV_HPHP")
+models=("BulkGZZ"  "WprimeWZ" "ZprimeWW" "BulkGWW"  "ZprimeZH" "WprimeWH")
+>>>>>>> 257bec0b4a12ef71aa045d7721969ca9c9b78ffb
+
+ for model in ${models[@]}
+ do
+   for c in ${category[@]}
+   do
+       python makeCard.py --outlabel "sigonly_M4000" --pseudodata $model --signal $model --category $c --period "2016"
+  
+    python makeCard.py --outlabel "sigonly_M2000" --pseudodata $model --signal $model --category $c --period "2016"
+   done 
+ done
+
 
 
 for model in ${models[@]}

@@ -7,7 +7,7 @@ from array import array
 import math
 import CMS_lumi
 from tools import PostFitTools
-ROOT.gErrorIgnoreLevel = ROOT.kWarning
+#ROOT.gErrorIgnoreLevel = ROOT.kWarning
 ROOT.gROOT.ProcessLine(".x tdrstyle.cc");
 
 #ROOT.gSystem.Load("Util_cxx.so")
@@ -35,7 +35,7 @@ parser.add_option("--pdfy",dest="pdfy",help="name of pdfs lie PTYUp etc",default
 parser.add_option("-s","--signal",dest="fitSignal",action="store_true",help="do S+B fit",default=False)
 parser.add_option("--doFit",dest="fit",action="store_false",help="actually fit the the distributions",default=True)
 parser.add_option("-t","--addTop",dest="addTop",action="store_true",help="Fit top",default=False)
-parser.add_option("-v","--doVjets",dest="doVjets",action="store_true",help="Fit top",default=False)
+parser.add_option("-v","--doVjets",dest="doVjets",action="store_true",help="Fit Vjets",default=True)
 parser.add_option("-M","--mass",dest="signalMass",type=float,help="signal mass",default=1560.)
 parser.add_option("--signalScaleF",dest="signalScaleF",type=float,help="scale factor to apply to signal when drawing so its still visible!",default=100.)
 parser.add_option("--prelim",dest="prelim",type=int,help="add preliminary label",default=0)
@@ -47,6 +47,7 @@ ROOT.gStyle.SetOptStat(0)
 ROOT.RooMsgService.instance().setGlobalKillBelow(ROOT.RooFit.FATAL)
 
 
+print " do signal fit ? ",options.fitSignal
 
 signalName = "ZprimeZH"
 if options.name.find("WZ")!=-1:
@@ -61,22 +62,20 @@ if options.name.find("BulkGZZ")!=-1:
     signalName="BulkGZZ"
 period = "2016"
 if options.name.find("2017")!=-1: period = "2017"
+if options.name.find("2018")!=-1: period = "2018"
+if options.name.find("Run2")!=-1: period = "Run2"
 
-                 
 
-   
 
 
 if __name__=="__main__":
      finMC = ROOT.TFile(options.input,"READ");
      hinMC = finMC.Get("nonRes");
-     print options.name
      purity = options.channel
      print " run on category ", purity
     
      print " get workspace "               
-    
-     print 
+         print 
      print "open file " +options.name
      f = ROOT.TFile(options.name,"READ")
      workspace = f.Get("w")
@@ -85,7 +84,9 @@ if __name__=="__main__":
 
      model = workspace.pdf("model_b") 
      model_b = workspace.pdf("model_b")
-     if options.fitSignal: model = workspace.pdf("model_s")
+     if options.fitSignal == True: 
+         print " %%%%%%%%% model = model_s" 
+         model = workspace.pdf("model_s")
      data_all = workspace.data("data_obs")
      data1 = workspace.data("data_obs").reduce("CMS_channel==CMS_channel::JJ_"+purity+"_13TeV_"+period)
      
@@ -94,7 +95,7 @@ if __name__=="__main__":
      
      args  = model.getComponents()
      pdf1Name = "pdf_binJJ_"+purity+"_13TeV_"+period+"_bonly"
-     if options.fitSignal:
+     if options.fitSignal == True:
       pdf1Name = "pdf_binJJ_"+purity+"_13TeV_"+period
      print "pdf1Name ",pdf1Name
 
@@ -123,11 +124,19 @@ if __name__=="__main__":
 
      #################################################
      if options.fit:
+        print "Fitting S+B"
         fitresult = model.fitTo(data_all,ROOT.RooFit.SumW2Error(not(options.data)),ROOT.RooFit.Minos(0),ROOT.RooFit.Verbose(0),ROOT.RooFit.Save(1),ROOT.RooFit.NumCPU(8))  
+        print " FIT RESULT ",fitresult.Print() 
+#        print "Fitting b"
+#        fitresult_bkg_only = model_b.fitTo(data_all,ROOT.RooFit.SumW2Error(not(options.data)),ROOT.RooFit.Minos(0),ROOT.RooFit.Verbose(0),ROOT.RooFit.Save(1),ROOT.RooFit.NumCPU(8))  
+#        print "done fitting!!!!!!"
+
         if options.label.find("sigonly")==-1:
             fitresult_bkg_only = model_b.fitTo(data_all,ROOT.RooFit.SumW2Error(not(options.data)),ROOT.RooFit.Minos(0),ROOT.RooFit.Verbose(0),ROOT.RooFit.Save(1),ROOT.RooFit.NumCPU(8))
         else: fitresult_bkg_only = fitresult
-             
+  
+            
+
      print 
      print period+" Prefit nonRes pdf:"
      pdf1_nonres_shape_prefit = args["nonResNominal_JJ_"+purity+"_13TeV_"+period]
@@ -166,11 +175,12 @@ if __name__=="__main__":
       pdf1_signal_postfit.Print()
       print
   
-     print "Full 2016 post-fit pdf:"     
+      
+     print "Full post-fit pdf:"     
      pdf1_shape_postfit  = args[pdf1Name+"_nuis"]
      pdf1_shape_postfit.Print()
      print
-    
+
 		    
      allpdfs = [] 
      allpdfs.append(pdf1_nonres_shape_postfit)

@@ -153,6 +153,7 @@ colors.append(["#CD8500","#CD950C","#EE9A00","#EEAD0E","#FFA500","#FFB90F","#FFC
 colors.append(["#8B2500","#CD3700","#EE4000","#FF4500","#CD4F39","#EE5C42","#EE6A50","#FF7256","#FA8072","#FFA07A","#EEB4B4"]*4)
 colors.append(["#EE82EE","#FF00FF","#D02090","#C71585","#B03060 ","#DB7093","#FFB6C1","#FFC0CB"]*4)
 colors.append(["#D2B48C","#FFA54F","#EE9A49","#CD853F"]*4)
+#colors.append(["#000080","#0000CD","#0000FF","#3D59AB","#4169E1","#4876FF","#6495ED","#1E90FF","#63B8FF","#87CEFA","#C6E2FF"]*3)   
 
 
 
@@ -265,6 +266,8 @@ def doAll(category,jsons,legs):
                     with open(options.indir+f.replace("Hjet","Vjet")) as jsonFileV:
                         jV = json.load(jsonFileV)
                     getMJPdf(w,jV,MH,name,j)
+            print "signal  "+jsons[ii]
+            print " color ii "+str(ii)+" i "+str(i)+" "+colors[ii][i]
             w.pdf('signal_%d%s'%(MH,name)).plotOn(frame[-1], ROOT.RooFit.LineColor(ROOT.TColor.GetColor(colors[ii][i])),ROOT.RooFit.Name(str(MH)+name))#,ROOT.RooFit.Range(MH*0.8,1.2*MH))#ROOT.RooFit.Normalization(1, ROOT.RooAbsReal.RelativeExpected),
       
    
@@ -355,8 +358,19 @@ def doAll(category,jsons,legs):
       
 if __name__ == '__main__':
     #doSingle()
+#    legs = ["G_{bulk} #rightarrow WW"]
     legs = ["G_{bulk} #rightarrow ZZ","W' #rightarrow WZ","G_{bulk} #rightarrow WW","Z'#rightarrow WW","Z' #rightarrow ZH","W' #rightarrow WH"]
+#    legs = ["Z' #rightarrow ZH"]
+#    signals = ["BulkGWW"]
     signals = ["BulkGZZ","WprimeWZ","BulkGWW","ZprimeWW","ZprimeZH","WprimeWH"]
+#    signals = ["ZprimeZH"]
+#    categories = ["VV_HPLP","VV_HPHP"]
+#    categories = ["VV_HPHP","VV_HPLP","VH_HPLP","VH_HPHP","VH_LPHP"]
+#    categories = ["VV_HPHP","VV_HPLP","VH_HPHP","VH_LPHP"]
+
+#    legs = ["G_{bulk} #rightarrow ZZ","W' #rightarrow WZ","G_{bulk} #rightarrow WW","Z'#rightarrow WW","Z' #rightarrow ZH","W' #rightarrow WH"]
+#    signals = ["BulkGZZ","WprimeWZ","BulkGWW","ZprimeWW","ZprimeZH","WprimeWH"]
+
     categories = options.category.split(',')
     for category in categories:
       jsons=[]

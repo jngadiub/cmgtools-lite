@@ -9,6 +9,7 @@ rt.gROOT.SetBatch(True)
 from time import sleep
 
 # Run from command line with
+#python Projections3DHisto.py --mc JJ_2016_nonRes_VV_HPLP.root,nonRes -k JJ_2016_nonRes_3D_VV_HPLP.root,histo -o control-plots-HPLP-pythia
 #python Projections3DHisto.py --mc 2017/JJ_nonRes_HPLP.root,nonRes -k 2016/JJ_nonRes_3D_HPLP_2017_copy.root,histo -o control-plots-HPLP-pythia
 #python Projections3DHisto.py --mc 2017/JJ_nonRes_HPHP.root,nonRes -k 2016/JJ_nonRes_3D_HPHP_2017_copy.root,histo -o control-plots-HPHP-pythia
 #python Projections3DHisto.py --mc 2016/JJ_nonRes_LPLP_altshapeUp.root,nonRes -k 2016/JJ_nonRes_3D_LPLP_fixed.root,histo_altshapeUp -o control-plots-LPLPfixed-herwig
@@ -23,7 +24,7 @@ def get_canvas(cname):
  CMS_lumi.lumi_8TeV = "18.3 fb^{-1}"
  CMS_lumi.writeExtraText = 1
  CMS_lumi.extraText = "Simulation"
- CMS_lumi.lumi_sqrtS = "13 TeV (2017)" # used with iPeriod = 0, e.g. for simulation-only plots (default is an empty string)
+ CMS_lumi.lumi_sqrtS = "13 TeV (2016)" # used with iPeriod = 0, e.g. for simulation-only plots (default is an empty string)
 
  iPos = 11
  if( iPos==0 ): CMS_lumi.relPosX = 0.12
@@ -68,7 +69,9 @@ os.system('rm -rf %s'%options.outdir)
 os.system('mkdir %s'%options.outdir)
 
 kfile,kname = options.kernel.split(',')
+print "kfile "+str(kfile)
 fin = rt.TFile.Open(kfile,"READ")
+print "kname "+str(kname)
 hin = fin.Get(kname)
 hin.Scale(1./hin.Integral())
 
@@ -206,7 +209,7 @@ frame = cy.GetFrame()
 frame.Draw()
 cy.SaveAs(options.outdir+"/cy.png","pdf")
 
-'''
+
 labelsXY = ['All m_{jj} bins']
 for i in range(1,4): labelsXY.append( "%.1f < m_{jj} < %.1f TeV"%( hin.GetZaxis().GetBinLowEdge(zbinMin[i])/1000.,hin.GetZaxis().GetBinUpEdge(zbinMax[i])/1000.) )
 
@@ -269,7 +272,7 @@ for i in range(4):
  pt.Draw()
 
  cpullsy.SaveAs(options.outdir+"/"+cpullsy.GetName()+".png","pdf")
-'''
+
 
 #xbinMin[5] = {1,hin.GetXaxis().FindBin(55),hin.GetXaxis().FindBin(70),hin.GetXaxis().FindBin(100),hin.GetXaxis().FindBin(150)}
 #xbinMax[5] = {binsx,hin.GetXaxis().FindBin(70),hin.GetXaxis().FindBin(100),hin.GetXaxis().FindBin(150),binsx}
@@ -344,7 +347,7 @@ cz.SaveAs(options.outdir+"/cz.png","pdf")
 labelsZ = ["All m_{jet} bins"]
 for i in range(1,5):
  labelsZ.append("%i < m_{jet} < %i GeV"%(hin.GetXaxis().GetBinLowEdge(xbinMin[i]),hin.GetXaxis().GetBinUpEdge(xbinMax[i])))
-''' 
+
 for i in range(5):
 
  pt = rt.TPaveText(0.1436782,0.7690678,0.4224138,0.8644068,"brNDC")
@@ -376,11 +379,12 @@ for i in range(5):
  pt.Draw()
 
  cpullsz.SaveAs(options.outdir+"/"+cpullsz.GetName()+".png","pdf")
-''' 
+
 
 #xbinMin = [hin.GetXaxis().FindBin(173)+1]
 #xbinMax = [binsx]
-  
+
+
 hin_PTUp = fin.Get("histo_PTUp")
 hin_PTUp.Scale(1./hin_PTUp.Integral())
 hin_PTDown = fin.Get("histo_PTDown")
@@ -443,12 +447,14 @@ hz_OPT3Down.Scale(1./hz_OPT3Down.Integral())
 
 hzMC[0].Scale(1./hzMC[0].Integral())
 hz[0].Scale(1./hz[0].Integral())
+
 #leg3 = rt.TLegend(0.6,0.55,0.95,0.8)
 leg3 = rt.TLegend(0.53,0.55,0.78,0.89)
 leg3.SetBorderSize(0)
 leg3.SetTextSize(0.035)
 leg3.AddEntry(hzMC[0],"Simulation (%s)"%(options.label),"LP")
 leg3.AddEntry(hz[0],"Template","L")
+
 leg3.AddEntry(hz_PTUp,"#propto m_{jj} up/down","L")
 leg3.AddEntry(hz_OPTUp,"#propto 1/m_{jj} up/down","L")
 leg3.AddEntry(hz_altshapeUp,"HERWIG up/down","L")
@@ -462,7 +468,7 @@ czSyst.SetLogy()
 
 #hz[4].SetLineColor(rt.kBlack)
 #hz[4].Scale(1./0.001)
-hz[0].SetMinimum(1E-06)
+hz[0].SetMinimum(1E-011)
 hz[0].SetMaximum(10.0)
 hz[0].Draw("HIST")
 hz_PTUp.Draw("HISTsame")
@@ -622,12 +628,15 @@ leg3.AddEntry(hy_altshape2Up,"MADGRAPH+PYTHIA up/down","L")
 #leg3.AddEntry(hy_altshape3Up,"POWHEG up/down","L")
 leg3.AddEntry(hy_OPT3Up,"m_{jj} turn-on up/down","L")
 
+
+
 cySyst = get_canvas("cySyst")
 cySyst.cd()
 
 hy[0].SetMinimum(0)
 hy[0].SetMaximum(0.04)
 hy[0].Draw("HIST")
+
 hy_PTUp.Draw("HISTsame")
 hy_PTDown.Draw("HISTsame") 
 hy_OPTUp.Draw("HISTsame")
@@ -641,6 +650,7 @@ hy_altshape2Down.Draw("HISTsame")
 hy_OPT3Up.Draw("HISTsame")
 hy_OPT3Down.Draw("HISTsame")
 hyMC[0].Draw("same")
+
 leg3.Draw()
 
 CMS_lumi.CMS_lumi(cySyst, 0, 11)
@@ -669,4 +679,5 @@ hyz.Draw("COLZ")
 cyz.SaveAs(TString(outDirName)+TString("/")+TString("cyz.png"),"pdf")
 
 }
+
 '''
