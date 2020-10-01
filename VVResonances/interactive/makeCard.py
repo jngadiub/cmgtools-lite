@@ -176,7 +176,7 @@ for sig in signals:
         Tools.AddResBackgroundSystematics(card,p)
       Tools.AddNonResBackgroundSystematics(card,p)
       #Tools.AddTaggingSystematics(card,sig,dataset,p,resultsDir[dataset]+'/migrationunc.json')
-      Tools.AddTTSystematics4(card,["CMS_VV_JJ_TTJets_slope",0.05],dataset)
+      Tools.AddTTSystematics4(card,["CMS_VV_JJ_TTJets_slope",0.05],dataset,p)
       #Tools.AddTTSystematics2(card,sig,dataset,p,resultsDir[dataset])
       card.makeCard()
 
@@ -190,8 +190,8 @@ for sig in signals:
     #make combined 
     if len(purities)>1:
       print "#######     going to combine purity categories: ",purities    
-      combo_card = cardName.replace("VV_HPHP","").replace("VV_HPLP","").replace("VV_LPLP","").replace("VH_HPHP","").replace("VH_HPLP","").replace("VH_LPHP","").replace("VH_HPNP_control_region","").replace("VH_NPHP_control_region","")
-      combo_workspace = workspaceName.replace("VV_HPHP","").replace("VV_HPLP","").replace("VV_LPLP","").replace("VH_HPHP","").replace("VH_HPLP","").replace("VH_LPHP","").replace("VH_HPNP_control_region","").replace("VH_NPHP_control_region","")
+      combo_card = cardName.replace("VV_HPHP","").replace("VV_HPLP","").replace("VV_LPLP","").replace("VH_HPHP","").replace("VH_HPLP","").replace("VH_LPHP","").replace("VH_HPNP_control_region","").replace("VH_NPHP_control_region","").replace("__","_VVVH_")
+      combo_workspace = workspaceName.replace("VV_HPHP","").replace("VV_HPLP","").replace("VV_LPLP","").replace("VH_HPHP","").replace("VH_HPLP","").replace("VH_LPHP","").replace("VH_HPNP_control_region","").replace("VH_NPHP_control_region","").replace("__","_VVVH_")
       os.system('rm %s'%combo_card)
       cmd_combo+=' >> %s'%combo_card
       print cmd_combo
