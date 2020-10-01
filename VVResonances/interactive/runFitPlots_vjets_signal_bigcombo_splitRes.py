@@ -92,7 +92,7 @@ def addResults(results): #self.hfinals,self.dh, self.htot_sig,self.axis,self.Bin
     errs = []
     for i in range(0,len(results)):
         errs.append(results[i][7])
-    errors = addGraph(results[0][7]) # errs)
+    errors = addGraph(errs)
     for j in range(1,len(results)):
         dh.Add(results[j][1])
         hsig.Add(results[j][2])
@@ -137,7 +137,6 @@ if __name__=="__main__":
      workspace.var("MH").setConstant(1)
      f.Close()
      #workspace.Print()
-     #years = ["2016"]#,"2017"]
      model = workspace.pdf("model_b")
      model_b = workspace.pdf("model_b")
      if options.fitSignal: model = workspace.pdf("model_s")
@@ -151,20 +150,8 @@ if __name__=="__main__":
      workspace.var("MJJ").setVal(2000)
      bkgs = ["nonRes","Wjets","Zjets","TTJetsTop","TTJetsW","TTJetsNonRes","TTJetsWNonResT","TTJetsResWResT" ,"TTJetsTNonResT"]
      #print number of events before the fit
-     #for year in years:
      data[period] = (workspace.data("data_obs").reduce("CMS_channel==CMS_channel::JJ_"+purity+"_13TeV_"+period))
      pdf1Name [period] =  "pdf_binJJ_"+purity+"_13TeV_"+period+"_bonly"
-     workspace.var("MJJ").setVal(1154)
-     workspace.var("MJJ").setConstant(1)
-     print " prefit W mean 1 ",args[pdf1Name[period]].getComponents()["mean1_TTJetsW_mjetRes_l1_JJ_"+purity+"_13TeV_"+period].getVal()
-     print " prefit W mean 2 ",args[pdf1Name[period]].getComponents()["mean1_TTJetsW_mjetRes_l2_JJ_"+purity+"_13TeV_"+period].getVal()
-     print " prefit T mean 1 ",args[pdf1Name[period]].getComponents()["mean2_TTJetsTop_mjetRes_l1_JJ_"+purity+"_13TeV_"+period].getVal()
-     print " prefit T mean 2 ",args[pdf1Name[period]].getComponents()["mean2_TTJetsTop_mjetRes_l2_JJ_"+purity+"_13TeV_"+period].getVal()
-     print " prefit W sigma 1 ",args[pdf1Name[period]].getComponents()["sigma1_TTJetsW_mjetRes_l1_JJ_"+purity+"_13TeV_"+period].getVal()
-     print " prefit W sigma 2 ",args[pdf1Name[period]].getComponents()["sigma1_TTJetsW_mjetRes_l2_JJ_"+purity+"_13TeV_"+period].getVal()
-     print " prefit T sigma 1 ",args[pdf1Name[period]].getComponents()["sigma2_TTJetsTop_mjetRes_l1_JJ_"+purity+"_13TeV_"+period].getVal()
-     print " prefit T sigma 2 ",args[pdf1Name[period]].getComponents()["sigma2_TTJetsTop_mjetRes_l2_JJ_"+purity+"_13TeV_"+period].getVal()
-     workspace.var("MJJ").setConstant(0)
      if options.fitSignal: pdf1Name [period] =  "pdf_binJJ_"+purity+"_13TeV_"+period
      print "pdf1Name ",pdf1Name
      print
@@ -219,7 +206,7 @@ if __name__=="__main__":
      else: allsignalpdfs[period] =None
         
         
-     print 
+     print
      print period+" Prefit nonRes pdf:"
      pdf1_nonres_shape_prefit = args["nonResNominal_JJ_"+purity+"_13TeV_"+period]
      pdf1_nonres_shape_prefit.Print()
@@ -230,8 +217,6 @@ if __name__=="__main__":
      allpdfsz = PostFitTools.definefinalPDFs(options,"z",allpdfs)
      allpdfsx = PostFitTools.definefinalPDFs(options,"x",allpdfs)
      allpdfsy = PostFitTools.definefinalPDFs(options,"y",allpdfs)
-    
-
 
      if options.fit:
         bkgLabel = ["nonRes","Wjets","Zjets","resT","resW","nonresT","resWnonresT","resTresW","resTnonresT"]
@@ -257,7 +242,7 @@ if __name__=="__main__":
                         else:
                             print pf.GetName(), pf.getVal(), pf.getError()
                             slopes[bn] =pf.getVal()
-                    print "slopes[bn] ",slopes[bn]
+                            print "slopes[bn] ",slopes[bn]
                 print "normalization of "+bkg+" after fit:",(expected[bkg][0].getVal()), " +/- ",expected[bkg][1] ,"   ("+period+")"
         all_expected[period] = expected
         #save post fit ttbar only normalization to be used as prefit value when fitting all bkg
@@ -268,17 +253,6 @@ if __name__=="__main__":
                 json.dump(slopes,jsonfileslopes)
                 jsonfile.close()
                 jsonfileslopes.close()
-        workspace.var("MJJ").setVal(1154)
-        workspace.var("MJJ").setConstant(1)
-        print " POSTFIT W mean 1 ",args[pdf1Name[period]].getComponents()["mean1_TTJetsW_mjetRes_l1_JJ_"+purity+"_13TeV_"+period].getVal()
-        print " POSTFIT W mean 2 ",args[pdf1Name[period]].getComponents()["mean1_TTJetsW_mjetRes_l2_JJ_"+purity+"_13TeV_"+period].getVal()
-        print " POSTFIT T mean 1 ",args[pdf1Name[period]].getComponents()["mean2_TTJetsTop_mjetRes_l1_JJ_"+purity+"_13TeV_"+period].getVal()
-        print " POSTFIT T mean 2 ",args[pdf1Name[period]].getComponents()["mean2_TTJetsTop_mjetRes_l2_JJ_"+purity+"_13TeV_"+period].getVal()
-        print " POSTFIT W sigma 1 ",args[pdf1Name[period]].getComponents()["sigma1_TTJetsW_mjetRes_l1_JJ_"+purity+"_13TeV_"+period].getVal()
-        print " POSTFIT W sigma 2 ",args[pdf1Name[period]].getComponents()["sigma1_TTJetsW_mjetRes_l2_JJ_"+purity+"_13TeV_"+period].getVal()
-        print " POSTFIT T sigma 1 ",args[pdf1Name[period]].getComponents()["sigma2_TTJetsTop_mjetRes_l1_JJ_"+purity+"_13TeV_"+period].getVal()
-        print " POSTFIT T sigma 2 ",args[pdf1Name[period]].getComponents()["sigma2_TTJetsTop_mjetRes_l2_JJ_"+purity+"_13TeV_"+period].getVal()
-        workspace.var("MJJ").setConstant(0)
         if options.fitSignal:
                 signal_expected[period] = [ (args[pdf1Name[period]].getComponents())["n_exp_final_binJJ_"+purity+"_13TeV_"+period+"_proc_"+signalName], (args[pdf1Name[period]].getComponents())["n_exp_final_binJJ_"+purity+"_13TeV_"+period+"_proc_"+signalName].getPropagatedError(fitresult)]
                 print "Fitted signal yields:",signal_expected[period][0].getVal()," +/- ", signal_expected[period][bkg][1] ,"(",period,")"
@@ -291,46 +265,21 @@ if __name__=="__main__":
          forproj = PostFitTools.Projection(hinMC,[options.xrange,options.yrange,options.zrange], workspace,options.fit,options.blind,fitresult_bkg_only)
      else: forproj = PostFitTools.Projection(hinMC,[options.xrange,options.yrange,options.zrange], workspace,options.fit,options.blind)
      #make projections onto MJJ axis 
-     if options.projection =="z":
+     if options.projection =="z" or options.projection =="xyz":
          results = []
          res = forproj.doProjection(data[period],allpdfsz[period],all_expected[period],"z",allsignalpdfs[period],signal_expected[period])
-         #results.append(tmp) 
-         #res = addResults(results)
          forplotting.MakePlots(res[0],res[1],res[2],res[3],res[4],res[5], res[6],res[7])
      #make projections onto MJ1 axis
-     if options.projection =="x":
+     if options.projection =="x" or options.projection =="xyz":
          results = []
          res = forproj.doProjection(data[period],allpdfsx[period],all_expected[period],"x",allsignalpdfs[period],signal_expected[period])
-         #results.append(tmp)
-         #res = addResults(results)
          forplotting.MakePlots(res[0],res[1],res[2],res[3],res[4],res[5], res[6],res[7])
      #make projections onto MJ2 axis
-     if options.projection =="y":
+     if options.projection =="y" or options.projection =="xyz":
          results = []
          res = forproj.doProjection(data[period],allpdfsy[period],all_expected[period],"y",allsignalpdfs[period],signal_expected[period])
-         #results.append(tmp)
-         #res = addResults(results)
          forplotting.MakePlots(res[0],res[1],res[2],res[3],res[4],res[5], res[6],res[7])
 
-     if options.projection =="xyz":
-         results = []
-         print data[period],allpdfsz[period],all_expected[period],"z",allsignalpdfs[period],signal_expected[period]
-         res = forproj.doProjection(data[period],allpdfsz[period],all_expected[period],"z",allsignalpdfs[period],signal_expected[period])
-         #results.append(tmp)
-         #res = addResults(results)
-         forplotting.MakePlots(res[0],res[1],res[2],res[3],res[4],res[5], res[6],res[7])
-    
-         results = []
-         res = forproj.doProjection(data[period],allpdfsx[period],all_expected[period],"x",allsignalpdfs[period],signal_expected[period])
-         #results.append(tmp)
-         #res = addResults(results)
-         forplotting.MakePlots(res[0],res[1],res[2],res[3],res[4],res[5], res[6],res[7])
-         results = []
-         
-         res = forproj.doProjection(data[period],allpdfsy[period],all_expected[period],"y",allsignalpdfs[period],signal_expected[period])
-         #results.append(tmp)
-         #res = addResults(results)
-         forplotting.MakePlots(res[0],res[1],res[2],res[3],res[4],res[5], res[6],res[7])
 
         
      logfile.close()
