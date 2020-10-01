@@ -154,6 +154,17 @@ if __name__=="__main__":
      #for year in years:
      data[period] = (workspace.data("data_obs").reduce("CMS_channel==CMS_channel::JJ_"+purity+"_13TeV_"+period))
      pdf1Name [period] =  "pdf_binJJ_"+purity+"_13TeV_"+period+"_bonly"
+     workspace.var("MJJ").setVal(1154)
+     workspace.var("MJJ").setConstant(1)
+     print " prefit W mean 1 ",args[pdf1Name[period]].getComponents()["mean1_TTJetsW_mjetRes_l1_JJ_"+purity+"_13TeV_"+period].getVal()
+     print " prefit W mean 2 ",args[pdf1Name[period]].getComponents()["mean1_TTJetsW_mjetRes_l2_JJ_"+purity+"_13TeV_"+period].getVal()
+     print " prefit T mean 1 ",args[pdf1Name[period]].getComponents()["mean2_TTJetsTop_mjetRes_l1_JJ_"+purity+"_13TeV_"+period].getVal()
+     print " prefit T mean 2 ",args[pdf1Name[period]].getComponents()["mean2_TTJetsTop_mjetRes_l2_JJ_"+purity+"_13TeV_"+period].getVal()
+     print " prefit W sigma 1 ",args[pdf1Name[period]].getComponents()["sigma1_TTJetsW_mjetRes_l1_JJ_"+purity+"_13TeV_"+period].getVal()
+     print " prefit W sigma 2 ",args[pdf1Name[period]].getComponents()["sigma1_TTJetsW_mjetRes_l2_JJ_"+purity+"_13TeV_"+period].getVal()
+     print " prefit T sigma 1 ",args[pdf1Name[period]].getComponents()["sigma2_TTJetsTop_mjetRes_l1_JJ_"+purity+"_13TeV_"+period].getVal()
+     print " prefit T sigma 2 ",args[pdf1Name[period]].getComponents()["sigma2_TTJetsTop_mjetRes_l2_JJ_"+purity+"_13TeV_"+period].getVal()
+     workspace.var("MJJ").setConstant(0)
      if options.fitSignal: pdf1Name [period] =  "pdf_binJJ_"+purity+"_13TeV_"+period
      print "pdf1Name ",pdf1Name
      print
@@ -167,8 +178,8 @@ if __name__=="__main__":
          print "Expected number of "+bkg+" events:",(expected[bkg][0].getVal()),"   ("+period+")"
      all_expected[period] = expected
      if options.fitSignal:
-        print "Expected signal yields:",(args[pdf1Name[period]].getComponents())["n_exp_final_binJJ_"+purity+"_13TeV_2016_proc_"+signalName].getVal(),"(",period,")"
-        signal_expected[period] = [ (args[pdf1Name[period]].getComponents())["n_exp_final_binJJ_"+purity+"_13TeV_2016_proc_"+signalName], 0.]
+        print "Expected signal yields:",(args[pdf1Name[period]].getComponents())["n_exp_final_binJJ_"+purity+"_13TeV_"+period+"_proc_"+signalName].getVal(),"(",period,")"
+        signal_expected[period] = [ (args[pdf1Name[period]].getComponents())["n_exp_final_binJJ_"+purity+"_13TeV_"+period+"_proc_"+signalName], 0.]
      else: signal_expected[period] = [0.,0.]
      print 
      
@@ -219,27 +230,57 @@ if __name__=="__main__":
      allpdfsz = PostFitTools.definefinalPDFs(options,"z",allpdfs)
      allpdfsx = PostFitTools.definefinalPDFs(options,"x",allpdfs)
      allpdfsy = PostFitTools.definefinalPDFs(options,"y",allpdfs)
-     
+    
+
+
      if options.fit:
         bkgLabel = ["nonRes","Wjets","Zjets","resT","resW","nonresT","resWnonresT","resTresW","resTnonresT"]
+        mappdf = {"resT":"TTJetsTop","resW":"TTJetsW","nonresT":"TTJetsNonRes","resTnonresT":"TTJetsTNonResT","resWnonresT":"TTJetsWNonResT","resTresW":"TTJetsResWResT"}
         expected = {}
         norms = {}
+        slopes = {}
+
         for bkg,bn in zip(bkgs,bkgLabel):
                 if options.doVjets==False and (bkg=="Wjets" or bkg=="Zjets"): expected[bkg] = [0.,0.]; continue
                 if options.addTop==False and (bkg.find("TTJets")!=-1): expected[bkg] = [0.,0.]; continue
                 #(args[pdf1Name[period]].getComponents())["n_exp_binJJ_"+purity+"_13TeV_"+period+"_proc_"+bkg].dump()
                 expected[bkg] = [ (args[pdf1Name[period]].getComponents())["n_exp_binJJ_"+purity+"_13TeV_"+period+"_proc_"+bkg],(args[pdf1Name[period]].getComponents())["n_exp_binJJ_"+purity+"_13TeV_"+period+"_proc_"+bkg].getPropagatedError(fitresult)]
                 norms[bn] = expected[bkg][0].getVal() 
+                if bn in mappdf:
+                    print "+mappdf[bn] ",mappdf[bn]
+                    params = fitresult.floatParsFinal()
+                    paramsfinal = ROOT.RooArgSet(params)
+                    for k in range(0,len(params)):
+                        pf = params.at(k)
+                        if not("CMS_VV_JJ_"+mappdf[bn]+"_slope" in pf.GetName()):
+                            continue
+                        else:
+                            print pf.GetName(), pf.getVal(), pf.getError()
+                            slopes[bn] =pf.getVal()
+                    print "slopes[bn] ",slopes[bn]
                 print "normalization of "+bkg+" after fit:",(expected[bkg][0].getVal()), " +/- ",expected[bkg][1] ,"   ("+period+")"
         all_expected[period] = expected
         #save post fit ttbar only normalization to be used as prefit value when fitting all bkg
         if options.name.find("ttbar")!=-1:
                 jsonfile = open(options.jsonname+"_"+options.channel+".json","w")
+                jsonfileslopes = open(options.jsonname+"Slopes_"+options.channel+".json","w")
                 json.dump(norms,jsonfile)
+                json.dump(slopes,jsonfileslopes)
                 jsonfile.close()
-
+                jsonfileslopes.close()
+        workspace.var("MJJ").setVal(1154)
+        workspace.var("MJJ").setConstant(1)
+        print " POSTFIT W mean 1 ",args[pdf1Name[period]].getComponents()["mean1_TTJetsW_mjetRes_l1_JJ_"+purity+"_13TeV_"+period].getVal()
+        print " POSTFIT W mean 2 ",args[pdf1Name[period]].getComponents()["mean1_TTJetsW_mjetRes_l2_JJ_"+purity+"_13TeV_"+period].getVal()
+        print " POSTFIT T mean 1 ",args[pdf1Name[period]].getComponents()["mean2_TTJetsTop_mjetRes_l1_JJ_"+purity+"_13TeV_"+period].getVal()
+        print " POSTFIT T mean 2 ",args[pdf1Name[period]].getComponents()["mean2_TTJetsTop_mjetRes_l2_JJ_"+purity+"_13TeV_"+period].getVal()
+        print " POSTFIT W sigma 1 ",args[pdf1Name[period]].getComponents()["sigma1_TTJetsW_mjetRes_l1_JJ_"+purity+"_13TeV_"+period].getVal()
+        print " POSTFIT W sigma 2 ",args[pdf1Name[period]].getComponents()["sigma1_TTJetsW_mjetRes_l2_JJ_"+purity+"_13TeV_"+period].getVal()
+        print " POSTFIT T sigma 1 ",args[pdf1Name[period]].getComponents()["sigma2_TTJetsTop_mjetRes_l1_JJ_"+purity+"_13TeV_"+period].getVal()
+        print " POSTFIT T sigma 2 ",args[pdf1Name[period]].getComponents()["sigma2_TTJetsTop_mjetRes_l2_JJ_"+purity+"_13TeV_"+period].getVal()
+        workspace.var("MJJ").setConstant(0)
         if options.fitSignal:
-                signal_expected[period] = [ (args[pdf1Name[period]].getComponents())["n_exp_final_binJJ_"+purity+"_13TeV_2016_proc_"+signalName], (args[pdf1Name[period]].getComponents())["n_exp_final_binJJ_"+purity+"_13TeV_2016_proc_"+signalName].getPropagatedError(fitresult)]
+                signal_expected[period] = [ (args[pdf1Name[period]].getComponents())["n_exp_final_binJJ_"+purity+"_13TeV_"+period+"_proc_"+signalName], (args[pdf1Name[period]].getComponents())["n_exp_final_binJJ_"+purity+"_13TeV_"+period+"_proc_"+signalName].getPropagatedError(fitresult)]
                 print "Fitted signal yields:",signal_expected[period][0].getVal()," +/- ", signal_expected[period][bkg][1] ,"(",period,")"
         print 
           	 	 	
