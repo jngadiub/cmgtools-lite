@@ -170,6 +170,7 @@ class DatacardTools():
     uncjsonfile=open(resultsDir+"/JJ_"+dataset+"_TTJets_MjjUnc_NP.json")
     unc = json.load(uncjsonfile)
     for i in range(0,len(contrib)):
+     if self.pseudodata.find("ttbar")!=-1:
 
        #load mJJ - assume same for the three contributions (preliminary)
        #jsonfile = resultsDir+"/JJ_"+contrib[i]+dataset+"_TTJets_MVV_"+category+".json"
@@ -181,6 +182,12 @@ class DatacardTools():
        #print "load ", rootFileMVV[contrib[i]], " for ttbar contribution"
        #f = ROOT.TFile(rootFileMVV[contrib[i]],"READ")
        #card.addHistoShapeFromFile("TTJets"+contrib[i]+"_mjj",["MJJ"],rootFileMVV[contrib[i]],"histo_nominal",["PT:CMS_VV_JJ_TTJets_PTZ_"+category],False,0)       
+     else:
+      jsonfile = resultsDir+"/JJ_"+contrib[i]+dataset+"_TTJets_MVV_NP.json"
+      slopejson= normjson.replace("Norm","NormSlopes")
+      print "load parametrisation for MVV ttbar contributions ",jsonfile,contrib[i],slopejson
+      #card.addMVVMinorBkgParametricShape("TTJets"+contrib[i]+"_mjj",["MJJ"],jsonfile,[uncertainty[0].replace("TTJets",mappdf[contrib[i]])+"_"+category,unc[contrib[i]]])
+      card.addMVVMinorBkgParametricShape("TTJets"+contrib[i]+"_mjj",["MJJ"],jsonfile,[uncertainty[0].replace("TTJets",mappdf[contrib[i]]),unc[contrib[i]]],slopejson)
 
 
     card.addMJJTTJetsParametricShapeResW("TTJetsW_mjetRes_l1","MJ1",resultsDir+"/JJ_%s_TTJets_%s.json"%(dataset,category),{'CMS_scale_prunedj':1.},{'CMS_res_prunedj':1.},self.scales[dataset])#,{'CMS_f_g1':1.},{'CMS_f_res':1.})
