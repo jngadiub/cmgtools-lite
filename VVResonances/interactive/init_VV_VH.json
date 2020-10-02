@@ -136,9 +136,9 @@
         "NP" : "1.",
         "nonres" : "1" ,
         "res" : "(jj_l1_mergedVTruth==1&&jj_l1_softDrop_mass>60&&jj_l1_softDrop_mass<120)" ,
-        "resTT_W" : "((jj_l1_mergedVTruth==1&&jj_l1_mergedTopTruth==0)&&(jj_l2_mergedVTruth==1&&jj_l2_mergedTopTruth==0))" ,
-        "resTT" : "((jj_l1_mergedTopTruth==1 && jj_l1_mergedVTruth==1)&&(jj_l2_mergedTopTruth==1 && jj_l2_mergedVTruth==1))" ,
-        "nonresTT" : "((jj_l1_mergedVTruth==0&&jj_l1_mergedTopTruth==0)&& (jj_l2_mergedVTruth==0&&jj_l2_mergedTopTruth==0))" ,
+        "resW" : "((jj_l1_mergedVTruth==1&&jj_l1_mergedTopTruth==0)&&(jj_l2_mergedVTruth==1&&jj_l2_mergedTopTruth==0))" ,
+        "resT" : "((jj_l1_mergedTopTruth==1 && jj_l1_mergedVTruth==1)&&(jj_l2_mergedTopTruth==1 && jj_l2_mergedVTruth==1))" ,
+        "nonresT" : "((jj_l1_mergedVTruth==0&&jj_l1_mergedTopTruth==0)&& (jj_l2_mergedVTruth==0&&jj_l2_mergedTopTruth==0))" ,
         "resTresW":"(((jj_l1_mergedVTruth==1&&jj_l1_mergedTopTruth==0)&&(jj_l2_mergedVTruth==1&&jj_l2_mergedTopTruth==1)) || ((jj_l2_mergedVTruth==1&&jj_l2_mergedTopTruth==0)&&(jj_l1_mergedVTruth==1&&jj_l1_mergedTopTruth==1)))" ,
         "resTnonresT":"(((jj_l1_mergedTopTruth==1 && jj_l1_mergedVTruth==1) && (jj_l2_mergedTopTruth==0 && jj_l2_mergedVTruth==0)) || ((jj_l2_mergedTopTruth==1 && jj_l2_mergedVTruth==1) && ( jj_l1_mergedVTruth==0 && jj_l1_mergedTopTruth==0)))" , "resWnonresT":"((jj_l1_mergedVTruth==1&&jj_l1_mergedTopTruth==0&&jj_l2_mergedVTruth==0&&jj_l2_mergedTopTruth==0)|| (jj_l2_mergedVTruth==1&&jj_l2_mergedTopTruth==0&&jj_l1_mergedVTruth==0&&jj_l1_mergedTopTruth==0))" , 
 
