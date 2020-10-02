@@ -104,7 +104,10 @@ for mass in flipped.keys():
 print " complete ",complete_mass
 
 
-category=options.output.split("_")[-3]+"_"+options.output.split("_")[-2]
+if options.output.find('NP')!=-1:
+    category='NP'
+else:
+    category=options.output.split("_")[-3]+"_"+options.output.split("_")[-2]
 print "category ",category
 
 mvv,maxi,mini = options.mvv,options.maxi,options.mini
