@@ -82,10 +82,10 @@ if useTriggerWeights:
     
 #all categories
 #categories=['VH_HPHP','VH_LPHP','VV_HPHP'] #,'VBF_VV_HPHP','VBF_VV_HPLP']
-categories=['VH_HPHP','VH_LPHP','VH_HPLP','VV_HPHP','VV_HPLP'] #,'VBF_VV_HPHP','VBF_VV_HPLP']
+#categories=['VH_HPHP','VH_LPHP','VH_HPLP','VV_HPHP','VV_HPLP'] #,'VBF_VV_HPHP','VBF_VV_HPLP']
 #categories=['VH_HPNP_control_region'] #,'VH_NPHP_control_region']
 #categories=['VV_HPLP'] 
-#categories=['NP']
+categories=['NP']
        
 
 #list of signal samples --> nb, radion and vbf samples to be added
@@ -237,10 +237,10 @@ if options.run.find("all")!=-1 or options.run.find("qcd")!=-1:
 
   
 
-   if options.run.find("all")!=-1 or options.run.find("fits")!=-1 or options.run.find("All")!=-1:
-        print "for V+jets"
-        print "first we fit"
-        f.fitVJets("JJ_"+filePeriod+"_WJets",resTemplate,1.,1.)
+if options.run.find("all")!=-1 or options.run.find("fits")!=-1 or options.run.find("All")!=-1:
+    print "for V+jets"
+    print "first we fit"
+    f.fitVJets("JJ_"+filePeriod+"_WJets",resTemplate,1.,1.)
     wait=False
     if options.batch == True : wait=True 
     if options.run.find("all")!=-1 or options.run.find("kernel")!=-1 or options.run.find("All")!=-1:

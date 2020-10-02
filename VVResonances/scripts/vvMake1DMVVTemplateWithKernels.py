@@ -192,7 +192,7 @@ for filename in os.listdir(folder):
             dataPlotters[-1].addCorrectionFactor(luminosity,'flat')
             if fname.find("QCD_Pt_") !=-1 or fname.find("QCD_HT") !=-1: 
                 print "going to apply spikekiller for ",fname
-                dataPlotters[fname].addCorrectionFactor('b_spikekiller','tree')
+                dataPlotters[-1].addCorrectionFactor('b_spikekiller','tree')
             if options.triggerW:
                 dataPlotters[-1].addCorrectionFactor('triggerWeight','tree')
                 print "Using trigger weights from tree"
