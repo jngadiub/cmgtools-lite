@@ -130,6 +130,11 @@ class cuts():
                  
 
 
+            self.W_HPmassscale["Run2"] = data["W_LPmassscale"+self.yeartag]
+            self.W_LPmassscale["Run2"] = data["W_HPmassscale"+self.yeartag]
+
+            self.H_HPmassscale["Run2"] = data["H_LPmassscale"+self.yeartag]
+            self.H_LPmassscale["Run2"] = data["H_HPmassscale"+self.yeartag]
 
             self.vtag_pt_dependence["Run2"] = data["vtag_pt_dependence"+self.yeartag]
             self.lumi["Run2"] =  data["lumi"+self.yeartag]
@@ -144,19 +149,17 @@ class cuts():
                 elif year=="2018":
                     self.yeartag = "18"
                 else: print "no such data taking year -> running with default values on 2016 data"
-           
-         
-         
+
                 self.W_tag_unc_HP[year] = data["W_tag_unc_HP"][str(year)]
                 self.W_tag_unc_LP[year] = data["W_tag_unc_LP"][str(year)]
                 self.H_tag_unc_HP[year] = data["H_tag_unc_HP"][str(year)]
                 self.H_tag_unc_LP[year] = data["H_tag_unc_LP"][str(year)]
 
-                self.W_LPmassscale[year] = data["W_HPmassscale"+self.yeartag]
                 self.W_HPmassscale[year] = data["W_LPmassscale"+self.yeartag]
-                
-                self.H_LPmassscale[year] = data["H_HPmassscale"+self.yeartag]
+                self.W_LPmassscale[year] = data["W_HPmassscale"+self.yeartag]
                 self.H_HPmassscale[year] = data["H_LPmassscale"+self.yeartag]
+                self.H_LPmassscale[year] = data["H_HPmassscale"+self.yeartag]
+
 
                 self.fixParsSigMVV = data["fixParsSigMVV"]
                 self.fixParsSig = data["fixParsSig"]
@@ -207,7 +210,7 @@ class cuts():
 
 
             print " tagging cuts ",self.WPHPl1Wtag
-            selections = ["common","common_VV","common_VBF","NP","res","nonres","resTT","acceptance","acceptanceMJ","acceptanceMVV","acceptanceGEN","looseacceptanceMJ"]
+            selections = ["common","common_VV","common_VBF","NP","res","nonres","resT","resW","nonresT","resTnonresT","resWnonresT","resTresW","acceptance","acceptanceMJ","acceptanceMVV","acceptanceGEN","looseacceptanceMJ"]
             for sel in selections:
                 self.cuts[sel] = data["selection_cuts"][sel]
                 self.cuts[sel] = self.cuts[sel].replace("minMJ",str(self.minMJ))
