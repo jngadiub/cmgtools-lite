@@ -116,7 +116,7 @@ def dodCBFits(h1,mass,prefix,fixpars):
     func.plotOn(frame)
     frame.Draw()
    
-    c3.SaveAs("test3_M"+str(mass)+"_"+prefix+".pdf")
+    #c3.SaveAs("test3_M"+str(mass)+"_"+prefix+".pdf")
     del func,var
     return { "MEAN":params[0].getVal(), "SIGMA": params[1].getVal(), "ALPHA1": params[2].getVal(), "ALPHA2": params[3].getVal() , "N1": params[4].getVal(), "N2": params[5].getVal(),"MEANERR":params[0].getError(), "SIGMAERR": params[1].getError(), "ALPHA1ERR": params[2].getError(), "ALPHA2ERR": params[3].getError() , "N1ERR": params[4].getError(), "N2ERR": params[5].getError()}
     
