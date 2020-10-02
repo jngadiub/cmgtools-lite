@@ -294,7 +294,7 @@ class AllFunctions():
         if filename.find("gen")!=-1:
             cmd='vvMakeData.py -s "{template}" -d {data} -c "{cut}"  -o "{rootFile}" -v "jj_l1_gen_softDrop_mass,jj_l2_gen_softDrop_mass,jj_gen_partialMass" -b "{bins},{bins},{BINS}" -m "{mini},{mini},{MINI}" -M "{maxi},{maxi},{MAXI}" -f {factors} -n "{name}" {samples}'.format(template=template,cut=cut,rootFile=rootFile,BINS=self.binsMVV,bins=self.binsMJ,MINI=self.minMVV,MAXI=self.maxMVV,mini=self.minMJ,maxi=self.maxMJ,factors=factors,name=name,data=data,samples=sam)
         else:
-            cmd='vvMakeData.py -s "{template}" -d {data} -c "{cut}"  -o "{rootFile}" -v "jj_l1_softDrop_mass,jj_l2_softDrop_mass,jj_LV_mass" -b "{bins},{bins},{BINS}" -m "{mini},{mini},{MINI}" -M "{maxi},{maxi},{MAXI}" -f {factors} -n "{name}" {samples}'.format(template=template,cut=cut,rootFile=rootFile,BINS=self.binsMVV,bins=self.binsMJ,MINI=self.minMVV,MAXI=self.maxMVV,mini=self.minMJ,maxi=self.maxMJ,factors=factors,name=name,data=data,samples=sam)
+            cmd='vvMakeData.py -s "{template}" -d {data} -c "{cut}"  -o "{rootFile}" -v "jj_l1_softDrop_mass,jj_l2_softDrop_mass,jj_LV_mass" -b "{bins},{bins},{BINS}" -m "{mini},{mini},{MINI}" -M "{maxi},{maxi},{MAXI}" -f "{factors}" -n "{name}" {samples}'.format(template=template,cut=cut,rootFile=rootFile,BINS=self.binsMVV,bins=self.binsMJ,MINI=self.minMVV,MAXI=self.maxMVV,mini=self.minMJ,maxi=self.maxMJ,factors=factors,name=name,data=data,samples=sam)
         cmd=cmd+self.HCALbinsMVV
         print "going to execute command "+str(cmd)
         print " "
