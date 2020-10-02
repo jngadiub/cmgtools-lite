@@ -292,23 +292,23 @@ if options.run.find("all")!=-1 or options.run.find("pseudoVJETS")!=-1:
 if options.run.find("all")!=-1 or options.run.find("pseudoTT")!=-1:
     print " Do pseudodata with tt"
     from modules.submitJobs import makePseudoDataTT
-    for p in categories: makePseudoDataTT("results_"+str(period)+"/JJ_"+str(period)+"_TTJets_"+p+".root",
-					  "JJ_PDTT_%s.root"%p,ctx.lumi,
-                                          period,p)
+    for p in categories: makePseudoDataTT("results_"+filePeriod+"/JJ_"+filePeriod+"_TTJets_"+p+".root",
+					  "JJ_%s_PDTT_%s.root"%(filePeriod,p),ctx.lumi,
+                                          filePeriod,p)
 if options.run.find("all")!=-1 or options.run.find("pseudoNOQCD")!=-1:
     print " Do pseudodata with vjets & tt: DID YOU PRODUCE THE WORKSPACE BEFORE???"
     from modules.submitJobs import makePseudoDataNoQCD
-    for p in categories: makePseudoDataNoQCD("results_"+str(period)+"/JJ_all_"+str(period)+"_TTJets_"+p+".root",
-					       "JJ_PDnoQCD_%s.root"%p,ctx.lumi,
-					       "results_"+str(period)+"/workspace_JJ_BulkGWW_"+p+"_13TeV_"+str(period)+"_PrepPseudo.root",
-					       period,p)
+    for p in categories: makePseudoDataNoQCD("results_"+filePeriod+"/JJ_"+filePeriod+"_TTJets_"+p+".root",
+					       "JJ_%s_PDnoQCD_%s.root"%(filePeriod,p),ctx.lumi,
+					       "results_"+filePeriod+"/workspace_JJ_BulkGWW_"+p+"_13TeV_"+filePeriod+"_PrepPseudo.root",
+					       filePeriod,p)
 if options.run.find("all")!=-1 or options.run.find("pseudoALL")!=-1:
     print " Do pseudodata with vjets & tt: DID YOU PRODUCE THE WORKSPACE BEFORE???"
     from modules.submitJobs import makePseudoDataVjetsTT
     for p in categories: makePseudoDataVjetsTT("results_"+filePeriod+"/JJ_"+filePeriod+"_nonRes_%s.root"%p,
                                                "results_"+filePeriod+"/JJ_"+filePeriod+"_TTJets_"+p+".root",
 					       "results_"+filePeriod+"/save_new_shapes_"+filePeriod+"_pythia_%s_3D.root"%p,
-					       "pythia","JJ_PDALL_%s.root"%p,ctx.lumi,
+					       "pythia","JJ_%s_PDALL_%s.root"%(filePeriod,p),ctx.lumi,
 					       "results_"+filePeriod+"/workspace_JJ_BulkGWW_"+p+"_13TeV_"+filePeriod+"_PrepPseudo.root",
 					       period,p)
 
