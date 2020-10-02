@@ -41,7 +41,11 @@ def getBinning(binsMVV):
 sampleTypes=options.samples.split(',')
 
 dataPlotters=[]
-category=options.output.split("/")[-1].split(".")[0].split("_")[3]+"_"+options.output.split("/")[-1].split(".")[0].split("_")[4]
+if options.output.find('NP') !=-1: category = 'NP'
+elif options.output.find('control_region')!=-1:
+    if options.output.find('VH_NPHP'): category = 'VH_NPHP_control_region'
+    else: category = 'VH_HPNP_control_region'
+else: category=options.output.split("/")[-1].split(".")[0].split("_")[3]+"_"+options.output.split("/")[-1].split(".")[0].split("_")[4]
 print " cat ",category
 
 
