@@ -10,6 +10,8 @@ from CMGTools.VVResonances.plotting.tdrstyle import *
 setTDRStyle()
 from CMGTools.VVResonances.plotting.TreePlotter import TreePlotter
 from CMGTools.VVResonances.plotting.MergedPlotter import MergedPlotter
+sys.path.insert(0, "../interactive/")
+import cuts
 
 ROOT.gSystem.Load("libCMGToolsVVResonances")
 ROOT.gROOT.SetBatch(True)
@@ -261,59 +263,71 @@ sampleTypes=options.samples.split(',')
 
 
 print "Creating datasets for samples: " ,sampleTypes
-dataPlotters={}
-dataPlottersNW={}
-for filename in os.listdir(args[0]):
-    for sampleType in sampleTypes:
-        if filename.find(sampleType)!=-1:
-            fnameParts=filename.split('.')
-            fname=fnameParts[0]
-            ext=fnameParts[1]
-            if ext.find("root") ==-1: continue
-            dataPlotters[fname] = (TreePlotter(args[0]+'/'+fname+'.root','AnalysisTree'))
-            dataPlotters[fname].setupFromFile(args[0]+'/'+fname+'.pck')
-            dataPlotters[fname].addCorrectionFactor('xsec','tree')
-            dataPlotters[fname].addCorrectionFactor('genWeight','tree')
-            dataPlotters[fname].addCorrectionFactor('puWeight','tree')
-            if fname.find("QCD_Pt_") !=-1 or fname.find("QCD_HT") !=-1: 
-                print "going to apply spikekiller for ",fname
-                dataPlotters[fname].addCorrectionFactor('b_spikekiller','tree')
-            if filename.find("TT")!=-1:
-                #we consider ttbar with reweight applyied as nominal!
-                dataPlotters[fname].addCorrectionFactor('TopPTWeight','tree')
-            if options.triggerW:
-              dataPlotters[fname].addCorrectionFactor('triggerWeight','tree')
-              print "Using trigger weights from tree"
-            for w in weights_:
-	     if w != '': dataPlotters[fname].addCorrectionFactor(w,'branch')
-	    corrFactor = 1
-            if filename.find('Z') != -1:
-                corrFactor = options.corrFactorZ
-                print "add correction factor for Z+jets sample"
-            if filename.find('W') != -1:
-                corrFactor = options.corrFactorW
-                print "add correction factor for W+jets sample"
-            dataPlotters[fname].addCorrectionFactor(corrFactor,'flat') 
+list_dataPlotters = []
+list_dataPlottersNW=[]
 
-            dataPlotters[fname].filename=fname
-            dataPlottersNW[fname] = (TreePlotter(args[0]+'/'+fname+'.root','AnalysisTree'))
-            dataPlottersNW[fname].addCorrectionFactor('puWeight','tree')
-            dataPlottersNW[fname].addCorrectionFactor('genWeight','tree')
-            if fname.find("QCD_Pt_") !=-1 or fname.find("QCD_HT") !=-1:
-                print "going to apply spikekiller for ",fname
-                dataPlottersNW[fname].addCorrectionFactor('b_spikekiller','tree')
-            if options.triggerW: dataPlottersNW[fname].addCorrectionFactor('triggerWeight','tree')
-            dataPlottersNW[fname].addCorrectionFactor(corrFactor,'flat')
-            for w in weights_: 
-             if w != '': dataPlottersNW[fname].addCorrectionFactor(w,'branch')
-             if options.triggerW: dataPlottersNW[fname].addCorrectionFactor('triggerWeight','tree')
-            # for different background -> add reweighting of pT spectrum
-            #if filename.find("Jets")!=-1:
-                 #dataPlottersNW[fname].addCorrectionFactor("(1+ 0.00027272727*pow(jj_l1_gen_pt, 1) )*(1 + 0.00027272727 * pow(jj_l2_gen_pt, 1))","branch")
-                 #dataPlottersNW[fname].addCorrectionFactor("sqrt((1.05*pow(jj_l1_gen_pt, 1) )*(1.05 * pow(jj_l2_gen_pt, 1)))","branch")
-                 #dataPlottersNW[fname].addCorrectionFactor("(1+ pow(5500*jj_l1_gen_pt, 2) )*(1 + pow(5500*jj_l2_gen_pt, 2))","branch")
-            dataPlottersNW[fname].addCorrectionFactor(corrFactor,'flat')
-            dataPlottersNW[fname].filename=fname
+folders = str(args[0]).split(",")
+for folder in folders:
+    for filename in os.listdir(folder):
+        for sampleType in sampleTypes:
+            if filename.find(sampleType)!=-1:
+                if filename.find(".")==-1: continue
+                fnameParts=filename.split('.')
+                fname=fnameParts[0]
+                ext=fnameParts[1]
+                if ext.find("root") ==-1: continue
+                year=folder.split("/")[-2]
+                print "year ",year
+                ctx = cuts.cuts("init_VV_VH.json",year,"dijetbins_random")
+                luminosity=   ctx.lumi[year]/ctx.lumi["Run2"]
+                if options.output.find("Run2") ==-1: luminosity = 1
+                print " fraction of lumi ",luminosity
+                list_dataPlotters.append(TreePlotter(folder+'/'+fname+'.root','AnalysisTree'))
+                list_dataPlotters[-1].setupFromFile(folder+'/'+fname+'.pck')
+                list_dataPlotters[-1].addCorrectionFactor('xsec','tree')
+                list_dataPlotters[-1].addCorrectionFactor(luminosity,'flat')
+                list_dataPlotters[-1].addCorrectionFactor('genWeight','tree')
+                list_dataPlotters[-1].addCorrectionFactor('puWeight','tree')
+                if fname.find("QCD_Pt_") !=-1 or fname.find("QCD_HT") !=-1:
+                    print "going to apply spikekiller for ",fname
+                    list_dataPlotters[-1].addCorrectionFactor('b_spikekiller','tree')
+                if filename.find("TT")!=-1:
+                    #we consider ttbar with reweight applyied as nominal!
+                    list_dataPlotters[-1].addCorrectionFactor('TopPTWeight','tree')
+                if options.triggerW:
+                    list_dataPlotters[-1].addCorrectionFactor('triggerWeight','tree')
+                    print "Using trigger weights from tree"
+                for w in weights_:
+                    if w != '': list_dataPlotters[-1].addCorrectionFactor(w,'branch')
+                corrFactor = 1
+                if filename.find('Z') != -1:
+                    corrFactor = options.corrFactorZ
+                    print "add correction factor for Z+jets sample"
+                if filename.find('W') != -1:
+                    corrFactor = options.corrFactorW
+                    print "add correction factor for W+jets sample"
+                list_dataPlotters[-1].addCorrectionFactor(corrFactor,'flat')
+                list_dataPlotters[-1].filename=fname
+
+                list_dataPlottersNW.append(TreePlotter(folder+'/'+fname+'.root','AnalysisTree'))
+                list_dataPlottersNW[-1].addCorrectionFactor('puWeight','tree')
+                list_dataPlottersNW[-1].addCorrectionFactor('genWeight','tree')
+                list_dataPlottersNW[-1].addCorrectionFactor(luminosity,'flat')
+                if fname.find("QCD_Pt_") !=-1 or fname.find("QCD_HT") !=-1:
+                    print "going to apply spikekiller for ",fname
+                    list_dataPlottersNW[-1].addCorrectionFactor('b_spikekiller','tree')
+                if options.triggerW: list_dataPlottersNW[-1].addCorrectionFactor('triggerWeight','tree')
+                list_dataPlottersNW[-1].addCorrectionFactor(corrFactor,'flat')
+                for w in weights_:
+                    if w != '': list_dataPlottersNW[-1].addCorrectionFactor(w,'branch')
+                if options.triggerW: list_dataPlottersNW[-1].addCorrectionFactor('triggerWeight','tree')
+                # for different background -> add reweighting of pT spectrum
+                #if filename.find("Jets")!=-1:
+                #list_dataPlottersNW[-1].addCorrectionFactor("(1+ 0.00027272727*pow(jj_l1_gen_pt, 1) )*(1 + 0.00027272727 * pow(jj_l2_gen_pt, 1))","branch")
+                #list_dataPlottersNW[-1].addCorrectionFactor("sqrt((1.05*pow(jj_l1_gen_pt, 1) )*(1.05 * pow(jj_l2_gen_pt, 1)))","branch")
+                #list_dataPlottersNW[-1].addCorrectionFactor("(1+ pow(5500*jj_l1_gen_pt, 2) )*(1 + pow(5500*jj_l2_gen_pt, 2))","branch")
+                list_dataPlottersNW[-1].addCorrectionFactor(corrFactor,'flat')
+                list_dataPlottersNW[-1].filename=fname
       
 
 
@@ -333,16 +347,8 @@ maxEvents = -1
 
 #Nominal histogram Pythia:
 #here pick the right plotters!
-print dataPlotters
-list_dataPlotters = []
-list_dataPlottersNW=[]
-keys = dataPlotters.keys()
-
-for k in keys:
-    if k.find("TT")!=-1 or k.find("WJets")!=-1 or k.find("ZJets")!=-1:
-        list_dataPlotters.append(dataPlotters[k])
-        if k.find("TT")!=-1: list_dataPlottersNW.append(dataPlottersNW[k])
 print list_dataPlotters
+print list_dataPlottersNW
 if len(list_dataPlotters) > 0:
     for plotter in list_dataPlotters:
         print "make shapes for Vjets or TTbar"
@@ -359,12 +365,12 @@ if len(list_dataPlottersNW) > 0:
             
 print " ********** Done making hist now do the fit ******************"
 
-finalFit = doFit(mvv_nominal,((options.output).split("_")[-1]).split(".")[0])
+finalFit = doFit(mvv_nominal,((options.output).split("_")[2]).split(".")[0])
 
 
 print "************************ do debugging plots *******************"
 
-doPlot(mvv_nominal,finalFit,sampleTypes,((options.output).split("_")[1]).split(".")[0],mvv_nominal_w)
+doPlot(mvv_nominal,finalFit,sampleTypes,((options.output).split("_")[2]).split(".")[0]+"_"+((options.output).split("_")[1]).split(".")[0],mvv_nominal_w)
 
 print " **************************** write fit to json ***************"
 print " open json file ",options.output
@@ -376,12 +382,12 @@ json.dump(parametrization,f)
 if options.samples.find("TT")!=-1: 
     print " ********** Making fit without reweight  ******************"
 
-    noreweightFit = doFit(mvv_nominal_w,((options.output).split("_")[-1]).split(".")[0])
+    noreweightFit = doFit(mvv_nominal_w,((options.output).split("_")[2]).split(".")[0])
 
 
     print "************************ do plots *******************"
 
-    doPlot(mvv_nominal,noreweightFit,sampleTypes,((options.output).split("_")[1]).split(".")[0]+"_noreweight",mvv_nominal_w)
+    doPlot(mvv_nominal,noreweightFit,sampleTypes,((options.output).split("_")[2]).split(".")[0]+"_"+((options.output).split("_")[1]).split(".")[0]+"_noreweight",mvv_nominal_w)
 
     print " **************************** write fit to json ***************"
     jsonname="noreweight_"+options.output
