@@ -59,9 +59,9 @@ lumi = ctx.lumi #{'2016':ctx16.lumi["2016"],'2017':ctx17.lumi["2017"], '2018':ct
 lumi_unc = ctx.lumi_unc #{'2016':ctx16.lumi_unc,'2017':ctx17.lumi_unc, '2018':ctx18.lumi_unc}
 
 if pseudodata == False:
-  print "how to access scales need to be fixed!!"
-  scales = {"2017" :[ctx17.W_HPmassscale,ctx17.W_LPmassscale], "2016":[ctx16.W_HPmassscale,ctx16.W_LPmassscale], "2018":[ctx18.W_HPmassscale,ctx18.W_LPmassscale]}
-  scalesHiggs = {"2017" :[ctx17.H_HPmassscale,ctx17.H_LPmassscale], "2016":[ctx16.H_HPmassscale,ctx16.H_LPmassscale], "2018":[ctx18.H_HPmassscale,ctx18.H_LPmassscale]}
+  print "how to access scales need to be fixed!!" #now it should be fixed how we read them from cuts, but not how we use them in datacard
+  scales = [ctx.W_HPmassscale,ctx.W_LPmassscale]
+  scalesHiggs = [ctx.H_HPmassscale,ctx.H_LPmassscale]
 
 
 #quick fix to add VH !!!
@@ -159,22 +159,22 @@ for sig in signals:
         scaleData=lumi[dataset]
       elif pseudodata=="True":
         print "Using pseudodata with all backgrounds (QCD, V+jets and tt+jets)"
-        rootFileData = resultsDir[dataset]+"/JJ_PDALL_"+p+".root"
+        rootFileData = resultsDir[dataset]+"/JJ_%s_PDALL_"+p+".root"%(dataset)
         histName="data"
         scaleData=1.0
       elif pseudodata=="ttjets":
         print "Using pseudodata with only tt+jets backgrounds"
-        rootFileData = resultsDir[dataset]+"/JJ_TTJets_"+p+".root"
+        rootFileData = resultsDir[dataset]+"/JJ_%s_TTJets_"+p+".root"%(dataset)
         histName="data_obs"
         scaleData=1.0
       elif pseudodata=="noqcd":
         print "Using pseudodata with only tt+jets backgrounds and no qcd"
-        rootFileData = resultsDir[dataset]+"/JJ_PDnoQCD_"+p+".root"
+        rootFileData = resultsDir[dataset]+"/JJ_%s_PDnoQCD_"+p+".root"%(dataset)
         histName="data"
         scaleData=1.0
       elif pseudodata=="ttbar":
         print "Using pseudodata with only tt backgrounds"
-        rootFileData = resultsDir[dataset]+"/JJ_PDTT_"+p+".root"
+        rootFileData = resultsDir[dataset]+"/JJ_%s_PDTT_"+p+".root"%(dataset)
         histName="data"
         scaleData=1.0
       elif pseudodata==sig:
