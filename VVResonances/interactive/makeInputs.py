@@ -237,10 +237,11 @@ if options.run.find("all")!=-1 or options.run.find("qcd")!=-1:
 
   
 
-if options.run.find("all")!=-1 or options.run.find("fits")!=-1 or options.run.find("All")!=-1:
+if options.run.find("all")!=-1 or options.run.find("vjets")!=-1:
     print "for V+jets"
-    print "first we fit"
-    f.fitVJets("JJ_"+filePeriod+"_WJets",resTemplate,1.,1.)
+    if options.run.find("all")!=-1 or options.run.find("fits")!=-1 or options.run.find("All")!=-1:
+        print "first we fit"
+        f.fitVJets("JJ_"+filePeriod+"_WJets",resTemplate,1.,1.)
     wait=False
     if options.batch == True : wait=True 
     if options.run.find("all")!=-1 or options.run.find("kernel")!=-1 or options.run.find("All")!=-1:
@@ -264,29 +265,17 @@ if options.run.find("all")!=-1 or options.run.find("fits")!=-1 or options.run.fi
 
 if options.run.find("all")!=-1 or options.run.find("tt")!=-1:
     print " NB !! TTBAR MJJ NOT YET UPDATED!!"
+    print "first we fit"
     f.fitTT   ("JJ_%s_TTJets"%(filePeriod),TTemplate,1.,)
     wait=False
     if options.batch == True : wait=True
-    print "resT"
-    f.makeMinorBkgShapesMVV("TTJets","JJ_resT"+filePeriod,TTemplate,ctx.cuts['resTT'],'resTT')
-    f.makeNormalizations("TTJets","JJ_resT"+filePeriod,TTemplate,0,ctx.cuts['resTT'],"nResTT",options.single,"")
-    print "resW"
-    f.makeMinorBkgShapesMVV("TTJets","JJ_resW"+filePeriod,TTemplate,ctx.cuts['resTT_W'],'resW')
-    f.makeNormalizations("TTJets","JJ_resW"+filePeriod,TTemplate,0,ctx.cuts['resTT_W'],"nResTT",options.single,"")
-    print "nonres"
-    f.makeMinorBkgShapesMVV("TTJets","JJ_nonresT"+filePeriod,TTemplate,ctx.cuts['nonresTT'],'nonresTT')
-    f.makeNormalizations("TTJets","JJ_nonresT"+filePeriod,TTemplate,0,ctx.cuts['nonresTT'],"nResTT",options.single,"")
-    print "resTresW"
-    f.makeMinorBkgShapesMVV("TTJets","JJ_resTresW"+filePeriod,TTemplate,ctx.cuts['resTresW'],'resTresW')
-    f.makeNormalizations("TTJets","JJ_resTresW"+filePeriod,TTemplate,0,ctx.cuts['resTresW'],"nResTT",options.single,"")
-    print "resTnonresT"
-    f.makeMinorBkgShapesMVV("TTJets","JJ_resTnonresT"+filePeriod,TTemplate,ctx.cuts['resTnonresT'],'resTnonresT')
-    f.makeNormalizations("TTJets","JJ_resTnonresT"+filePeriod,TTemplate,0,ctx.cuts['resTnonresT'],"nResTT",options.single,"")
-    print "resWnonresT"
-    f.makeMinorBkgShapesMVV("TTJets","JJ_resWnonresT"+filePeriod,TTemplate,ctx.cuts['resWnonresT'],'resWnonresT')
-    f.makeNormalizations("TTJets","JJ_resWnonresT"+filePeriod,TTemplate,0,ctx.cuts['resWnonresT'],"nResTT",options.single,"")
     print "make norm for all contributions of ttbar together"
     f.makeNormalizations("TTJets","JJ_"+filePeriod,TTemplate,0,ctx.cuts['nonres'],"nResTT",options.single,"")
+    contrib =["resT","resW","nonresT","resTnonresT","resWnonresT","resTresW"]
+    for con in contrib:
+        print " ***************************         "+con+"      ******************************"
+        f.makeMinorBkgShapesMVV("TTJets"+con,"JJ_"+filePeriod,TTemplate,ctx.cuts[con],con)
+        f.makeNormalizations("TTJets"+con,"JJ_"+filePeriod,TTemplate,0,ctx.cuts[con],"nResTT",options.single,"")
 
 
 if options.run.find("all")!=-1 or options.run.find("data")!=-1:
