@@ -52,20 +52,19 @@ if outlabel.find("sigonly")!=-1 or outlabel.find("Vjetsonly")!=-1: sf_qcd = 0.00
 # vtag uncertainty is added through the migrationunc.json file 
 # all other uncertainties and SF from one place: defined in init_VV_VH.json imported via the class defined in cuts.py
 ctx = cuts.cuts("init_VV_VH.json",options.period,"dijetbins_random")
-#ctx17 = cuts.cuts("init_VV_VH.json","2017","dijetbins_random")
-#ctx18 = cuts.cuts("init_VV_VH.json","2018","dijetbins_random")
 
-lumi = ctx.lumi #{'2016':ctx16.lumi["2016"],'2017':ctx17.lumi["2017"], '2018':ctx18.lumi}
-lumi_unc = ctx.lumi_unc #{'2016':ctx16.lumi_unc,'2017':ctx17.lumi_unc, '2018':ctx18.lumi_unc}
+lumi = ctx.lumi
+lumi_unc = ctx.lumi_unc
 
-if pseudodata == False:
-  print "how to access scales need to be fixed!!" #now it should be fixed how we read them from cuts, but not how we use them in datacard
+scales = [1.,1.]
+scalesHiggs = [1.,1.]
+if pseudodata == "False":
   scales = [ctx.W_HPmassscale,ctx.W_LPmassscale]
   scalesHiggs = [ctx.H_HPmassscale,ctx.H_LPmassscale]
 
 
 #quick fix to add VH !!!
-vtag_pt_dependence = ctx.vtag_pt_dependence #{"2016" : ctx.vtag_pt_dependence["2016"],"2017" : ctx.vtag_pt_dependence["2017"],"2018" : ctx.vtag_pt_dependence["2018"]}
+vtag_pt_dependence = ctx.vtag_pt_dependence
 
 
 

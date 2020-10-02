@@ -13,11 +13,11 @@ class cuts():
     HPSF_htag = {}                                
     LPSF_htag = {}                                
                                                   
-    W_LPmassscale = {}                                
-    W_HPmassscale = {}
+    W_LPmassscale = 1.
+    W_HPmassscale = 1.
                   
-    H_LPmassscale = {}
-    H_HPmassscale = {}
+    H_LPmassscale = 1.
+    H_HPmassscale = 1.
                                                   
     minMJ = 0.                                    
     maxMJ = 0.                                    
@@ -130,11 +130,11 @@ class cuts():
                  
 
 
-            self.W_HPmassscale["Run2"] = data["W_LPmassscale"+self.yeartag]
-            self.W_LPmassscale["Run2"] = data["W_HPmassscale"+self.yeartag]
+                self.W_HPmassscale = data["W_HPmassscale"+self.yeartag]
+                self.W_LPmassscale = data["W_LPmassscale"+self.yeartag]
 
-            self.H_HPmassscale["Run2"] = data["H_LPmassscale"+self.yeartag]
-            self.H_LPmassscale["Run2"] = data["H_HPmassscale"+self.yeartag]
+                self.H_HPmassscale = data["H_HPmassscale"+self.yeartag]
+                self.H_LPmassscale = data["H_LPmassscale"+self.yeartag]
 
             self.vtag_pt_dependence["Run2"] = data["vtag_pt_dependence"+self.yeartag]
             self.lumi["Run2"] =  data["lumi"+self.yeartag]
@@ -155,10 +155,6 @@ class cuts():
                 self.H_tag_unc_HP[year] = data["H_tag_unc_HP"][str(year)]
                 self.H_tag_unc_LP[year] = data["H_tag_unc_LP"][str(year)]
 
-                self.W_HPmassscale[year] = data["W_LPmassscale"+self.yeartag]
-                self.W_LPmassscale[year] = data["W_HPmassscale"+self.yeartag]
-                self.H_HPmassscale[year] = data["H_LPmassscale"+self.yeartag]
-                self.H_LPmassscale[year] = data["H_HPmassscale"+self.yeartag]
 
 
                 self.fixParsSigMVV = data["fixParsSigMVV"]
@@ -191,6 +187,11 @@ class cuts():
                     self.WPLPl2Wtag = data["tagging_variables_and_wp"]["l2Wtag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Wtag"+self.yeartag])
                     self.WPHPl2Htag = data["tagging_variables_and_wp"]["l2Htag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Htag"+self.yeartag])
                     self.WPLPl2Htag = data["tagging_variables_and_wp"]["l2Htag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Htag"+self.yeartag])
+
+                    self.W_HPmassscale = data["W_HPmassscale"+self.yeartag]
+                    self.W_LPmassscale = data["W_LPmassscale"+self.yeartag]
+                    self.H_HPmassscale = data["H_HPmassscale"+self.yeartag]
+                    self.H_LPmassscale = data["H_LPmassscale"+self.yeartag]
 
 
                 self.catVtag['HP1'] =  '('+ self.varl1Wtag +'>'+ self.WPHPl1Wtag +')'

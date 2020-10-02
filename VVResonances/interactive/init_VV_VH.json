@@ -29,6 +29,7 @@
     "W_HPmassscale17" : 0.983,
     "W_HPmassscale18" : 1.0,
     "W_HPmassscale161718" : 1.0,
+    "W_LPmassscale161718" : 1.0,
     
     "H_LPmassscale16" : 1.086,
     "H_LPmassscale17" : 1.08,
@@ -37,6 +38,7 @@
     "H_HPmassscale17" : 0.983,
     "H_HPmassscale18" : 1.0,
     "H_HPmassscale161718" : 1.0,
+    "H_LPmassscale161718" : 1.0,
     
     
     "ranges_and_binning" : {
