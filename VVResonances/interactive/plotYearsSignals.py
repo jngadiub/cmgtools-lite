@@ -448,19 +448,17 @@ def doJetMass(leg,signal,titles,years):
                 
 if __name__ == '__main__':
 
-#    signals = ["BulkGZZ","WprimeWZ","BulkGWW","ZprimeWW","ZprimeZH","WprimeWH"]
-#    legs = ["G_{bulk} #rightarrow ZZ","W' #rightarrow WZ","G_{bulk} #rightarrow WW","Z'#rightarrow WW","Z'#rightarrow ZH","W'#rightarrow WH"]                                               
-    signals = ["BulkGWW","ZprimeZH"]
-    legs = ["G_{bulk} #rightarrow WW","Z'#rightarrow ZH"]                                                                                                                                                     
+    signals = ["BulkGZZ","WprimeWZ","BulkGWW","ZprimeWW","ZprimeZH","WprimeWH"]
+    legs = ["G_{bulk} #rightarrow ZZ","W' #rightarrow WZ","G_{bulk} #rightarrow WW","Z'#rightarrow WW","Z'#rightarrow ZH","W'#rightarrow WH"]
+#    signals = ["BulkGWW","ZprimeZH"]
+#    legs = ["G_{bulk} #rightarrow WW","Z'#rightarrow ZH"]
 #    signals = ["ZprimeZH"]
-#    legs = ["Z'#rightarrow ZH"]                                                                                                                                                     
-
-
+#    legs = ["Z'#rightarrow ZH"]
 #    signals = ["BulkGWW"] 
 #    legs = ["G_{bulk} #rightarrow WW"] 
+
     years = ["2016","2017","2018","Run2"]    
     for i in range(len(signals)):
-#    for i in range(1):
       print i
       print signals[i]
       print legs[i]
