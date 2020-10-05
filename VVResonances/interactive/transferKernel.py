@@ -109,18 +109,18 @@ def conditional(hist):
             hist.SetBinContent(j,i,hist.GetBinContent(j,i)/integral)
 
 
-def merge_all():
- fin_herwig_mjj = ROOT.TFile.Open('save_new_shapes_%s_herwig_%s_1D.root'%(options.year,purity),'READ') 
+def merge_all(dataset):
+ fin_herwig_mjj = ROOT.TFile.Open('save_new_shapes_%s_herwig_%s_1D.root'%(dataset,purity),'READ')
  histo_altshapeUp_mjj = fin_herwig_mjj.histo_nominal
  histo_altshapeUp_mjj.SetName('histo_altshapeUp')
  histo_altshapeUp_mjj.SetTitle('histo_altshapeUp')
 
- fin_madgraph_mjj = ROOT.TFile.Open('save_new_shapes_%s_madgraph_%s_1D.root'%(options.year,purity),'READ')
+ fin_madgraph_mjj = ROOT.TFile.Open('save_new_shapes_%s_madgraph_%s_1D.root'%(dataset,purity),'READ')
  histo_altshape2Up_mjj = fin_madgraph_mjj.histo_nominal
  histo_altshape2Up_mjj.SetName('histo_altshape2Up')
  histo_altshape2Up_mjj.SetTitle('histo_altshape2Up')
  
- fin_pythia_mjj = ROOT.TFile.Open('save_new_shapes_%s_pythia_%s_1D.root'%(options.year,purity),'UPDATE')
+ fin_pythia_mjj = ROOT.TFile.Open('save_new_shapes_%s_pythia_%s_1D.root'%(dataset,purity),'UPDATE')
  histo_nominal = fin_pythia_mjj.histo_nominal
  histo_altshapeUp_mjj.Write('histo_altshapeUp')
  histo_altshapeDown_mjj = mirror(histo_altshapeUp_mjj,histo_nominal,"histo_altshapeDown")
@@ -138,17 +138,17 @@ def merge_all():
  fin_madgraph_mjj.Close()
  fin_herwig_mjj.Close()
  
- fin_herwig_l1 = ROOT.TFile.Open('save_new_shapes_%s_herwig_%s_COND2D_l1.root'%(options.year,purity),'READ') 
+ fin_herwig_l1 = ROOT.TFile.Open('save_new_shapes_%s_herwig_%s_COND2D_l1.root'%(dataset,purity),'READ')
  histo_altshapeUp_l1 = fin_herwig_l1.histo_nominal
  histo_altshapeUp_l1.SetName('histo_altshapeUp')
  histo_altshapeUp_l1.SetTitle('histo_altshapeUp')
  
- fin_madgraph_l1 = ROOT.TFile.Open('save_new_shapes_%s_madgraph_%s_COND2D_l1.root'%(options.year,purity),'READ')
+ fin_madgraph_l1 = ROOT.TFile.Open('save_new_shapes_%s_madgraph_%s_COND2D_l1.root'%(dataset,purity),'READ')
  histo_altshape2Up_l1 = fin_madgraph_l1.histo_nominal
  histo_altshape2Up_l1.SetName('histo_altshape2Up')
  histo_altshape2Up_l1.SetTitle('histo_altshape2Up')
  
- fin_pythia_l1 = ROOT.TFile.Open('save_new_shapes_%s_pythia_%s_COND2D_l1.root'%(options.year,purity),'UPDATE')
+ fin_pythia_l1 = ROOT.TFile.Open('save_new_shapes_%s_pythia_%s_COND2D_l1.root'%(dataset,purity),'UPDATE')
  histo_nominal = fin_pythia_l1.histo_nominal
  histo_altshapeUp_l1.Write('histo_altshapeUp')
  histo_altshapeDown_l1 = mirror(histo_altshapeUp_l1,histo_nominal,"histo_altshapeDown",2)
@@ -168,17 +168,17 @@ def merge_all():
  fin_madgraph_l1.Close()
  fin_herwig_l1.Close()
  
- fin_herwig_l2 = ROOT.TFile.Open('save_new_shapes_%s_herwig_%s_COND2D_l2.root'%(options.year,purity),'READ') 
+ fin_herwig_l2 = ROOT.TFile.Open('save_new_shapes_%s_herwig_%s_COND2D_l2.root'%(dataset,purity),'READ')
  histo_altshapeUp_l2 = fin_herwig_l2.histo_nominal
  histo_altshapeUp_l2.SetName('histo_altshapeUp')
  histo_altshapeUp_l2.SetTitle('histo_altshapeUp')
  
- fin_madgraph_l2 = ROOT.TFile.Open('save_new_shapes_%s_madgraph_%s_COND2D_l2.root'%(options.year,purity),'READ')
+ fin_madgraph_l2 = ROOT.TFile.Open('save_new_shapes_%s_madgraph_%s_COND2D_l2.root'%(dataset,purity),'READ')
  histo_altshape2Up_l2 = fin_madgraph_l2.histo_nominal
  histo_altshape2Up_l2.SetName('histo_altshape2Up')
  histo_altshape2Up_l2.SetTitle('histo_altshape2Up')
  
- fin_pythia_l2 = ROOT.TFile.Open('save_new_shapes_%s_pythia_%s_COND2D_l2.root'%(options.year,purity),'UPDATE')
+ fin_pythia_l2 = ROOT.TFile.Open('save_new_shapes_%s_pythia_%s_COND2D_l2.root'%(dataset,purity),'UPDATE')
  histo_nominal = fin_pythia_l2.histo_nominal
  histo_altshapeUp_l2.Write('histo_altshapeUp')
  histo_altshapeDown_l2 = mirror(histo_altshapeUp_l2,histo_nominal,"histo_altshapeDown",2)
@@ -201,7 +201,7 @@ def merge_all():
  inputx=fin_pythia_l1.GetName()
  inputy=fin_pythia_l2.GetName()
  inputz=fin_pythia_mjj.GetName()     
- rootFile="save_new_shapes_%s_pythia_"%options.year+purity+"_3D.root"
+ rootFile="save_new_shapes_%s_pythia_"%dataset+purity+"_3D.root"
    
  print "Reading " ,inputx
  print "Reading " ,inputy
@@ -265,7 +265,7 @@ def save_shape(final_shape,norm_nonres,pTools,sample="pythia"):
     
     for zk,zv in pTools.zBins_redux.iteritems(): histo_z.Fill(zv,lv_z[zk-1]*norm_nonres[0])    
        
-    fout_z = ROOT.TFile.Open('save_new_shapes_%s_%s_%s_1D.root'%(options.year,sample,purity),'RECREATE')
+    fout_z = ROOT.TFile.Open('save_new_shapes_%s_%s_%s_1D.root'%(dataset,sample,purity),'RECREATE')
     fout_z.cd()
     histo_z.Scale(1./histo_z.Integral())
     histo_z.SetTitle('histo_nominal')
@@ -294,7 +294,7 @@ def save_shape(final_shape,norm_nonres,pTools,sample="pythia"):
         
     fout_z.Close()
     
-    fout_xz = ROOT.TFile.Open('save_new_shapes_%s_%s_%s_COND2D_l1.root'%(options.year,sample,purity),'RECREATE')
+    fout_xz = ROOT.TFile.Open('save_new_shapes_%s_%s_%s_COND2D_l1.root'%(dataset,sample,purity),'RECREATE')
     fout_xz.cd()  
     conditional(histo_xz)
     histo_xz.SetTitle('histo_nominal')
@@ -327,7 +327,7 @@ def save_shape(final_shape,norm_nonres,pTools,sample="pythia"):
         
     fout_xz.Close()
     
-    fout_yz = ROOT.TFile.Open('save_new_shapes_%s_%s_%s_COND2D_l2.root'%(options.year,sample,purity),'RECREATE')
+    fout_yz = ROOT.TFile.Open('save_new_shapes_%s_%s_%s_COND2D_l2.root'%(dataset,sample,purity),'RECREATE')
     fout_yz.cd()  
     conditional(histo_yz)
     histo_yz.SetTitle('histo_nominal')
@@ -364,7 +364,7 @@ def save_shape(final_shape,norm_nonres,pTools,sample="pythia"):
      inputx=fout_xz.GetName()
      inputy=fout_yz.GetName()
      inputz=fout_z.GetName()     
-     rootFile="save_new_shapes_%s_%s_"%(options.year,sample)+purity+"_3D.root"
+     rootFile="save_new_shapes_%s_%s_"%(dataset,sample)+purity+"_3D.root"
    
      print "Reading " ,inputx
      print "Reading " ,inputy
@@ -402,26 +402,10 @@ def makeNonResCard():
  print "lumi unc",lumi_unc 
  vtag_pt_dependence = ctx.vtag_pt_dependence
  print " vtag_pt_dependence ",vtag_pt_dependence
+ vtag_pt_dependence = {'VV_HPHP':'((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))','VV_HPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))','VH_HPHP':'1','VH_HPLP':'1','VH_LPHP':'1','VH_LPLP':'1'}
  
-
-
- scales = {"2017" :[0.983,1.08], "2016":[1.014,1.086],"2018":[1,1]}
- scalesHiggs = {"2017" :[1.,1.], "2016":[1.,1.],"2018":[1,1]}
-
- vtag_unc = {'VV_HPHP':{},'VV_HPLP':{},'VV_LPLP':{},'VH_HPHP':{},'VH_HPLP':{},'VH_LPHP':{}, 'VV_etraLP':{}}
- vtag_unc['VV_HPHP'] = {'2016':'1.232/0.792','2017':'1.269/0.763'}
- vtag_unc['VV_HPLP'] = {'2016':'0.882/1.12','2017':'0.866/1.136'}    
- vtag_unc['VV_LPLP'] = {'2016':'1.063','2017':'1.043'}
- vtag_unc['VV_extraLP'] = {'2016':'1.063','2017':'1.043'}
-
- vtag_unc['VBF_VV_HPHP'] = {'2016':'1.232/0.792','2017':'1.269/0.763'}
- vtag_unc['VBF_VV_HPLP'] = {'2016':'0.882/1.12','2017':'0.866/1.136'}
- vtag_unc['VBF_VV_LPLP'] = {'2016':'1.063','2017':'1.043'}
-
- #this is a quick fix! these values are wrong!!
- vtag_unc['VH_HPHP'] = {'2016':'1.232/0.792','2017':'1.269/0.763'}
- vtag_unc['VH_HPLP'] = {'2016':'0.882/1.12','2017':'0.866/1.136'}    
- vtag_unc['VH_LPHP'] = {'2016':'1.063','2017':'1.043'}
+ scales = [ctx.W_HPmassscale,ctx.W_LPmassscale]
+ scalesHiggs = [ctx.H_HPmassscale,ctx.H_LPmassscale]
 
 
  DTools = DatacardTools(scales,scalesHiggs,vtag_pt_dependence,lumi_unc,1.0,"","",doCorrelation)
@@ -434,7 +418,7 @@ def makeNonResCard():
       
 # DTools.AddSignal(card,dataset,purity,sig,'results_2016',0)
  print "Adding Signal"
- DTools.AddSignal(card,dataset,purity,sig,'results_%s'%options.year,0)
+ DTools.AddSignal(card,dataset,purity,sig,'results_%s'%dataset,0)
  print "Signal Added !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
  hname = 'histo'
  if options.sample!='pythia': hname+=('_'+options.sample)
@@ -486,7 +470,9 @@ if __name__=="__main__":
      #  os.mkdir(options.output)     
 
      #################################################
-                              
+     if options.year.find(",")!=-1: dataset ="Run2"
+     print dataset
+
      finMC = ROOT.TFile(options.input,"READ");
      hinMC = finMC.Get("nonRes");
      purity = ''
@@ -508,7 +494,7 @@ if __name__=="__main__":
       sys.exit()  
      print "Using purity: " ,purity    
      if options.merge:
-      merge_all()
+      merge_all(dataset)
       sys.exit()       
 
      print " ########################       makeNonResCard      ###"
@@ -569,9 +555,9 @@ if __name__=="__main__":
      args  = model.getComponents()
      print "model ",model.Print()
      print "args = model components ",args.Print()
-     pdfName = "pdf_binJJ_"+purity+"_13TeV_%s_bonly"%options.year
+     pdfName = "pdf_binJJ_"+purity+"_13TeV_%s_bonly"%dataset
      print "pdfName ",pdfName 
-     print "Expected number of QCD events:",(args[pdfName].getComponents())["n_exp_binJJ_"+purity+"_13TeV_%s_proc_nonRes"%options.year].getVal()
+     print "Expected number of QCD events:",(args[pdfName].getComponents())["n_exp_binJJ_"+purity+"_13TeV_%s_proc_nonRes"%dataset].getVal()
     
      #################################################
      print "###########        Fitting:            ################"
@@ -586,11 +572,11 @@ if __name__=="__main__":
             
      print 
      print "Prefit nonRes pdf:"
-     pdf_nonres_shape_prefit = args["nonResNominal_JJ_"+purity+"_13TeV_%s"%options.year]
+     pdf_nonres_shape_prefit = args["nonResNominal_JJ_"+purity+"_13TeV_%s"%dataset]
      pdf_nonres_shape_prefit.Print()
      print
      print "Postfit nonRes pdf:"
-     pdf_nonres_shape_postfit  = args["shapeBkg_nonRes_JJ_"+purity+"_13TeV_%s"%options.year]
+     pdf_nonres_shape_postfit  = args["shapeBkg_nonRes_JJ_"+purity+"_13TeV_%s"%dataset]
      pdf_nonres_shape_postfit.Print()
      pdf_nonres_shape_postfit.funcList().Print()
      pdf_nonres_shape_postfit.coefList().Print()
@@ -625,18 +611,18 @@ if __name__=="__main__":
       
      print
     
-     norm = (args["pdf_binJJ_"+purity+"_13TeV_%s_bonly"%options.year].getComponents())["n_exp_binJJ_"+purity+"_13TeV_%s_proc_nonRes"%options.year].getVal()
+     norm = (args["pdf_binJJ_"+purity+"_13TeV_%s_bonly"%dataset].getComponents())["n_exp_binJJ_"+purity+"_13TeV_%s_proc_nonRes"%dataset].getVal()
      print "norm after fit "+str(norm)
           
      #################################################
-     (args[pdfName].getComponents())["n_exp_binJJ_"+purity+"_13TeV_%s_proc_nonRes"%options.year].dump()     
+     (args[pdfName].getComponents())["n_exp_binJJ_"+purity+"_13TeV_%s_proc_nonRes"%dataset].dump()
      norm_nonres = [0,0]
-     norm_nonres[0] = (args["pdf_binJJ_"+purity+"_13TeV_%s_bonly"%options.year].getComponents())["n_exp_binJJ_"+purity+"_13TeV_%s_proc_nonRes"%options.year].getVal()
-     norm_nonres[1] = (args["pdf_binJJ_"+purity+"_13TeV_%s_bonly"%options.year].getComponents())["n_exp_binJJ_"+purity+"_13TeV_%s_proc_nonRes"%options.year].getPropagatedError(fitresult)
+     norm_nonres[0] = (args["pdf_binJJ_"+purity+"_13TeV_%s_bonly"%dataset].getComponents())["n_exp_binJJ_"+purity+"_13TeV_%s_proc_nonRes"%dataset].getVal()
+     norm_nonres[1] = (args["pdf_binJJ_"+purity+"_13TeV_%s_bonly"%dataset].getComponents())["n_exp_binJJ_"+purity+"_13TeV_%s_proc_nonRes"%dataset].getPropagatedError(fitresult)
      print "QCD normalization after fit",norm_nonres[0],"+/-",norm_nonres[1]
      #################################################     
      save_shape(pdf_nonres_shape_postfit,norm_nonres,Tools,options.sample)
-     nevents = {"nonRes": [(args["pdf_binJJ_"+purity+"_13TeV_%s_bonly"%options.year].getComponents())["n_exp_binJJ_"+purity+"_13TeV_%s_proc_nonRes"%options.year], (args["pdf_binJJ_"+purity+"_13TeV_%s_bonly"%options.year].getComponents())["n_exp_binJJ_"+purity+"_13TeV_%s_proc_nonRes"%options.year].getPropagatedError(fitresult)]}
+     nevents = {"nonRes": [(args["pdf_binJJ_"+purity+"_13TeV_%s_bonly"%dataset].getComponents())["n_exp_binJJ_"+purity+"_13TeV_%s_proc_nonRes"%dataset], (args["pdf_binJJ_"+purity+"_13TeV_%s_bonly"%dataset].getComponents())["n_exp_binJJ_"+purity+"_13TeV_%s_proc_nonRes"%dataset].getPropagatedError(fitresult)]}
 
      forplotting = Postfitplotter(parser,"","BulkGWW",options.sample+"_"+purity)
      #make projections onto MJJ axis 
