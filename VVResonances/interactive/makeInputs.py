@@ -262,7 +262,6 @@ if options.run.find("all")!=-1 or options.run.find("vjets")!=-1:
 
 
 if options.run.find("all")!=-1 or options.run.find("tt")!=-1:
-    print " NB !! TTBAR MJJ NOT YET UPDATED!!"
     print "first we fit"
     f.fitTT   ("JJ_%s_TTJets"%(filePeriod),TTemplate,1.,)
     wait=False
