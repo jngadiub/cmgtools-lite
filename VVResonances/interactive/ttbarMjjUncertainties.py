@@ -26,7 +26,7 @@ def CalculateUnc(p1,p2):
 
 if __name__=="__main__":
 
-    year='2016'
+    year='Run2'
     directory='results_'+year
     ttbarComponents=['nonresT','resT','resTnonresT','resTresW','resW','resWnonresT']
     #categories=["VV_HPHP","VV_HPLP","VH_HPHP","VH_LPHP","VH_HPLP"]
@@ -34,8 +34,8 @@ if __name__=="__main__":
     for c in categories:
         unc = {}
         for t in ttbarComponents:
-            c3w = getParameterFromJson(directory+'/JJ_'+t+year+'_TTJets_MVV_'+c+'.json',"c3")
-            c3 = getParameterFromJson(directory+'/noreweight_JJ_'+t+year+'_TTJets_MVV_'+c+'.json',"c3")
+            c3w = getParameterFromJson(directory+'/JJ_'+year+'_TTJets'+t+'_MVV_'+c+'.json',"c3")
+            c3 = getParameterFromJson(directory+'/noreweight_JJ_'+year+'_TTJets'+t+'_MVV_'+c+'.json',"c3")
             unc.update({t:CalculateUnc(c3w,c3)})
 
         print unc
