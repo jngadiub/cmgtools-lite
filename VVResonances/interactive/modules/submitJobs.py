@@ -79,7 +79,7 @@ def waitForBatchJobs( jobname, remainingjobs, listOfJobs, userName, timeCheck="3
             print "Done! Have %i out of %i files in res%s directory. Return to main script"%(nout,listOfJobs,jobname)
         return
         
-def submitJobs(minEv,maxEv,cmd,OutputFileNames,queue,jobname,path):
+def submitJobs(minEv,maxEv,cmd,OutputFileNames,queue,jobname,path,submitjobs=True):
     joblist = []
     print "minEv ",minEv
     print " iteritems() ",minEv.iteritems()
@@ -89,39 +89,39 @@ def submitJobs(minEv,maxEv,cmd,OutputFileNames,queue,jobname,path):
       directory = str(k).split(removefile)[0]
       year=directory.split("/")[-2]
       template = str(k).split("/")[-1]
-      for j in range(len(v)):
-       os.system("mkdir tmp"+jobname+"/"+year+"_"+template.replace(".root","")+"_"+str(i+1))
-       os.chdir("tmp"+jobname+"/"+year+"_"+template.replace(".root","")+"_"+str(i+1))
-
-       with open('job_%s_%i.sh'%(year+"_"+template.replace(".root",""),i+1), 'w') as fout:
-          print " fout" , fout
-          fout.write("#!/bin/sh\n")
-          fout.write("echo\n")
-          fout.write("echo\n")
-          fout.write("echo 'START---------------'\n")
-          fout.write("echo 'WORKDIR ' ${PWD}\n")
-          if runinKA==False:
-            fout.write("source /afs/cern.ch/cms/cmsset_default.sh\n")
-          else: fout.write("source /cvmfs/cms.cern.ch/cmsset_default.sh\n")
-          fout.write("cd "+str(path)+"\n")
-          fout.write("cmsenv\n")
-          if runinKA==True: fout.write("mkdir -p /tmp/${USER}/\n")
-          fout.write(cmd+" -o res"+jobname+"/"+OutputFileNames+"_"+str(i+1)+"_"+year+"_"+template+" -e "+str(minEv[k][j])+" -E "+str(maxEv[k][j])+" "+directory+" -s "+template+"\n")
-          fout.write("echo 'STOP---------------'\n")
-          fout.write("echo\n")
-          fout.write("echo\n")
+      if submitjobs == True:
+          for j in range(len(v)):
+              os.system("mkdir tmp"+jobname+"/"+year+"_"+template.replace(".root","")+"_"+str(i+1))
+              os.chdir("tmp"+jobname+"/"+year+"_"+template.replace(".root","")+"_"+str(i+1))
+              with open('job_%s_%i.sh'%(year+"_"+template.replace(".root",""),i+1), 'w') as fout:
+                  print " fout" , fout
+                  fout.write("#!/bin/sh\n")
+                  fout.write("echo\n")
+                  fout.write("echo\n")
+                  fout.write("echo 'START---------------'\n")
+                  fout.write("echo 'WORKDIR ' ${PWD}\n")
+                  if runinKA==False:
+                      fout.write("source /afs/cern.ch/cms/cmsset_default.sh\n")
+                  else: fout.write("source /cvmfs/cms.cern.ch/cmsset_default.sh\n")
+                  fout.write("cd "+str(path)+"\n")
+                  fout.write("cmsenv\n")
+                  if runinKA==True: fout.write("mkdir -p /tmp/${USER}/\n")
+                  fout.write(cmd+" -o res"+jobname+"/"+OutputFileNames+"_"+str(i+1)+"_"+year+"_"+template+" -e "+str(minEv[k][j])+" -E "+str(maxEv[k][j])+" "+directory+" -s "+template+"\n")
+                  fout.write("echo 'STOP---------------'\n")
+                  fout.write("echo\n")
+                  fout.write("echo\n")
         
-       if useCondorBatch:
-               os.system("mv  job_*.sh "+jobname+".sh")
-               makeSubmitFileCondor(jobname+".sh",jobname,"workday")
-               os.system("condor_submit submit.sub")
-       else:
-               os.system("chmod 755 job_%s_%i.sh"%(k.replace(".root",""),i+1) )
-               os.system("bsub -q "+queue+" -o logs job_%s_%i.sh -J %s"%(k.replace(".root",""),i+1,jobname))
-       print "job nr " + str(i+1) + " file " + k + " being submitted"
-       joblist.append("%s_%i"%(year+"_"+template.replace(".root",""),i+1))
-       os.chdir("../..")
-       i+=1
+              if useCondorBatch:
+                  os.system("mv  job_*.sh "+jobname+".sh")
+                  makeSubmitFileCondor(jobname+".sh",jobname,"workday")
+                  os.system("condor_submit submit.sub")
+              else:
+                  os.system("chmod 755 job_%s_%i.sh"%(k.replace(".root",""),i+1) )
+                  os.system("bsub -q "+queue+" -o logs job_%s_%i.sh -J %s"%(k.replace(".root",""),i+1,jobname))
+              print "job nr " + str(i+1) + " file " + k + " being submitted"
+              os.chdir("../..")
+      joblist.append("%s_%i"%(year+"_"+template.replace(".root",""),i+1))
+      i+=1
     return joblist     
 
 def getEvents(template,samples):
@@ -243,7 +243,7 @@ def Make2DDetectorParam(rootFile,template,cut,samples,jobname="DetPar",bins="200
     print
     return joblist, files   
     
-def Make1DMVVTemplateWithKernels(rootFile,template,cut,resFile,binsMVV,minMVV,maxMVV,samples,jobName="1DMVV",wait=True,binning='',addOption=""):
+def Make1DMVVTemplateWithKernels(rootFile,template,cut,resFile,binsMVV,minMVV,maxMVV,samples,jobName="1DMVV",wait=True,binning='',addOption="",sendjobs=True):
 
     
     print 
@@ -276,28 +276,30 @@ def Make1DMVVTemplateWithKernels(rootFile,template,cut,resFile,binsMVV,minMVV,ma
     queue = "8nh" # give bsub queue -- 8nm (8 minutes), 1nh (1 hour), 8nh, 1nd (1day), 2nd, 1nw (1 week), 2nw 
     
     path = os.getcwd()
-    try: os.system("rm -r tmp"+jobName)
-    except: print "No tmp"+jobName+"/ directory"
-    os.system("mkdir tmp"+jobName)
-    try: os.stat("res"+jobName)
-    except: os.mkdir("res"+jobName)
+    if sendjobs == True:
+        try: os.system("rm -r tmp"+jobName)
+        except: print "No tmp"+jobName+"/ directory"
+        os.system("mkdir tmp"+jobName)
+        try: os.stat("res"+jobName)
+        except: os.mkdir("res"+jobName)
 
     #### Creating and sending jobs #####
     print " Creating and sending jobs "
-    joblist = submitJobs(minEv,maxEv,cmd,OutputFileNames,queue,jobName,path)
+    joblist = submitJobs(minEv,maxEv,cmd,OutputFileNames,queue,jobName,path,sendjobs)
     print "job list made "
     with open('tmp'+jobName+'_joblist.txt','w') as outfile:
         outfile.write("jobList = %s\n" % joblist)
         outfile.write("files = %s\n" % files)
     outfile.close()
     print
-    print "your jobs:"
-    if useCondorBatch:
-        os.system("condor_q")
-    else:
-        os.system("bjobs")
-    if wait: waitForBatchJobs(jobName,NumberOfJobs,NumberOfJobs, userName, timeCheck)
-    print
+    if sendjobs == True:
+        print "your jobs:"
+        if useCondorBatch:
+            os.system("condor_q")
+        else:
+            os.system("bjobs")
+        if wait: waitForBatchJobs(jobName,NumberOfJobs,NumberOfJobs, userName, timeCheck)
+        print
     print 'END: Make1DMVVTemplateWithKernels'
     print 
 
@@ -508,21 +510,21 @@ def getNormJobs(files,jobList,outdir,purity):
 def reSubmit(jobdir,resubmit,jobname):
  jobs = []
  for o in os.listdir(jobdir):
-	 for jobs in resubmit:
-		 if o.find(jobs) != -1: 
-			 jobfolder = jobdir+"/"+jobs+"/"
-			 os.chdir(jobfolder)
-			 if useCondorBatch:
-			    cmd = "condor_submit submit.sub"
-			    script = jobname+".sh"
-                         else:
-                            script = "job_"+jobs+".sh"
-                            cmd = "bsub -q 8nh -o logs %s -J %s"%(script,jobname)
-			 print cmd
-			 jobs += cmd
-			 os.system("chmod 755 %s"%script)
-			 os.system(cmd)
-			 os.chdir("../..")
+     for jobs in resubmit:
+         if o.find(jobs) != -1:
+             jobfolder = jobdir+"/"+jobs+"/"
+             os.chdir(jobfolder)
+             if useCondorBatch:
+                 cmd = "condor_submit submit.sub"
+                 script = jobname+".sh"
+             else:
+                 script = "job_"+jobs+".sh"
+                 cmd = "bsub -q 8nh -o logs %s -J %s"%(script,jobname)
+             print cmd
+             jobs += cmd
+             os.system("chmod 755 %s"%script)
+             os.system(cmd)
+             os.chdir("../..")
  return jobs
 
 def merge2DDetectorParam(jobList,files,resFile,binsxStr,jobname,template="QCD_Pt_"):
@@ -1472,7 +1474,7 @@ def merge2DTemplate(jobList,files,jobname,purity,leg,binsMVV,binsMJ,minMVV,maxMV
   os.system('rm -r '+outdir+'_out')
   # os.system('rm -r '+outdir)
   
-def makeData(template,cut,rootFile,binsMVV,binsMJ,minMVV,maxMVV,minMJ,maxMJ,factors,name,data,jobname,samples,wait=True,binning='',addOption=""):
+def makeData(template,cut,rootFile,binsMVV,binsMJ,minMVV,maxMVV,minMJ,maxMJ,factors,name,data,jobname,samples,wait=True,binning='',addOption="",sendjobs=True):
     print 
     print 'START: makeData'
     print "template = ",template
@@ -1503,12 +1505,17 @@ def makeData(template,cut,rootFile,binsMVV,binsMJ,minMVV,maxMVV,minMJ,maxMJ,fact
     OutputFileNames = rootFile.replace(".root","")
     cmd='vvMakeData.py -d {data} -c "{cut}"  -v "jj_l1_softDrop_mass,jj_l2_softDrop_mass,jj_LV_mass" {binning} -b "{bins},{bins},{BINS}" -m "{mini},{mini},{MINI}" -M "{maxi},{maxi},{MAXI}" -f {factors} -n "{name}" {addOption} '.format(cut=cut,BINS=binsMVV,bins=binsMJ,MINI=minMVV,MAXI=maxMVV,mini=minMJ,maxi=maxMJ,factors=factors,name=name,data=data,infolder=samples,binning=binning,addOption=addOption)  
     queue = "1nd" # give bsub queue -- 8nm (8 minutes), 1nh (1 hour), 8nh, 1nd (1day), 2nd, 1nw (1 week), 2nw 
-    path = os.getcwd()
-    try: os.system("rm -r tmp"+jobname)
-    except: print "No tmp/ directory"
-    os.system("mkdir tmp"+jobname)
-    try: os.stat("res"+jobname) 
-    except: os.mkdir("res"+jobname)
+    if sendjobs == True:
+        path = os.getcwd()
+        try:
+            os.system("rm -r tmp"+jobname)
+        except:
+            print "No tmp/ directory"
+        os.system("mkdir tmp"+jobname)
+        try:
+            os.stat("res"+jobname)
+        except:
+            os.mkdir("res"+jobname)
         
     
 
@@ -1524,47 +1531,49 @@ def makeData(template,cut,rootFile,binsMVV,binsMJ,minMVV,maxMVV,minMJ,maxMJ,fact
        print "year ",year
        template = str(files[x-1]).split("/")[-1]
        print "template ",template
-       os.system("mkdir tmp"+jobname+"/"+year+"_"+template.replace(".root",""))
-       os.chdir("tmp"+jobname+"/"+year+"_"+template.replace(".root",""))
-       #os.system("mkdir tmp"+jobname+"/"+str(files[x-1]).replace(".root",""))
-       #os.chdir(path+"tmp"+jobname+"/"+str(files[x-1]).replace(".root",""))
+       if sendjobs == True:
+           os.system("mkdir tmp"+jobname+"/"+year+"_"+template.replace(".root",""))
+           os.chdir("tmp"+jobname+"/"+year+"_"+template.replace(".root",""))
+           #os.system("mkdir tmp"+jobname+"/"+str(files[x-1]).replace(".root",""))
+           #os.chdir(path+"tmp"+jobname+"/"+str(files[x-1]).replace(".root",""))
      
-       with open('job_%s_%s.sh'%(year,template.replace(".root","")), 'w') as fout:
-          fout.write("#!/bin/sh\n")
-          fout.write("echo\n")
-          fout.write("echo\n")
-          fout.write("echo 'START---------------'\n")
-          fout.write("echo 'WORKDIR ' ${PWD}\n")
-          if runinKA==False:
-            fout.write("source /afs/cern.ch/cms/cmsset_default.sh\n")
-          else: fout.write("source /cvmfs/cms.cern.ch/cmsset_default.sh\n")
-          fout.write("cd "+str(path)+"\n")
-          fout.write("cmsenv\n")
-          if runinKA==True: fout.write("mkdir -p /tmp/${USER}/\n")
-          fout.write(cmd+" -o "+path+"/res"+jobname+"/"+OutputFileNames+"_"+year+"_"+template+" -s "+template+" "+directory+"\n")
-          fout.write("echo 'STOP---------------'\n")
-          fout.write("echo\n")
-          fout.write("echo\n")
-       os.system("chmod 755 job_%s.sh"%(year+"_"+template.replace(".root","")) )
+           with open('job_%s_%s.sh'%(year,template.replace(".root","")), 'w') as fout:
+               fout.write("#!/bin/sh\n")
+               fout.write("echo\n")
+               fout.write("echo\n")
+               fout.write("echo 'START---------------'\n")
+               fout.write("echo 'WORKDIR ' ${PWD}\n")
+               if runinKA==False:
+                   fout.write("source /afs/cern.ch/cms/cmsset_default.sh\n")
+               else: fout.write("source /cvmfs/cms.cern.ch/cmsset_default.sh\n")
+               fout.write("cd "+str(path)+"\n")
+               fout.write("cmsenv\n")
+               if runinKA==True: fout.write("mkdir -p /tmp/${USER}/\n")
+               fout.write(cmd+" -o "+path+"/res"+jobname+"/"+OutputFileNames+"_"+year+"_"+template+" -s "+template+" "+directory+"\n")
+               fout.write("echo 'STOP---------------'\n")
+               fout.write("echo\n")
+               fout.write("echo\n")
+               os.system("chmod 755 job_%s.sh"%(year+"_"+template.replace(".root","")) )
 
-       if useCondorBatch:
-           os.system("mv  job_*.sh "+jobname+".sh")
-           makeSubmitFileCondor(jobname+".sh",jobname,"workday")
-           os.system("condor_submit submit.sub")
-       else:
-           os.system("bsub -q "+queue+" -o logs job_%s.sh -J %s"%(template.replace(".root",""),jobname))
-       print "job nr " + str(x) + " submitted"
+               if useCondorBatch:
+                   os.system("mv  job_*.sh "+jobname+".sh")
+                   makeSubmitFileCondor(jobname+".sh",jobname,"workday")
+                   os.system("condor_submit submit.sub")
+               else:
+                   os.system("bsub -q "+queue+" -o logs job_%s.sh -J %s"%(template.replace(".root",""),jobname))
+                   print "job nr " + str(x) + " submitted"
        joblist.append("%s"%(year+"_"+template.replace(".root","")))
-       os.chdir("../..")
+       if sendjobs == True:       os.chdir("../..")
    
     print
-    print "your jobs:"
-    if useCondorBatch:
-        os.system("condor_q")
-    else:
-        os.system("bjobs")
-    userName=os.environ['USER']
-    if wait: waitForBatchJobs(jobname,NumberOfJobs,NumberOfJobs, userName, timeCheck)
+    if sendjobs == True:
+        print "your jobs:"
+        if useCondorBatch:
+            os.system("condor_q")
+        else:
+            os.system("bjobs")
+        userName=os.environ['USER']
+        if wait: waitForBatchJobs(jobname,NumberOfJobs,NumberOfJobs, userName, timeCheck)
     
     print
     print 'END: makeData'

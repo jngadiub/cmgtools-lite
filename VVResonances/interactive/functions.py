@@ -97,7 +97,7 @@ class AllFunctions():
         os.system(cmd)
  
 
- def makeBackgroundShapesMVVKernel(self,name,filename,template,addCut="1",jobName="1DMVV",wait=True,corrFactorW=1,corrFactorZ=1):
+ def makeBackgroundShapesMVVKernel(self,name,filename,template,addCut="1",jobName="1DMVV",wait=True,corrFactorW=1,corrFactorZ=1,sendjobs=True):
 
   pwd = os.getcwd()
   print "samples ",self.samples
@@ -128,7 +128,7 @@ class AllFunctions():
     #if name.find("Jets") == -1: template += ",QCD_HT" #irene because QCD Pt- should go without spike killer!!
     #print " ***************    not doing QCD_HT & QCD_Pt- because not ready yet!! *************** "
     from modules.submitJobs import Make1DMVVTemplateWithKernels,merge1DMVVTemplate
-    jobList, files = Make1DMVVTemplateWithKernels(rootFile,template,cut,resFile,self.binsMVV,self.minMVV,self.maxMVV,smp,jobname,wait,self.HCALbinsMVV) #,addOption) #irene
+    jobList, files = Make1DMVVTemplateWithKernels(rootFile,template,cut,resFile,self.binsMVV,self.minMVV,self.maxMVV,smp,jobname,wait,self.HCALbinsMVV,"",sendjobs) #irene
     if wait: merge1DMVVTemplate(jobList,files,jobname,c,self.binsMVV,self.minMVV,self.maxMVV,self.HCALbinsMVV,name,filename)
    else:
     cmd='vvMake1DMVVTemplateWithKernels.py -H "x" -o "{rootFile}" -s "{template}" -c "{cut}"  -v "jj_gen_partialMass" -b {binsMVV}  -x {minMVV} -X {maxMVV} -r {res} {directory} --corrFactorW {corrFactorW} --corrFactorZ {corrFactorZ} '.format(rootFile=rootFile,template=template,cut=cut,res=resFile,binsMVV=self.binsMVV,minMVV=self.minMVV,maxMVV=self.maxMVV,corrFactorW=corrFactorW,corrFactorZ=corrFactorZ,directory=smp)
@@ -227,7 +227,7 @@ class AllFunctions():
    #   cmd='vvMakeTriggerShapes.py -i "{rootFile}"'.format(rootFile=rootFile)
    #   os.system(cmd)
 
- def makeNormalizations(self,name,filename,template,data=0,addCut='1',jobName="nR",makesingle=False,factors="1",wait=True): #,HPSF=1.,LPSF=1.):
+ def makeNormalizations(self,name,filename,template,data=0,addCut='1',jobName="nR",makesingle=False,factors="1",sendjobs=True,wait=True): #,HPSF=1.,LPSF=1.):
  
   pwd = os.getcwd()
   period=filename.split("_")[1]
@@ -259,8 +259,11 @@ class AllFunctions():
        #if name.find("nonRes")!= -1: template += ",QCD_HT"  #irene because QCD Pt- should go without spike killer!! 
        #print " ***************    not doing QCD_HT &  QCD_Pt- because not ready yet!! *************** "
        from modules.submitJobs import makeData,mergeData
-       jobList, files = makeData(template,cut,rootFile,self.binsMVV,self.binsMJ,self.minMVV,self.maxMVV,self.minMJ,self.maxMJ,factors,name,data,jobname,sam,wait,self.HCALbinsMVV) #,addOption) #irene
+       jobList, files = makeData(template,cut,rootFile,self.binsMVV,self.binsMJ,self.minMVV,self.maxMVV,self.minMJ,self.maxMJ,factors,name,data,jobname,sam,wait,self.HCALbinsMVV,"",sendjobs) #irene
        wait = True
+       if sendjobs == False:
+        wait = False
+        mergeData(jobList, files,jobname,c,rootFile,filename,name)
        if wait: mergeData(jobList, files,jobname,c,rootFile,filename,name)
        if makesingle and period == "Run2":
              print " ########    making norms also for single years ##############"
