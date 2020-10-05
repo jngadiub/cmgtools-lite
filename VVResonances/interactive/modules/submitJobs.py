@@ -1536,7 +1536,7 @@ def makeData(template,cut,rootFile,binsMVV,binsMJ,minMVV,maxMVV,minMJ,maxMJ,fact
            os.chdir("tmp"+jobname+"/"+year+"_"+template.replace(".root",""))
            #os.system("mkdir tmp"+jobname+"/"+str(files[x-1]).replace(".root",""))
            #os.chdir(path+"tmp"+jobname+"/"+str(files[x-1]).replace(".root",""))
-     
+
            with open('job_%s_%s.sh'%(year,template.replace(".root","")), 'w') as fout:
                fout.write("#!/bin/sh\n")
                fout.write("echo\n")
@@ -1553,17 +1553,18 @@ def makeData(template,cut,rootFile,binsMVV,binsMJ,minMVV,maxMVV,minMJ,maxMJ,fact
                fout.write("echo 'STOP---------------'\n")
                fout.write("echo\n")
                fout.write("echo\n")
-               os.system("chmod 755 job_%s.sh"%(year+"_"+template.replace(".root","")) )
+           os.system("chmod 755 job_%s.sh"%(year+"_"+template.replace(".root","")) )
 
-               if useCondorBatch:
-                   os.system("mv  job_*.sh "+jobname+".sh")
-                   makeSubmitFileCondor(jobname+".sh",jobname,"workday")
-                   os.system("condor_submit submit.sub")
-               else:
-                   os.system("bsub -q "+queue+" -o logs job_%s.sh -J %s"%(template.replace(".root",""),jobname))
-                   print "job nr " + str(x) + " submitted"
+           if useCondorBatch:
+               os.system("mv  job_*.sh "+jobname+".sh")
+               makeSubmitFileCondor(jobname+".sh",jobname,"workday")
+               os.system("condor_submit submit.sub")
+           else:
+               os.system("bsub -q "+queue+" -o logs job_%s.sh -J %s"%(template.replace(".root",""),jobname))
+               print "job nr " + str(x) + " submitted"
+           os.chdir("../..")
        joblist.append("%s"%(year+"_"+template.replace(".root","")))
-       if sendjobs == True:       os.chdir("../..")
+
    
     print
     if sendjobs == True:
