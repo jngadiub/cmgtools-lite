@@ -33,6 +33,7 @@ parser.add_option("--run",dest="run",help="decide which parts of the code should
 parser.add_option("--signal",dest="signal",default="BGWW",help="which signal do you want to run? options are BulkGWW, BulkGZZ, WprimeWZ, ZprimeWW, ZprimeZH")
 parser.add_option("--fitvjetsmjj",dest="fitvjetsmjj",default=False,action="store_true",help="True makes fits for mjj of vjets, False uses hists")
 parser.add_option("--single",dest="single",default=False,help="set to True to merge kernels also for single years when processing full run2 data")
+parser.add_option("--sendjobs",dest="sendjobs",default=True,help="make job list without submitting them (useful to only merge jobs if something was not finished")
 
 (options,args) = parser.parse_args()
 
@@ -81,12 +82,9 @@ if useTriggerWeights:
     addOption = "-t"
     
 #all categories
-#categories=['VH_HPHP','VH_LPHP','VV_HPHP'] #,'VBF_VV_HPHP','VBF_VV_HPLP']
-#categories=['VH_HPHP','VH_LPHP','VH_HPLP','VV_HPHP','VV_HPLP'] #,'VBF_VV_HPHP','VBF_VV_HPLP']
-#categories=['VH_HPNP_control_region'] #,'VH_NPHP_control_region']
-#categories=['VV_HPLP'] 
-categories=['NP']
-       
+categories=["VH_HPHP","VH_HPLP","VH_LPHP","VV_HPHP","VV_HPLP"]
+#categories=["NP"]
+
 
 #list of signal samples --> nb, radion and vbf samples to be added
 BulkGravWWTemplate="BulkGravToWW_"
@@ -233,7 +231,7 @@ if options.run.find("all")!=-1 or options.run.find("qcd")!=-1:
             f.makeBackgroundShapesMVVConditional("nonRes","JJ_"+filePeriod,nonResTemplate,'l2',ctx.cuts['nonres'],"2Dl2",wait)
             f.mergeBackgroundShapes("nonRes","JJ_"+filePeriod)
     if options.run.find("all")!=-1 or options.run.find("norm")!=-1:
-        f.makeNormalizations("nonRes","JJ_"+filePeriod,nonResTemplate,0,ctx.cuts['nonres'],"nRes",options.single)
+        f.makeNormalizations("nonRes","JJ_"+filePeriod,nonResTemplate,0,ctx.cuts['nonres'],"nRes",options.single,"",options.sendjobs)
 
   
 
@@ -252,14 +250,14 @@ if options.run.find("all")!=-1 or options.run.find("vjets")!=-1:
         else :
             print " did you run Detector response  for this period? otherwise the kernels steps will not work!"
             print "first kernel W"
-            f.makeBackgroundShapesMVVKernel("WJets","JJ_"+filePeriod,WresTemplate,ctx.cuts['nonres'],"1DW",wait,1.,1.)
+            f.makeBackgroundShapesMVVKernel("WJets","JJ_"+filePeriod,WresTemplate,ctx.cuts['nonres'],"1DW",wait,1.,1.,options.sendjobs)
             print "then kernel Z"
-            f.makeBackgroundShapesMVVKernel("ZJets","JJ_"+filePeriod,ZresTemplate,ctx.cuts['nonres'],"1DZ",wait,1.,1.)
+            f.makeBackgroundShapesMVVKernel("ZJets","JJ_"+filePeriod,ZresTemplate,ctx.cuts['nonres'],"1DZ",wait,1.,1.,options.sendjobs)
     if options.run.find("all")!=-1 or options.run.find("vjetsnorm")!=-1 or options.run.find("All")!=-1:
         print "then norm W"
-        f.makeNormalizations("WJets","JJ_"+filePeriod,WresTemplate,0,ctx.cuts['nonres'],"nResWJets",options.single,"1") #,HPSF_vtag,LPSF_vtag)
+        f.makeNormalizations("WJets","JJ_"+filePeriod,WresTemplate,0,ctx.cuts['nonres'],"nResWJets",options.single,"1",options.sendjobs) #,HPSF_vtag,LPSF_vtag)
         print "then norm Z"
-        f.makeNormalizations("ZJets","JJ_"+filePeriod,ZresTemplate,0,ctx.cuts['nonres'],"nResZJets",options.single,"1")
+        f.makeNormalizations("ZJets","JJ_"+filePeriod,ZresTemplate,0,ctx.cuts['nonres'],"nResZJets",options.single,"1",options.sendjobs)
 
 
 
