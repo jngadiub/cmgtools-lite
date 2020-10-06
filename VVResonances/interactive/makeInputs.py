@@ -267,12 +267,12 @@ if options.run.find("all")!=-1 or options.run.find("tt")!=-1:
     wait=False
     if options.batch == True : wait=True
     print "make norm for all contributions of ttbar together"
-    f.makeNormalizations("TTJets","JJ_"+filePeriod,TTemplate,0,ctx.cuts['nonres'],"nResTT",options.single,"")
+    f.makeNormalizations("TTJets","JJ_"+filePeriod,TTemplate,0,ctx.cuts['nonres'],"nResTT",options.single,"1",options.sendjobs)
     contrib =["resT","resW","nonresT","resTnonresT","resWnonresT","resTresW"]
     for con in contrib:
         print " ***************************         "+con+"      ******************************"
         f.makeMinorBkgShapesMVV("TTJets"+con,"JJ_"+filePeriod,TTemplate,ctx.cuts[con],con)
-        f.makeNormalizations("TTJets"+con,"JJ_"+filePeriod,TTemplate,0,ctx.cuts[con],"nResTT",options.single,"")
+        f.makeNormalizations("TTJets"+con,"JJ_"+filePeriod,TTemplate,0,ctx.cuts[con],"nResTT"+con,options.single,"1",options.sendjobs)
 
 
 if options.run.find("all")!=-1 or options.run.find("data")!=-1:
@@ -290,7 +290,7 @@ if options.run.find("all")!=-1 or options.run.find("pseudoTT")!=-1:
     print " Do pseudodata with tt"
     from modules.submitJobs import makePseudoDataTT
     for p in categories: makePseudoDataTT("results_"+filePeriod+"/JJ_"+filePeriod+"_TTJets_"+p+".root",
-					  "JJ_%s_PDTT_%s.root"%(filePeriod,p),ctx.lumi,
+					  "JJ_%s_PDTT_%s.root"%(filePeriod,p),ctx.lumi[filePeriod],
                                           filePeriod,p)
 if options.run.find("all")!=-1 or options.run.find("pseudoNOQCD")!=-1:
     print " Do pseudodata with vjets & tt: DID YOU PRODUCE THE WORKSPACE BEFORE???"
