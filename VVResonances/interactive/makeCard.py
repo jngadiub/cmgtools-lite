@@ -127,9 +127,9 @@ for sig in signals:
       ncontrib+=1
         
       print "##########################       including tt+jets in datacard      ######################"
-      #rootFileMVV = {"resT":resultsDir[dataset]+'/JJ_resT'+dataset+'_TTJets_MVV_NP.root', "resW":resultsDir[dataset]+"/JJ_resW"+dataset+"_TTJets_MVV_NP.root","nonresT":resultsDir[dataset]+"/JJ_nonresT"+dataset+"_TTJets_MVV_NP.root","resTnonresT":resultsDir[dataset]+"/JJ_resTnonresT"+dataset+"_TTJets_MVV_NP.root","resWnonresT":resultsDir[dataset]+"/JJ_resWnonresT"+dataset+"_TTJets_MVV_NP.root","resTresW":resultsDir[dataset]+"/JJ_resTresW"+dataset+"_TTJets_MVV_NP.root"}
-      rootFileMVV = {"resT":resultsDir[dataset]+'/JJ_resT'+dataset+'_TTJets_MVV_'+p+'.root', "resW":resultsDir[dataset]+"/JJ_resW"+dataset+"_TTJets_MVV_"+p+".root","nonresT":resultsDir[dataset]+"/JJ_nonresT"+dataset+"_TTJets_MVV_"+p+".root","resTnonresT":resultsDir[dataset]+"/JJ_resTnonresT"+dataset+"_TTJets_MVV_"+p+".root","resWnonresT":resultsDir[dataset]+"/JJ_resWnonresT"+dataset+"_TTJets_MVV_"+p+".root","resTresW":resultsDir[dataset]+"/JJ_resTresW"+dataset+"_TTJets_MVV_"+p+".root"}
-      rootFileNorm = {"resT" : resultsDir[dataset]+'/JJ_resT'+dataset+'_TTJets_'+p+'.root', "resW": resultsDir[dataset]+'/JJ_resW'+dataset+'_TTJets_'+p+'.root',"nonresT" : resultsDir[dataset]+'/JJ_nonresT'+dataset+'_TTJets_'+p+'.root',"resTnonresT": resultsDir[dataset]+'/JJ_resTnonresT'+dataset+'_TTJets_'+p+'.root' , "resWnonresT": resultsDir[dataset]+'/JJ_resWnonresT'+dataset+'_TTJets_'+p+'.root',"resWresT": resultsDir[dataset]+'/JJ_resTresW'+dataset+'_TTJets_'+p+'.root'}
+      contrib =["resT","resW","nonresT","resTnonresT","resWnonresT","resTresW"]
+      rootFileMVV = {ttcon:resultsDir[dataset]+'/JJ_'+dataset+'_TTJets'+ttcon+'_MVV_NP.root' for ttcon in contrib}
+      rootFileNorm = {ttcon:resultsDir[dataset]+'/JJ_'+dataset+'_TTJets'+ttcon+'_'+p+'.root' for ttcon in contrib}
       jsonfileNorm = resultsDir[dataset]+'/'+options.jsonname+'_'+p+'.json'
       Tools.AddTTBackground3(card,dataset,p,rootFileMVV,rootFileNorm,resultsDir[dataset],ncontrib,["CMS_VV_JJ_TTJets_slope",0.5],jsonfileNorm)
       #rootFileMVV  = resultsDir[dataset]+'/JJ_'+dataset+'_TTJets_MVV_'+p+'.root'
@@ -173,7 +173,7 @@ for sig in signals:
         scaleData=1.0
       elif pseudodata=="ttbar":
         print "Using pseudodata with only tt backgrounds"
-        rootFileData = resultsDir[dataset]+"/JJ_%s_PDTT_"+p+".root"%(dataset)
+        rootFileData = resultsDir[dataset]+"/JJ_"+dataset+"_PDTT_"+p+".root"
         histName="data"
         scaleData=1.0
       elif pseudodata==sig:
@@ -196,7 +196,7 @@ for sig in signals:
       else:
         Tools.AddResBackgroundSystematics(card,p)
       Tools.AddNonResBackgroundSystematics(card,p)
-      Tools.AddTaggingSystematics(card,sig,dataset,p,resultsDir[dataset]+'/migrationunc_'+sig+'_'+dataset+'.json')
+      #Tools.AddTaggingSystematics(card,sig,dataset,p,resultsDir[dataset]+'/migrationunc_'+sig+'_'+dataset+'.json')
       Tools.AddTTSystematics4(card,["CMS_VV_JJ_TTJets_slope",0.05],dataset,p)
       print "##########################       systematics added in datacard      ######################"  
 
