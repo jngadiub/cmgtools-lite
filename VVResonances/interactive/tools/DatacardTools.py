@@ -190,7 +190,7 @@ class DatacardTools():
 
        #load mJJ - assume same for the three contributions (preliminary)
        #jsonfile = resultsDir+"/JJ_"+contrib[i]+dataset+"_TTJets_MVV_"+category+".json"
-       jsonfile = resultsDir+"/JJ_"+contrib[i]+dataset+"_TTJets_MVV_NP.json"
+       jsonfile = resultsDir+"/JJ_"+dataset+"_TTJets"+contrib[i]+"_MVV_NP.json"
        print "load parametrisation for MVV ttbar contributions ",jsonfile,contrib[i]
        #card.addMVVMinorBkgParametricShape("TTJets"+contrib[i]+"_mjj",["MJJ"],jsonfile,[uncertainty[0].replace("TTJets",mappdf[contrib[i]])+"_"+category,unc[contrib[i]]])
        card.addMVVMinorBkgParametricShape("TTJets"+contrib[i]+"_mjj",["MJJ"],jsonfile,[uncertainty[0].replace("TTJets",mappdf[contrib[i]]),unc[contrib[i]]])
@@ -199,7 +199,7 @@ class DatacardTools():
        #f = ROOT.TFile(rootFileMVV[contrib[i]],"READ")
        #card.addHistoShapeFromFile("TTJets"+contrib[i]+"_mjj",["MJJ"],rootFileMVV[contrib[i]],"histo_nominal",["PT:CMS_VV_JJ_TTJets_PTZ_"+category],False,0)       
      else:
-      jsonfile = resultsDir+"/JJ_"+contrib[i]+dataset+"_TTJets_MVV_NP.json"
+      jsonfile = resultsDir+"/JJ_"+dataset+"_TTJets"+contrib[i]+"_MVV_NP.json"
       slopejson= normjson.replace("Norm","NormSlopes")
       print "load parametrisation for MVV ttbar contributions ",jsonfile,contrib[i],slopejson
       #card.addMVVMinorBkgParametricShape("TTJets"+contrib[i]+"_mjj",["MJJ"],jsonfile,[uncertainty[0].replace("TTJets",mappdf[contrib[i]])+"_"+category,unc[contrib[i]]])
@@ -260,24 +260,14 @@ class DatacardTools():
     print "outlabel "+self.outlabel
     if self.outlabel.find("sigOnly")!=-1 or self.outlabel.find("sigonly")!=-1:
         print "add small yield"
-        card.addFixedYieldFromFile('TTJetsW',ncontrib,rootFileNorm["resW"],"TTJetsW",0.000001)
-        card.addFixedYieldFromFile('TTJetsTop',ncontrib+1,rootFileNorm["resT"],"TTJetsTop",0.000001)
-        card.addFixedYieldFromFile('TTJetsNonRes',ncontrib+2,rootFileNorm["nonresT"],"TTJetsNonRes",0.000001)
-        card.addFixedYieldFromFile('TTJetsTnonresT',ncontrib+3,rootFileNorm["resTnonresT"],"TTJetsTnonresT",0.000001/2.)
-        card.addFixedYieldFromFile('TTJetsnonresTresT',ncontrib+4,rootFileNorm["resTnonresT"],"TTJetsnonresTresT",0.000001/2.)
-        card.addFixedYieldFromFile('TTJetsWnonresT',ncontrib+5,rootFileNorm["resWnonresT"],"TTJetsWnonresT",0.000001/2.)
-        card.addFixedYieldFromFile('TTJetsnonresTresW',ncontrib+6,rootFileNorm["resWnonresT"],"TTJetsnonresTresW",0.000001/2.)
+        for i in range(0,len(contrib)):
+         card.addFixedYieldFromFile(mappdf[contrib[i]],ncontrib+i,rootFileNorm[contrib[i]],"TTJets"+mappdf[contrib[i]],0.000001)
     elif self.pseudodata.find("ttbar")!=-1: 
-	card.addFixedYieldFromFile('TTJetsW',ncontrib,rootFileNorm["resW"],"TTJets")
-        card.addFixedYieldFromFile('TTJetsTop',ncontrib+1,rootFileNorm["resT"],"TTJets")
-        card.addFixedYieldFromFile('TTJetsNonRes',ncontrib+2,rootFileNorm["nonresT"],"TTJets")
-        card.addFixedYieldFromFile('TTJetsWNonResT',ncontrib+3,rootFileNorm["resWnonresT"],"TTJets")
-        card.addFixedYieldFromFile('TTJetsResWResT',ncontrib+4,rootFileNorm["resWresT"],"TTJets")
-        card.addFixedYieldFromFile('TTJetsTNonResT',ncontrib+5,rootFileNorm["resTnonresT"],"TTJets")
+     for i in range(0,len(contrib)):
+      card.addFixedYieldFromFile(mappdf[contrib[i]],ncontrib+i,rootFileNorm[contrib[i]],"TTJets"+contrib[i])
     else:
         norm = open(normjson,"r")
         norms = json.load(norm)
-        mappdf = {"resT":"TTJetsTop","resW":"TTJetsW","nonresT":"TTJetsNonRes","resTnonresT":"TTJetsTNonResT","resWnonresT":"TTJetsWNonResT","resTresW":"TTJetsResWResT"}
         for i in range(0,len(contrib)):
             card.addYield(mappdf[contrib[i]],ncontrib+i,norms[contrib[i]])
 	          
