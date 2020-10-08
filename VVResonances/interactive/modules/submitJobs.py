@@ -9,7 +9,7 @@ import subprocess, thread
 from array import array
 ROOT.gROOT.SetBatch(True)
 
-timeCheck = "1000"
+timeCheck = "200"
 userName=os.environ['USER']
 
 
@@ -2232,7 +2232,7 @@ def makePseudoDataNoQCD(input_tt,output,lumi,workspace,year,purity):
  fout.Close()    
 
 def makePseudoDataTT(input_tt,output,lumi,year,purity):
- 
+
  pwd = os.getcwd()
  pwd = "/"
  ROOT.gRandom.SetSeed(123)
