@@ -77,6 +77,96 @@ def getBinning(binsMVV,minx,maxx,bins):
     return l
 
 
+def doRatioPlot(data,mvv_nominal_w,sampleTypes,outlabel):
+    c = get_canvas("c")
+    pad1 = ROOT.TPad("pad1","pad1",0,0.3,1,1)
+    pad2 = ROOT.TPad("pad2","pad2",0,0,1,0.3);
+    pad1.SetBottomMargin(0.00001);
+    pad1.SetBorderMode(0);
+    pad1.SetLogy();
+    pad2.SetTopMargin(0.00001);
+    pad2.SetBottomMargin(0.3);
+    pad2.SetBorderMode(0);
+    pad1.Draw();
+    pad2.Draw();
+    pad1.cd();
+    if data.Integral()!=0: data.Scale(1/data.Integral())
+    data.SetMarkerColor(ROOT.kBlack)
+    
+    data.GetYaxis().SetTitleOffset(1.5)
+    
+    data.GetXaxis().SetTitle("m_{jj} (GeV)")
+    data.GetYaxis().SetTitle("arbitrary scale")
+    data.SetMarkerStyle(20)
+    data.SetMaximum(1.2)
+    data.SetMinimum(0.0000001)
+    data.Draw("P")
+
+    l = ROOT.TLegend(0.3809045,0.6063636,0.7622613,0.8220979)
+    l.SetHeader(outlabel.split("_")[0])
+    l.AddEntry(data,"simulation","lp")
+
+    if mvv_nominal_w.Integral()!=0: mvv_nominal_w.Scale(1/mvv_nominal_w.Integral())
+    mvv_nominal_w.Draw("same")
+    mvv_nominal_w.SetMarkerStyle(4)
+    mvv_nominal_w.SetMarkerColor(ROOT.kBlue)
+    mvv_nominal_w.SetLineColor(ROOT.kBlue)
+
+    l.AddEntry(mvv_nominal_w,"no reweight", "lp")
+    l.Draw("same")
+
+    tmplabel = "nonRes"
+    if sampleTypes[0].find("Jets")!=-1: tmplabel="Jets"
+    if sampleTypes[0].find("TT")!=-1: tmplabel="TTbar"
+    if options.output.find('VV_HPLP')!=-1: tmplabel+='VV_HPLP'
+    if options.output.find('VV_HPHP')!=-1: tmplabel+='VV_HPHP'
+    if options.output.find('VH_HPLP')!=-1: tmplabel+='VH_HPLP'
+    if options.output.find('VH_HPHP')!=-1: tmplabel+='VH_HPHP'
+    if options.output.find('VH_LPHP')!=-1: tmplabel+='VH_LPHP'
+    if 'W' in sampleTypes: tmplabel="W"+tmplabel
+    if 'Z' in sampleTypes: tmplabel="Z"+tmplabel
+    text = ROOT.TLatex()
+    text.DrawLatexNDC(0.13,0.92,"#font[62]{CMS} #font[52]{Simulation}")
+
+
+    pad2.cd()
+    r = ROOT.TH1F()
+    data.Copy(r)
+    r.GetYaxis().SetTitle("nominal(reweight)/variation")
+    r.GetYaxis().SetLabelFont(63);
+    r.GetYaxis().SetLabelSize(16);
+    r.GetXaxis().SetLabelFont(63);
+    r.GetXaxis().SetLabelSize(16);
+
+    r.GetYaxis().SetTitleFont(63);
+    r.GetYaxis().SetTitleOffset(2.);
+    r.GetYaxis().SetTitleSize(16);
+    r.GetXaxis().SetTitleFont(63);
+    r.GetXaxis().SetTitleSize(16);
+    r.GetXaxis().SetTitleOffset(3);
+
+    for i in range(0,data.GetNbinsX()+1):
+        ratio = 0.
+        if mvv_nominal_w.GetBinContent(i+1)!=0:
+            ratio=data.GetBinContent(i+1)/mvv_nominal_w.GetBinContent(i+1)
+        r.SetBinContent(i+1,ratio)
+    r.SetMarkerStyle(10)
+    r.SetMarkerColor(ROOT.kBlack)
+    r.SetLineColor(ROOT.kBlack)
+    r.SetMaximum(1.1)
+    r.SetMinimum(0.9)
+    r.Draw("p")
+    li = ROOT.TLine(data.GetXaxis().GetXmin(),1,data.GetXaxis().GetXmax(),1)
+    li.SetLineStyle(2)
+    li.SetLineColor(ROOT.kRed)
+    li.Draw("same")
+
+    c.cd()
+    outputname="debug_mVV_shapes_"+tmplabel+"_"+outlabel+".pdf"
+    c.SaveAs(outputname)
+    print "for debugging save",outputname
+
+
 def doPlot(data,finalFit,sampleTypes,outlabel,mvv_nominal_w=None):
     c = get_canvas("c")
     c.SetLogy()
@@ -219,7 +309,7 @@ def doPlot(data,finalFit,sampleTypes,outlabel,mvv_nominal_w=None):
     c.SaveAs(outputname)
     print "for debugging save",outputname
 
-def doPlotRatio(data,finalFit,sampleTypes,outlabel,mvv_nominal_w=None):
+def doPlotC3Ratio(data,finalFit,sampleTypes,outlabel,mvv_nominal_w=None):
     c = get_canvas("c")
     pad1 = ROOT.TPad("pad1","pad1",0,0.3,1,1)
     pad2 = ROOT.TPad("pad2","pad2",0,0,1,0.3);
@@ -434,7 +524,7 @@ def doPlotCRatio(data,finalFit,sampleTypes,outlabel,mvv_nominal_w=None):
     pad1.Draw();
     pad2.Draw();
     pad1.cd();
-
+    print " pads"
     data.SetMarkerColor(ROOT.kBlack)
     
     data.GetYaxis().SetTitleOffset(1.5)
@@ -455,7 +545,7 @@ def doPlotCRatio(data,finalFit,sampleTypes,outlabel,mvv_nominal_w=None):
         finalFit.SetLineColor(ROOT.kBlue)
         finalFit.SetLineWidth(2)
         finalFit.SetLineStyle(2)
-        
+        '''          
         c3var = (orig.GetParameter(4)-finalFit.GetParameter(4))
 
         tmpu = orig.Clone()
@@ -514,8 +604,8 @@ def doPlotCRatio(data,finalFit,sampleTypes,outlabel,mvv_nominal_w=None):
         tmpdc.SetLineColor(ROOT.kOrange)
         tmpdc.SetLineStyle(2)
         tmpdc.Draw("fsame")
-
-
+        print " variations "
+        '''
     finalFit.Draw("fsame")
 
     '''
@@ -534,10 +624,12 @@ def doPlotCRatio(data,finalFit,sampleTypes,outlabel,mvv_nominal_w=None):
     l.AddEntry(data,"simulation","lp")
     l.AddEntry(orig,"Fit","l")
     if outlabel.find("noreweight")!=-1 :
+        '''
         l.AddEntry(tmpu,"Fit, c3 +/- unc","l")
         l.AddEntry(tmpu2,"Fit, c2 +/- unc","l")
         l.AddEntry(tmpu3,"Fit, c1 +/- unc","l")
         l.AddEntry(tmpuc,"Fit, c1,c2,c3 +/- unc","l")
+        '''
     if mvv_nominal_w!=None:
         if mvv_nominal_w.Integral()!=0: mvv_nominal_w.Scale(1/mvv_nominal_w.Integral())
         mvv_nominal_w.Draw("same")
@@ -593,7 +685,7 @@ def doPlotCRatio(data,finalFit,sampleTypes,outlabel,mvv_nominal_w=None):
     text = ROOT.TLatex()
     text.DrawLatexNDC(0.13,0.92,"#font[62]{CMS} #font[52]{Simulation}")
     orig.Draw("same")
-
+    print " end pad 1"
     pad2.cd()
     r = ROOT.TH1F()
     data.Copy(r)
@@ -619,8 +711,8 @@ def doPlotCRatio(data,finalFit,sampleTypes,outlabel,mvv_nominal_w=None):
     r.SetMarkerStyle(10)
     r.SetMarkerColor(ROOT.kBlack)
     r.SetLineColor(ROOT.kBlack)
-    r.SetMaximum(2)
-    r.SetMinimum(-2)
+    r.SetMaximum(5)
+    r.SetMinimum(-5)
     r.Draw("p")
     li = ROOT.TLine(data.GetXaxis().GetXmin(),0,data.GetXaxis().GetXmax(),0)
     li.SetLineStyle(2)
@@ -692,14 +784,14 @@ def doFit(proj,label="",fixPars=None):
     print expo
     if fixPars!=None:
         print " fixPars = ",fixPars
-        expo.SetParLimits(4,0.,1000.)
+        #expo.SetParLimits(4,0.,1000.)
         for key in fixPars.keys():
             p = fixPars[key]
-            if key=="N0": expo.SetParameter(0,p); expo.SetParLimits(0,p-p/10000.,2.); 
-            if key=="c1": expo.SetParameter(1,p); expo.SetParLimits(1,0.,p*3); 
-            if key=="c2": expo.SetParameter(2,p); expo.SetParLimits(2,p-p/10000.,1.); 
-            if key=="N1": expo.SetParameter(3,p); expo.SetParLimits(3,p-p/10000.,2.); 
-            ##if key=="c3": expo.SetParLimits(4,fixPars[key],fixPars[key])
+            if key=="N0": expo.SetParameter(0,p); expo.SetParLimits(0,0.,1.); 
+            if key=="c1": expo.SetParameter(1,p); expo.SetParLimits(1,0.,1000.); 
+            if key=="c2": expo.SetParameter(2,p); expo.SetParLimits(2,0.,1.); 
+            if key=="N1": expo.SetParameter(3,p); expo.SetParLimits(3,0.,1.); 
+            if key=="c3": expo.SetParameter(4,p); expo.SetParLimits(4,0.,1000.);
     #expo=ROOT.TF1("expo","[0]*e^(-[1]*x)*(1/x)",1000,8000)
     
     print " expo ",expo
@@ -709,16 +801,17 @@ def doFit(proj,label="",fixPars=None):
     print " c2 ",expo.GetParameter(2)
     print " c3 ",expo.GetParameter(4)
 
-
-    print " 1st fit "
-    proj.Fit(expo,"LLMR","",beginFitX,endX)
-    print " expo ",expo
-    print " N0 ",expo.GetParameter(0)
-    print " N1 ",expo.GetParameter(3)
-    print " c1 ",expo.GetParameter(1)
-    print " c2 ",expo.GetParameter(2)
-    print " c3 ",expo.GetParameter(4)
-    print expo.GetChisquare(),proj.GetNbinsX(),expo.GetChisquare()/proj.GetNbinsX()
+    for i in range(1,10):
+        print " fit N "+str(i)
+        proj.Fit(expo,"LLMR","",beginFitX,endX)
+        print " expo ",expo
+        print " N0 ",expo.GetParameter(0)
+        print " N1 ",expo.GetParameter(3)
+        print " c1 ",expo.GetParameter(1)
+        print " c2 ",expo.GetParameter(2)
+        print " c3 ",expo.GetParameter(4)
+        print expo.GetChisquare(),proj.GetNbinsX(),expo.GetChisquare()/proj.GetNbinsX()
+    '''
     #p0 = expo.GetParameter(0)
     #p1 = expo.GetParameter(1)
     #expo=ROOT.TF1("expo","[0]*(e^(-[1]*x))*(1+TMath::Erf(x-[2]))",1000,8000) #*(1+TMath::Erf(x-[2]))
@@ -749,7 +842,7 @@ def doFit(proj,label="",fixPars=None):
     print " c3 ",expo.GetParameter(4)
 
     print expo.GetChisquare(),proj.GetNbinsX(),expo.GetChisquare()/proj.GetNbinsX()
-
+    '''
     return expo
 
 
@@ -849,10 +942,11 @@ def doCFit(proj,finalFit,label="",fixPars=None):
         expo.SetParLimits(4,65.,200.)
     expo=ROOT.TF1("expo","[0]*e^(-[1]*(x -1125.)/13000.-[2]/((x-1125.)/13000.))+ [3]*e^(-[4]*(x -1125.)/13000.)",1000,8000)
     print expo
-    expo.SetParLimits(4,0.5*expo.GetParameter(4),1.5*expo.GetParameter(4)) 
-    expo.SetParLimits(1,0.5*expo.GetParameter(1),1.5*expo.GetParameter(1))
-    #expo.SetParameter(1,100.)
-    expo.SetParLimits(2,0.5*expo.GetParameter(2),1.5*expo.GetParameter(2))
+    expo.SetParLimits(4,0.01*finalFit.GetParameter(4),5*finalFit.GetParameter(4)) 
+    expo.SetParameter(4,0.)
+    expo.SetParLimits(1,0.01*finalFit.GetParameter(1),5*finalFit.GetParameter(1))
+    expo.SetParameter(1,0.)
+    expo.SetParLimits(2,0.,5*finalFit.GetParameter(2))
 
     print "N0 final fit ",finalFit.GetParameter(0)
     expo.FixParameter(0,finalFit.GetParameter(0)) #,finalFit.GetParameter(0));
@@ -1021,16 +1115,25 @@ if len(list_dataPlottersNW) > 0:
         histI2=plotter.drawTH1Binned('jj_LV_mass',options.cut,"1",array('f',binning))
         print "data Integral "+str(histI2.Integral())
         mvv_nominal_w.Add(histI2)
+
+component = ((options.output).split("_")[2]).split(".")[0]
+
+print " ********** Done making hist now do ratio plot  ******************"
+
+
+doRatioPlot(mvv_nominal,mvv_nominal_w,sampleTypes,((options.output).split("_")[2]).split(".")[0]+"_"+((options.output).split("_")[1]).split(".")[0]+"_ratio")
+
+
             
 print " ********** Done making hist now do the fit ******************"
 
-fixPars = {"N0":0,"N1":0,"c1":100,"c2":0}
-finalFit = doFit(mvv_nominal,((options.output).split("_")[2]).split(".")[0],fixPars)
+#fixPars = {"N0":0,"N1":0,"c1":0,"c2":0,"c3":0.}
+finalFit = doFit(mvv_nominal,((options.output).split("_")[2]).split(".")[0]) #,fixPars)
 
 
 print "************************ do debugging plots *******************"
 
-doPlotRatio(mvv_nominal,finalFit,sampleTypes,((options.output).split("_")[2]).split(".")[0]+"_"+((options.output).split("_")[1]).split(".")[0],mvv_nominal_w)
+doPlotCRatio(mvv_nominal,finalFit,sampleTypes,((options.output).split("_")[2]).split(".")[0]+"_"+((options.output).split("_")[1]).split(".")[0],mvv_nominal_w)
 
 print " **************************** write fit to json ***************"
 print " open json file ",options.output
@@ -1042,9 +1145,12 @@ json.dump(parametrization,f)
 if options.samples.find("TT")!=-1: 
     print " ********** Making fit without reweight  ******************"
 
-    #noreweightFit = doFit(mvv_nominal_w,((options.output).split("_")[2]).split(".")[0])
+    fixPars=None
+    if component == "nonresT":
+        fixPars={"N0":0.,"N1":0.,"c1":10.,"c2":0.,"c3":10.}
+    noreweightFit = doFit(mvv_nominal_w,((options.output).split("_")[2]).split(".")[0],fixPars)
     #noreweightFit = doC3Fit(mvv_nominal_w,finalFit,((options.output).split("_")[2]).split(".")[0])
-    noreweightFit = doCFit(mvv_nominal_w,finalFit,((options.output).split("_")[2]).split(".")[0])
+    #noreweightFit = doCFit(mvv_nominal_w,finalFit,((options.output).split("_")[2]).split(".")[0])
 
 
     print "************************ do plots *******************"
@@ -1058,37 +1164,3 @@ if options.samples.find("TT")!=-1:
     parametrization = getParametrization(noreweightFit)
     json.dump(parametrization,f)
 
-
-#print " ********** Make PT reweighted histograms ********************"
-#alpha=1.5/float(options.maxx)
-#histogram_pt_down,histogram_pt_up=unequalScale(mvv_nominal,"mvv_PT",alpha)
-
-#alpha=1.5*float(options.minx)
-#histogram_opt_down,histogram_opt_up=unequalScale(mvv_nominal,"mvv_OPT",alpha)
-
-#alpha=float(options.maxx)*float(options.maxx)
-#histogram_pt2_down,histogram_pt2_up=unequalScale(mvv_nominal,"mvv_PT2",alpha,2)
-
-#alpha=float(options.minx)*float(options.minx)
-#histogram_opt2_down,histogram_opt2_up=unequalScale(mvv_nominal,"mvv_OPT2",alpha,2)
-
-#print " ************************* try final fit on reweighted histos BUT this time only c2 is floating ************"
-
-
-#Fit = doFit(histogram_pt_down,((options.output).split("_")[-1]).split(".")[0]+"_pt_down",parametrization)
-#doPlot(histogram_pt_down,Fit,sampleTypes,((options.output).split("_")[-1]).split(".")[0]+"_pt_down")
-#Fit = doFit(histogram_pt_up,((options.output).split("_")[-1]).split(".")[0]+"_pt_up",parametrization)
-#doPlot(histogram_pt_up,Fit,sampleTypes,((options.output).split("_")[-1]).split(".")[0]+"_pt_up")
-#Fit = doFit(histogram_opt_down,((options.output).split("_")[-1]).split(".")[0]+"_opt_down",parametrization)
-#doPlot(histogram_opt_down,Fit,sampleTypes,((options.output).split("_")[-1]).split(".")[0]+"_opt_down")
-#Fit = doFit(histogram_opt_up,((options.output).split("_")[-1]).split(".")[0]+"_opt_up",parametrization)
-#doPlot(histogram_opt_up,Fit,sampleTypes,((options.output).split("_")[-1]).split(".")[0]+"_opt_up")
-#Fit = doFit(histogram_pt2_down,((options.output).split("_")[-1]).split(".")[0]+"_pt2_down",parametrization)
-#doPlot(histogram_pt2_down,Fit,sampleTypes,((options.output).split("_")[-1]).split(".")[0]+"_pt2_down")
-#Fit = doFit(histogram_pt2_up,((options.output).split("_")[-1]).split(".")[0]+"_pt2_up",parametrization)
-#doPlot(histogram_pt2_up,Fit,sampleTypes,((options.output).split("_")[-1]).split(".")[0]+"_pt2_up")
-
-#Fit = doFit(histogram_opt2_down,((options.output).split("_")[-1]).split(".")[0]+"_opt2_down",parametrization)
-#doPlot(histogram_opt2_down,Fit,sampleTypes,((options.output).split("_")[-1]).split(".")[0]+"_opt2_down")
-#Fit = doFit(histogram_opt2_up,((options.output).split("_")[-1]).split(".")[0]+"_opt2_up",parametrization)
-#doPlot(histogram_opt2_up,Fit,sampleTypes,((options.output).split("_")[-1]).split(".")[0]+"_opt2_up")
