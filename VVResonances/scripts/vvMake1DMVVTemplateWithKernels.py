@@ -121,14 +121,9 @@ weights_ = options.weights.split(',')
 random=ROOT.TRandom3(101082)
 
 sampleTypes=options.samples.split(',')
-#period = "2016"
-#if options.samples.find("HT800")!=-1:
-#    period = "2017"
 period=options.period
 
 stack = ROOT.THStack("stack","")
-Wjets = False
-Zjets = False
 print "Creating datasets for samples: " ,sampleTypes
 dataPlotters=[]
 dataPlottersNW=[]
@@ -169,16 +164,14 @@ for filename in os.listdir(folder):
             corrFactor = 1
             if filename.find('Z') != -1:
                 corrFactor = options.corrFactorZ
-                Zjets = True
                 print "add correction factor for Z+jets sample"
             if filename.find('W') != -1:
                 corrFactor = options.corrFactorW
-                Wjets = True
                 print "add correction factor for W+jets sample"
+            dataPlotters[-1].addCorrectionFactor(corrFactor,'flat') 
             if filename.find("TT")!=-1:
                 #we consider ttbar with reweight applyied as nominal!
                 dataPlotters[-1].addCorrectionFactor('TopPTWeight','tree')
-            dataPlotters[-1].addCorrectionFactor(corrFactor,'flat') 
             dataPlotters[-1].filename=fname
 
             dataPlottersNW.append(TreePlotter(folder+'/'+fname+'.root','AnalysisTree'))
@@ -187,7 +180,6 @@ for filename in os.listdir(folder):
             if fname.find("QCD_Pt_") !=-1 or fname.find("QCD_HT") !=-1:
                 print "going to apply spikekiller for ",fname
                 dataPlottersNW[-1].addCorrectionFactor('b_spikekiller','tree')
-            if options.triggerW: dataPlottersNW[-1].addCorrectionFactor('triggerWeight','tree')
             dataPlottersNW[-1].addCorrectionFactor(corrFactor,'flat')
             for w in weights_: 
                 if w != '': dataPlottersNW[-1].addCorrectionFactor(w,'branch')
@@ -261,11 +253,11 @@ for plotter,plotterNW in zip(dataPlotters,dataPlottersNW):
  '''
 
 
- #Nominal histogram Pythia8
+ #Nominal histogram Pythia8 / first V+jets sample
  c=0
  if plotter.filename.find(sampleTypes[0].replace('.root','')) != -1 : #and plotter.filename.find("Jets") == -1 and plotter.filename.find("TT") ==-1: 
-   print "Preparing nominal histogram for sampletype " ,sampleTypes[0]
-   print "filename: ", plotter.filename, " preparing central values histo"
+   print "Preparing  histogram for sampletype " ,sampleTypes[0]
+   print "filename: ", plotter.filename
    histI2=plotter.drawTH1Binned('jj_LV_mass',options.cut,"1",array('f',binning))
    canv = ROOT.TCanvas("c1","c1",800,600)
    dataset=plotterNW.makeDataSet('jj_gen_partialMass,jj_l1_gen_pt,jj_l1_gen_softDrop_mass',options.cut,options.firstEv,options.lastEv)     
@@ -283,11 +275,11 @@ for plotter,plotterNW in zip(dataPlotters,dataPlottersNW):
    histI2.Delete()
    histTMP.Delete()
 
-
+#variation madgraph/ second V+jets sample
  if len(sampleTypes)<2: continue
  elif plotter.filename.find(sampleTypes[1].replace('.root','')) != -1 : #and plotter.filename.find("Jets") == -1 and plotter.filename.find("TT") ==-1: #alternative shape Herwig
-   print "Preparing alternative shapes for sampletype " ,sampleTypes[1]
-   print "filename: ", plotter.filename, " preparing alternate shape histo"
+   print "Preparing histogram for sampletype " ,sampleTypes[1]
+   print "filename: ", plotter.filename
    histI2=plotter.drawTH1Binned('jj_LV_mass',options.cut,"1",array('f',binning))
  
    dataset=plotterNW.makeDataSet('jj_gen_partialMass,jj_l1_gen_pt,jj_l1_gen_softDrop_mass',options.cut,options.firstEv,options.lastEv)
@@ -309,11 +301,11 @@ for plotter,plotterNW in zip(dataPlotters,dataPlottersNW):
    histogram_altshapeUp.SetLineColor(ROOT.kBlue)
    histogram_altshapeUp.SetFillColorAlpha(ROOT.kBlue, 0.6)
    stack.Add(histogram_altshapeUp)
-
+#variation herwig/ third V+jets sample
  if len(sampleTypes)<3: continue
  elif plotter.filename.find(sampleTypes[2].replace('.root','')) != -1 : #and plotter.filename.find("Jets") == -1 and plotter.filename.find("TT") ==-1: #alternative shape Pythia8+Madgraph (not used for syst but only for cross checks)
-   print "Preparing alternative shapes for sampletype " ,sampleTypes[2]
-   print "filename: ", plotter.filename, " preparing alternate shape histo"
+   print "Preparing histogram for sampletype " ,sampleTypes[2]
+   print "filename: ", plotter.filename
    
    histI2=plotter.drawTH1Binned('jj_LV_mass',options.cut,"1",array('f',binning))
 
