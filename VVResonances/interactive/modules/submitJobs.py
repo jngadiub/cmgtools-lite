@@ -805,20 +805,21 @@ def merge1DMVVTemplate(jobList,files,jobname,purity,binsMVV,minMVV,maxMVV,HCALbi
             finalHistos = {}
             finalHistos['histo_nominal'] = ROOT.TH1F("histo_nominal_out","histo_nominal_out",binsMVV,minMVV,maxMVV)
             finalHistos['mvv_nominal'] = ROOT.TH1F("mvv_nominal_out","mvv_nominal_out",binsMVV,minMVV,maxMVV)
+            if jobname.find("TT") !=-1:  finalHistos['histo_noreweight'] = ROOT.TH1F("histo_noreweight_out","histo_noreweight_out",binsMVV,minMVV,maxMVV)
             if HCALbinsMVV!="":
                 a,b,bins = HCALbinsMVV.split(" ")
                 binning = getBinning(bins)
                 binning = array("f",binning)
                 finalHistos['histo_nominal'] = ROOT.TH1F("histo_nominal_out","histo_nominal_out",len(binning)-1,binning)
                 finalHistos['mvv_nominal'] = ROOT.TH1F("mvv_nominal_out","mvv_nominal_out",len(binning)-1,binning)
-                
+                if jobname.find("TT") !=-1: finalHistos['histo_noreweight'] = ROOT.TH1F("histo_noreweight_out","histo_noreweight_out",len(binning)-1,binning)
             for f in jobsPerSample[s]:
                 
                 inf = ROOT.TFile.Open(f,'READ')
                 
                 for h in inf.GetListOfKeys():
                     
-                    if (h.GetName() == 'histo_nominal' and h.GetTitle() == 'histo_nominal') or (h.GetName() == 'mvv_nominal' and h.GetTitle() == 'mvv_nominal'):
+                    if (h.GetName() == 'histo_nominal' and h.GetTitle() == 'histo_nominal') or (h.GetName() == 'mvv_nominal' and h.GetTitle() == 'mvv_nominal') or  (h.GetName() == 'histo_noreweight' and h.GetTitle() == 'histo_noreweight'):
                         
                         histo = ROOT.TH1F()
                         histo = inf.Get(h.GetName())
@@ -831,7 +832,7 @@ def merge1DMVVTemplate(jobList,files,jobname,purity,binsMVV,minMVV,maxMVV,HCALbi
             outf.cd()  
             finalHistos['histo_nominal'].Write('histo_nominal')
             finalHistos['mvv_nominal'].Write('mvv_nominal')
-   
+            if jobname.find("TT") !=-1: finalHistos['histo_noreweight'].Write('histo_noreweight')
             outf.Close()
             outf.Delete()
 
@@ -842,18 +843,21 @@ def merge1DMVVTemplate(jobList,files,jobname,purity,binsMVV,minMVV,maxMVV,HCALbi
         pythia_files = []
         herwig_files = []
         dijet_files = []
+        tt_files=[]
 
         for f in filelist:
             if f.find('QCD_HT') != -1: mg_files.append('./'+outdir+'_out'+'/'+f)
             elif f.find('QCD_Pt_') != -1: pythia_files.append('./'+outdir+'_out'+'/'+f)
             elif f.find('QCD_Pt-') != -1: herwig_files.append('./'+outdir+'_out'+'/'+f)
+            elif f.find("TT")!= -1: tt_files.append('./'+outdir+'_out'+'/'+f)
             else: dijet_files.append('./'+outdir+'_out'+'/'+f)
 	 
         doMadGraph = False
         doHerwig   = False
         doPythia   = False
         doDijet    = False
-	
+	doTT       = False
+
         #now hadd them
         if len(mg_files) > 0:
             cmd = 'hadd -f %s_%s_MVV_%s_altshape2.root '%(filename,name,purity)
@@ -927,7 +931,29 @@ def merge1DMVVTemplate(jobList,files,jobname,purity,binsMVV,minMVV,maxMVV,HCALbi
             histo_NLO.SetTitle('histo_nominal')
 
             doDijet = True
-		
+
+        if len(tt_files) > 0:
+
+            cmd = 'hadd -f %s_%s_MVV_%s.root '%(filename,name,purity)
+            for f in tt_files:
+                cmd += f
+                cmd += ' '
+            print cmd
+            os.system(cmd)
+
+            fhadd_tt = ROOT.TFile.Open('%s_%s_MVV_%s.root'%(filename,name,purity),'READ')
+            mvv_nominal = fhadd_tt.Get('mvv_nominal')
+            mvv_nominal.SetName('mvv_nominal')
+            mvv_nominal.SetTitle('mvv_nominal')
+            histo_nominal = fhadd_tt.Get('histo_nominal')
+            histo_nominal.SetName('histo_nominal')
+            histo_nominal.SetTitle('histo_nominal')
+            histo_noreweight = fhadd_tt.Get('histo_noreweight')
+            histo_noreweight.SetName('histo_noreweight')
+            histo_noreweight.SetTitle('histo_noreweight')
+
+            doTT = True
+
         outf = ROOT.TFile.Open('%s_%s_MVV_%s.root'%(filename,name,purity),'RECREATE') 
         
         if doPythia:
@@ -1051,7 +1077,52 @@ def merge1DMVVTemplate(jobList,files,jobname,purity,binsMVV,minMVV,maxMVV,HCALbi
                 histogram_NLODown.SetName('histo_NLODown')
                 histogram_NLODown.SetTitle('histo_NLODown')
                 histogram_NLODown.Write('histo_NLODown')
-                
+
+        if doTT:
+            print "doing TTbar!!"
+            mvv_nominal.Write('mvv_nominal')
+            histo_nominal.Write('histo_nominal')
+            histo_noreweight.Write('histo_noreweight')
+            c = ROOT.TCanvas("c","C",600,400)
+            c.SetRightMargin(0.11)
+            c.SetLeftMargin(0.11)
+            c.SetTopMargin(0.11)
+            histo_nominal.SetLineColor(ROOT.kBlue)
+            sf=histo_nominal.Integral()
+            #if(sf != 0): histo_nominal.Scale(1./sf)
+            histo_nominal.GetYaxis().SetTitle("arbitrary scale")
+            histo_nominal.GetYaxis().SetTitleOffset(1.5)
+            histo_nominal.GetXaxis().SetTitle("dijet mass")
+            histo_nominal.SetMinimum(0.0000000000001)
+            histo_noreweight     .Scale(sf/histo_noreweight.Integral())
+            histo_nominal.Draw("hist")
+            histo_noreweight.SetLineColor(ROOT.kRed)
+            histo_noreweight.SetLineWidth(2)
+            histo_noreweight.Draw("histsame")
+            text = ROOT.TLatex()
+            text.DrawLatexNDC(0.13,0.92,"#font[62]{CMS} #font[52]{Simulation}")
+            mvv_nominal.Scale(sf/mvv_nominal.Integral())
+            mvv_nominal.SetMarkerColor(ROOT.kBlack)
+            mvv_nominal.SetMarkerStyle(7)
+            mvv_nominal.Draw("same")
+            c.SetLogy()
+
+
+            l = ROOT.TLegend(0.17,0.2,0.6,0.33)
+            l.AddEntry(mvv_nominal,"simulation","lp")
+            l.AddEntry(histo_nominal,"template","l")
+            l.AddEntry(histo_noreweight,"no pt reweigh","l")
+            l.Draw("same")
+
+
+            tmplabel = name
+            label=filename.split("_")[1]
+            print "label ",label
+            tmplabel += "_"+label+"_"+purity
+            c.SaveAs("debug_mVV_kernels_"+tmplabel+".pdf")
+            print "for debugging save","debug_mVV_kernels_"+tmplabel+".pdf"
+
+
         os.system('rm -rf '+outdir+'_out/')
                 
 def merge2DTemplate(jobList,files,jobname,purity,leg,binsMVV,binsMJ,minMVV,maxMVV,minMJ,maxMJ,HCALbinsMVV,name,filename,samples):  
