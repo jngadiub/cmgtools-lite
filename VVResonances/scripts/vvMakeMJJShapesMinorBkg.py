@@ -232,17 +232,6 @@ def doPlot(data,finalFit,sampleTypes,outlabel,mvv_nominal_w=None):
 
     finalFit.Draw("fsame")
 
-    '''
-    tmp = orig.Clone()
-    tmp.SetParameter(4,orig.GetParameter(4))
-    tmp.SetLineColor(ROOT.kOrange)
-    tmp.Draw("fsame")
-    
-    tmp2 = orig.Clone()
-    tmp2.SetParameter(4,0.8*orig.GetParameter(4))
-    tmp2.SetLineColor(ROOT.kOrange)
-    tmp2.Draw("fsame")
-    '''
     l = ROOT.TLegend(0.3809045,0.6063636,0.7622613,0.8220979)
     l.SetHeader(outlabel.split("_")[0])
     l.AddEntry(data,"simulation","lp")
@@ -257,9 +246,6 @@ def doPlot(data,finalFit,sampleTypes,outlabel,mvv_nominal_w=None):
         mvv_nominal_w.SetMarkerStyle(10)
         mvv_nominal_w.SetMarkerColor(ROOT.kBlue)
         mvv_nominal_w.SetLineColor(ROOT.kBlue)
-        #if options.samples.find("TT")!=-1:
-
-        #else: l.AddEntry(mvv_nominal_w,"pT up variation", "lp")
     l.Draw("same")
 
     print "nominal chisquare ",orig.GetChisquare()/data.GetNbinsX()
@@ -385,17 +371,6 @@ def doPlotC3Ratio(data,finalFit,sampleTypes,outlabel,mvv_nominal_w=None):
 
     finalFit.Draw("fsame")
 
-    '''
-    tmp = orig.Clone()
-    tmp.SetParameter(4,orig.GetParameter(4))
-    tmp.SetLineColor(ROOT.kOrange)
-    tmp.Draw("fsame")
-    
-    tmp2 = orig.Clone()
-    tmp2.SetParameter(4,0.8*orig.GetParameter(4))
-    tmp2.SetLineColor(ROOT.kOrange)
-    tmp2.Draw("fsame")
-    '''
     l = ROOT.TLegend(0.3809045,0.6063636,0.7622613,0.8220979)
     l.SetHeader(outlabel.split("_")[0])
     l.AddEntry(data,"simulation","lp")
@@ -410,9 +385,6 @@ def doPlotC3Ratio(data,finalFit,sampleTypes,outlabel,mvv_nominal_w=None):
         mvv_nominal_w.SetMarkerStyle(4)
         mvv_nominal_w.SetMarkerColor(ROOT.kBlue)
         mvv_nominal_w.SetLineColor(ROOT.kBlue)
-        #if options.samples.find("TT")!=-1:
-
-        #else: l.AddEntry(mvv_nominal_w,"pT up variation", "lp")
     l.Draw("same")
 
     print "nominal chisquare ",orig.GetChisquare()/data.GetNbinsX()
@@ -608,17 +580,6 @@ def doPlotCRatio(data,finalFit,sampleTypes,outlabel,mvv_nominal_w=None):
         '''
     finalFit.Draw("fsame")
 
-    '''
-    tmp = orig.Clone()
-    tmp.SetParameter(4,orig.GetParameter(4))
-    tmp.SetLineColor(ROOT.kOrange)
-    tmp.Draw("fsame")
-    
-    tmp2 = orig.Clone()
-    tmp2.SetParameter(4,0.8*orig.GetParameter(4))
-    tmp2.SetLineColor(ROOT.kOrange)
-    tmp2.Draw("fsame")
-    '''
     l = ROOT.TLegend(0.3809045,0.6063636,0.7622613,0.8220979)
     l.SetHeader(outlabel.split("_")[0])
     l.AddEntry(data,"simulation","lp")
@@ -636,9 +597,6 @@ def doPlotCRatio(data,finalFit,sampleTypes,outlabel,mvv_nominal_w=None):
         mvv_nominal_w.SetMarkerStyle(4)
         mvv_nominal_w.SetMarkerColor(ROOT.kBlue)
         mvv_nominal_w.SetLineColor(ROOT.kBlue)
-        #if options.samples.find("TT")!=-1:
-
-        #else: l.AddEntry(mvv_nominal_w,"pT up variation", "lp")
     l.Draw("same")
 
     print "nominal chisquare ",orig.GetChisquare()/data.GetNbinsX()
@@ -784,7 +742,6 @@ def doFit(proj,label="",fixPars=None):
     print expo
     if fixPars!=None:
         print " fixPars = ",fixPars
-        #expo.SetParLimits(4,0.,1000.)
         for key in fixPars.keys():
             p = fixPars[key]
             if key=="N0": expo.SetParameter(0,p); expo.SetParLimits(0,0.,1.); 
@@ -792,7 +749,6 @@ def doFit(proj,label="",fixPars=None):
             if key=="c2": expo.SetParameter(2,p); expo.SetParLimits(2,0.,1.); 
             if key=="N1": expo.SetParameter(3,p); expo.SetParLimits(3,0.,1.); 
             if key=="c3": expo.SetParameter(4,p); expo.SetParLimits(4,0.,1000.);
-    #expo=ROOT.TF1("expo","[0]*e^(-[1]*x)*(1/x)",1000,8000)
     
     print " expo ",expo
     print " N0 ",expo.GetParameter(0)
@@ -811,38 +767,6 @@ def doFit(proj,label="",fixPars=None):
         print " c2 ",expo.GetParameter(2)
         print " c3 ",expo.GetParameter(4)
         print expo.GetChisquare(),proj.GetNbinsX(),expo.GetChisquare()/proj.GetNbinsX()
-    '''
-    #p0 = expo.GetParameter(0)
-    #p1 = expo.GetParameter(1)
-    #expo=ROOT.TF1("expo","[0]*(e^(-[1]*x))*(1+TMath::Erf(x-[2]))",1000,8000) #*(1+TMath::Erf(x-[2]))
-    #expo.SetParameters(0,p0)
-    #expo.SetParameters(1,p1)
-    #expo.SetParLimits(2,0,1000)
-    #expo.SetParLimits(3,-50,110)
-    #expo=ROOT.TF1("expo","expo(2)",1000,8000)
-    #expo.SetParameters(0,16.,2.)
-    print " 2nd fit "
-    proj.Fit(expo,"LLMR","",beginFitX,endX)
-    print " expo ",expo
-    print " N0 ",expo.GetParameter(0)
-    print " N1 ",expo.GetParameter(3)
-    print " c1 ",expo.GetParameter(1)
-    print " c2 ",expo.GetParameter(2)
-    print " c3 ",expo.GetParameter(4)
-
-    print expo.GetChisquare(),proj.GetNbinsX(),expo.GetChisquare()/proj.GetNbinsX()
-
-    print " 3rd fit "
-    proj.Fit(expo,"LLMR","",beginFitX,endX)
-    print " expo ",expo
-    print " N0 ",expo.GetParameter(0)
-    print " N1 ",expo.GetParameter(3)
-    print " c1 ",expo.GetParameter(1)
-    print " c2 ",expo.GetParameter(2)
-    print " c3 ",expo.GetParameter(4)
-
-    print expo.GetChisquare(),proj.GetNbinsX(),expo.GetChisquare()/proj.GetNbinsX()
-    '''
     return expo
 
 
