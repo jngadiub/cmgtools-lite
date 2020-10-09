@@ -175,6 +175,9 @@ for filename in os.listdir(folder):
                 corrFactor = options.corrFactorW
                 Wjets = True
                 print "add correction factor for W+jets sample"
+            if filename.find("TT")!=-1:
+                #we consider ttbar with reweight applyied as nominal!
+                dataPlotters[-1].addCorrectionFactor('TopPTWeight','tree')
             dataPlotters[-1].addCorrectionFactor(corrFactor,'flat') 
             dataPlotters[-1].filename=fname
 
