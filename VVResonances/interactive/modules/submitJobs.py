@@ -245,9 +245,12 @@ def Make2DDetectorParam(rootFile,template,cut,samples,jobname="DetPar",bins="200
     
 def Make1DMVVTemplateWithKernels(rootFile,template,cut,resFile,binsMVV,minMVV,maxMVV,samples,jobName="1DMVV",wait=True,binning='',addOption="",sendjobs=True):
 
-    
+    command='vvMake1DMVVTemplateWithKernels.py'
+    if rootFile.find("TT")!=-1: command='vvMake1DMVVTemplateTTbar.py'
+
     print 
     print 'START: Make1DMVVTemplateWithKernels with parameters:'
+    print command
     print
     print "rootFile = %s" %rootFile  
     print "template = %s" %template  
@@ -269,7 +272,7 @@ def Make1DMVVTemplateWithKernels(rootFile,template,cut,resFile,binsMVV,minMVV,ma
     print
 
     #cmd='vvMake1DMVVTemplateWithKernels.py -H "x" -c "{cut}"  -v "jj_gen_partialMass" {binning} -b {binsMVV}  -x {minMVV} -X {maxMVV} -r {res} {addOption} -d {infolder} '.format(rootFile=rootFile,cut=cut,res=resFile,binsMVV=binsMVV,minMVV=minMVV,maxMVV=maxMVV,infolder=samples,binning=binning,addOption=addOption)
-    cmd='vvMake1DMVVTemplateWithKernels.py -H "x" -c "{cut}"  -v "jj_gen_partialMass" {binning} -b {binsMVV}  -x {minMVV} -X {maxMVV} -r {res} {addOption} '.format(rootFile=rootFile,cut=cut,res=resFile,binsMVV=binsMVV,minMVV=minMVV,maxMVV=maxMVV,binning=binning,addOption=addOption)
+    cmd=command+' -H "x" -c "{cut}"  -v "jj_gen_partialMass" {binning} -b {binsMVV}  -x {minMVV} -X {maxMVV} -r {res} {addOption} '.format(rootFile=rootFile,cut=cut,res=resFile,binsMVV=binsMVV,minMVV=minMVV,maxMVV=maxMVV,binning=binning,addOption=addOption)
     print "cmd ",cmd 
     OutputFileNames = rootFile.replace(".root","") # base of the output file name, they will be saved in res directory
     print "OutputFileNames ",OutputFileNames
