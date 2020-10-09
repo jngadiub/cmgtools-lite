@@ -31,7 +31,7 @@ parser.add_option("--batch",action="store_false",dest="batch",help="submit to ba
 parser.add_option("--trigg",action="store_true",dest="trigg",help="add trigger weights or not ",default=False)
 parser.add_option("--run",dest="run",help="decide which parts of the code should be run right now possible optoins are: all : run everything, sigmvv: run signal mvv fit sigmj: run signal mj fit, signorm: run signal norm, vjets: run vjets, tt: run ttbar , qcdtemplates: run qcd templates, qcdkernel: run qcd kernel, qcdnorm: run qcd merge and norm, detector: run detector fit , data : run the data or pseudodata scripts ",default="all")
 parser.add_option("--signal",dest="signal",default="BGWW",help="which signal do you want to run? options are BulkGWW, BulkGZZ, WprimeWZ, ZprimeWW, ZprimeZH")
-parser.add_option("--fitvjetsmjj",dest="fitvjetsmjj",default=False,action="store_true",help="True makes fits for mjj of vjets, False uses hists")
+parser.add_option("--fitsmjj",dest="fitsmjj",default=False,action="store_true",help="True makes fits for mjj of vjets/tt, False uses hists")
 parser.add_option("--single",dest="single",default=False,help="set to True to merge kernels also for single years when processing full run2 data")
 parser.add_option("--sendjobs",dest="sendjobs",default=True,help="make job list without submitting them (useful to only merge jobs if something was not finished")
 
@@ -110,13 +110,16 @@ dataTemplate="JetHT"
 #nonResTemplate="QCD_HT" #medium stat madgraph+pythia
 nonResTemplate="QCD_Pt_" #high stat pythia8
 
+'''
 if(period == "2016"):                                                                                                                                                                                                                        
     TTemplate= "TT_Mtt-700to1000,TT_Mtt-1000toInf" 
 elif (filePeriod == "Run2"):
     TTemplate= "TT_Mtt-700to1000,TT_Mtt-1000toInf,TTToHadronic"
 else:                                                                                                                                                                                                                                       
     TTemplate= "TTToHadronic" 
+'''
 
+TTemplate= "TT_Mtt-700to1000,TT_Mtt-1000toInf"
 WresTemplate= "WJetsToQQ_HT400to600,WJetsToQQ_HT600to800,WJetsToQQ_HT800toInf"
 ZresTemplate= "ZJetsToQQ_HT400to600,ZJetsToQQ_HT600to800,ZJetsToQQ_HT800toInf"
 resTemplate= "ZJetsToQQ_HT400to600,ZJetsToQQ_HT600to800,ZJetsToQQ_HT800toInf,WJetsToQQ_HT400to600,WJetsToQQ_HT600to800,WJetsToQQ_HT800toInf"
@@ -243,7 +246,7 @@ if options.run.find("all")!=-1 or options.run.find("vjets")!=-1:
     wait=False
     if options.batch == True : wait=True 
     if options.run.find("all")!=-1 or options.run.find("kernel")!=-1 or options.run.find("All")!=-1:
-        if options.fitvjetsmjj == True:
+        if options.fitsmjj == True:
             print "and then we fit mvv"
             f.makeMinorBkgShapesMVV("ZJets","JJ_"+filePeriod,ZresTemplate,ctx.cuts['nonres'],"Zjets",1.,1.)
             f.makeMinorBkgShapesMVV("WJets","JJ_"+filePeriod,WresTemplate,ctx.cuts['nonres'],"Wjets",1.,1.)
@@ -271,7 +274,10 @@ if options.run.find("all")!=-1 or options.run.find("tt")!=-1:
     contrib =["resT","resW","nonresT","resTnonresT","resWnonresT","resTresW"]
     for con in contrib:
         print " ***************************         "+con+"      ******************************"
-        f.makeMinorBkgShapesMVV("TTJets"+con,"JJ_"+filePeriod,TTemplate,ctx.cuts[con],con)
+        if options.fitsmjj == True:
+            f.makeMinorBkgShapesMVV("TTJets"+con,"JJ_"+filePeriod,TTemplate,ctx.cuts[con],con)
+        else:
+            f.makeBackgroundShapesMVVKernel("TTJets"+con,"JJ_"+filePeriod,TTemplate,ctx.cuts[con],"1DTT"+con,wait,1.,1.,options.sendjobs)
         f.makeNormalizations("TTJets"+con,"JJ_"+filePeriod,TTemplate,0,ctx.cuts[con],"nResTT"+con,options.single,"1",options.sendjobs)
 
 
