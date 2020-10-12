@@ -41,7 +41,7 @@ parser.add_option("--prelim",dest="prelim",help="add preliminary label",default=
 parser.add_option("--channel",dest="channel",help="which category to use? ",default="VV_HPHP")
 parser.add_option("--doFit",dest="fit",action="store_true",help="actually fit the the distributions",default=False)
 parser.add_option("-v","--doVjets",dest="doVjets",action="store_true",help="Fit top",default=False)
-
+parser.add_option("--slopes",dest="slopes",action="store_true",help="save ttbar slopes",default=False)
 (options,args) = parser.parse_args()
 ROOT.gStyle.SetOptStat(0)
 ROOT.RooMsgService.instance().setGlobalKillBelow(ROOT.RooFit.FATAL)
@@ -127,6 +127,9 @@ def writeLogfile(options,fitresult):
 if __name__=="__main__":
      finMC = ROOT.TFile(options.input,"READ");
      hinMC = finMC.Get("nonRes");
+     binwidth = hinMC.GetXaxis().GetBinWidth(3)
+     print "binwidth ",binwidth
+
      print options.name
      purity = options.channel  
      
@@ -232,7 +235,7 @@ if __name__=="__main__":
                 expected[bkg] = [ (args[pdf1Name[period]].getComponents())["n_exp_binJJ_"+purity+"_13TeV_"+period+"_proc_"+bkg],(args[pdf1Name[period]].getComponents())["n_exp_binJJ_"+purity+"_13TeV_"+period+"_proc_"+bkg].getPropagatedError(fitresult)]
                 norms[bn] = expected[bkg][0].getVal() 
                 if bn in mappdf:
-                    print "+mappdf[bn] ",mappdf[bn]
+                    #print "+mappdf[bn] ",mappdf[bn]
                     params = fitresult.floatParsFinal()
                     paramsfinal = ROOT.RooArgSet(params)
                     for k in range(0,len(params)):
@@ -248,11 +251,12 @@ if __name__=="__main__":
         #save post fit ttbar only normalization to be used as prefit value when fitting all bkg
         if options.name.find("ttbar")!=-1:
                 jsonfile = open(options.jsonname+"_"+options.channel+".json","w")
-                jsonfileslopes = open(options.jsonname+"Slopes_"+options.channel+".json","w")
                 json.dump(norms,jsonfile)
-                json.dump(slopes,jsonfileslopes)
                 jsonfile.close()
-                jsonfileslopes.close()
+                if options.slopes == True:
+                    jsonfileslopes = open(options.jsonname+"Slopes_"+options.channel+".json","w")
+                    json.dump(slopes,jsonfileslopes)
+                    jsonfileslopes.close()
         if options.fitSignal:
                 signal_expected[period] = [ (args[pdf1Name[period]].getComponents())["n_exp_final_binJJ_"+purity+"_13TeV_"+period+"_proc_"+signalName], (args[pdf1Name[period]].getComponents())["n_exp_final_binJJ_"+purity+"_13TeV_"+period+"_proc_"+signalName].getPropagatedError(fitresult)]
                 print "Fitted signal yields:",signal_expected[period][0].getVal()," +/- ", signal_expected[period][bkg][1] ,"(",period,")"
@@ -273,12 +277,12 @@ if __name__=="__main__":
      if options.projection =="x" or options.projection =="xyz":
          results = []
          res = forproj.doProjection(data[period],allpdfsx[period],all_expected[period],"x",allsignalpdfs[period],signal_expected[period])
-         forplotting.MakePlots(res[0],res[1],res[2],res[3],res[4],res[5], res[6],res[7])
+         forplotting.MakePlots(res[0],res[1],res[2],res[3],res[4],res[5], res[6],res[7],binwidth)
      #make projections onto MJ2 axis
      if options.projection =="y" or options.projection =="xyz":
          results = []
          res = forproj.doProjection(data[period],allpdfsy[period],all_expected[period],"y",allsignalpdfs[period],signal_expected[period])
-         forplotting.MakePlots(res[0],res[1],res[2],res[3],res[4],res[5], res[6],res[7])
+         forplotting.MakePlots(res[0],res[1],res[2],res[3],res[4],res[5], res[6],res[7],binwidth)
 
 
         
