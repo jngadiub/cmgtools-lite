@@ -360,7 +360,7 @@ class Postfitplotter():
         if period =="2016":  CMS_lumi.lumi_13TeV = "35.9 fb^{-1}"
         if period =="2017":  CMS_lumi.lumi_13TeV = "77.3 fb^{-1}"
         if period =="16+17":  CMS_lumi.lumi_13TeV = "113.2 fb^{-1}"
-        if period =="run2":  CMS_lumi.lumi_13TeV = "run2 fb^{-1}"
+        if period =="Run2":  CMS_lumi.lumi_13TeV = "137.2 fb^{-1}"
         CMS_lumi.writeExtraText = 1
         CMS_lumi.lumi_sqrtS = "13 TeV (2016+2017)" # used with iPeriod = 0, e.g. for simulation-only plots (default is an empty string)
         CMS_lumi.extraText = self.options.prelim
@@ -392,7 +392,7 @@ class Postfitplotter():
 
 
 
-    def MakePlots(self,histos,hdata,hsig,axis,nBins,maxY=-1.,normsig = 1.,errors=None):
+    def MakePlots(self,histos,hdata,hsig,axis,nBins,maxY=-1.,normsig = 1.,errors=None,binwidth=2):
         print histos
         extra1 = ''
         extra2 = ''
@@ -474,7 +474,7 @@ class Postfitplotter():
         histos[0].GetYaxis().SetTitleOffset(1.3)
         histos[0].GetYaxis().SetTitle("Events")
         histos[0].GetYaxis().SetTitleOffset(1.3)
-        histos[0].GetYaxis().SetTitle("Events / 2 GeV")
+        histos[0].GetYaxis().SetTitle("Events / "+str(binwidth)+" GeV")
         if axis == 'z': histos[0].GetYaxis().SetTitle("Events / 100 GeV")
         histos[0].GetYaxis().SetTitleSize(0.06)
         histos[0].GetYaxis().SetLabelSize(0.06)
@@ -873,7 +873,7 @@ class Projection():
         r ={}
         for i in range(0,N+2):
             #v = mmin + i * (mmax-mmin)/float(N)
-            r[i] = axis.GetBinWidth(i) 
+            r[i] = axis.GetBinWidth(i)
         return r 
 
     
@@ -1080,7 +1080,8 @@ class Projection():
         x_min = self.Binslowedge
         proj = self.axis
         rand = ROOT.TRandom3(1234);
-        number_errorband = 100
+        number_errorband = 5 #100
+        print " number_errorband reduced to "+str(number_errorband)+" for speed reasons!"
         syst = [0 for i in range(number_errorband)]
       
         value = [0 for x in range(len(x_min))]  
