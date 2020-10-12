@@ -2101,7 +2101,7 @@ def makePseudoDataVjets(input,kernel,mc,output,lumi,workspace,year,purity,rescal
 
 
 def makePseudoDataVjetsTT(input,input_tt,kernel,mc,output,lumi,workspace,year,purity):
- 
+
  pwd = os.getcwd()
  pwd = "/"
  ROOT.gRandom.SetSeed(123)
@@ -2124,8 +2124,9 @@ def makePseudoDataVjetsTT(input,input_tt,kernel,mc,output,lumi,workspace,year,pu
  xbins = array("f",getListOfBinsLowEdge(hmcin,"x"))
  zbins = array("f",getListOfBinsLowEdge(hmcin,"z"))
  hout = ROOT.TH3F('data','data',len(xbins)-1,xbins,len(xbins)-1,xbins,len(zbins)-1,zbins)
- 
- hout.FillRandom(hdata,int(hmcin.Integral()*lumi))
+ nEventsQCD = int(hmcin.Integral()*lumi)
+ print "Expected QCD events: ",nEventsQCD
+ hout.FillRandom(hdata,nEventsQCD)
  
  ws_file = ROOT.TFile.Open(workspace,'READ')
  ws = ws_file.Get('w')
@@ -2205,7 +2206,7 @@ def makePseudoDataVjetsTT(input,input_tt,kernel,mc,output,lumi,workspace,year,pu
  print "Expected W+jets events: ",nEventsW
  print "Expected Z+jets events: ",nEventsZ
  print "Expected TTJets events:",int(hin_tt.Integral()*lumi)
- print "Expected QCD events: ",int(hmcin.Integral()*lumi)
+ print "Expected QCD events: ",nEventsQCD
  print "Writing histograms nonRes and data to file ", output
 
  finmc.Close()
