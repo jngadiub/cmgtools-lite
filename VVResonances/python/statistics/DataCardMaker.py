@@ -683,7 +683,7 @@ class DataCardMaker:
             resolutionStr=resolutionStr+"+{factor}*{syst}".format(factor=factor,syst=syst)
             resolutionSysts.append(syst)
        
-        
+
        
         MJJ=variable            
         if self.w.var(MJJ) == None: self.w.factory(MJJ+"[0,1000]")
@@ -854,7 +854,8 @@ class DataCardMaker:
         #Load SYstematics
         coeffList=ROOT.RooArgList()
         pdfList=ROOT.RooArgList(self.w.pdf(pdfName))
-
+        variationList=["Up","Down"]
+        if filename.find("TTJets")!=-1: variationList=["nominal","noreweight"]
         for systval in systematics:
             splitted=systval.split(':')
             systName=splitted[1]
@@ -862,12 +863,13 @@ class DataCardMaker:
             if self.w.var(systName) == None: self.w.factory(systName+"[-1,1]")
             coeffList.add(self.w.var(systName))
 
-            for variation in ["Up","Down"]:
-                histo=FR.Get(histoname+"_"+syst+variation)
-                print 'loaded',histoname+"_"+syst+variation
+            for variation in variationList:
+                histostring = histoname+"_"+syst+variation
+                if filename.find("TTJets")!=-1: histostring= histoname.replace("nominal",variation)
+                histo=FR.Get(histostring)
                 histName="_".join([name+"_"+syst+variation+"HIST",tag])
                 roohist = ROOT.RooDataHist(histName,histName,varlist,histo)
-       
+
                 pdfName="_".join([name+"_"+syst+variation,self.tag])
                 pdf=ROOT.RooHistPdf(pdfName,pdfName,varset,roohist,order)
 
