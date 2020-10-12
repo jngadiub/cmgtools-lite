@@ -271,6 +271,7 @@ if options.run.find("all")!=-1 or options.run.find("tt")!=-1:
     if options.batch == True : wait=True
     print "make norm for all contributions of ttbar together"
     f.makeNormalizations("TTJets","JJ_"+filePeriod,TTemplate,0,ctx.cuts['nonres'],"nResTT",options.single,"1",options.sendjobs)
+    f.makeBackgroundShapesMVVKernel("TTJets","JJ_"+filePeriod,TTemplate,ctx.cuts['nonres'],"1DTT",wait,1.,1.,options.sendjobs)
     contrib =["resT","resW","nonresT","resTnonresT","resWnonresT","resTresW"]
     for con in contrib:
         print " ***************************         "+con+"      ******************************"
@@ -302,7 +303,7 @@ if options.run.find("all")!=-1 or options.run.find("pseudoNOQCD")!=-1:
     print " Do pseudodata with vjets & tt: DID YOU PRODUCE THE WORKSPACE BEFORE???"
     from modules.submitJobs import makePseudoDataNoQCD
     for p in categories: makePseudoDataNoQCD("results_"+filePeriod+"/JJ_"+filePeriod+"_TTJets_"+p+".root",
-					       "JJ_%s_PDnoQCD_%s.root"%(filePeriod,p),ctx.lumi,
+					       "JJ_%s_PDnoQCD_%s.root"%(filePeriod,p),ctx.lumi[filePeriod],
 					       "results_"+filePeriod+"/workspace_JJ_BulkGWW_"+p+"_13TeV_"+filePeriod+"_PrepPseudo.root",
 					       filePeriod,p)
 if options.run.find("all")!=-1 or options.run.find("pseudoALL")!=-1:
@@ -311,8 +312,8 @@ if options.run.find("all")!=-1 or options.run.find("pseudoALL")!=-1:
     for p in categories: makePseudoDataVjetsTT("results_"+filePeriod+"/JJ_"+filePeriod+"_nonRes_%s.root"%p,
                                                "results_"+filePeriod+"/JJ_"+filePeriod+"_TTJets_"+p+".root",
 					       "results_"+filePeriod+"/save_new_shapes_"+filePeriod+"_pythia_%s_3D.root"%p,
-					       "pythia","JJ_%s_PDALL_%s.root"%(filePeriod,p),ctx.lumi,
+					       "pythia","JJ_%s_PDALL_%s.root"%(filePeriod,p),ctx.lumi[filePeriod],
 					       "results_"+filePeriod+"/workspace_JJ_BulkGWW_"+p+"_13TeV_"+filePeriod+"_PrepPseudo.root",
-					       period,p)
+					       filePeriod,p)
 
 print " ########## I did everything I could! ###### "
