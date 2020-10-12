@@ -24,6 +24,7 @@ parser.add_option("--outlabel",dest="outlabel",help="lebel for output workspaces
 parser.add_option("-c","--category",dest="category",default="VV_HPLP,VV_HPHP,VH_HPLP,VH_HPHP,VH_LPHP",help="run period")
 parser.add_option("-j","--jsonname",dest="jsonname",help="write the name of the output json file, the category will be automatically inserted",default='ttbarNorm')
 parser.add_option("--fitvjetsmjj",dest="fitvjetsmjj",default=False,action="store_true",help="True makes fits for mjj of vjets, False uses hists")
+parser.add_option("--fitTTmjj",dest="fitTTmjj",default=False,action="store_true",help="True makes fits for mjj of ttbar, False uses hists")
 parser.add_option("--combo",dest="combo",default=True,help="If True inputs from the 3 years combined will be used")
 (options,args) = parser.parse_args()
 
@@ -128,10 +129,15 @@ for sig in signals:
         
       print "##########################       including tt+jets in datacard      ######################"
       contrib =["resT","resW","nonresT","resTnonresT","resWnonresT","resTresW"]
-      rootFileMVV = {ttcon:resultsDir[dataset]+'/JJ_'+dataset+'_TTJets'+ttcon+'_MVV_NP.root' for ttcon in contrib}
+      rootFileMVV = {ttcon:resultsDir[dataset]+'/JJ_'+dataset+'_TTJets'+ttcon+'_MVV_'+p+'.root' for ttcon in contrib}
       rootFileNorm = {ttcon:resultsDir[dataset]+'/JJ_'+dataset+'_TTJets'+ttcon+'_'+p+'.root' for ttcon in contrib}
       jsonfileNorm = resultsDir[dataset]+'/'+options.jsonname+'_'+p+'.json'
-      Tools.AddTTBackground3(card,dataset,p,rootFileMVV,rootFileNorm,resultsDir[dataset],ncontrib,["CMS_VV_JJ_TTJets_slope",0.5],jsonfileNorm)
+      if options.fitTTmjj == True:
+        print "load fits"
+        Tools.AddTTBackground3(card,dataset,p,rootFileMVV,rootFileNorm,resultsDir[dataset],ncontrib,["CMS_VV_JJ_TTJets_slope",0.5],jsonfileNorm)
+      else:
+        print "load templates"
+        Tools.AddTTBackground4(card,dataset,p,rootFileMVV,rootFileNorm,resultsDir[dataset],ncontrib,["CMS_VV_JJ_TTJets_slope",0.5],jsonfileNorm)
       #rootFileMVV  = resultsDir[dataset]+'/JJ_'+dataset+'_TTJets_MVV_'+p+'.root'
       #rootFileNorm = resultsDir[dataset]+'/JJ_'+dataset+'_TTJets_'+p+'.root'
       #Tools.AddTTBackground2(card,dataset,p,rootFileMVV,rootFileNorm,resultsDir[dataset],ncontrib)
@@ -153,22 +159,22 @@ for sig in signals:
 
       print " including data or pseudodata in datacard"
       if pseudodata=="PrepPseudo":
-        rootFileData = resultsDir[dataset]+"/JJ_%s_nonRes_3D_NP.root"%(dataset) #use this only to prepare workspace for making pseudo data with vjets
+        rootFileData = resultsDir[dataset]+"/JJ_"+dataset+"_nonRes_3D_NP.root" #use this only to prepare workspace for making pseudo data with vjets
         histName="histo"
         scaleData=lumi[dataset]
       elif pseudodata=="True":
         print "Using pseudodata with all backgrounds (QCD, V+jets and tt+jets)"
-        rootFileData = resultsDir[dataset]+"/JJ_%s_PDALL_"+p+".root"%(dataset)
+        rootFileData = resultsDir[dataset]+"/JJ_"+dataset+"_PDALL_"+p+".root"
         histName="data"
         scaleData=1.0
       elif pseudodata=="ttjets":
         print "Using pseudodata with only tt+jets backgrounds"
-        rootFileData = resultsDir[dataset]+"/JJ_%s_TTJets_"+p+".root"%(dataset)
+        rootFileData = resultsDir[dataset]+"/JJ_"+dataset+"_TTJets_"+p+".root"
         histName="data_obs"
         scaleData=1.0
       elif pseudodata=="noqcd":
         print "Using pseudodata with only tt+jets backgrounds and no qcd"
-        rootFileData = resultsDir[dataset]+"/JJ_%s_PDnoQCD_"+p+".root"%(dataset)
+        rootFileData = resultsDir[dataset]+"/JJ_"+dataset+"_PDnoQCD_"+p+".root"
         histName="data"
         scaleData=1.0
       elif pseudodata=="ttbar":
@@ -197,7 +203,12 @@ for sig in signals:
         Tools.AddResBackgroundSystematics(card,p)
       Tools.AddNonResBackgroundSystematics(card,p)
       #Tools.AddTaggingSystematics(card,sig,dataset,p,resultsDir[dataset]+'/migrationunc_'+sig+'_'+dataset+'.json')
-      Tools.AddTTSystematics4(card,["CMS_VV_JJ_TTJets_slope",0.05],dataset,p)
+      if options.fitTTmjj == True:
+        print "load fits syst"
+        Tools.AddTTSystematics4(card,["CMS_VV_JJ_TTJets_slope",0.05],dataset,p)
+      else:
+        print "load templates syst"
+        Tools.AddTTSystematics5(card,p)
       print "##########################       systematics added in datacard      ######################"  
 
 
