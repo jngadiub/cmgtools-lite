@@ -2132,17 +2132,17 @@ def makePseudoDataVjetsTT(input,input_tt,kernel,mc,output,lumi,workspace,year,pu
  ws_file.Close()
  ws.Print()
 
- modelWjets = ws.pdf('shapeBkg_Wjets_JJ_%s_13TeV_%i'%(purity,year))
- modelZjets = ws.pdf('shapeBkg_Zjets_JJ_%s_13TeV_%i'%(purity,year))
- category = ws.obj("CMS_channel==CMS_channel::JJ_"+purity+"_13TeV_%i"%year)
+ modelWjets = ws.pdf('shapeBkg_Wjets_JJ_%s_13TeV_%s'%(purity,year))
+ modelZjets = ws.pdf('shapeBkg_Zjets_JJ_%s_13TeV_%s'%(purity,year))
+ category = ws.obj("CMS_channel==CMS_channel::JJ_"+purity+"_13TeV_%s"%year)
 
  MJ1= ws.var("MJ1");
  MJ2= ws.var("MJ2");
  MJJ= ws.var("MJJ");
  args = ROOT.RooArgSet(MJ1,MJ2,MJJ)
  ### Wjets
- print "n_exp_binJJ_"+purity+"_13TeV_%i_proc_Wjets"%year
- o_norm_wjets = ws.obj("n_exp_binJJ_"+purity+"_13TeV_%i_proc_Wjets"%year)
+ print "n_exp_binJJ_"+purity+"_13TeV_%s_proc_Wjets"%year
+ o_norm_wjets = ws.obj("n_exp_binJJ_"+purity+"_13TeV_%s_proc_Wjets"%year)
  hout_wjets = ROOT.TH3F('wjets','wjets',len(xbins)-1,xbins,len(xbins)-1,xbins,len(zbins)-1,zbins)
  
  nEventsW = o_norm_wjets.getVal()
@@ -2163,8 +2163,8 @@ def makePseudoDataVjetsTT(input,input_tt,kernel,mc,output,lumi,workspace,year,pu
       
  hout.Add(hout_wjets)
  ### Zjets
- print "n_exp_binJJ_"+purity+"_13TeV_%i_proc_Zjets"%year
- o_norm_zjets = ws.obj("n_exp_binJJ_"+purity+"_13TeV_%i_proc_Zjets"%year)
+ print "n_exp_binJJ_"+purity+"_13TeV_%s_proc_Zjets"%year
+ o_norm_zjets = ws.obj("n_exp_binJJ_"+purity+"_13TeV_%s_proc_Zjets"%year)
  hout_zjets = ROOT.TH3F('zjets','zjets',len(xbins)-1,xbins,len(xbins)-1,xbins,len(zbins)-1,zbins)
  
  nEventsZ = o_norm_zjets.getVal()
