@@ -24,17 +24,17 @@ period = options.period
 
 if options.wtd.find("pseudo")!= -1 :
     print "####        rebinning pseudo data "
-    pseudo = "JJ_"+str(period)+"_PDVjets_"+str(purity)+".root"
+    pseudo = "JJ_"+str(period)+"_PDALL_"+str(purity)+".root"
 
     r_file = ROOT.TFile(str(options.indir)+pseudo,"READ")
     data = r_file.Get("data")
     nonRes = r_file.Get("nonRes")
 
-    #print data.GetXaxis().GetNbins()
+    print data.GetXaxis().GetNbins()
 
     data.RebinX(rebin)
 
-    #print data.GetXaxis().GetNbins()
+    print data.GetXaxis().GetNbins()
     
     data.RebinY(rebin)
 
@@ -46,6 +46,20 @@ if options.wtd.find("pseudo")!= -1 :
     data.Write()
     nonRes.Write("nonRes")
 
+if options.wtd.find("norm")!= -1 :
+    print "####        rebinning norm "
+    pseudo = "JJ_"+str(period)+"_nonRes_"+str(purity)+".root"
+
+    r_file = ROOT.TFile(str(options.indir)+pseudo,"READ")
+    nonRes = r_file.Get("nonRes")
+
+
+    nonRes.RebinX(rebin)
+    nonRes.RebinY(rebin)
+
+
+    r_file_out = ROOT.TFile(str(options.outdir)+pseudo,"RECREATE")
+    nonRes.Write("nonRes")
 
 
 if options.wtd.find("shapes")!=-1 :
