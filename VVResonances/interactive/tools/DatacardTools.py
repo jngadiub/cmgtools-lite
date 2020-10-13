@@ -272,7 +272,7 @@ class DatacardTools():
             card.addYield(mappdf[contrib[i]],ncontrib+i,norms[contrib[i]])
 
  #new implementation: split in 6 contributions W+W, T+T, nonRes+nonRes, nonRes+T, nonres+W, resT+resW with mjj templates
- def AddTTBackground4(self,card,dataset,category,rootFileMVV,rootFileNorm,resultsDir,ncontrib,uncertainty,normjson):
+ def AddTTBackground4(self,card,dataset,category,rootFileMVV,rootFileNorm,resultsDir,ncontrib,normjson):
     print "add TT+jets background"
     contrib =["resT","resW","nonresT","resTnonresT","resWnonresT","resTresW"]
     mappdf = {"resT":"TTJetsTop","resW":"TTJetsW","nonresT":"TTJetsNonRes","resTnonresT":"TTJetsTNonResT","resWnonresT":"TTJetsWNonResT","resTresW":"TTJetsResWResT"}
