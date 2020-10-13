@@ -420,7 +420,7 @@ class DatacardTools():
           card.addFixedYieldFromFile("nonRes",ncontrib,rootFileNorm,"nonRes",self.sfQCD)
  
  def AddData(self,card,fileData,histoName,scaleData):
-  
+
       card.importBinnedData(fileData,histoName,["MJ1","MJ2","MJJ"],'data_obs',scaleData)
  
  #with old implementation 
@@ -512,15 +512,16 @@ class DatacardTools():
     card.addSystematic("CMS_res_prunedj","param",[0.0,0.08])
     contrib =["resT","resW","nonresT","resTnonresT","resWnonresT","resTresW"]
     mappdf = {"resT":"TTJetsTop","resW":"TTJetsW","nonresT":"TTJetsNonRes","resTnonresT":"TTJetsTNonResT","resWnonresT":"TTJetsWNonResT","resTresW":"TTJetsResWResT"}
+    for i in range(0,len(contrib)):
+     card.addSystematic("CMS_VV_JJ_"+mappdf[contrib[i]]+"_TOPPTZ_"+category,"param",[0,0.2])
+     card.addSystematic("CMS_VV_JJ_"+mappdf[contrib[i]]+"_TOPOPTZ_"+category,"param",[0,0.2])
     if self.pseudodata.find("ttbar")==-1:
         card.addSystematic("CMS_VV_JJ_TTJets_norm","lnN",{mappdf[ttcon]:1.05 for ttcon in contrib})
-        card.addSystematic("CMS_VV_JJ_TTJets_TOPPTZ_"+category,"param",[0,0.1])
-        card.addSystematic("CMS_VV_JJ_TTJets_TOPOPTZ_"+category,"param",[0,0.1])
+        #card.addSystematic("CMS_VV_JJ_TTJets_TOPPTZ_"+category,"param",[0,0.1])
+        #card.addSystematic("CMS_VV_JJ_TTJets_TOPOPTZ_"+category,"param",[0,0.1])
     else:
         for i in range(0,len(contrib)):
          card.addSystematic("CMS_VV_JJ_"+mappdf[contrib[i]]+"_norm","lnN",{mappdf[contrib[i]]:3.2})
-         card.addSystematic("CMS_VV_JJ_"+mappdf[contrib[i]]+"_TOPPTZ_"+category,"param",[0,0.1])
-         card.addSystematic("CMS_VV_JJ_"+mappdf[contrib[i]]+"_TOPOPTZ_"+category,"param",[0,0.1])
 
        
  def AddSigSystematics(self,card,sig,dataset,category,correlate):
