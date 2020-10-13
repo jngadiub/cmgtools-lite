@@ -39,7 +39,19 @@ parser.add_option("--corrFactorZ",dest="corrFactorZ",type=float,help="add correc
 
 (options,args) = parser.parse_args()
 
+tmplabel = options.output.split("_")[2]
+if options.output.find("/")!=-1: tmplabel = (options.output.split("/")[1]).split("_")[2]
+print " tmplabel ",tmplabel
+ttlabel = tmplabel.replace("TTJets","")
+print " ttlabel ",ttlabel
 
+if options.output.find('VV_HPLP')!=-1: purity='VV_HPLP'
+if options.output.find('VV_HPHP')!=-1: purity='VV_HPHP'
+if options.output.find('VH_HPLP')!=-1: purity='VH_HPLP'
+if options.output.find('VH_HPHP')!=-1: purity='VH_HPHP'
+if options.output.find('VH_LPHP')!=-1: purity='VH_LPHP'
+if options.output.find('NP')!=-1: purity='NP'
+print "purity ",purity
 def getBinning(binsMVV,minx,maxx,bins):
     l=[]
     if binsMVV=="":
@@ -77,7 +89,7 @@ def mirror(histo,histoNominal,name):
     return newHisto      
 
   
-def smoothTail1D(proj):
+def smoothTail1D(proj,smooth=3000):
     if proj.Integral() == 0:
         print "histogram has zero integral "+proj.GetName()
         return 0
@@ -86,7 +98,7 @@ def smoothTail1D(proj):
     
     
     beginFitX = 2100#1500
-    endX = 3000 #2800
+    endX = smooth #2800
     #if options.output.find("HPHP")!=-1: 
         #beginFitX=1100
         #endX = 1500
@@ -142,6 +154,16 @@ print "now working with cuts "
 ctx = cuts.cuts("init_VV_VH.json",year,"dijetbins_random")
 print "lumi for year "+year+" = ",ctx.lumi[year]
 luminosity = ctx.lumi[year]/ctx.lumi["Run2"]
+#smoothstart=ctx.tt_smooth
+smoothstart={ "resT" : { "NP": 3000., "VV_HPHP": 3000. , "VV_HPLP": 3000., "VH_HPHP": 3000., "VH_HPLP": 2000., "VH_LPHP": 3000. },
+                                  "resW": { "NP": 1800., "VV_HPHP": 3000. , "VV_HPLP": 1800., "VH_HPHP": 1600., "VH_HPLP": 1800., "VH_LPHP": 1600. },
+                                  "resTnonresT": { "NP": 3000., "VV_HPHP": 2600. , "VV_HPLP": 1800., "VH_HPHP": 3000., "VH_HPLP": 3000., "VH_LPHP": 2400. },
+                                  "resWnonresT": { "NP": 2000., "VV_HPHP": 2000. , "VV_HPLP": 2000., "VH_HPHP": 2000., "VH_HPLP": 2000., "VH_LPHP": 2000. },
+                                  "resTnonresT" : { "NP": 3000., "VV_HPHP": 2600. , "VV_HPLP": 2400., "VH_HPHP": 3000., "VH_HPLP": 1600., "VH_LPHP": 3000. },
+                                  "resTresW" : { "NP": 3000., "VV_HPHP": 2000. , "VV_HPLP": 1800., "VH_HPHP": 2000., "VH_HPLP": 3000., "VH_LPHP": 2200. },
+                                  "nonresT" : { "NP": 3000., "VV_HPHP": 1800. , "VV_HPLP": 2000., "VH_HPHP": 2000., "VH_HPLP": 1800., "VH_LPHP": 3000. }}
+
+print "smooth start",smoothstart 
 if options.output.find("Run2") ==-1: luminosity = 1
 for filename in os.listdir(folder):
     for sampleType in sampleTypes:
@@ -336,13 +358,14 @@ finalHistograms={histogram_nominal.GetName(): histogram_nominal,
                  histogram_noreweight.GetName(): histogram_noreweight,
                  mvv_nominal.GetName(): mvv_nominal
 }
-
+smooth = smoothstart[ttlabel][purity]
+print " smooth ",smooth
 for hist in finalHistograms.itervalues():
  # hist.Write(hist.GetName()+"_raw")
  if (options.output).find("Jets")!=-1 and hist.GetName().find("hist")!=-1:
      print "smooth tails of 1D histogram for vjets background of histo "+hist.GetName()
      if hist.Integral() > 0:
-        smoothTail1D(hist)
+        smoothTail1D(hist,smooth)
         if hist.GetName().find("hist_nominal")!=-1:
             hist.Scale(scale)
         #if hist.GetName().find("mvv_nominal")!=-1:
@@ -386,17 +409,11 @@ if histogram_nominal.Integral()!=0 and histogram_noreweight.Integral()!=0:
     l.Draw("same")
 
     
-    tmplabel = options.output.split("_")[2]
-    if options.output.find("/")!=-1: (options.output.split("/")[1]).split("_")[2]
+
+    #if options.output.find("/")!=-1: tmplabel = (options.output.split("/")[1]).split("_")[2]
     label=options.output.split("_")[1]
     print "label ",label
-    if options.output.find('VV_HPLP')!=-1: tmplabel+='VV_HPLP'
-    if options.output.find('VV_HPHP')!=-1: tmplabel+='VV_HPHP'
-    if options.output.find('VH_HPLP')!=-1: tmplabel+='VH_HPLP'
-    if options.output.find('VH_HPHP')!=-1: tmplabel+='VH_HPHP'
-    if options.output.find('VH_LPHP')!=-1: tmplabel+='VH_LPHP'
-    if options.output.find('NP')!=-1: tmplabel+='NP'
-    tmplabel += label
+    tmplabel += label+"_"+purity
     c.SaveAs("debug_mVV_kernels_"+tmplabel+".pdf")
     print "for debugging save","debug_mVV_kernels_"+tmplabel+".pdf"
 
