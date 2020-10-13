@@ -17,7 +17,7 @@ for cat in ${categories[*]}; do
     #echo $dir20
     #python rebinPseudodata.py -c $cat -i ${basedir}pseudo80/ -o $dir20 -b 4
     echo $dir40
-    python rebinPseudodataAndTemplates.py -c $cat -i ${basedir}pseudo80/ -o $dir40 -b 2 -p "Run2" --wtd "normpseudoshapes"
+    python rebinPseudodataAndTemplates.py -c $cat -i ${basedir}pseudo80/ -o $dir40 -b 2 -p "Run2" --wtd "ttnormpseudoshapes"
 #    echo $dir10
 #    python rebinPseudodata.py -c $cat -i ${basedir}pseudo80/ -o $dir10 -b 8
 
