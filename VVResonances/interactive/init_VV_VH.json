@@ -151,9 +151,9 @@
         "acceptanceMVV" : "(jj_LV_mass> minMVV &&jj_LV_mass< maxMVV )",
         "acceptanceGEN"  :  "(jj_l1_gen_softDrop_mass> minGenMJ &&jj_l2_gen_softDrop_mass> minGenMJ &&jj_l1_gen_softDrop_mass< maxGenMJ &&jj_l2_gen_softDrop_mass< maxGenMJ &&jj_gen_partialMass> minGenMVV &&jj_gen_partialMass< maxGenMVV &&TMath::Log(jj_l1_gen_softDrop_mass**2/jj_l1_gen_pt**2)<-1.5&&TMath::Log(jj_l2_gen_softDrop_mass**2/jj_l2_gen_pt**2)<-1.5)" ,
         "looseacceptanceMJ" : "(jj_l1_softDrop_mass>35&&jj_l1_softDrop_mass<300&&jj_l2_softDrop_mass>35&&jj_l2_softDrop_mass<300)"  
-   
+
     },
-    
+
     "fixParsSig" : {"ZprimeZH":{
     "NP":{"fixPars":"alpha:0.8,alpha2:2.0,alphaH:0.6","pol":"mean:spline,sigma:spline,alpha:spline,n:spline,alpha2:spline,n2:spline,meanH:spline,sigmaH:spline,alphaH:spline,nH:spline,alpha2H:spline,n2H:spline"}},
     "BulkGWW":{"NP":{"fixPars":"n:5","pol":"mean:spline,sigma:spline,alpha:spline,n:spline,alpha2:spline,n2:spline"}}, 
@@ -170,5 +170,5 @@
                "BulkGZZ":{"fixPars":"1","pol":"MEAN:spline,SIGMA:spline,N1:spline,ALPHA1:spline,N2:spline,ALPHA2:spline"},
                "ZprimeWW":{"fixPars":"N1:1.61364,N2:4.6012","pol":"MEAN:spline,SIGMA:spline,N1:spline,ALPHA1:spline,N2:spline,ALPHA2:spline"}}
     
-}    
+}
 

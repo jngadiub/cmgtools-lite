@@ -8,26 +8,26 @@
 
 #category=("VH_NPHP_control_region") # "VH_HPLP" "VH_LPHP" "VH_HPHP" "VV_HPLP" "VV_HPHP")
 category=("VH_LPHP" "VH_HPLP" "VH_HPHP" "VV_HPLP" "VV_HPHP")
-
+period=Run2
 for c in ${category[@]}
 do 
 
-    outputdir=prefit_ttbar_2016/
+    outputdir=prefit_ttbar__${period}/
     mkdir ${outputdir}
 
     echo "############## make prefit for ##############"
-    label=prefit_ttbar_2016_${c}
+    label=prefit_ttbar__${period}_${c}
     echo $label
-    python runFitPlots_vjets_signal_bigcombo_splitRes.py -n workspace_JJ_BulkGWW_${c}_13TeV_2016_ttbar.root  -i  results_2016/JJ_2016_nonRes_${c}.root -M 2000  -o ${outputdir} --channel ${c} -l ${c} --doVjets --addTop | tee ${label}.log
+    python runFitPlots_vjets_signal_bigcombo_splitRes.py -n results_${period}/workspace_JJ_BulkGWW_${c}_13TeV_${period}_ttbar.root  -i  results_${period}/JJ_${period}_nonRes_${c}.root -M 2000  -o ${outputdir} --channel ${c} -l ${c} --doVjets --addTop | tee ${label}.log
 
 
-    outputdir=postfit_ttbar_2016/
+    outputdir=postfit_ttbar_${period}/
     mkdir ${outputdir}
 
     echo "############## make postfit for ##############"
-    label=postfit_ttbar_2016_${c}
+    label=postfit_ttbar_${period}_${c}
     echo $label
-    python runFitPlots_vjets_signal_bigcombo_splitRes.py -n results_2016/workspace_JJ_BulkGWW_${c}_13TeV_2016_ttbar.root  -i  results_2016/JJ_2016_nonRes_${c}.root -M 2000  -o ${outputdir} --channel ${c} -l ${c} --doVjets --addTop --doFit | tee ${label}.log
+    python runFitPlots_vjets_signal_bigcombo_splitRes.py -n results_${period}/workspace_JJ_BulkGWW_${c}_13TeV_${period}_ttbar.root  -i  results_${period}/JJ_${period}_nonRes_${c}.root -M 2000  -o ${outputdir} --channel ${c} -l ${c} --doVjets --addTop --doFit | tee ${label}.log
 
 done
   

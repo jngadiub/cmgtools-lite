@@ -99,7 +99,7 @@ mkdir postfitplots/
 
 category=( "VH_HPLP" "VH_LPHP" "VH_HPHP" "VV_HPLP" "VV_HPHP")
 models=("BulkGZZ"  "WprimeWZ" "ZprimeWW" "BulkGWW"  "ZprimeZH" "WprimeWH")
->>>>>>> 257bec0b4a12ef71aa045d7721969ca9c9b78ffb
+
 
  for model in ${models[@]}
  do
