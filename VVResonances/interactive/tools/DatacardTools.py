@@ -288,7 +288,7 @@ class DatacardTools():
 
 
     for i in range(0,len(contrib)):
-      card.addHistoShapeFromFile("TTJets"+contrib[i]+"_mjj",["MJJ"],rootFileMVV[contrib[i]],"histo_nominal",['TOPPT:CMS_VV_JJ_'+mappdf[contrib[i]]+'_TOPPTZ_'+category,'TOPOPT:CMS_VV_JJ_'+mappdf[contrib[i]]+'_TOPOPTZ_'+category],False,0)
+      card.addHistoShapeFromFile("TTJets"+contrib[i]+"_mjj",["MJJ"],rootFileMVV[contrib[i]],"histo_nominal",['TOPPT:CMS_VV_JJ_'+mappdf[contrib[i]]+'_TOPPTZ_'+category],False,0)
 
     # built final PDFs:
     # W+W PDF
@@ -510,7 +510,6 @@ class DatacardTools():
     mappdf = {"resT":"TTJetsTop","resW":"TTJetsW","nonresT":"TTJetsNonRes","resTnonresT":"TTJetsTNonResT","resWnonresT":"TTJetsWNonResT","resTresW":"TTJetsResWResT"}
     for i in range(0,len(contrib)):
      card.addSystematic("CMS_VV_JJ_"+mappdf[contrib[i]]+"_TOPPTZ_"+category,"param",[0,1.])
-     card.addSystematic("CMS_VV_JJ_"+mappdf[contrib[i]]+"_TOPOPTZ_"+category,"param",[0,1.])
     if self.pseudodata.find("ttbar")==-1:
         card.addSystematic("CMS_VV_JJ_TTJets_norm","lnN",{mappdf[ttcon]:1.05 for ttcon in contrib})
         #card.addSystematic("CMS_VV_JJ_TTJets_TOPPTZ_"+category,"param",[0,0.1])
