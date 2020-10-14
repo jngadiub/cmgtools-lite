@@ -286,10 +286,12 @@ class DatacardTools():
     card.addMJJTTJetsParametricShapeNonRes("TTJetsNonRes_mjetRes_l1","MJ1",resultsDir+"/JJ_%s_TTJets_%s.json"%(dataset,category),{'CMS_scale_prunedj':1.},{'CMS_res_prunedj':1.})#,{'CMS_f_g1':1.},{'CMS_f_res':1.})
     card.addMJJTTJetsParametricShapeNonRes("TTJetsNonRes_mjetRes_l2","MJ2",resultsDir+"/JJ_%s_TTJets_%s.json"%(dataset,category),{'CMS_scale_prunedj':1.},{'CMS_res_prunedj':1.})#,{'CMS_f_g1':1.},{'CMS_f_res':1.})
 
-
-    for i in range(0,len(contrib)):
+    if self.pseudodata.find("ttbar")!=-1:
+     for i in range(0,len(contrib)):
       card.addHistoShapeFromFile("TTJets"+contrib[i]+"_mjj",["MJJ"],rootFileMVV[contrib[i]],"histo_nominal",['TOPPT:CMS_VV_JJ_'+mappdf[contrib[i]]+'_TOPPTZ_'+category],False,0)
-
+    else:
+     for i in range(0,len(contrib)):
+      card.addHistoShapeFromFile("TTJets"+contrib[i]+"_mjj",["MJJ"],rootFileMVV[contrib[i]],"histo_nominal",['TOPPT:CMS_VV_JJ_TTJets_TOPPTZ_'+category],False,0) 
     # built final PDFs:
     # W+W PDF
     card.conditionalProduct3('TTJetsW','TTJetsresW_mjj','TTJetsW_mjetRes_l1','TTJetsW_mjetRes_l2','MJJ')
@@ -508,16 +510,14 @@ class DatacardTools():
  def AddTTSystematics5(self,card,category):
     contrib =["resT","resW","nonresT","resTnonresT","resWnonresT","resTresW"]
     mappdf = {"resT":"TTJetsTop","resW":"TTJetsW","nonresT":"TTJetsNonRes","resTnonresT":"TTJetsTNonResT","resWnonresT":"TTJetsWNonResT","resTresW":"TTJetsResWResT"}
-    for i in range(0,len(contrib)):
-     card.addSystematic("CMS_VV_JJ_"+mappdf[contrib[i]]+"_TOPPTZ_"+category,"param",[0,1.])
+   
     if self.pseudodata.find("ttbar")==-1:
         card.addSystematic("CMS_VV_JJ_TTJets_norm","lnN",{mappdf[ttcon]:1.05 for ttcon in contrib})
-        #card.addSystematic("CMS_VV_JJ_TTJets_TOPPTZ_"+category,"param",[0,0.1])
-        #card.addSystematic("CMS_VV_JJ_TTJets_TOPOPTZ_"+category,"param",[0,0.1])
+        card.addSystematic("CMS_VV_JJ_TTJets_TOPPTZ_"+category,"param",[0,1.])
     else:
         for i in range(0,len(contrib)):
          card.addSystematic("CMS_VV_JJ_"+mappdf[contrib[i]]+"_norm","lnN",{mappdf[contrib[i]]:3.2})
-
+         card.addSystematic("CMS_VV_JJ_"+mappdf[contrib[i]]+"_TOPPTZ_"+category,"param",[0,1.])
        
  def AddSigSystematics(self,card,sig,dataset,category,correlate):
 
