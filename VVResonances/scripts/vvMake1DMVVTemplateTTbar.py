@@ -98,6 +98,7 @@ def smoothTail1D(proj,smooth=3000):
     
     
     beginFitX = 2100#1500
+    if smooth < 2600 : beginFitX = 1200
     endX = smooth #2800
     #if options.output.find("HPHP")!=-1: 
         #beginFitX=1100
@@ -155,13 +156,13 @@ ctx = cuts.cuts("init_VV_VH.json",year,"dijetbins_random")
 print "lumi for year "+year+" = ",ctx.lumi[year]
 luminosity = ctx.lumi[year]/ctx.lumi["Run2"]
 #smoothstart=ctx.tt_smooth
-smoothstart={ "resT" : { "NP": 3000., "VV_HPHP": 3000. , "VV_HPLP": 3000., "VH_HPHP": 3000., "VH_HPLP": 2000., "VH_LPHP": 3000. },
-                                  "resW": { "NP": 1800., "VV_HPHP": 3000. , "VV_HPLP": 1800., "VH_HPHP": 1600., "VH_HPLP": 1800., "VH_LPHP": 1600. },
-                                  "resTnonresT": { "NP": 3000., "VV_HPHP": 2600. , "VV_HPLP": 1800., "VH_HPHP": 3000., "VH_HPLP": 3000., "VH_LPHP": 2400. },
-                                  "resWnonresT": { "NP": 2000., "VV_HPHP": 2000. , "VV_HPLP": 2000., "VH_HPHP": 2000., "VH_HPLP": 2000., "VH_LPHP": 2000. },
-                                  "resTnonresT" : { "NP": 3000., "VV_HPHP": 2600. , "VV_HPLP": 2400., "VH_HPHP": 3000., "VH_HPLP": 1600., "VH_LPHP": 3000. },
-                                  "resTresW" : { "NP": 3000., "VV_HPHP": 2000. , "VV_HPLP": 1800., "VH_HPHP": 2000., "VH_HPLP": 3000., "VH_LPHP": 2200. },
-                                  "nonresT" : { "NP": 3000., "VV_HPHP": 1800. , "VV_HPLP": 2000., "VH_HPHP": 2000., "VH_HPLP": 1800., "VH_LPHP": 3000. }}
+smoothstart={ "resT" : { "NP": 3000., "VV_HPHP": 3000. , "VV_HPLP": 1800., "VH_HPHP": 3000., "VH_HPLP": 2000., "VH_LPHP": 3000. },
+              "resW": { "NP": 1800., "VV_HPHP": 1800. , "VV_HPLP": 1400., "VH_HPHP": 1400., "VH_HPLP": 1600., "VH_LPHP": 1200. },
+              "resTnonresT": { "NP": 3000., "VV_HPHP": 2600. , "VV_HPLP": 1800., "VH_HPHP": 3000., "VH_HPLP": 3000., "VH_LPHP": 2400. },
+              "resWnonresT": { "NP": 2000., "VV_HPHP": 1800. , "VV_HPLP": 1800., "VH_HPHP": 1800., "VH_HPLP": 2000., "VH_LPHP": 1800. },
+              "resTnonresT" : { "NP": 3000., "VV_HPHP": 2600. , "VV_HPLP": 2000., "VH_HPHP": 3000., "VH_HPLP": 1600., "VH_LPHP": 3000. },
+              "resTresW" : { "NP": 3000., "VV_HPHP": 2000. , "VV_HPLP": 1800., "VH_HPHP": 1800., "VH_HPLP": 3000., "VH_LPHP": 2200. },
+              "nonresT" : { "NP": 3000., "VV_HPHP": 1600. , "VV_HPLP": 1800., "VH_HPHP": 1600., "VH_HPLP": 1600., "VH_LPHP": 3000. }}
 
 print "smooth start",smoothstart 
 if options.output.find("Run2") ==-1: luminosity = 1
