@@ -22,9 +22,8 @@ class AllFunctions():
   self.printAllParameters()
   
  def makeSignalShapesMVV(self,filename,template,fixParsMVV,addcuts="1"):
-  #if 'VBF' in template: cut='*'.join([self.cuts['common_VBF'],self.cuts['acceptanceMJ'],addcuts])
-  #else: cut='*'.join([self.cuts['common_VV'],self.cuts['acceptanceMJ'],addcuts])
-  cut='*'.join([self.cuts['common'],self.cuts['acceptanceMJ'],addcuts])
+  if 'VBF' in template: cut='*'.join([self.cuts['common_VBF'],self.cuts['acceptanceMJ'],addcuts])
+  else: cut='*'.join([self.cuts['common_VV'],self.cuts['acceptanceMJ'],addcuts])
   ##the parameters to be fixed should be optimized
   rootFile=filename+"_MVV.root"
   fixPars = fixParsMVV["fixPars"]  
@@ -52,9 +51,8 @@ class AllFunctions():
  def makeSignalYields(self,filename,template,branchingFraction,functype="pol5"):
   
   for c in self.categories:
-   #if 'VBF' in c: cut = "*".join([self.cuts[c.replace('VBF_','')],self.cuts['common_VBF'],self.cuts['acceptance'],str(sfP[c.replace('VBF_','')])])
-   #else: cut = "*".join([self.cuts[c],self.cuts['common_VV'],self.cuts['acceptance'],str(sfP[c])])
-   cut = "*".join([self.cuts[c],self.cuts['common'],self.cuts['acceptance']]) #,str(sfP[c])])
+   if 'VBF' in c: cut = "*".join([self.cuts[c.replace('VBF_','')],self.cuts['common_VBF'],self.cuts['acceptance'],str(sfP[c.replace('VBF_','')])])
+   else: cut = "*".join([self.cuts[c],self.cuts['common_VV'],self.cuts['acceptance'],str(sfP[c])])
    yieldFile=filename+"_"+c+"_yield"
    fnc = functype
    cmd='vvMakeSignalYields.py -s {template} -c "{cut}" -o {output} -V "jj_LV_mass" -m {minMVV} -M {maxMVV} -f {fnc} -b {BR} --minMX {minMX} --maxMX {maxMX} {samples} '.format(template=template, cut=cut, output=yieldFile,minMVV=self.minMVV,maxMVV=self.maxMVV,fnc=fnc,BR=branchingFraction,minMX=self.minMX,maxMX=self.maxMX,samples=self.samples)
@@ -116,9 +114,8 @@ class AllFunctions():
    rootFile = filename+"_"+name+"_MVV_"+c+".root"
    print "Saving to ",rootFile
    
-#   if 'VBF' in c: cut='*'.join([self.cuts['common_VBF'],self.cuts[c.replace('VBF_','')],addCut,self.cuts['acceptanceGEN'],self.cuts['looseacceptanceMJ']])
-#   else: cut='*'.join([self.cuts['common_VV'],self.cuts[c],addCut,self.cuts['acceptanceGEN'],self.cuts['looseacceptanceMJ']])
-   cut='*'.join([self.cuts['common'],self.cuts[c],addCut,self.cuts['acceptanceGEN'],self.cuts['looseacceptanceMJ']]) 
+   if 'VBF' in c: cut='*'.join([self.cuts['common_VBF'],self.cuts[c.replace('VBF_','')],addCut,self.cuts['acceptanceGEN'],self.cuts['looseacceptanceMJ']])
+   else: cut='*'.join([self.cuts['common_VV'],self.cuts[c],addCut,self.cuts['acceptanceGEN'],self.cuts['looseacceptanceMJ']])
    folders=[]
    folders= self.samples.split(',')
    smp= ""
@@ -155,9 +152,8 @@ class AllFunctions():
    print "Reading " ,resFile
    print "Saving to ",rootFile
    
-#   if 'VBF' in c: cut='*'.join([self.cuts['common_VBF'],self.cuts[c.replace('VBF_','')],addCut])#,cuts['acceptanceGEN'],cuts['looseacceptanceMJ']])
-#   else: cut='*'.join([self.cuts['common_VV'],self.cuts[c],addCut])#,cuts['acceptanceGEN'],cuts['looseacceptanceMJ']])
-   cut='*'.join([self.cuts['common'],self.cuts[c],addCut])#,cuts['acceptanceGEN'],cuts['looseacceptanceMJ']])
+   if 'VBF' in c: cut='*'.join([self.cuts['common_VBF'],self.cuts[c.replace('VBF_','')],addCut])#,cuts['acceptanceGEN'],cuts['looseacceptanceMJ']])
+   else: cut='*'.join([self.cuts['common_VV'],self.cuts[c],addCut])#,cuts['acceptanceGEN'],cuts['looseacceptanceMJ']])
 
    folders=[]
    folders= self.samples.split(',')
@@ -253,9 +249,8 @@ class AllFunctions():
    rootFile=filename+"_"+name+"_"+c+".root"
    print "Saving to ",rootFile  
    
-#   if 'VBF' in c: cut='*'.join([self.cuts['common_VBF'],self.cuts[c.replace('VBF_','')],addCut,self.cuts['acceptance']])
-#   else: cut='*'.join([self.cuts['common_VV'],self.cuts[c],addCut,self.cuts['acceptance']])
-   cut='*'.join([self.cuts['common'],self.cuts[c],addCut,self.cuts['acceptance']])
+   if 'VBF' in c: cut='*'.join([self.cuts['common_VBF'],self.cuts[c.replace('VBF_','')],addCut,self.cuts['acceptance']])
+   else: cut='*'.join([self.cuts['common_VV'],self.cuts[c],addCut,self.cuts['acceptance']])
 
    if self.submitToBatch:
        if name.find("nonRes")!= -1: template += ",QCD_Pt-,QCD_HT"
@@ -296,9 +291,8 @@ class AllFunctions():
 
  def fitVJets(self,filename,template,Wxsec=1,Zxsec=1):
    for c in self.categories:
-#     if 'VBF' in c: cut='*'.join([self.cuts['common_VBF'],self.cuts[c.replace('VBF_','')],self.cuts['acceptance']])
-#     else: cut='*'.join([self.cuts['common_VV'],self.cuts[c],self.cuts['acceptance']])
-     cut='*'.join([self.cuts['common'],self.cuts[c],self.cuts['acceptance']])
+     if 'VBF' in c: cut='*'.join([self.cuts['common_VBF'],self.cuts[c.replace('VBF_','')],self.cuts['acceptance']])
+     else: cut='*'.join([self.cuts['common_VV'],self.cuts[c],self.cuts['acceptance']])
      rootFile=filename+"_"+c+".root"
      pwd = os.getcwd()
      folders=[]
