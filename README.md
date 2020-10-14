@@ -47,12 +47,15 @@ Current sample location with random sorting of jet1 and jet2
 Before running, initialiaze the `basedir` variable in `makeInputs.py` to your `simboliklinkname`
 
 Make the 3D templates. Several options can be specified to produce QCD, V+Jets or signal templates, normalization etc.
+
+Except for signals, when running on Run2, use the batc submission!!
  
 ```
  python makeInputs.py -p 2016 --run "signorm" --signal "ZprimeWW" --batch False 
  python makeInputs.py -p 2016 --run "sigmvv" --signal "ZprimeWW" --batch False 
  python makeInputs.py -p 2016 --run "sigmjet" --signal "ZprimeWW" --batch False 
- python makeInputs.py -p 2016 --run "vjets" --batch False                                                                                                                                      
+ python makeInputs.py -p 2016 --run "vjets" --batch False   
+ python makeInputs.py -p "2016,2017,2018" --run "vjets" 
  python makeInputs.py -p 2016 --run "qcdtemplates"
  python makeInputs.py -p 2016 --run "qcdkernel"
  python makeInputs.py -p 2016 --run "qcdnorm"
