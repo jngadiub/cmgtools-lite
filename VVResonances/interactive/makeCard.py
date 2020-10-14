@@ -129,8 +129,8 @@ for sig in signals:
         
       print "##########################       including tt+jets in datacard      ######################"
       contrib =["resT","resW","nonresT","resTnonresT","resWnonresT","resTresW"]
-      #rootFileMVV = {ttcon:resultsDir[dataset]+'/JJ_'+dataset+'_TTJets'+ttcon+'_MVV_'+p+'.root' for ttcon in contrib}
-      rootFileMVV = {ttcon:resultsDir[dataset]+'/JJ_'+dataset+'_TTJets'+ttcon+'_MVV_NP.root' for ttcon in contrib}
+      rootFileMVV = {ttcon:resultsDir[dataset]+'/JJ_'+dataset+'_TTJets'+ttcon+'_MVV_'+p+'.root' for ttcon in contrib}
+      #rootFileMVV = {ttcon:resultsDir[dataset]+'/JJ_'+dataset+'_TTJets'+ttcon+'_MVV_NP.root' for ttcon in contrib}
       rootFileNorm = {ttcon:resultsDir[dataset]+'/JJ_'+dataset+'_TTJets'+ttcon+'_'+p+'.root' for ttcon in contrib}
       jsonfileNorm = resultsDir[dataset]+'/'+options.jsonname+'_'+p+'.json'
       if options.fitTTmjj == True:
