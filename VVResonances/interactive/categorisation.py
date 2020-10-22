@@ -22,7 +22,7 @@ from rootpy.tree import CharArrayCol
 parser = optparse.OptionParser()
 parser.add_option("-y","--year",dest="year",default='2016',help="year of data taking")
 parser.add_option("-s","--signal",dest="signal",help="signal to categorise",default='ZprimeToZh')
-parser.add_option("-d","--directory",dest="directory",help="directory with signal samples",default='2016_new/')
+parser.add_option("-d","--directory",dest="directory",help="directory with signal samples",default='deepAK8V2/')
 
 (options,args) = parser.parse_args()
 
@@ -143,6 +143,9 @@ class myTree:
     jj_l1_mergedHTruth           = rootint()
     jj_l2_mergedHTruth           = rootint()
     
+    jj_l1_mergedTopTruth           = rootint()
+    jj_l2_mergedTopTruth           = rootint()
+
     jj_l1_mergedZbbTruth           = rootint()
     jj_l2_mergedZbbTruth           = rootint()
     
@@ -171,7 +174,8 @@ class myTree:
         self.newTree.Branch("jj_l2_mergedVTruth",self.jj_l2_mergedVTruth,"jj_l2_mergedVTruth/i")
         self.newTree.Branch("jj_l1_mergedHTruth",self.jj_l1_mergedHTruth,"jj_l1_mergedHTruth/i")
         self.newTree.Branch("jj_l2_mergedHTruth",self.jj_l2_mergedHTruth,"jj_l2_mergedHTruth/i")
-        
+        self.newTree.Branch("jj_l1_mergedTopTruth",self.jj_l1_mergedTopTruth,"jj_l1_mergedTopTruth/i")
+        self.newTree.Branch("jj_l2_mergedTopTruth",self.jj_l2_mergedTopTruth,"jj_l2_mergedTopTruth/i")
         self.newTree.Branch("jj_l1_mergedZbbTruth",self.jj_l1_mergedZbbTruth,"jj_l1_mergedZbbTruth/i")
         self.newTree.Branch("jj_l2_mergedZbbTruth",self.jj_l2_mergedZbbTruth,"jj_l2_mergedZbbTruth/i")
    
@@ -227,6 +231,13 @@ class myTree:
             self.jj_l2_mergedVTruth.ri = event.jj_l2_mergedVTruth
             self.jj_l1_mergedHTruth.ri = event.jj_l1_mergedHTruth
             self.jj_l2_mergedHTruth.ri = event.jj_l2_mergedHTruth
+            try:
+                self.jj_l1_mergedTopTruth.ri = event.jj_l1_mergedTopTruth
+                self.jj_l2_mergedTopTruth.ri = event.jj_l2_mergedTopTruth
+            except:
+                self.jj_l1_mergedTopTruth.ri = 0
+                self.jj_l2_mergedTopTruth.ri = 0
+
             self.jj_l1_mergedZbbTruth.ri = event.jj_l1_mergedZbbTruth
             self.jj_l2_mergedZbbTruth.ri = event.jj_l2_mergedZbbTruth
             self.category[:7] = cat 
@@ -263,6 +274,8 @@ class myTree:
     def test(self):
         for event in self.newTree:
             print event.jj_l1_mergedVTruth
+            print event.jj_l1_mergedTopTruth
+            print event.jj_l2_mergedTopTruth
     def write(self):
         self.File.cd()
         self.newTree.Write()
@@ -270,7 +283,7 @@ class myTree:
 if __name__=='__main__':
     if options.directory.find(options.year)== -1: print 'ATTENTION: are you sure you are using the right directory for '+options.year+' data?'    
     period = options.year
-    ctx  = cuts.cuts("init_VV_VH.json",period,"random_dijetbins")
+    ctx  = cuts.cuts("init_VV_VH_SF.json",period,"random_dijetbins")
     samples=""
     basedir=options.directory
     filePeriod=options.year
@@ -287,9 +300,10 @@ if __name__=='__main__':
         samples=basedir+period+"/"
     outfile = ROOT.TFile('migrationunc/'+options.signal+'_'+filePeriod+'.root','RECREATE')
 
-    if(options.signal.find("Jets")==-1):
+    if(options.signal.find("Jets")!=-1 or options.signal.find("TT")!=-1):
+        samplelist= getBkgSamplelist(samples,options.signal)
+    else:
         samplelist= getSamplelist(samples,options.signal,ctx.minMX,ctx.maxMX)
-    else: samplelist= getBkgSamplelist(samples,options.signal)
 
     for sample in samplelist.keys():
         print sample
