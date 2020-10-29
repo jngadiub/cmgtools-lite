@@ -1,9 +1,7 @@
-
 # class to initialize all analysis cuts
 # init_ VV_VH.json contains all analysis cuts! -> need category import this file
 import json
 import ast
-
 class cuts():
     lumi = {}
     lumi_unc = {}
@@ -12,7 +10,16 @@ class cuts():
     LPSF_vtag = {}                                
     HPSF_htag = {}                                
     LPSF_htag = {}                                
-                                                  
+    HPSF_toptag = {}
+    LPSF_toptag = {}
+
+    W_tag_unc_HP = {}
+    W_tag_unc_LP = {}
+    H_tag_unc_HP = {}
+    H_tag_unc_LP = {}
+    TOP_tag_unc_HP = {}
+    TOP_tag_unc_LP = {}
+
     W_LPmassscale = 1.
     W_HPmassscale = 1.
                   
@@ -70,11 +77,6 @@ class cuts():
     WPNPl2Htag = ""
     WPNPLPl2Htag = ""
 
-    W_tag_unc_HP = {}
-    W_tag_unc_LP = {}
-    H_tag_unc_HP = {}
-    H_tag_unc_LP = {}
-    
     vtag_pt_dependence ={}
 
     cuts={}
@@ -150,19 +152,24 @@ class cuts():
                     self.yeartag = "18"
                 else: print "no such data taking year -> running with default values on 2016 data"
 
+                self.fixParsSigMVV = data["fixParsSigMVV"]
+                self.fixParsSig = data["fixParsSig"]
+
                 self.W_tag_unc_HP[year] = data["W_tag_unc_HP"][str(year)]
                 self.W_tag_unc_LP[year] = data["W_tag_unc_LP"][str(year)]
                 self.H_tag_unc_HP[year] = data["H_tag_unc_HP"][str(year)]
                 self.H_tag_unc_LP[year] = data["H_tag_unc_LP"][str(year)]
+                self.TOP_tag_unc_HP[year] = data["TOP_tag_unc_HP"][str(year)]
+                self.TOP_tag_unc_LP[year] = data["TOP_tag_unc_LP"][str(year)]
 
+                self.HPSF_vtag[year] = data['wtag_SF_HP'][str(year)]
+                self.LPSF_vtag[year] = data['wtag_SF_LP'][str(year)]
+                self.HPSF_htag[year] = data['htag_SF_HP'][str(year)]
+                self.LPSF_htag[year] = data['htag_SF_LP'][str(year)]
+                self.HPSF_toptag[year] = data['top_tag_SF_HP'][str(year)]
+                self.LPSF_toptag[year] = data['top_tag_SF_LP'][str(year)]
+                print " ALL SF PROPERLY READ"
 
-
-                self.fixParsSigMVV = data["fixParsSigMVV"]
-                self.fixParsSig = data["fixParsSig"]
-                self.HPSF_vtag[year] = data['HPSF'+self.yeartag]
-                self.LPSF_vtag[year] = data['LPSF'+self.yeartag]
-                self.HPSF_htag[year] = data['htagHPSF'+self.yeartag]
-                self.LPSF_htag[year] = data['htagLPSF'+self.yeartag]
                 self.vtag_pt_dependence[year] = data["vtag_pt_dependence"+self.yeartag]
 
                 #    https://twiki.cern.ch/twiki/bin/viewauth/CMS/TWikiLUM

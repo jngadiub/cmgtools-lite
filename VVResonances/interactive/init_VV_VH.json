@@ -9,18 +9,24 @@
     "unc_lumi18": 1.025,
     "unc_lumi161718": 1.018,
 
-    "HPSF16" :  0.937,
-    "LPSF16" :  1.006,
-    "HPSF17" :  0.955,
-    "LPSF17" :  1.003,
-    "HPSF18" :  1.0,
-    "LPSF18" :  1.0,
-    "htagHPSF16" :  0.937,
-    "htagLPSF16" :  1.006,
-    "htagHPSF17" :  0.955,
-    "htagLPSF17" :  1.003,
-    "htagHPSF18" :  1.0,
-    "htagLPSF18" :  1.0,
+    "_commentOnSF":"from Loukas https://www.dropbox.com/sh/fvmvnub5whffl2o/AADtbetcJlViSVBIG7Yge9epa?dl=0&preview=dak8ddt_sf.xlsx for pt 400-800, at the moment WvsQCD values used for all SF",
+    "wtag_SF_HP" : {"2016": 0.87, "2017": 0.78, "2018": 0.77},
+    "wtag_SF_LP" : {"2016": 1.02, "2017": 0.93, "2018": 0.98},
+
+    "W_tag_unc_HP" : {"2016": 0.07, "2017": 0.06, "2018": 0.04},
+    "W_tag_unc_LP" : {"2016": 0.18, "2017": 0.15, "2018": 0.13},
+
+    "htag_SF_HP" : {"2016": 0.87, "2017": 0.78, "2018": 0.77},
+    "htag_SF_LP" : {"2016": 1.02, "2017": 0.93, "2018": 0.98},
+
+    "H_tag_unc_HP" : {"2016": 0.07, "2017": 0.06, "2018": 0.04},
+    "H_tag_unc_LP" : {"2016": 0.18, "2017": 0.15, "2018": 0.13},
+
+    "top_tag_SF_HP" : {"2016": 0.87, "2017": 0.78, "2018": 0.77},
+    "top_tag_SF_LP" : {"2016": 1.02, "2017": 0.93, "2018": 0.98},
+
+    "TOP_tag_unc_HP" : {"2016": 0.07, "2017": 0.06, "2018": 0.04},
+    "TOP_tag_unc_LP" : {"2016": 0.18, "2017": 0.15, "2018": 0.13},
     
     "W_LPmassscale16" : 1.086,
     "W_LPmassscale17" : 1.08,
@@ -64,10 +70,6 @@
     },
     
 
-    "W_tag_unc_HP" : {"2016": 0.21 , "2017": 0.25 , "2018": 0.25  },
-    "W_tag_unc_LP" : {"2016": 0.11, "2017": 0.13 , "2018": 0.13 },
-    "H_tag_unc_HP" : {"2016": 0.21 , "2017": 0.25 , "2018": 0.25 },
-    "H_tag_unc_LP" : {"2016": 0.11, "2017": 0.13 , "2018": 0.13  },
     "vtag_pt_dependence16" : {"VV_HPHP":"((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))","VV_HPLP":"((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))","VH_HPHP":"1","VH_HPLP":"1","VH_LPHP":"1","NP":"1"},
     "vtag_pt_dependence17" : {"VV_HPHP":"((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))","VV_HPLP":"((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))","VH_HPHP":"1","VH_HPLP":"1","VH_LPHP":"1","NP":"1"},
     "vtag_pt_dependence18" : {"VV_HPHP":"((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))","VV_HPLP":"((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))","VH_HPHP":"1","VH_HPLP":"1","VH_LPHP":"1","NP":"1"},
@@ -77,25 +79,25 @@
     "tagging_variables_and_wp" : {
    "varl1Wtag": "jj_l1_DeepBoosted_WvsQCD",
    "varl2Wtag": "jj_l2_DeepBoosted_WvsQCD",
-   "l1Wtag16" : "jj_l1_DeepBoosted_WvsQCD__XX_default_16",
-   "l2Wtag16" : "jj_l2_DeepBoosted_WvsQCD__XX_default_16",
-   "l1Wtag17" : "jj_l1_DeepBoosted_WvsQCD__XX_default_17",
-   "l2Wtag17" : "jj_l2_DeepBoosted_WvsQCD__XX_default_17",
-   "l1Wtag18" : "jj_l1_DeepBoosted_WvsQCD__XX_default_18",
-   "l2Wtag18" : "jj_l2_DeepBoosted_WvsQCD__XX_default_18",
+   "l1Wtag16" : "jj_l1_DeepBoosted_WvsQCD__XX_default_161718",
+   "l2Wtag16" : "jj_l2_DeepBoosted_WvsQCD__XX_default_161718",
+   "l1Wtag17" : "jj_l1_DeepBoosted_WvsQCD__XX_default_161718",
+   "l2Wtag17" : "jj_l2_DeepBoosted_WvsQCD__XX_default_161718",
+   "l1Wtag18" : "jj_l1_DeepBoosted_WvsQCD__XX_default_161718",
+   "l2Wtag18" : "jj_l2_DeepBoosted_WvsQCD__XX_default_161718",
    "l1Wtag161718" : "jj_l1_DeepBoosted_WvsQCD__XX_default_161718",
    "l2Wtag161718" : "jj_l2_DeepBoosted_WvsQCD__XX_default_161718",
-    
-    
-    
+
+
+
     "varl1Htag": "jj_l1_DeepBoosted_ZHbbvsQCD",
     "varl2Htag": "jj_l2_DeepBoosted_ZHbbvsQCD",
-    "l1Htag16" : "jj_l1_DeepBoosted_ZHbbvsQCD__XX_default_16",
-    "l2Htag16" : "jj_l2_DeepBoosted_ZHbbvsQCD__XX_default_16",
-    "l1Htag17" : "jj_l1_DeepBoosted_ZHbbvsQCD__XX_default_17",
-    "l2Htag17" : "jj_l2_DeepBoosted_ZHbbvsQCD__XX_default_17",
-    "l1Htag18" : "jj_l1_DeepBoosted_ZHbbvsQCD__XX_default_18",
-    "l2Htag18" : "jj_l2_DeepBoosted_ZHbbvsQCD__XX_default_18",
+    "l1Htag16" : "jj_l1_DeepBoosted_ZHbbvsQCD__XX_default_161718",
+    "l2Htag16" : "jj_l2_DeepBoosted_ZHbbvsQCD__XX_default_161718",
+    "l1Htag17" : "jj_l1_DeepBoosted_ZHbbvsQCD__XX_default_161718",
+    "l2Htag17" : "jj_l2_DeepBoosted_ZHbbvsQCD__XX_default_161718",
+    "l1Htag18" : "jj_l1_DeepBoosted_ZHbbvsQCD__XX_default_161718",
+    "l2Htag18" : "jj_l2_DeepBoosted_ZHbbvsQCD__XX_default_161718",
     "l1Htag161718" : "jj_l1_DeepBoosted_ZHbbvsQCD__XX_default_161718",
     "l2Htag161718" : "jj_l2_DeepBoosted_ZHbbvsQCD__XX_default_161718",
     
