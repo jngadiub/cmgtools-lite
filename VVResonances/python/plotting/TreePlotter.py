@@ -19,6 +19,10 @@ class TreePlotter(PlotterBase):
         self.random=ROOT.TRandom(101082)
         self.N=self.tree.GetEntries()
 
+    def addFriend(self,treename,filename):
+        self.tree.AddFriend(treename,filename)
+
+
     def setupFromFile(self,filename):
         f=open(filename)
         data=pickle.load(f)
