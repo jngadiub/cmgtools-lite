@@ -197,8 +197,7 @@ def calculateSF(self,event,ctx,year,jet,SF=1,eff_vtag=[1,1],eff_htag=[1,1],mista
             eff_vtag[1] *= (ctx.LPSF_vtag[year]-ctx.W_tag_unc_LP[year])
             #print "********************      SF ",SF
             #print "eff_wtag[0] ",eff_vtag[0]
-        else:
-            print " "
+        #else:
             #print " jetTag is ",jetTag
     elif jetTruth=='top' :
         #print " this is a top!"
@@ -213,8 +212,7 @@ def calculateSF(self,event,ctx,year,jet,SF=1,eff_vtag=[1,1],eff_htag=[1,1],mista
             SF *= ctx.LPSF_toptag[year]
             mistag_top[0] *= (ctx.LPSF_toptag[year]+ctx.TOP_tag_unc_LP[year])
             mistag_top[1] *= (ctx.LPSF_toptag[year]-ctx.TOP_tag_unc_LP[year])
-    else:
-        print " "
+    #else:
         #print "***********************       this jet do not contain V, H and top     **************************"
     #print "SF ",SF
     #print " mistag_top ",mistag_top
