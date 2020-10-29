@@ -413,7 +413,7 @@ class myTree:
 if __name__=='__main__':
     if options.directory.find(options.year)== -1: print 'ATTENTION: are you sure you are using the right directory for '+options.year+' data?'    
     period = options.year
-    ctx  = cuts.cuts("init_VV_VH_SF.json",period,"random_dijetbins")
+    ctx  = cuts.cuts("init_VV_VH.json",period,"random_dijetbins")
     samples=""
     basedir=options.directory
     filePeriod=options.year
