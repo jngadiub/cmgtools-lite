@@ -83,7 +83,7 @@ class Postfitplotter():
         try: 
             self.options.signalScaleF
         except AttributeError:
-            optparser.add_option("--signalScaleF",dest="signalScaleF",type=float,help="scale factor to apply to signal when drawing so its still visible!",default=100.)
+            optparser.add_option("--signalScaleF",dest="signalScaleF",type=float,help="scale factor to apply to signal when drawing so its still visible!",default=500.)
             optparser.add_option("-s","--signal",dest="fitSignal",action="store_true",help="do S+B fit",default=False)
             optparser.add_option("-M","--mass",dest="signalMass",type=float,help="signal mass",default=1560.)
 
