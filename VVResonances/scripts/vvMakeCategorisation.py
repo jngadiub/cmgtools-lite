@@ -1,3 +1,4 @@
+#!/usr/bin/env python 
 # make tree containing genweight, other event weights, as well as is jet H/ V jet, what category is the event classified in, what V/Htag has each jet -> for each signal sample!
 #use this as input for the migrationUncertainties.py script
 import ROOT
@@ -12,9 +13,10 @@ ROOT.gROOT.ProcessLine("struct rootfloat { Float_t rf;};")
 from ROOT import rootfloat
 ROOT.gROOT.ProcessLine("struct rootlong { Long_t li;};")
 from ROOT import rootlong
-import cuts
-from rootpy.tree import CharArrayCol
 
+from rootpy.tree import CharArrayCol
+sys.path.insert(0, "../interactive/")
+import cuts
 # python categorisation.py -y "2016" -s WJetsToQQ -d deepAK8V2/
 # python categorisation.py -y "2016,2017,2018" -s WJetsToQQ -d deepAK8V2/
 # python categorisation.py -y "2016" -s BulkGravToWW -d deepAK8V2/
@@ -25,6 +27,7 @@ parser.add_option("-s","--signal",dest="signal",help="signal to categorise",defa
 parser.add_option("-d","--directory",dest="directory",help="directory with signal samples",default='deepAK8V2/')
 
 (options,args) = parser.parse_args()
+
 
 
 def getSamplelist(directories,signal,minMX=1200.,maxMX=8000.):
@@ -112,7 +115,10 @@ def selectSignalTree(cs,sample):
     print 'sum '+str(sumcat)
     print 'overall signal efficiency after selection cut '+str(finaltree.GetEntries()/float(chain.GetEntries()))
     print 'signal efficiency after category cuts '+str(sumcat/float(chain.GetEntries()))
-    print 'efficiency of all category cuts '+str(sumcat/float(finaltree.GetEntries()))
+    if finaltree.GetEntries() !=0 :
+        print 'efficiency of all category cuts '+str(sumcat/float(finaltree.GetEntries()))
+    else: 
+        print ' no events left after preselection, presumably it is a low pt bin sample '
     signaltree_VH_HPHP.SetName('VH_HPHP')
     signaltree_VV_HPHP.SetName('VV_HPHP')
     signaltree_VH_LPHP.SetName('VH_LPHP')
@@ -160,7 +166,7 @@ def calculateSF(self,event,ctx,year,jet,SF=1,eff_vtag=[1,1],eff_htag=[1,1],mista
         jetTruth = "H"
     elif TTruth == 1:
         jetTruth = "top"
-    print " jetTruth ",jetTruth
+    #print " jetTruth ",jetTruth
     if (jetTruth=='H' or jetTruth=='V'):
         #print " jetTruth H or V"
         if jetTag == 'HPHtag':
@@ -191,9 +197,11 @@ def calculateSF(self,event,ctx,year,jet,SF=1,eff_vtag=[1,1],eff_htag=[1,1],mista
             eff_vtag[1] *= (ctx.LPSF_vtag[year]-ctx.W_tag_unc_LP[year])
             #print "********************      SF ",SF
             #print "eff_wtag[0] ",eff_vtag[0]
-        else: print " jetTag is ",jetTag
+        else:
+            print " "
+            #print " jetTag is ",jetTag
     elif jetTruth=='top' :
-        print " this is a top!"
+        #print " this is a top!"
         if jetTag == 'HPHtag':
             #print "jetTag== HPHtag"
             SF *= ctx.HPSF_toptag[year]
@@ -371,7 +379,7 @@ class myTree:
             tag2=self.jj_l2_jetTag[:6]
 
             SF = 1.0
-            CMS_eff_vtag_sf = [1.0,1.0] #for up and down variations
+            CMS_eff_vtag_sf = [1.0,1.0] #for up and down variations                                                                                                                                                               
             CMS_eff_htag_sf = [1.0,1.0]
             CMS_mistag_top_sf = [1.0,1.0]
             jet = 1
@@ -416,10 +424,10 @@ if __name__=='__main__':
 
         for year in period:
             print year
-            if year==period[-1]: samples+=basedir+year+"/"
-            else: samples+=basedir+year+"/,"
+            if year==period[-1]: samples+=basedir+"/"
+            else: samples+=basedir+"/,"
     else: 
-        samples=basedir+period+"/"
+        samples=basedir+"/"
     outfile = ROOT.TFile('migrationunc/'+options.signal+'_'+filePeriod+'.root','RECREATE')
 
     if(options.signal.find("Jets")!=-1 or options.signal.find("TT")!=-1):
