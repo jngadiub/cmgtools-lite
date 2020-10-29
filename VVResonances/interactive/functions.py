@@ -226,6 +226,37 @@ class AllFunctions():
    #   cmd='vvMakeTriggerShapes.py -i "{rootFile}"'.format(rootFile=rootFile)
    #   os.system(cmd)
 
+ def makeSF(self,template):
+
+  pwd = os.getcwd()
+  folders=[]
+  folders= self.samples.split(',')
+  sam= ""
+  for s in folders:
+   sam+=pwd +"/"+s
+   if s != folders[-1]: sam+=","
+  print "Using files in" , sam
+
+  print " TEMPLATE ",template
+
+  print "making categorization "
+  dirs = sam.split(",")
+  for d in dirs:
+   print " dir ",d
+   for filen in os.listdir(d):
+    if filen.find(".")==-1:
+     print "in "+str(filen)+"the separator . was not found. -> continue!"
+     continue
+    samplelist = template.split(",")
+    #print samplelist
+    for sampleType in samplelist:
+     if filen.find(sampleType)!=-1:
+      print " sample ",sampleType
+      cmd='vvMakeCategorisation.py -s "{sample}" -d "{directory}" -y "{year}"'.format(sample=sampleType,directory=d,year=d.split('/')[-2])
+      print " going to execute ",cmd
+      os.system(cmd)
+      #else: print sampleType+" NOT FOUND IN "+filen
+
  def makeNormalizations(self,name,filename,template,data=0,addCut='1',jobName="nR",makesingle=False,factors="1",sendjobs=True,wait=True): #,HPSF=1.,LPSF=1.):
  
   pwd = os.getcwd()
@@ -239,12 +270,6 @@ class AllFunctions():
   print "Using files in" , sam
   
   for c in self.categories:
-   '''
-   #apply V/H tagging scale factors --> this will have to be updated
-   if name.find("Jets")!=-1:
-        if c.find("HPLP"): factors=factors+",sf:"+str(LPSF)
-        else: factors=factors+",sf:"+str(HPSF)
-   '''   
    jobname = jobName+"_"+period+"_"+c
    rootFile=filename+"_"+name+"_"+c+".root"
    print "Saving to ",rootFile  
