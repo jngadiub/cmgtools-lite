@@ -386,8 +386,8 @@ class myTree:
             SF,CMS_eff_vtag_sf,CMS_eff_htag_sf,CMS_mistag_top_sf = calculateSF(self,event,ctx,year,jet,SF,CMS_eff_vtag_sf,CMS_eff_htag_sf,CMS_mistag_top_sf,self.jj_l1_mergedTopTruth,self.jj_l2_mergedTopTruth,tag1,tag2)
             jet = 2
             SF,CMS_eff_vtag_sf,CMS_eff_htag_sf,CMS_mistag_top_sf = calculateSF(self,event,ctx,year,jet,SF,CMS_eff_vtag_sf,CMS_eff_htag_sf,CMS_mistag_top_sf,self.jj_l1_mergedTopTruth,self.jj_l2_mergedTopTruth,tag1,tag2)
-            print " final SF ",SF
-            print
+            #print " final SF ",SF
+            #print
             self.sf.rf = SF
             self.CMS_eff_vtag_sf_up.rf = CMS_eff_vtag_sf[0]
             self.CMS_eff_vtag_sf_down.rf = CMS_eff_vtag_sf[1]
