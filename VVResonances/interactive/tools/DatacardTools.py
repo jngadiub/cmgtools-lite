@@ -546,11 +546,13 @@ class DatacardTools():
      if signal.find('BulkGZZ')!=-1 : sig = "BulkGravToZZ"
      uncup   = data[sig+"_"+dataset+"_CMS_VV_JJ_DeepJet_Htag_eff"][p+"_up"]
      uncdown = data[sig+"_"+dataset+"_CMS_VV_JJ_DeepJet_Htag_eff"][p+"_down"]
-     card.addSystematic("CMS_VV_JJ_DeepJet_Htag_eff","lnN",{'%s'%signal: str(uncup)+"/"+ str(uncdown),'Wjets': str(uncup)+"/"+ str(uncdown),'Zjets': str(uncup)+"/"+ str(uncdown)})
+     card.addSystematic("CMS_VV_JJ_DeepJet_Htag_eff","lnN",{'%s'%signal: str(uncdown)+"/"+ str(uncup),'Wjets': str(uncdown)+"/"+ str(uncup),'Zjets': str(uncdown)+"/"+ str(uncup)})
      uncup   = data[sig+"_"+dataset+"_CMS_VV_JJ_DeepJet_Vtag_eff"][p+"_up"]
      uncdown = data[sig+"_"+dataset+"_CMS_VV_JJ_DeepJet_Vtag_eff"][p+"_down"]
-     card.addSystematic("CMS_VV_JJ_DeepJet_Vtag_eff","lnN",{'%s'%signal: str(uncup)+"/"+ str(uncdown),'Wjets': str(uncup)+"/"+ str(uncdown),'Zjets': str(uncup)+"/"+ str(uncdown)})
-     
+     card.addSystematic("CMS_VV_JJ_DeepJet_Vtag_eff","lnN",{'%s'%signal: str(uncdown)+"/"+ str(uncup),'Wjets': str(uncdown)+"/"+ str(uncup),'Zjets': str(uncdown)+"/"+ str(uncup)})
+     uncup   = data[sig+"_"+dataset+"_CMS_VV_JJ_DeepJet_TOPtag_mistag"][p+"_up"]
+     uncdown = data[sig+"_"+dataset+"_CMS_VV_JJ_DeepJet_TOPtag_mistag"][p+"_down"]
+     card.addSystematic("CMS_VV_JJ_DeepJet_TOPtag_mistag","lnN",{'%s'%signal: str(uncdown)+"/"+ str(uncup),'Wjets': str(uncdown)+"/"+ str(uncup),'Zjets': str(uncdown)+"/"+ str(uncup)})
      
  def AddResBackgroundSystematics(self,card,category,extra_uncertainty=[]):
  
