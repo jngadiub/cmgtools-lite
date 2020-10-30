@@ -119,13 +119,6 @@ for mass in sorted(complete_mass.keys()):
         print " fraction of lumi ",ctx.lumi[year]/luminosity_tot 
         luminosity=   ctx.lumi[year]/luminosity_tot #str(ctx.lumi[year]/luminosity_tot)
         if options.output.find("Run2") ==-1: luminosity = 1
-        taggerSF={'VV_HPLP':{year:ctx.HPSF_vtag[year]*ctx.LPSF_vtag.get(year,0) for year in ctx.LPSF_vtag.keys()},'VH_HPHP':{year:ctx.HPSF_htag[year]*ctx.HPSF_vtag.get(year,0) for year in ctx.HPSF_vtag.keys()},'VH_HPLP':{year:ctx.HPSF_htag[year]*ctx.LPSF_vtag.get(year,0) for year in ctx.LPSF_vtag.keys()},'VH_LPHP':{year:ctx.HPSF_vtag[year]*ctx.LPSF_htag.get(year,0) for year in ctx.LPSF_htag.keys()},'VH_LPLP':{year:ctx.LPSF_htag[year]*ctx.LPSF_vtag.get(year,0) for year in ctx.LPSF_vtag.keys()},'VV_HPHP':{year:ctx.HPSF_vtag[year]*ctx.HPSF_vtag.get(year,0) for year in ctx.HPSF_vtag.keys() }}
-
-        if category.find('NP')!=-1 : 
-            SF =1.
-        else:
-            SF = taggerSF[category][year]
-        print "SF ",SF
         plotter.append(TreePlotter(complete_mass[mass][folder]+'.root','AnalysisTree'))
         plotter[-1].setupFromFile(complete_mass[mass][folder]+'.pck')
         if year == "2016": plotter[-1].addCorrectionFactor('genWeight','tree')
@@ -135,13 +128,16 @@ for mass in sorted(complete_mass.keys()):
         plotter[-1].addCorrectionFactor('xsec','tree')
         plotter[-1].addCorrectionFactor('puWeight','tree')
         plotter[-1].addCorrectionFactor(luminosity,'flat')
+        plotter[-1].addFriend("all","../interactive/migrationunc/"+complete_mass[mass][folder].split("/")[-1]+"_"+year+".root")
+        plotter[-1].addCorrectionFactor("all.SF",'tree')
+
         if options.triggerW:
             plotter[-1].addCorrectionFactor('jj_triggerWeight','tree')	
             print "Using triggerweight"
         if histo == None :
-            histo = plotter[-1].drawTH1(options.mvv,options.cut+"*"+str(SF),"1.",500,options.min,options.max)
+            histo = plotter[-1].drawTH1(options.mvv,options.cut,"1.",500,options.min,options.max)
         else:
-            histo.Add(plotter[-1].drawTH1(options.mvv,options.cut+"*"+str(SF),"1.",500,options.min,options.max))
+            histo.Add(plotter[-1].drawTH1(options.mvv,options.cut,"1.",500,options.min,options.max))
 
 
     err=ROOT.Double(0)
