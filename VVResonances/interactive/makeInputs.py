@@ -198,7 +198,8 @@ if options.run.find("all")!=-1 or options.run.find("sig")!=-1:
             f.makeSignalShapesMVV("JJ_"+str(signal_inuse)+"_"+filePeriod,signaltemplate_inuse,fixParsSigMVV[signal_inuse.replace('VBF_','')],"1")
     if options.run.find("all")!=-1 or options.run.find("SF")!=-1:
         print " make SF "
-        f.makeSF(signaltemplate_inuse)
+        f.makeSF(signaltemplate_inuse,isSignal=True)
+        f.makeMigrationUnc(signaltemplate_inuse,str(signal_inuse),period,isSignal=True)
     if options.run.find("all")!=-1 or options.run.find("norm")!=-1:
         print "fit signal norm, DID YOU MAKE SF "
         f.makeSignalYields("JJ_"+str(signal_inuse)+"_"+filePeriod,signaltemplate_inuse,xsec_inuse,'"pol2"') #'"[0]*TMath::Log10(x)"')
@@ -257,8 +258,10 @@ if options.run.find("all")!=-1 or options.run.find("vjets")!=-1:
     if options.run.find("all")!=-1 or options.run.find("vjetsSF")!=-1 or options.run.find("All")!=-1:
         print "then SF W"
         f.makeSF(WresTemplate)
+        f.makeMigrationUnc(WresTemplate,"WJets",period)
         print "then SF Z"
         f.makeSF(ZresTemplate)
+        f.makeMigrationUnc(ZresTemplate,"ZJets",period)
     if options.run.find("all")!=-1 or options.run.find("vjetsnorm")!=-1 or options.run.find("All")!=-1:
         print " DID YOU PRODUCE THE SF TREES?? "
         print "then norm W"
@@ -277,8 +280,11 @@ if options.run.find("all")!=-1 or options.run.find("tt")!=-1:
     if options.run.find("all")!=-1 or options.run.find("SF")!=-1 or options.run.find("ALL")!=-1:
         print " Making SF "
         f.makeSF(TTemplate)
+        f.makeMigrationUnc(TTemplate,"TTJets",period)
     if options.run.find("all")!=-1 or options.run.find("norm")!=-1 or options.run.find("ALL")!=-1:
         print "make norm for all contributions of ttbar together, DID YOU MAKE SF?"
+        f.makeNormalizations("TTJets","JJ_"+filePeriod,TTemplate,0,ctx.cuts['nonres'],"nResTT",options.single,"1",options.sendjobs)
+    if options.run.find("all")!=-1 or options.run.find("templates")!=-1 or options.run.find("ALL")!=-1:
         f.makeBackgroundShapesMVVKernel("TTJets","JJ_"+filePeriod,TTemplate,ctx.cuts['nonres'],"1DTT",wait,1.,1.,options.sendjobs)
     contrib =["resT","resW","nonresT","resTnonresT","resWnonresT","resTresW"]
     for con in contrib:

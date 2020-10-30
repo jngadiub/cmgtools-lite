@@ -52,7 +52,7 @@ class AllFunctions():
   
   for c in self.categories:
    if 'VBF' in c: cut = "*".join([self.cuts[c.replace('VBF_','')],self.cuts['common_VBF'],self.cuts['acceptance'],str(sfP[c.replace('VBF_','')])])
-   else: cut = "*".join([self.cuts[c],self.cuts['common_VV'],self.cuts['acceptance'],str(sfP[c])])
+   else: cut = "*".join([self.cuts[c],self.cuts['common_VV'],self.cuts['acceptance']]) #,str(sfP[c])])
    yieldFile=filename+"_"+c+"_yield"
    fnc = functype
    cmd='vvMakeSignalYields.py -s {template} -c "{cut}" -o {output} -V "jj_LV_mass" -m {minMVV} -M {maxMVV} -f {fnc} -b {BR} --minMX {minMX} --maxMX {maxMX} {samples} '.format(template=template, cut=cut, output=yieldFile,minMVV=self.minMVV,maxMVV=self.maxMVV,fnc=fnc,BR=branchingFraction,minMX=self.minMX,maxMX=self.maxMX,samples=self.samples)
@@ -226,7 +226,7 @@ class AllFunctions():
    #   cmd='vvMakeTriggerShapes.py -i "{rootFile}"'.format(rootFile=rootFile)
    #   os.system(cmd)
 
- def makeSF(self,template):
+ def makeSF(self,template,isSignal=False):
 
   pwd = os.getcwd()
   folders=[]
@@ -250,12 +250,31 @@ class AllFunctions():
     samplelist = template.split(",")
     #print samplelist
     for sampleType in samplelist:
-     if filen.find(sampleType)!=-1:
+     if filen.find(sampleType)!=-1 and filen.find(".root")!=-1:
+      if filen.find("VBF")!=-1 and sampleType.find("VBF")==-1: continue
       print " sample ",sampleType
+      if isSignal == True:
+       print " is signal !"
+       fnameParts=filen.split('.')
+       fname=fnameParts[0]
+       mass = float(fname.split('_')[-1])
+       if mass <self. minMX or mass > self.maxMX: continue
+       else: sampleType=sampleType+"narrow_"+fname.split('_')[-1]
+
       cmd='vvMakeCategorisation.py -s "{sample}" -d "{directory}" -y "{year}"'.format(sample=sampleType,directory=d,year=d.split('/')[-2])
       print " going to execute ",cmd
       os.system(cmd)
       #else: print sampleType+" NOT FOUND IN "+filen
+
+
+ def makeMigrationUnc(self,template,outname,year,isSignal=False,directory='migrationunc/'):
+  print "Using files in" , directory
+  print " TEMPLATE ",template
+  print "making migration uncertainties "
+  cmd='vvMakeMigrationUncertainties.py -s "{sample}" -d "{directory}" -y "{year}" -o "{outname}" --isSignal {isSignal}'.format(sample=template,directory=directory,year=year,outname=outname,isSignal=isSignal)
+  print " going to execute ",cmd
+  os.system(cmd)
+
 
  def makeNormalizations(self,name,filename,template,data=0,addCut='1',jobName="nR",makesingle=False,factors="1",sendjobs=True,wait=True): #,HPSF=1.,LPSF=1.):
  
