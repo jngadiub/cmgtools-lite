@@ -73,6 +73,7 @@ def getBkgSamplelist(directories,signal):
     for directory in dirs:
         for filename in os.listdir(directory):
             if filename.find(signal)!=-1 and filename.find('root')!=-1:
+                if filename.find("VBF")!=-1 and signal.find("VBF")==-1: continue
                 fnameParts=filename.split('.')
                 fname=fnameParts[0]
                 fpart=fnameParts[0].split("_")[0]
@@ -295,6 +296,9 @@ class myTree:
         print " setOutputTreeBranchValues ",cat
         rf = ROOT.TFile(tmpname+'.root','READ')
         cattree = rf.Get(cat)
+        print " cat "+cat+" "+str(cattree.GetEntries())
+
+
         ZHbb_branch_l1 = cattree.GetBranch(ctx.varl1Htag)
         ZHbb_leaf_l1 = ZHbb_branch_l1.GetLeaf(ctx.varl1Htag)
         W_branch_l1 = cattree.GetBranch(ctx.varl1Wtag)
@@ -325,7 +329,7 @@ class myTree:
         WPLP_ZHbb_leaf_l2 = WPLP_ZHbb_branch_l2.GetLeaf(ctx.WPLPl2Htag)
         WPLP_W_branch_l2 = cattree.GetBranch(ctx.WPLPl2Wtag)
         WPLP_W_leaf_l2 = WPLP_W_branch_l2.GetLeaf(ctx.WPLPl2Wtag)
-        
+
         
         for event in cattree:
             self.puWeight.rf       = event.puWeight 
@@ -348,7 +352,9 @@ class myTree:
 
             self.jj_l1_mergedZbbTruth.ri = event.jj_l1_mergedZbbTruth
             self.jj_l2_mergedZbbTruth.ri = event.jj_l2_mergedZbbTruth
-            self.category[:7] = cat 
+            if cat !='all':
+                self.category[:7] = cat
+            else: self.category[:7] = "0"
             # this depends now on the actual cuts in the analysis!!
             if ZHbb_leaf_l1.GetValue() > WPHP_ZHbb_leaf_l1.GetValue():
                 self.jj_l1_jetTag[:6] = 'HPHtag'
@@ -394,7 +400,7 @@ class myTree:
             self.CMS_mistag_top_sf_up.rf = CMS_mistag_top_sf[0]
             self.CMS_mistag_top_sf_down.rf = CMS_mistag_top_sf[1]
 
-                    
+
             #print self.jj_l1_jetTag
             self.newTree.Fill()
         print 'number of events in this category '+str(self.newTree.GetEntries())
@@ -428,30 +434,27 @@ if __name__=='__main__':
         samples=basedir+"/"
     outfile = ROOT.TFile('migrationunc/'+options.signal+'_'+filePeriod+'.root','RECREATE')
 
-    if(options.signal.find("Jets")!=-1 or options.signal.find("TT")!=-1):
-        samplelist= getBkgSamplelist(samples,options.signal)
-    else:
-        samplelist= getSamplelist(samples,options.signal,ctx.minMX,ctx.maxMX)
+    samplelist= getBkgSamplelist(samples,options.signal)
+    print " samplelist ", samplelist
 
     for sample in samplelist.keys():
         print sample
         print 'init new tree'
         outtree = myTree(sample,outfile)
+        outtreeAll = myTree(sample,outfile)
         print 'select common cuts signal tree' 
         tmpfilename = selectSignalTree(ctx.cuts,samplelist[sample])
         print " tmpfilename ",tmpfilename
-        #for t in signaltrees:
         outtree.setOutputTreeBranchValues('VH_HPHP',ctx,tmpfilename,filePeriod)
         outtree.setOutputTreeBranchValues('VV_HPHP',ctx,tmpfilename,filePeriod)
         outtree.setOutputTreeBranchValues('VH_LPHP',ctx,tmpfilename,filePeriod)
         outtree.setOutputTreeBranchValues('VH_HPLP',ctx,tmpfilename,filePeriod)
         outtree.setOutputTreeBranchValues('VV_HPLP',ctx,tmpfilename,filePeriod)
-        outtree.setOutputTreeBranchValues('commonacceptance',ctx,tmpfilename,filePeriod)
         outfile.cd()
-        outtree.write()
-        outtree.setOutputTreeBranchValues('all',ctx,tmpfilename,filePeriod)
+        outtree.write('signalregion')
+        outtreeAll.setOutputTreeBranchValues('all',ctx,tmpfilename,filePeriod)
         outfile.cd()
-        outtree.write('all')
+        outtreeAll.write('all')
         
         os.system("rm "+tmpfilename+".root")
         
