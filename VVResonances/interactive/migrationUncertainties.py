@@ -1,98 +1,41 @@
+#!/usr/bin/env python
 ############# script to estimate migration uncertainties for the full hadronic VV/VH -> 4q analysis ###############
 ############# base calculation on measuremnt of sf uncertainties for the W/H-tagging scale factors  ###############
 
 # for the moment there are the same scale factors for W-tagging and H-tagging, for 2018 i put the same as for 2017 for now!
 import ROOT
-from optparse import OptionParser
+import optparse
 import sys,os
 import cuts #, HPSF16, HPSF17, LPSF16, LPSF17, dijetbins, HCALbinsMVVSignal
 import json
+from array import array
+ROOT.gROOT.ProcessLine("struct rootint { Int_t ri;};")
+from ROOT import rootint
+ROOT.gROOT.ProcessLine("struct rootfloat { Float_t rf;};")
+from ROOT import rootfloat
+ROOT.gROOT.ProcessLine("struct rootlong { Long_t li;};")
+from ROOT import rootlong
+sys.path.insert(0, "../interactive/")
+import cuts
+
+
+parser = optparse.OptionParser()
+parser.add_option("-y","--year",dest="year",default='2016',help="year of data taking")
+parser.add_option("-s","--samples",dest="samples",help="sample to calculate the migration unc.",default='ZprimeToZh')
+parser.add_option("-d","--directory",dest="directory",help="directory with signal samples",default="migrationunc/")
+parser.add_option("-m","--minMX",dest="minMX",type=float,help="mVV variable",default=1200)
+parser.add_option("-M","--maxMX",dest="maxMX",type=float, help="mVV variable",default=8000)
+parser.add_option("-c","--categories",dest="categories",help="list of considered categories",default='VH_HPHP,VV_HPHP,VH_LPHP,VH_HPLP,VV_HPLP')
+parser.add_option("-t","--tags",dest="tags",help="list of tags",default='H_tag,V_tag,top_tag')
+parser.add_option("--isSignal",dest="isSignal",action="store_true", help="is signal?",default=False)
+parser.add_option("-o","--output",dest="output",help="Output",default='ZprimeZH')
+(options,args) = parser.parse_args()
 
 
 
-def calculateWeight(e,category,uncertainty_var, uncertainty_num,variation):
-    factor =1
-    jet1truth = ''
-    if e.jj_l1_mergedVTruth==1: 
-        jet1truth = 'V'
-    if e.jj_l1_mergedHTruth==1 or e.jj_l1_mergedZbbTruth==1: 
-        jet1truth = 'H'
-    jet2truth = ''
-    if e.jj_l2_mergedVTruth==1: jet2truth = 'V'
-    if e.jj_l2_mergedHTruth==1 or e.jj_l2_mergedZbbTruth==1: jet2truth = 'H'
-    # up variation HP H-tag
-    if uncertainty_var.find("H_tag")!=-1 and uncertainty_var.find("HP")!=-1 and variation=="up":
-        factor = uncpercategory_HPHtag(category,jet1truth,e.jj_l1_jetTag,jet2truth,e.jj_l2_jetTag,uncertainty_num)
-    if uncertainty_var.find("H_tag")!=-1 and uncertainty_var.find("HP")!=-1 and variation=="down":
-        factor = uncpercategory_HPHtag(category,jet1truth,e.jj_l1_jetTag,jet2truth,e.jj_l2_jetTag,-uncertainty_num)
-    if uncertainty_var.find("V_tag")!=-1 and uncertainty_var.find("HP")!=-1 and variation=="up":
-        factor = uncpercategory_HPVtag(category,jet1truth,e.jj_l1_jetTag,jet2truth,e.jj_l2_jetTag,uncertainty_num)
-    if uncertainty_var.find("V_tag")!=-1 and uncertainty_var.find("HP")!=-1 and variation=="down":
-        factor = uncpercategory_HPVtag(category,jet1truth,e.jj_l1_jetTag,jet2truth,e.jj_l2_jetTag,-uncertainty_num)    
-    
-    if uncertainty_var.find("H_tag")!=-1 and uncertainty_var.find("LP")!=-1 and variation=="up":
-        factor = uncpercategory_LPHtag(category,jet1truth,e.jj_l1_jetTag,jet2truth,e.jj_l2_jetTag,uncertainty_num)
-    if uncertainty_var.find("H_tag")!=-1 and uncertainty_var.find("LP")!=-1 and variation=="down":
-        factor = uncpercategory_LPHtag(category,jet1truth,e.jj_l1_jetTag,jet2truth,e.jj_l2_jetTag,-uncertainty_num)
-        
-    if uncertainty_var.find("V_tag")!=-1 and uncertainty_var.find("LP")!=-1 and variation=="up":
-        factor = uncpercategory_LPVtag(category,jet1truth,e.jj_l1_jetTag,jet2truth,e.jj_l2_jetTag,uncertainty_num)
-    if uncertainty_var.find("V_tag")!=-1 and uncertainty_var.find("LP")!=-1 and variation=="down":
-        factor = uncpercategory_LPVtag(category,jet1truth,e.jj_l1_jetTag,jet2truth,e.jj_l2_jetTag,-uncertainty_num)    
-        
-    return factor
 
-
-def uncpercategory_HPHtag(category,jet1truth,jet1tag,jet2truth,jet2tag,uncertainty):
-    # jet1truth = is this H or V jet from MC truth, jet1tag= in which category was this jet tagged f.e. HPHtag
-    w = 1.
-    if category=='VH_HPHP' or category=='VH_LPHP':
-        if (jet1truth=='H') and jet1tag.find('HPHtag')!=-1: w = w*(1+uncertainty)
-        if (jet2truth=='H') and jet2tag.find('HPHtag')!=-1: w = w*(1+uncertainty)
-    if category=='VV_HPLP' or category=='VH_HPLP' or category=='VH_LPHP' or category=='VV_HPHP':
-        if (jet1truth=='H') and jet1tag.find('Vtag')!=-1: w = w*(1-uncertainty)
-        if (jet2truth=='H') and jet2tag.find('Vtag')!=-1: w = w*(1-uncertainty)
-    
-    return w
-
-def uncpercategory_HPVtag(category,jet1truth,jet1tag,jet2truth,jet2tag,uncertainty):
-    # jet1truth = is this H or V jet from MC truth, jet1tag= in which category was this jet tagged f.e. HPHtag
-    w = 1.
-    if category=='VV_HPHP' or category=='VH_HPLP' or category=='VV_HPLP' or category=='VH_HPHP':
-        if (jet1truth=='V') and jet1tag.find('HPVtag')!=-1: w = w*(1+uncertainty)
-        if (jet2truth=='V') and jet2tag.find('HPVtag')!=-1: w = w*(1+uncertainty)
-    if category == 'VH_LPHP' or category=='VH_HPLP' :
-        if (jet1truth=='V') and jet1tag.find('Htag')!=-1: w = w*(1-uncertainty)
-        if (jet2truth=='V') and jet2tag.find('Htag')!=-1: w = w*(1-uncertainty)
-    return w
-
-
-def uncpercategory_LPVtag(category,jet1truth,jet1tag,jet2truth,jet2tag,uncertainty):
-    # jet1truth = is this H or V jet from MC truth, jet1tag= in which category was this jet tagged f.e. HPHtag
-    # LP is anti-correlated to HP so here everything that would be + in HP is -
-    w = 1.
-    if category=='VV_HPLP' or category=='VH_LPHP':
-        if (jet1truth=='V') and jet1tag.find('LPVtag')!=-1: w = w*(1-uncertainty)
-        if (jet2truth=='V') and jet2tag.find('LPVtag')!=-1: w = w*(1-uncertainty)
-    #if category == ''
-    #if (jet1truth=='V') and jet1tag.find('Htag')!=-1: w = w*(1+uncertainty)
-    #if (jet2truth=='V') and jet2tag.find('Htag')!=-1: w = w*(1+uncertainty)
-    return w
-
-def uncpercategory_LPHtag(category,jet1truth,jet1tag,jet2truth,jet2tag,uncertainty):
-    # jet1truth = is this H or V jet from MC truth, jet1tag= in which category was this jet tagged f.e. HPHtag
-    # LP is anti-correlated to HP so here everything that would be + in HP is -
-    w = 1.
-    if category=='VH_HPLP' or category=='VH_HPLP':
-        if (jet1truth=='H') and jet1tag.find('LPHtag')!=-1: w = w*(1-uncertainty)
-        if (jet2truth=='H') and jet2tag.find('LPHtag')!=-1: w = w*(1-uncertainty)
-    if category=='VV_HPLP' and category=='VV_HPLP':
-        if (jet1truth=='H') and jet1tag.find('Vtag')!=-1: w = w*(1+uncertainty)
-        if (jet2truth=='H') and jet2tag.find('Vtag')!=-1: w = w*(1+uncertainty)
-    return w
-
-
-def calculateMigration(tree,uncertainty_var,uncertainty_num,category):
+def calculateMigration(tree,uncertainty_var,category):
+    print " CAT ",category
     events   = 0
     events_wup = 0
     events_wdown = 0
@@ -101,17 +44,32 @@ def calculateMigration(tree,uncertainty_var,uncertainty_num,category):
     for e in tree:
         # apply category cuts to the tree
         if e.category.find(category)==-1: continue
-        events += e.genWeight*e.puWeight
-        # apply weight of uncertainty up/down variation to events with real W or H boson
-        # apply also weight for up/down variation if only a anti-tag requirement is present ...
+        events += e.genWeight*e.puWeight*e.SF
+        # apply weight of uncertainty up/down variation to events with real W or H boson and top mistag correction
+        # apply also weight for up/down variation of the SF
         # count overall weighted events in the category
-        # count unweighted events in the category
-        events_wup += e.genWeight*e.puWeight*calculateWeight(e,category,uncertainty_var, uncertainty_num,'up')
-        events_wdown += e.genWeight*e.puWeight*calculateWeight(e,category,uncertainty_var, uncertainty_num,'down')
-        
-    
-    # return list with number of unweighted, weighted events in the category given by category cuts
+        if uncertainty_var == "V_tag":
+            events_wup +=e.genWeight*e.puWeight*e.CMS_eff_vtag_sf_up
+        elif uncertainty_var == "H_tag":
+            events_wup +=e.genWeight*e.puWeight*e.CMS_eff_htag_sf_up
+        elif uncertainty_var == "top_tag":
+            events_wup +=e.genWeight*e.puWeight*e.CMS_mistag_top_sf_up
+        else:
+            print " ATTENTION! unknown uncertainty_var ",uncertainty_var
+        if uncertainty_var == "V_tag":
+            events_wdown +=e.genWeight*e.puWeight*e.CMS_eff_vtag_sf_down
+        elif uncertainty_var == "H_tag":
+            events_wdown +=e.genWeight*e.puWeight*e.CMS_eff_htag_sf_down
+        elif uncertainty_var == "top_tag":
+            events_wdown +=e.genWeight*e.puWeight*e.CMS_mistag_top_sf_down
+        else:
+            print " ATTENTION! unknown uncertainty_var ",uncertainty_var
+    # return list with number of weighted, weighted up and down events in the category given by category cuts
+    print " event ",events
+    print "up ",events_wup
+    print " down ", events_wdown
     return [events, events_wup,events_wdown]
+
 
 def printresult(res,cats):
     masses=[]
@@ -119,7 +77,7 @@ def printresult(res,cats):
         if (key.split('.')[1]).find(cats[0])!=-1:
             masses.append(int(key.split('.')[0]))
 
-    c = 'mass '
+    c = 'Sample '
     for cat in cats:
         c+='              '
         c+=cat 
@@ -128,9 +86,12 @@ def printresult(res,cats):
         tmp =str(m)+'  '
         for cat in cats:
             if res[str(m)+'.'+cat][0]!=0 :
-                tmp+= str(res[str(m)+'.'+cat][1]/float(res[str(m)+'.'+cat][0]))+' / '+str(res[str(m)+'.'+cat][2]/res[str(m)+'.'+cat][0])
-            #print res[str(m)+'.'+cat][1]
-            #print res[str(m)+'.'+cat][0]
+                nom = res[str(m)+'.'+cat][0]
+                up = res[str(m)+'.'+cat][1]
+                down = res[str(m)+'.'+cat][2]
+                tmp+= str(down/float(nom))+' / '+str(up/nom)
+            #print up
+            #print nom
             tmp+='   '
         print tmp
 
@@ -149,9 +110,12 @@ def printresultbkg(res,cats):
         tmp =str(m)+'  '
         for cat in cats:
             if res[str(m)+'.'+cat][0]!=0 :
-                tmp+= str(res[str(m)+'.'+cat][1]/float(res[str(m)+'.'+cat][0]))+' / '+str(res[str(m)+'.'+cat][2]/res[str(m)+'.'+cat][0])
-            #print res[str(m)+'.'+cat][1]
-            #print res[str(m)+'.'+cat][0]
+                nom = res[str(m)+'.'+cat][0]
+                up = res[str(m)+'.'+cat][1]
+                down = res[str(m)+'.'+cat][2]
+                tmp+= str(down/float(nom))+' / '+str(up/nom)
+            #print up
+            #print nom
             tmp+='   '
         print tmp
 
@@ -164,40 +128,45 @@ def calcfinalUnc(final,tag,cats):
         savekeys.append(k)
     masses=[]
     res=final[savekeys[0]]
-    res2=final[savekeys[1]]
     for key in res.keys():
         if (key.split('.')[1]).find(cats[0])!=-1:
             masses.append(key.split('.')[0])
     tmplistu = []
     tmplistd = []
-    c = 'mass '
+    c = 'Sample '
     for cat in cats:
         c+='              '
         c+=cat 
         tmplistd.append(0.)
         tmplistu.append(0.)
     print c
-    
+    print " sorted(masses) ",sorted(masses)
     for m in sorted(masses):
         tmp =str(m)+'  '
         i=0
         for cat in cats:
-            if res[str(m)+'.'+cat][0]!=0 and res2[str(m)+'.'+cat][0] != 0:
-                tmp+= str(round(res[str(m)+'.'+cat][1]/float(res[str(m)+'.'+cat][0])* res2[str(m)+'.'+cat][1]/float(res2[str(m)+'.'+cat][0]),2))+' / '+str(round(res[str(m)+'.'+cat][2]/res[str(m)+'.'+cat][0]* res2[str(m)+'.'+cat][2]/res2[str(m)+'.'+cat][0],2))
-                tmplistu[i]+= res[str(m)+'.'+cat][1]/float(res[str(m)+'.'+cat][0])* res2[str(m)+'.'+cat][1]/float(res2[str(m)+'.'+cat][0])
-                tmplistd[i]+= res[str(m)+'.'+cat][2]/res[str(m)+'.'+cat][0]* res2[str(m)+'.'+cat][2]/float(res2[str(m)+'.'+cat][0])
+            if res[str(m)+'.'+cat][0]!=0 :
+                nom= res[str(m)+'.'+cat][0]
+                upvar = res[str(m)+'.'+cat][1]
+                downvar = res[str(m)+'.'+cat][2]
+                tmp+= str(round(downvar/float(nom),2))+' / '+str(round(upvar/float(nom),2))
+                tmplistu[i]+= upvar/float(nom)
+                tmplistd[i]+= downvar/float(nom)
                 i+=1
             tmp+='   '
             
         print tmp
     i=0
     for c in cats:
+        #print " averaging on masses for signal???"
         data[c+'_up']= round(tmplistu[i]/float(len(masses)),2)
         data[c+'_down']= round(tmplistd[i]/float(len(masses)),2)
-    
+        i+=1
+
     return data
-    
-    
+
+
+
 if __name__=="__main__":
     # calculate migration uncertainty for all categories
     # up variation of W-Tag HP Sf -> down variation of W-tag LP sf, down variation of anti W-tag HP category
@@ -206,110 +175,105 @@ if __name__=="__main__":
     
     ######### first apply the usual acceptance cuts to the trees ####################
     data ={}
-    year = '2016,2017,2018'
-    masses = [1200,1400,1600,2000,2500,3000,3500,4000,4500,5000,5500,6000,6500,7000,7500,8000]
-    ctx  = cuts.cuts("init_VV_VH.json",year,"random_dijetbins")
-    if year != '2016,2017,2018' :
-        W_tag_SF_HP = ctx.HPSF_vtag[year]
-        W_tag_SF_LP = ctx.LPSF_vtag[year]
-
-        H_tag_SF_HP = ctx.HPSF_htag[year]
-        H_tag_SF_LP = ctx.LPSF_htag[year]
-
-        W_tag_unc_HP = ctx.W_tag_unc_HP[year]
-        W_tag_unc_LP = ctx.W_tag_unc_LP[year]
-
-        H_tag_unc_HP = ctx.H_tag_unc_HP[year]
-        H_tag_unc_LP = ctx.H_tag_unc_LP[year]
-
-    else:
-        years = year.split(",")
-        W_tag_SF_HP = 0
-        W_tag_SF_LP = 0
-
-        H_tag_SF_HP = 0
-        H_tag_SF_LP = 0
-
-        W_tag_unc_HP = 0
-        W_tag_unc_LP = 0
-
-        H_tag_unc_HP = 0
-        H_tag_unc_LP = 0
-
-        for y in years:
-
-            W_tag_SF_HP += ctx.HPSF_vtag[y]*ctx.lumi[y]/ctx.lumi["Run2"]
-            W_tag_SF_LP += ctx.LPSF_vtag[y]*ctx.lumi[y]/ctx.lumi["Run2"]
-
-            H_tag_SF_HP += ctx.HPSF_htag[y]*ctx.lumi[y]/ctx.lumi["Run2"]
-            H_tag_SF_LP += ctx.LPSF_htag[y]*ctx.lumi[y]/ctx.lumi["Run2"]
-
-            W_tag_unc_HP += ctx.W_tag_unc_HP[y]*ctx.lumi[y]/ctx.lumi["Run2"]
-            W_tag_unc_LP += ctx.W_tag_unc_LP[y]*ctx.lumi[y]/ctx.lumi["Run2"]
-
-            H_tag_unc_HP += ctx.H_tag_unc_HP[y]*ctx.lumi[y]/ctx.lumi["Run2"]
-            H_tag_unc_LP += ctx.H_tag_unc_LP[y]*ctx.lumi[y]/ctx.lumi["Run2"]
-
-    categories = ['VH_HPHP','VV_HPHP','VH_LPHP','VH_HPLP','VV_HPLP']
-    tags = ['H_tag_HP','H_tag_LP','V_tag_HP','V_tag_LP']
-    directory = "migrationunc/Run2/"
-
-    #files = ["BulkGravToWW_Run2.root"]
-    #files = ["ZprimeToZh_2016.root",'ZprimeToWW_2016.root',"WprimeToWh_2016.root","BulkGravToWW_2016.root","BulkGravToZZ_2016.root","WprimeToWZ_2016.root"]
-    files = ['WJetsToQQ_Run2.root','ZJetsToQQ_Run2.root']
-    #files = ["BulkGravToWW_2016.root"]
+    years = options.year.split(",")
+    directory = options.directory
+    categories=options.categories.split(",")
+    tags=options.tags.split(",")
+    sampleTypes = options.samples.split(",")
     final={}
 
-    for root_file in files:
+
+
+    print " Doing migration uncertainties! DID YOU EVALUTE THE SF BEFORE?"
+    jsonfilename = {}
+    for year in years:
+        chain = ROOT.TChain('signalregion')
+        print " year ",year
+        ctx  = cuts.cuts("init_VV_VH.json",year,"random_dijetbins")
+        for filename in os.listdir(directory):
+            for sampleType in sampleTypes:
+                if filename.find(sampleType)!=-1 and filename.find(year)!=-1:
+                    if filename.find(".")==-1: continue
+                    if filename.find("VBF")!=-1 and options.sample.find("VBF")==-1: continue
+                    fnameParts=filename.split('.')
+                    fname=fnameParts[0]
+                    print "fname ",fname
+                    ext=fnameParts[1]
+                    if ext.find("root") ==-1: continue
+                    if options.isSignal == True:
+                        print " is signal !"
+                        mass = float(fname.split('_')[-1])
+                        if mass <options.minMX or mass > options.maxMX: continue
+                        else: sampleType=sampleType+"narrow_"+fname.split('_')[-2]
+                    completename=directory+sampleType+"_"+year+".root"
+                    FileIn = ROOT.TFile(completename,"READ")
+                    chain.Add(completename)
+                    print " entries ",chain.GetEntries()
+        print " total Entries ",chain.GetEntries()
+
+
+        final = {}
+        splitstr = options.output
         for tag in tags:
-            
-            File = ROOT.TFile(directory+root_file,"READ")
-            print 'for signal '+str(root_file.replace('.root',''))
             result = {}
-            trees = []
-            if root_file.find("Jets")==-1:
-               for i in masses:
-                   trees.append(root_file.split("_")[0]+"_narrow_"+str(i))
-            else:
-                trees.append(root_file.split("_")[0])
-            print " trees ",trees
-            for t in trees:
-                try:
-                    fulltree = File.Get(t)
-                    print fulltree.GetEntries() 
-                except :
-                    print t," not found" 
-                    continue
-                print " using tree ",t 
-                if root_file.find("Jets")==-1: splitstr = t.split('narrow_')[1]
-                else:  splitstr = root_file.split("_")[0]
-                for cat in categories:
-                    if tag.find('HP')!=-1:
-                        if tag.find('V')!=--1:
-                            result[splitstr+'.'+cat] = calculateMigration(fulltree,tag,W_tag_unc_HP,cat)
-                        if tag.find('H')!=-1:
-                            result[splitstr+'.'+cat] = calculateMigration(fulltree,tag,H_tag_unc_HP,cat)
-                    if tag.find('LP')!=-1:
-                        if tag.find('V')!=-1:
-                            result[splitstr+'.'+cat] = calculateMigration(fulltree,tag,W_tag_unc_LP,cat)
-                        if tag.find('H')!=-1:
-                            result[splitstr+'.'+cat] = calculateMigration(fulltree,tag,H_tag_unc_LP,cat)
-            
-        
-            print '###################'+tag+'######################'
-            if root_file.find("Jets")==-1: printresult(result,categories)
-            else: printresultbkg(result,categories)
+            #print finaltree.Print()
+            for cat in categories:
+                result[splitstr+'.'+cat] = calculateMigration(chain,tag,cat)
+            print '###################   '+tag+'    ######################'
+
+            #if splitstr.find("Jets")!=-1 or splitstr.find("TT")!=-1 : printresultbkg(result,categories)
+            #else: printresult(result,categories)
+            printresultbkg(result,categories)
             final[tag]=result
+            print " FINAL ",final
 
-        print 'CMS_VV_JJ_DeepJet_Htag_eff' 
-        data[root_file.replace('.root','')+'_'+'CMS_VV_JJ_DeepJet_Htag_eff'] = calcfinalUnc(final,'H_tag',categories)
-        print 'CMS_VV_JJ_DeepJet_Vtag_eff' 
-        data[root_file.replace('.root','')+'_'+'CMS_VV_JJ_DeepJet_Vtag_eff'] = calcfinalUnc(final,'V_tag',categories)
+        print 'CMS_VV_JJ_DeepJet_Htag_eff'
+        data[year] = {options.output+'_'+'CMS_VV_JJ_DeepJet_Htag_eff' : calcfinalUnc(final,'H_tag',categories)}
+        print 'CMS_VV_JJ_DeepJet_Vtag_eff'
+        data[year].update( {options.output+'_'+'CMS_VV_JJ_DeepJet_Vtag_eff' : calcfinalUnc(final,'V_tag',categories)})
+        print 'CMS_VV_JJ_DeepJet_TOPtag_mistag'
+        data[year].update({options.output+'_'+'CMS_VV_JJ_DeepJet_TOPtag_mistag' : calcfinalUnc(final,'top_tag',categories)})
 
-        with open('migrationunc_'+root_file.split(".")[0]+'.json', 'w') as outfile:
-            json.dump(data, outfile)
-    
-    
-    
-    
-    
+        jsonfilename[year] = 'migrationunc_'+splitstr+'_'+year+'.json'
+        with open(jsonfilename[year], 'w') as outfile:
+            json.dump(data[year], outfile)
+
+
+    if len(years) == 3:
+        print "Making Run2 combination by average weighted by lumi"
+        unc = {}
+        #load the json files with uncertainties for each year
+        for year in years:
+            print jsonfilename[year]
+            with open(jsonfilename[year]) as json_file:
+                unc[year] = json.load(json_file)
+            print unc[year]
+
+        uncertainties = ["CMS_VV_JJ_DeepJet_Htag_eff","CMS_VV_JJ_DeepJet_Vtag_eff","CMS_VV_JJ_DeepJet_TOPtag_mistag"]
+
+        for u in uncertainties:
+            print u
+            u=root_file.replace('.root','')+'_'+u
+            print u 
+            catunc = {}
+            for c in categories:
+                print c 
+                for var in ["up","down"]:
+                    print var
+                    #average weightes by lumi
+                    sumunc = 0
+                    for year in years:
+                        print unc[year][u][c+"_"+var]
+                        ctx  = cuts.cuts("init_VV_VH.json",year,"random_dijetbins")
+                        sumunc+=unc[year][u][c+"_"+var]*ctx.lumi[year]/ctx.lumi["Run2"]
+                        print sumunc
+                        catunc[c+"_"+var] = round(sumunc,2)
+                    if "Run2" not in unc.keys():
+                        unc["Run2"] = {u:catunc}
+                    else:
+                        unc["Run2"].update( {u:catunc})
+
+                print unc["Run2"]
+
+        with open('migrationunc_'+root_file.split(".")[0]+'_Run2.json', 'w') as outfile:
+            json.dump(unc, outfile)
