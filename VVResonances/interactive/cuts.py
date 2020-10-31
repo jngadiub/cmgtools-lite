@@ -90,7 +90,7 @@ class cuts():
             data = json.load(json_file)
             ##### load binning and cut offs
             self.minMJ = data["ranges_and_binning"]["minMJ"]
-            print 'self.minMJ ', self.minMJ
+            #print 'self.minMJ ', self.minMJ
             self.maxMJ = data["ranges_and_binning"]["maxMJ"]
             self.binsMJ = data["ranges_and_binning"]["binsMJ"]
             
@@ -119,7 +119,7 @@ class cuts():
 
             self.yeartag="161718"
             if(run2==True):
-                print " taggers initialization is the one of run2 ",self.yeartag
+                #print " taggers initialization is the one of run2 ",self.yeartag
                 self.WPHPl1Wtag = data["tagging_variables_and_wp"]["l1Wtag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Wtag"+self.yeartag])
                 self.WPLPl1Wtag = data["tagging_variables_and_wp"]["l1Wtag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Wtag"+self.yeartag])
                 self.WPHPl1Htag = data["tagging_variables_and_wp"]["l1Htag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Htag"+self.yeartag])
@@ -141,8 +141,7 @@ class cuts():
             self.vtag_pt_dependence["Run2"] = data["vtag_pt_dependence"+self.yeartag]
             self.lumi["Run2"] =  data["lumi"+self.yeartag]
             self.lumi_unc["Run2"] = data["unc_lumi"+self.yeartag]
-            print " lumi run2 ",self.lumi["Run2"]  
-
+            #print " lumi run2 ",self.lumi["Run2"]
             for year in years:
                 if year=="2016":
                     self.yeartag = "16"
@@ -168,13 +167,13 @@ class cuts():
                 self.LPSF_htag[year] = data['htag_SF_LP'][year]
                 self.HPSF_toptag[year] = data['top_tag_SF_HP'][year]
                 self.LPSF_toptag[year] = data['top_tag_SF_LP'][year]
-                print " ALL SF PROPERLY READ"
+                #print " ALL SF PROPERLY READ"
 
                 self.vtag_pt_dependence[year] = data["vtag_pt_dependence"+self.yeartag]
 
                 #    https://twiki.cern.ch/twiki/bin/viewauth/CMS/TWikiLUM
                 self.lumi[year] =  data["lumi"+self.yeartag]
-                print "self.lumi[year]  ",self.lumi[year] 
+                #print "self.lumi[year]  ",self.lumi[year]
                 self.lumi_unc[year] = data["unc_lumi"+self.yeartag]
                 
 
@@ -184,7 +183,7 @@ class cuts():
                 self.varl2Htag = data["tagging_variables_and_wp"]["varl2Htag"]
 
                 if(run2==False):
-                    print " taggers initialization is the one of this year ",self.yeartag
+                    #print " taggers initialization is the one of this year ",self.yeartag
                     self.WPHPl1Wtag = data["tagging_variables_and_wp"]["l1Wtag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Wtag"+self.yeartag])
                     self.WPLPl1Wtag = data["tagging_variables_and_wp"]["l1Wtag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Wtag"+self.yeartag])
                     self.WPHPl1Htag = data["tagging_variables_and_wp"]["l1Htag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Htag"+self.yeartag])
@@ -217,7 +216,7 @@ class cuts():
                 self.catHtag['NP2'] =  '('+ self.varl2Htag +'<'+ self.WPLPl2Htag +')' 
 
 
-            print " tagging cuts ",self.WPHPl1Wtag
+            #print " tagging cuts ",self.WPHPl1Wtag
             selections = ["common","common_VV","common_VBF","NP","res","nonres","resT","resW","nonresT","resTnonresT","resWnonresT","resTresW","acceptance","acceptanceMJ","acceptanceMVV","acceptanceGEN","looseacceptanceMJ"]
             for sel in selections:
                 self.cuts[sel] = data["selection_cuts"][sel]
@@ -231,7 +230,7 @@ class cuts():
                 self.cuts[sel] = self.cuts[sel].replace("minGenMVV",str(self.minGenMVV))
                 self.cuts[sel] = self.cuts[sel].replace("maxGenMVV",str(self.maxGenMVV))
             if options.find('dijetbins')!=-1:
-                print "use dijet binning! "
+                #print "use dijet binning! "
                 alldijetbins =  data["ranges_and_binning"]["dijetbins"]
                 dijetbins = []
                 for b in alldijetbins:
@@ -258,8 +257,8 @@ class cuts():
                 self.HCALbinsMVV=""
                 self.HCALbinsMVVSignal=""
             if options.find('random')!=-1:
-                print "Use random sorting!"
-                print "ortoghonal VV + VH"
+                #print "Use random sorting!"
+                #print "ortoghonal VV + VH"
                 catsAll = {}
                 #scheme 2: improves VV HPHP (VH_HPHP -> VV_HPHP -> VH_LPHP,VH_HPLP -> VV_HPLP) 
                 #at least one H tag HP (+ one V/H tag HP)                                                                                                                                                                                                                                     
@@ -307,7 +306,7 @@ class cuts():
                 catsAll['HV_NPHP'] = '('+'&&'.join([self.catHtag['NP1'],self.catVtag['HP2']])+')'
                 self.cuts['VH_HPNP_control_region'] = '('+'('+'||'.join([catsAll['VH_HPNP'],catsAll['HV_NPHP']])+')'+'&&'+'('+'!'+self.cuts['VV_all']+')'+')'
             else:
-                print "Use b-tagging sorting"
+                #print "Use b-tagging sorting"
                 self.cuts['VH_HPHP'] = '('+  '&&'.join([self.catHtag['HP1'],self.catVtag['HP2']]) + ')'
                 self.cuts['VH_HPLP'] = '('+  '&&'.join([self.catHtag['HP1'],self.catVtag['LP2']]) + ')'
                 self.cuts['VH_LPHP'] = '('+  '&&'.join([self.catHtag['LP1'],self.catVtag['HP2']]) + ')'
