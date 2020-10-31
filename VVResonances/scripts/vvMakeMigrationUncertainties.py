@@ -186,7 +186,7 @@ if __name__=="__main__":
     jsonfilename = {}
     for year in years:
         chain = ROOT.TChain('signalregion')
-        print " year ",year
+        print "************     year ",year
         ctx  = cuts.cuts("init_VV_VH.json",year,"random_dijetbins")
         for filename in os.listdir(directory):
             for sampleType in sampleTypes:
@@ -223,7 +223,7 @@ if __name__=="__main__":
             #else: printresult(result,categories)
             printresultbkg(result,categories)
             final[tag]=result
-            print " FINAL ",final
+            print "************** FINAL ",final
 
         print 'CMS_VV_JJ_DeepJet_Htag_eff'
         data[year] = {options.output+'_'+'CMS_VV_JJ_DeepJet_Htag_eff' : calcfinalUnc(final,'H_tag',categories)}
@@ -238,13 +238,14 @@ if __name__=="__main__":
 
 
     if len(years) == 3:
-        print "Making Run2 combination by average weighted by lumi"
+        print "#######################################      Making Run2 combination by average weighted by lumi      ##############################"
         unc = {}
         #load the json files with uncertainties for each year
         for year in years:
             print jsonfilename[year]
             with open(jsonfilename[year]) as json_file:
                 unc[year] = json.load(json_file)
+            print " summary of ",year
             print unc[year]
 
         uncertainties = ["CMS_VV_JJ_DeepJet_Htag_eff","CMS_VV_JJ_DeepJet_Vtag_eff","CMS_VV_JJ_DeepJet_TOPtag_mistag"]
@@ -252,7 +253,6 @@ if __name__=="__main__":
         for u in uncertainties:
             print u
             u=splitstr+'_'+u
-            print u 
             catunc = {}
             for c in categories:
                 print c 
@@ -261,6 +261,7 @@ if __name__=="__main__":
                     #average weightes by lumi
                     sumunc = 0
                     for year in years:
+                        print " **** year "+year+"  ******"
                         print unc[year][u][c+"_"+var]
                         ctx  = cuts.cuts("init_VV_VH.json",year,"random_dijetbins")
                         sumunc+=unc[year][u][c+"_"+var]*ctx.lumi[year]/ctx.lumi["Run2"]
@@ -270,8 +271,8 @@ if __name__=="__main__":
                         unc["Run2"] = {u:catunc}
                     else:
                         unc["Run2"].update( {u:catunc})
-
-                print unc["Run2"]
+        print "Summary for Run2"
+        print unc["Run2"]
 
         with open('migrationunc_'+splitstr+'_Run2.json', 'w') as outfile:
             json.dump(unc, outfile)
