@@ -1,7 +1,6 @@
 from functions import *
 from optparse import OptionParser
 #from cuts import cuts, HPSF16, HPSF17, LPSF16, LPSF17, dijetbins, HCALbinsMVVSignal, minMJ,maxMJ,binsMJ, minMVV, maxMVV, binsMVV, minMX, maxMX, catVtag, catHtag
-import ROOT
 import cuts
 
 ## import cuts of the analysis from separate file
