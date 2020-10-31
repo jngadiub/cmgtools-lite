@@ -199,7 +199,7 @@ if options.run.find("all")!=-1 or options.run.find("sig")!=-1:
         print " make SF "
         f.makeSF(signaltemplate_inuse,isSignal=True)
     if options.run.find("all")!=-1 or options.run.find("MU")!=-1:
-        print " make MU "
+        print " make migration uncertainties "
         f.makeMigrationUnc(signaltemplate_inuse,str(signal_inuse),options.period,isSignal=True)
     if options.run.find("all")!=-1 or options.run.find("norm")!=-1:
         print "fit signal norm, DID YOU MAKE SF "
@@ -262,9 +262,9 @@ if options.run.find("all")!=-1 or options.run.find("vjets")!=-1:
         print "then SF Z"
         f.makeSF(ZresTemplate)
     if options.run.find("all")!=-1 or options.run.find("MU")!=-1 or options.run.find("All")!=-1:
-        print "then MU W"
+        print "then migration uncertainties W"
         f.makeMigrationUnc(WresTemplate,"WJets",options.period)
-        print "then MU Z"
+        print "then migration uncertainties Z"
         f.makeMigrationUnc(ZresTemplate,"ZJets",options.period)
     if options.run.find("all")!=-1 or options.run.find("vjetsnorm")!=-1 or options.run.find("All")!=-1:
         print " DID YOU PRODUCE THE SF TREES?? "
@@ -285,7 +285,7 @@ if options.run.find("all")!=-1 or options.run.find("tt")!=-1:
         print " Making SF "
         f.makeSF(TTemplate)
     if options.run.find("all")!=-1 or options.run.find("MU")!=-1 or options.run.find("ALL")!=-1:
-        print " Making MU "
+        print " Making migration uncertainties "
         f.makeMigrationUnc(TTemplate,"TTJets",options.period)
     if options.run.find("all")!=-1 or options.run.find("norm")!=-1 or options.run.find("ALL")!=-1:
         print "make norm for all contributions of ttbar together, DID YOU MAKE SF?"
