@@ -271,7 +271,9 @@ class AllFunctions():
   print "Using files in" , directory
   print " TEMPLATE ",template
   print "making migration uncertainties "
-  cmd='vvMakeMigrationUncertainties.py -s "{sample}" -d "{directory}" -y "{year}" -o "{outname}" --isSignal {isSignal}'.format(sample=template,directory=directory,year=year,outname=outname,isSignal=isSignal)
+  cmd='vvMakeMigrationUncertainties.py -s "{sample}" -d "{directory}" -y "{year}" -o "{outname}" '.format(sample=template,directory=directory,year=year,outname=outname)
+  if isSignal ==True:
+   cmd+=' --isSignal {isSignal}'.format(isSignal=isSignal)
   print " going to execute ",cmd
   os.system(cmd)
 

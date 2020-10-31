@@ -6,7 +6,6 @@
 import ROOT
 import optparse
 import sys,os
-import cuts #, HPSF16, HPSF17, LPSF16, LPSF17, dijetbins, HCALbinsMVVSignal
 import json
 from array import array
 ROOT.gROOT.ProcessLine("struct rootint { Int_t ri;};")
@@ -27,10 +26,9 @@ parser.add_option("-m","--minMX",dest="minMX",type=float,help="mVV variable",def
 parser.add_option("-M","--maxMX",dest="maxMX",type=float, help="mVV variable",default=8000)
 parser.add_option("-c","--categories",dest="categories",help="list of considered categories",default='VH_HPHP,VV_HPHP,VH_LPHP,VH_HPLP,VV_HPLP')
 parser.add_option("-t","--tags",dest="tags",help="list of tags",default='H_tag,V_tag,top_tag')
-parser.add_option("--isSignal",dest="isSignal",action="store_true", help="is signal?",default=False)
+parser.add_option("--isSignal",dest="isSignal",action="store_true", help="is signal?")
 parser.add_option("-o","--output",dest="output",help="Output",default='ZprimeZH')
 (options,args) = parser.parse_args()
-
 
 
 
@@ -253,7 +251,7 @@ if __name__=="__main__":
 
         for u in uncertainties:
             print u
-            u=root_file.replace('.root','')+'_'+u
+            u=splitstr+'_'+u
             print u 
             catunc = {}
             for c in categories:
@@ -275,5 +273,5 @@ if __name__=="__main__":
 
                 print unc["Run2"]
 
-        with open('migrationunc_'+root_file.split(".")[0]+'_Run2.json', 'w') as outfile:
+        with open('migrationunc_'+splitstr+'_Run2.json', 'w') as outfile:
             json.dump(unc, outfile)
