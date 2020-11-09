@@ -178,7 +178,7 @@ if __name__=="__main__":
     categories=options.categories.split(",")
     tags=options.tags.split(",")
     sampleTypes = options.samples.split(",")
-    final={}
+    total = {}
 
 
 
@@ -224,6 +224,7 @@ if __name__=="__main__":
             printresultbkg(result,categories)
             final[tag]=result
             print "************** FINAL ",final
+        total[year]=final
 
         print 'CMS_VV_JJ_DeepJet_Htag_eff'
         data[year] = {options.output+'_'+'CMS_VV_JJ_DeepJet_Htag_eff' : calcfinalUnc(final,'H_tag',categories)}
@@ -239,40 +240,36 @@ if __name__=="__main__":
 
     if len(years) == 3:
         print "#######################################      Making Run2 combination by average weighted by lumi      ##############################"
-        unc = {}
-        #load the json files with uncertainties for each year
-        for year in years:
-            print jsonfilename[year]
-            with open(jsonfilename[year]) as json_file:
-                unc[year] = json.load(json_file)
-            print " summary of ",year
-            print unc[year]
+        print " All years uncertainties "
+        print total
+        unc_Run2 = {}
+        for tag in tags:
+            unc_Run2[tag]={}
+            for cat in categories:
+                n = 0
+                u = 0
+                d = 0
+                for year in years:
+                    n += total[year][tag][splitstr+'.'+cat][0]*ctx.lumi[year]
+                    u += total[year][tag][splitstr+'.'+cat][1]*ctx.lumi[year]
+                    d += total[year][tag][splitstr+'.'+cat][2]*ctx.lumi[year]
+                if  unc_Run2[tag] == None:
+                    unc_Run2[tag] = {splitstr+'.'+cat : [n,u,d] }
+                else:
+                    unc_Run2[tag].update( {splitstr+'.'+cat : [n,u,d] })
+        print " run 2 unc "
+        print unc_Run2
 
-        uncertainties = ["CMS_VV_JJ_DeepJet_Htag_eff","CMS_VV_JJ_DeepJet_Vtag_eff","CMS_VV_JJ_DeepJet_TOPtag_mistag"]
+        print 'CMS_VV_JJ_DeepJet_Htag_eff'
+        data["Run2"] = {options.output+'_'+'CMS_VV_JJ_DeepJet_Htag_eff' : calcfinalUnc(unc_Run2,'H_tag',categories)}
+        print 'CMS_VV_JJ_DeepJet_Vtag_eff'
+        data["Run2"].update( {options.output+'_'+'CMS_VV_JJ_DeepJet_Vtag_eff' : calcfinalUnc(unc_Run2,'V_tag',categories)})
+        print 'CMS_VV_JJ_DeepJet_TOPtag_mistag'
+        data["Run2"].update({options.output+'_'+'CMS_VV_JJ_DeepJet_TOPtag_mistag' : calcfinalUnc(unc_Run2,'top_tag',categories)})
 
-        for u in uncertainties:
-            print u
-            u=splitstr+'_'+u
-            catunc = {}
-            for c in categories:
-                print c 
-                for var in ["up","down"]:
-                    print var
-                    #average weightes by lumi
-                    sumunc = 0
-                    for year in years:
-                        print " **** year "+year+"  ******"
-                        print unc[year][u][c+"_"+var]
-                        ctx  = cuts.cuts("init_VV_VH.json",year,"random_dijetbins")
-                        sumunc+=unc[year][u][c+"_"+var]*ctx.lumi[year]/ctx.lumi["Run2"]
-                        print sumunc
-                        catunc[c+"_"+var] = round(sumunc,2)
-                    if "Run2" not in unc.keys():
-                        unc["Run2"] = {u:catunc}
-                    else:
-                        unc["Run2"].update( {u:catunc})
-        print "Summary for Run2"
-        print unc["Run2"]
+        jsonfilename["Run2"] = 'migrationunc_'+splitstr+'_Run2.json'
+        with open(jsonfilename["Run2"], 'w') as outfile:
+            json.dump(data["Run2"], outfile)
 
-        with open('migrationunc_'+splitstr+'_Run2.json', 'w') as outfile:
-            json.dump(unc, outfile)
+
+ 
