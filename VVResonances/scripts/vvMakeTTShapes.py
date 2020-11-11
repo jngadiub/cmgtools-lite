@@ -257,7 +257,7 @@ def doFit(th1_projY,mjj_mean,mjj_error,N):
     fitter.w.var("c_1")   .setMin(100) #offset
     fitter.w.var("c_2")   .setMin(50) #width
     fitter.w.var("f_g1")  .setMin(0.05)
-    fitter.w.var("f_res") .setMin(0.1)
+    fitter.w.var("f_res") .setMin(0.2) #following Thea's suggestion to set the minimum to a higher value to make the fit converge
     fitter.w.var("mean1") .setMin(75.)
     fitter.w.var("mean2") .setMin(160.)
     fitter.w.var("sigma1").setMin(5)
