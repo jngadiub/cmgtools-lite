@@ -534,23 +534,59 @@ class DatacardTools():
        card.addSystematic("CMS_lumi","lnN",{'%s'%sig:self.lumi_unc[dataset]})
       
     
- def AddTaggingSystematics(self,card,signal,dataset,p,jsonfile): 
-     with open(jsonfile) as json_file:
-        data = json.load(json_file)
-     sig = signal
-     if signal.find('Zprime')!=-1 and signal.find("ZH")!=-1: sig = "ZprimeToZh" 
-     if signal.find('Zprime')!=-1 and signal.find("WW")!=-1: sig = "ZprimeToWW"
-     if signal.find('Wprime')!=-1 and signal.find("WH")!=-1: sig = "WprimeToWh" 
-     if signal.find('Wprime')!=-1 and signal.find("WZ")!=-1: sig = "WprimeToWZ"
-     if signal.find('BulkGWW')!=-1 : sig = "BulkGravToWW" 
-     if signal.find('BulkGZZ')!=-1 : sig = "BulkGravToZZ"
-     uncup   = data[sig+"_"+dataset+"_CMS_VV_JJ_DeepJet_Htag_eff"][p+"_up"]
-     uncdown = data[sig+"_"+dataset+"_CMS_VV_JJ_DeepJet_Htag_eff"][p+"_down"]
-     card.addSystematic("CMS_VV_JJ_DeepJet_Htag_eff","lnN",{'%s'%signal: str(uncup)+"/"+ str(uncdown),'Wjets': str(uncup)+"/"+ str(uncdown),'Zjets': str(uncup)+"/"+ str(uncdown)})
-     uncup   = data[sig+"_"+dataset+"_CMS_VV_JJ_DeepJet_Vtag_eff"][p+"_up"]
-     uncdown = data[sig+"_"+dataset+"_CMS_VV_JJ_DeepJet_Vtag_eff"][p+"_down"]
-     card.addSystematic("CMS_VV_JJ_DeepJet_Vtag_eff","lnN",{'%s'%signal: str(uncup)+"/"+ str(uncdown),'Wjets': str(uncup)+"/"+ str(uncdown),'Zjets': str(uncup)+"/"+ str(uncdown)})
-     
+ def AddTaggingSystematics(self,card,signal,p,jsonfile): 
+    contrib =["resT","resW","nonresT","resTnonresT","resWnonresT","resTresW"]
+    mappdf = {"resT":"TTJetsTop","resW":"TTJetsW","nonresT":"TTJetsNonRes","resTnonresT":"TTJetsTNonResT","resWnonresT":"TTJetsWNonResT","resTresW":"TTJetsResWResT"}
+    with open(jsonfile[0]) as json_file_sig:
+     data_sig = json.load(json_file_sig)
+    with open(jsonfile[1]) as json_file_w:
+     data_w = json.load(json_file_w)
+    with open(jsonfile[2]) as json_file_z:
+     data_z = json.load(json_file_z)
+    with open(jsonfile[3]) as json_file_t:
+     data_t = json.load(json_file_t)
+    sig = signal
+    if signal.find('Zprime')!=-1 and signal.find("ZH")!=-1: sig = "ZprimeToZh"
+    if signal.find('Zprime')!=-1 and signal.find("WW")!=-1: sig = "ZprimeToWW"
+    if signal.find('Wprime')!=-1 and signal.find("WH")!=-1: sig = "WprimeToWh"
+    if signal.find('Wprime')!=-1 and signal.find("WZ")!=-1: sig = "WprimeToWZ"
+    if signal.find('BulkGWW')!=-1 : sig = "BulkGravToWW"
+    if signal.find('BulkGZZ')!=-1 : sig = "BulkGravToZZ"
+    if signal.find('VBF')!=-1 : sig = "VBF_"+sig
+    uncup_s   = data_sig[signal+"_CMS_VV_JJ_DeepJet_Htag_eff"][p+"_up"]
+    uncdown_s = data_sig[signal+"_CMS_VV_JJ_DeepJet_Htag_eff"][p+"_down"]
+    uncup_w   = data_w["WJets_CMS_VV_JJ_DeepJet_Htag_eff"][p+"_up"]
+    uncdown_w = data_w["WJets_CMS_VV_JJ_DeepJet_Htag_eff"][p+"_down"]
+    uncup_z   = data_z["ZJets_CMS_VV_JJ_DeepJet_Htag_eff"][p+"_up"]
+    uncdown_z = data_z["ZJets_CMS_VV_JJ_DeepJet_Htag_eff"][p+"_down"]
+    uncup_t   = data_t["TTJets_CMS_VV_JJ_DeepJet_Htag_eff"][p+"_up"]
+    uncdown_t = data_t["TTJets_CMS_VV_JJ_DeepJet_Htag_eff"][p+"_down"]
+    unc = {'%s'%signal: str(uncdown_s)+"/"+ str(uncup_s) ,'Wjets': str(uncdown_w)+"/"+ str(uncup_w),'Zjets': str(uncdown_z)+"/"+ str(uncup_z)}
+    unc.update({mappdf[ttcon]: str(uncdown_t)+"/"+ str(uncup_t)for ttcon in contrib})
+    print unc
+    card.addSystematic("CMS_VV_JJ_DeepJet_Htag_eff","lnN",unc)
+    uncup_s   = data_sig[signal+"_CMS_VV_JJ_DeepJet_Vtag_eff"][p+"_up"]
+    uncdown_s = data_sig[signal+"_CMS_VV_JJ_DeepJet_Vtag_eff"][p+"_down"]
+    uncup_w   = data_w["WJets_CMS_VV_JJ_DeepJet_Vtag_eff"][p+"_up"]
+    uncdown_w = data_w["WJets_CMS_VV_JJ_DeepJet_Vtag_eff"][p+"_down"]
+    uncup_z   = data_z["ZJets_CMS_VV_JJ_DeepJet_Vtag_eff"][p+"_up"]
+    uncdown_z = data_z["ZJets_CMS_VV_JJ_DeepJet_Vtag_eff"][p+"_down"]
+    uncup_t   = data_t["TTJets_CMS_VV_JJ_DeepJet_Vtag_eff"][p+"_up"]
+    uncdown_t = data_t["TTJets_CMS_VV_JJ_DeepJet_Vtag_eff"][p+"_down"]
+    unc = {'%s'%signal: str(uncdown_s)+"/"+ str(uncup_s) ,'Wjets': str(uncdown_w)+"/"+ str(uncup_w),'Zjets': str(uncdown_z)+"/"+ str(uncup_z)}
+    unc.update({mappdf[ttcon]: str(uncdown_t)+"/"+ str(uncup_t)for ttcon in contrib})
+    card.addSystematic("CMS_VV_JJ_DeepJet_Vtag_eff","lnN",unc)
+    uncup_s   = data_sig[signal+"_CMS_VV_JJ_DeepJet_TOPtag_mistag"][p+"_up"]
+    uncdown_s = data_sig[signal+"_CMS_VV_JJ_DeepJet_TOPtag_mistag"][p+"_down"]
+    uncup_w   = data_w["WJets_CMS_VV_JJ_DeepJet_TOPtag_mistag"][p+"_up"]
+    uncdown_w = data_w["WJets_CMS_VV_JJ_DeepJet_TOPtag_mistag"][p+"_down"]
+    uncup_z   = data_z["ZJets_CMS_VV_JJ_DeepJet_TOPtag_mistag"][p+"_up"]
+    uncdown_z = data_z["ZJets_CMS_VV_JJ_DeepJet_TOPtag_mistag"][p+"_down"]
+    uncup_t   = data_t["TTJets_CMS_VV_JJ_DeepJet_TOPtag_mistag"][p+"_up"]
+    uncdown_t = data_t["TTJets_CMS_VV_JJ_DeepJet_TOPtag_mistag"][p+"_down"]
+    unc = {'%s'%signal: str(uncdown_s)+"/"+ str(uncup_s) ,'Wjets': str(uncdown_w)+"/"+ str(uncup_w),'Zjets': str(uncdown_z)+"/"+ str(uncup_z)}
+    unc.update({mappdf[ttcon]: str(uncdown_t)+"/"+ str(uncup_t)for ttcon in contrib})
+    card.addSystematic("CMS_VV_JJ_DeepJet_TOPtag_mistag","lnN",unc)
      
  def AddResBackgroundSystematics(self,card,category,extra_uncertainty=[]):
  
@@ -564,7 +600,7 @@ class DatacardTools():
         card.addSystematic("CMS_VV_JJ_Wjets_OPTZ_"+category,"param",[0,0.1]) #0.333
         card.addSystematic("CMS_VV_JJ_Zjets_PTZ_"+category,"param",[0,0.1]) #0.333
         card.addSystematic("CMS_VV_JJ_Zjets_OPTZ_"+category,"param",[0,0.1]) #0.333
-       
+
 
  def AddNonResBackgroundSystematics(self,card,category):
 

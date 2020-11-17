@@ -188,7 +188,8 @@ for sig in signals:
        histName="data_obs" 
        scaleData=1.0
       elif pseudodata=="False":
-        rootFileData = resultsDir[dataset]+"/JJ_"+dataset+"_data_"+p+".root" #resultsDir[dataset]+"/pseudo40/JJ_"+p+".root"
+        #rootFileData = resultsDir[dataset]+"/JJ_"+dataset+"_data_"+p+".root" #resultsDir[dataset]+"/pseudo40/JJ_"+p+".root"
+        rootFileData = resultsDir[dataset]+"/JJ_"+p+".root" #resultsDir[dataset]+"/pseudo40/JJ_"+p+".root"
         histName="data"
         scaleData=1.0
 
@@ -203,7 +204,7 @@ for sig in signals:
       else:
         Tools.AddResBackgroundSystematics(card,p)
       Tools.AddNonResBackgroundSystematics(card,p)
-      #Tools.AddTaggingSystematics(card,sig,dataset,p,resultsDir[dataset]+'/migrationunc_'+sig+'_'+dataset+'.json')
+      Tools.AddTaggingSystematics(card,sig,p,[resultsDir[dataset]+'/migrationunc_'+sig+'_'+dataset+'.json',resultsDir[dataset]+'/migrationunc_WJets_'+dataset+'.json',resultsDir[dataset]+'/migrationunc_ZJets_'+dataset+'.json',resultsDir[dataset]+'/migrationunc_TTJets_'+dataset+'.json'])
       if options.fitTTmjj == True:
         print "load fits syst"
         Tools.AddTTSystematics4(card,["CMS_VV_JJ_TTJets_slope",0.05],dataset,p)

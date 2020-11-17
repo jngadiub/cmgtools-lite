@@ -259,7 +259,7 @@ if __name__=="__main__":
                     jsonfileslopes.close()
         if options.fitSignal:
                 signal_expected[period] = [ (args[pdf1Name[period]].getComponents())["n_exp_final_binJJ_"+purity+"_13TeV_"+period+"_proc_"+signalName], (args[pdf1Name[period]].getComponents())["n_exp_final_binJJ_"+purity+"_13TeV_"+period+"_proc_"+signalName].getPropagatedError(fitresult)]
-                print "Fitted signal yields:",signal_expected[period][0].getVal()," +/- ", signal_expected[period][bkg][1] ,"(",period,")"
+                print "Fitted signal yields:",signal_expected[period][0].getVal()," +/- ", signal_expected[period][1] ,"(",period,")"
         print 
           	 	 	
          

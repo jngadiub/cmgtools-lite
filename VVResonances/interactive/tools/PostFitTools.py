@@ -83,7 +83,7 @@ class Postfitplotter():
         try: 
             self.options.signalScaleF
         except AttributeError:
-            optparser.add_option("--signalScaleF",dest="signalScaleF",type=float,help="scale factor to apply to signal when drawing so its still visible!",default=100.)
+            optparser.add_option("--signalScaleF",dest="signalScaleF",type=float,help="scale factor to apply to signal when drawing so its still visible!",default=500.)
             optparser.add_option("-s","--signal",dest="fitSignal",action="store_true",help="do S+B fit",default=False)
             optparser.add_option("-M","--mass",dest="signalMass",type=float,help="signal mass",default=1560.)
 
@@ -526,7 +526,7 @@ class Postfitplotter():
         if hsig!= None: # and (self.options.name.find('sigonly')!=-1  and doFit==0):
             print "print do hsignal ", hsig.Integral()
             if hsig.Integral()!=0.:   
-                hsig.Scale(scaling/normsig)
+                hsig.Scale(scaling/normsig.getVal())
         #        print "sig integral ",hsig.Integral()
         #        hsig.Scale(scaling/hsig.Integral())
         
@@ -1043,8 +1043,8 @@ class Projection():
         
         if pdf_sig!=None:
             print "fill signal "
-            for ik,iv in self.Bins_redux.iteritems(): self.htot_sig.Fill(iv,self.lv1_sig[0][iv]*norm_sig[0]); # print self.lv1_sig[0][iv]*norm_sig[0]    
-     
+            for ik,iv in self.Bins_redux.iteritems(): self.htot_sig.Fill(iv,self.lv1_sig[0][iv]*norm_sig[0].getVal()); # print self.lv1_sig[0][iv]*norm_sig[0]
+
         self.htot.Add(self.htot_nonres)
         if self.htot_Wres!=None: self.htot.Add(self.htot_Wres)
         if self.htot_Zres!=None: self.htot.Add(self.htot_Zres)
@@ -1080,8 +1080,8 @@ class Projection():
         x_min = self.Binslowedge
         proj = self.axis
         rand = ROOT.TRandom3(1234);
-        number_errorband = 5 #100
-        print " number_errorband reduced to "+str(number_errorband)+" for speed reasons!"
+        number_errorband = 100
+        #print " number_errorband reduced to "+str(number_errorband)+" for speed reasons!"
         syst = [0 for i in range(number_errorband)]
       
         value = [0 for x in range(len(x_min))]  

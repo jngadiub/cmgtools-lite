@@ -88,21 +88,11 @@ for filename in os.listdir(args[0]):
                 if fname.find("TT") !=-1:
                     print "applying top pt reweight"
                     dataPlotters[-1].addCorrectionFactor('TopPTWeight','tree')
-                if fname.find("Jets") !=-1:
+                if fname.find("Jets") !=-1 or fname.find("TT")!=-1:
                     print "applying tagging SF"
-                    taggerSF={'VV_HPLP':{year:ctx.HPSF_vtag[year]*ctx.LPSF_vtag.get(year,0) for year in ctx.LPSF_vtag.keys()},'VH_HPHP':{year:ctx.HPSF_htag[year]*ctx.HPSF_vtag.get(year,0) for year in ctx.HPSF_vtag.keys()},'VH_HPLP':{year:ctx.HPSF_htag[year]*ctx.LPSF_vtag.get(year,0) for year in ctx.LPSF_vtag.keys()},'VH_LPHP':{year:ctx.HPSF_vtag[year]*ctx.LPSF_htag.get(year,0) for year in ctx.LPSF_htag.keys()},'VH_LPLP':{year:ctx.LPSF_htag[year]*ctx.LPSF_vtag.get(year,0) for year in ctx.LPSF_vtag.keys()},'VV_HPHP':{year:ctx.HPSF_vtag[year]*ctx.HPSF_vtag.get(year,0) for year in ctx.HPSF_vtag.keys() }}
+                    dataPlotters[-1].addFriend("all","../interactive/migrationunc/"+fname+"_"+year+".root")
+                    dataPlotters[-1].addCorrectionFactor("all.SF",'tree')
 
-                    if category.find("NP")!=-1: 
-                        SF =1.
-                    else:
-                        SF = taggerSF[category][year]
-                    print "SF ",SF
-                    dataPlotters[-1].addCorrectionFactor(SF,'flat')
-
-
-
-        
-    
 
 data=MergedPlotter(dataPlotters)
 

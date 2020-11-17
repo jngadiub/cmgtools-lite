@@ -12,6 +12,7 @@ import cuts
 # python makeInputs.py -p "2016,2017,2018"  --run "vjetsAll"
 # python makeInputs.py -p "2016,2017,2018"  --run "vjetsfits"
 # python makeInputs.py -p "2016,2017,2018"  --run "vjetskernel"
+# python makeInputs.py -p "2016"  --run "vjetsSF"
 # python makeInputs.py -p "2016,2017,2018"  --run "vjetsnorm"
 # python makeInputs.py -p 2016 --run "qcdtemplates"
 # python makeInputs.py -p 2016 --run "qcdkernel"
@@ -39,9 +40,9 @@ parser.add_option("--sendjobs",dest="sendjobs",default=True,help="make job list 
 
 widerMVV=True
 
-
-ctx  = cuts.cuts("init_VV_VH.json",options.period,options.sorting+"dijetbins",widerMVV)
-if options.binning==False: ctx  = cuts.cuts("init_VV_VH.json",int(options.period),options.sorting,widerMVV)
+jsonfile="init_VV_VH.json"
+ctx  = cuts.cuts(jsonfile,options.period,options.sorting+"dijetbins",widerMVV)
+if options.binning==False: ctx  = cuts.cuts(jsonfile,int(options.period),options.sorting,widerMVV)
 
 basedir="deepAK8V2/"
 print "options.period  ",options.period  
@@ -59,10 +60,6 @@ if options.period.find(",")!=-1:
         else: samples+=basedir+year+"/,"
 else: samples=basedir+period+"/"
 # NB to use the DDT decorrelation method, the ntuples in /eos/cms/store/cmst3/group/exovv/VVtuple/FullRun2VVVHNtuple/deepAK8V2/ should be used
-#samples= str(period)+"trainingV2/" #for V+jets we use 2017 samples also for 2016 because the 2016 ones are buggy
-#samples= str(period)+"/" #for V+jets we use 2017 samples also for 2016 because the 2016 ones are buggy
-#samples="deepAK8V2/"+period
-#if period=="201678": sample="deepAK8V2/201?/"
 
 print "period ",period
 print "sample ",samples
@@ -84,7 +81,6 @@ if useTriggerWeights:
 #all categories
 categories=["VH_HPHP","VH_HPLP","VH_LPHP","VV_HPHP","VV_HPLP"]
 #categories=["NP"]
-
 
 #list of signal samples --> nb, radion and vbf samples to be added
 BulkGravWWTemplate="BulkGravToWW_"
@@ -199,10 +195,14 @@ if options.run.find("all")!=-1 or options.run.find("sig")!=-1:
             f.makeSignalShapesMVV("JJ_"+str(signal_inuse)+"_"+filePeriod,signaltemplate_inuse,fixParsSigMVV[signal_inuse],"1")
         else:
             f.makeSignalShapesMVV("JJ_"+str(signal_inuse)+"_"+filePeriod,signaltemplate_inuse,fixParsSigMVV[signal_inuse.replace('VBF_','')],"1")
-    
-
+    if options.run.find("all")!=-1 or options.run.find("SF")!=-1:
+        print " make SF "
+        f.makeSF(signaltemplate_inuse,isSignal=True)
+    if options.run.find("all")!=-1 or options.run.find("MU")!=-1:
+        print " make migration uncertainties "
+        f.makeMigrationUnc(signaltemplate_inuse,str(signal_inuse),options.period,isSignal=True)
     if options.run.find("all")!=-1 or options.run.find("norm")!=-1:
-        print "fit signal norm "
+        print "fit signal norm, DID YOU MAKE SF "
         f.makeSignalYields("JJ_"+str(signal_inuse)+"_"+filePeriod,signaltemplate_inuse,xsec_inuse,'"pol2"') #'"[0]*TMath::Log10(x)"')
         #f.makeNormalizations("sigonly_M2000","JJ_"+filePeriod+"_"+str(signal_inuse),signaltemplate_inuse+"narrow_2000",0,ctx.cuts['nonres'],"sig")
         #f.makeNormalizations("sigonly_M4000","JJ_"+filePeriod+"_"+str(signal_inuse),signaltemplate_inuse+"narrow_4000",0,ctx.cuts['nonres'],"sig")
@@ -256,7 +256,18 @@ if options.run.find("all")!=-1 or options.run.find("vjets")!=-1:
             f.makeBackgroundShapesMVVKernel("WJets","JJ_"+filePeriod,WresTemplate,ctx.cuts['nonres'],"1DW",wait,1.,1.,options.sendjobs)
             print "then kernel Z"
             f.makeBackgroundShapesMVVKernel("ZJets","JJ_"+filePeriod,ZresTemplate,ctx.cuts['nonres'],"1DZ",wait,1.,1.,options.sendjobs)
+    if options.run.find("all")!=-1 or options.run.find("SF")!=-1 or options.run.find("All")!=-1:
+        print "then SF W"
+        f.makeSF(WresTemplate)
+        print "then SF Z"
+        f.makeSF(ZresTemplate)
+    if options.run.find("all")!=-1 or options.run.find("MU")!=-1 or options.run.find("All")!=-1:
+        print "then migration uncertainties W"
+        f.makeMigrationUnc(WresTemplate,"WJets",options.period)
+        print "then migration uncertainties Z"
+        f.makeMigrationUnc(ZresTemplate,"ZJets",options.period)
     if options.run.find("all")!=-1 or options.run.find("vjetsnorm")!=-1 or options.run.find("All")!=-1:
+        print " DID YOU PRODUCE THE SF TREES?? "
         print "then norm W"
         f.makeNormalizations("WJets","JJ_"+filePeriod,WresTemplate,0,ctx.cuts['nonres'],"nResWJets",options.single,"1",options.sendjobs) #,HPSF_vtag,LPSF_vtag)
         print "then norm Z"
@@ -265,26 +276,39 @@ if options.run.find("all")!=-1 or options.run.find("vjets")!=-1:
 
 
 if options.run.find("all")!=-1 or options.run.find("tt")!=-1:
-    print "first we fit"
-    f.fitTT   ("JJ_%s_TTJets"%(filePeriod),TTemplate,1.,)
+    if options.run.find("all")!=-1 or options.run.find("fit")!=-1 or options.run.find("ALL")!=-1:
+        print "first we fit"
+        f.fitTT   ("JJ_%s_TTJets"%(filePeriod),TTemplate,1.,)
     wait=False
     if options.batch == True : wait=True
-    print "make norm for all contributions of ttbar together"
-    f.makeNormalizations("TTJets","JJ_"+filePeriod,TTemplate,0,ctx.cuts['nonres'],"nResTT",options.single,"1",options.sendjobs)
-    f.makeBackgroundShapesMVVKernel("TTJets","JJ_"+filePeriod,TTemplate,ctx.cuts['nonres'],"1DTT",wait,1.,1.,options.sendjobs)
+    if options.run.find("all")!=-1 or options.run.find("SF")!=-1 or options.run.find("ALL")!=-1:
+        print " Making SF "
+        f.makeSF(TTemplate)
+    if options.run.find("all")!=-1 or options.run.find("MU")!=-1 or options.run.find("ALL")!=-1:
+        print " Making migration uncertainties "
+        f.makeMigrationUnc(TTemplate,"TTJets",options.period)
+    if options.run.find("all")!=-1 or options.run.find("norm")!=-1 or options.run.find("ALL")!=-1:
+        print "make norm for all contributions of ttbar together, DID YOU MAKE SF?"
+        f.makeNormalizations("TTJets","JJ_"+filePeriod,TTemplate,0,ctx.cuts['nonres'],"nResTT",options.single,"1",options.sendjobs)
+    if options.run.find("all")!=-1 or options.run.find("templates")!=-1 or options.run.find("ALL")!=-1:
+        f.makeBackgroundShapesMVVKernel("TTJets","JJ_"+filePeriod,TTemplate,ctx.cuts['nonres'],"1DTT",wait,1.,1.,options.sendjobs)
     contrib =["resT","resW","nonresT","resTnonresT","resWnonresT","resTresW"]
     for con in contrib:
-        print " ***************************         "+con+"      ******************************"
-        if options.fitsmjj == True:
-            f.makeMinorBkgShapesMVV("TTJets"+con,"JJ_"+filePeriod,TTemplate,ctx.cuts[con],con)
-        else:
-            f.makeBackgroundShapesMVVKernel("TTJets"+con,"JJ_"+filePeriod,TTemplate,ctx.cuts[con],"1DTT"+con,wait,1.,1.,options.sendjobs)
-        f.makeNormalizations("TTJets"+con,"JJ_"+filePeriod,TTemplate,0,ctx.cuts[con],"nResTT"+con,options.single,"1",options.sendjobs)
+        if options.run.find("all")!=-1 or options.run.find("templates")!=-1 or options.run.find("ALL")!=-1:
+            print " ***************************         "+con+"      ******************************"
+            if options.fitsmjj == True:
+                f.makeMinorBkgShapesMVV("TTJets"+con,"JJ_"+filePeriod,TTemplate,ctx.cuts[con],con)
+            else:
+                f.makeBackgroundShapesMVVKernel("TTJets"+con,"JJ_"+filePeriod,TTemplate,ctx.cuts[con],"1DTT"+con,wait,1.,1.,options.sendjobs)
+        if options.run.find("all")!=-1 or options.run.find("norm")!=-1 or options.run.find("ALL")!=-1:
+            print " ***************************         "+con+"      ******************************"
+            print "make norm, DID YOU MAKE SF?"
+            f.makeNormalizations("TTJets"+con,"JJ_"+filePeriod,TTemplate,0,ctx.cuts[con],"nResTT"+con,options.single,"1",options.sendjobs)
 
 
 if options.run.find("all")!=-1 or options.run.find("data")!=-1:
     print " Do data "
-    f.makeNormalizations("data","JJ_"+filePeriod,dataTemplate,1,'1',"normD") #run on data. Currently run on pseudodata only (below)
+    f.makeNormalizations("data","JJ_"+filePeriod,dataTemplate,1,'1',"normD",options.single,"1",options.sendjobs) #run on data. Currently run on pseudodata only (below)
 if options.run.find("all")!=-1 or options.run.find("pseudoNOVJETS")!=-1:
     print " Do pseudodata without vjets"
     from modules.submitJobs import makePseudoData
