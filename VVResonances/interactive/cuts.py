@@ -186,11 +186,13 @@ class cuts():
                     #print " taggers initialization is the one of this year ",self.yeartag
                     self.WPHPl1Wtag = data["tagging_variables_and_wp"]["l1Wtag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Wtag"+self.yeartag])
                     self.WPLPl1Wtag = data["tagging_variables_and_wp"]["l1Wtag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Wtag"+self.yeartag])
+                    self.WPNPl1Wtag = data["tagging_variables_and_wp"]["l1Wtag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_NP_Wtag"+self.yeartag])
                     self.WPHPl1Htag = data["tagging_variables_and_wp"]["l1Htag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Htag"+self.yeartag])
                     self.WPLPl1Htag = data["tagging_variables_and_wp"]["l1Htag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Htag"+self.yeartag])
    
                     self.WPHPl2Wtag = data["tagging_variables_and_wp"]["l2Wtag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Wtag"+self.yeartag])
                     self.WPLPl2Wtag = data["tagging_variables_and_wp"]["l2Wtag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Wtag"+self.yeartag])
+                    self.WPNPl2Wtag = data["tagging_variables_and_wp"]["l2Wtag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_NP_Wtag"+self.yeartag])
                     self.WPHPl2Htag = data["tagging_variables_and_wp"]["l2Htag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Htag"+self.yeartag])
                     self.WPLPl2Htag = data["tagging_variables_and_wp"]["l2Htag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Htag"+self.yeartag])
 
@@ -204,8 +206,8 @@ class cuts():
                 self.catVtag['HP2'] =  '('+ self.varl2Wtag +'>'+ self.WPHPl2Wtag +')'
                 self.catVtag['LP1'] = '(('+ self.varl1Wtag +'<'+ self.WPHPl1Wtag +')&&('+ self.varl1Wtag +'>'+ self.WPLPl1Wtag +'))' 
                 self.catVtag['LP2'] = '(('+ self.varl2Wtag +'<'+ self.WPHPl2Wtag +')&&('+ self.varl2Wtag +'>'+ self.WPLPl2Wtag +'))'
-                self.catVtag['NP1'] =  '('+ self.varl1Wtag +'<'+ self.WPLPl1Wtag +')' 
-                self.catVtag['NP2'] =  '('+ self.varl2Wtag +'<'+ self.WPLPl2Wtag +')' 
+                self.catVtag['NP1'] =  '('+ self.varl1Wtag +'<'+ self.WPNPl1Wtag +')'
+                self.catVtag['NP2'] =  '('+ self.varl2Wtag +'<'+ self.WPNPl2Wtag +')'
                 
             
                 self.catHtag['HP1'] =  '('+ self.varl1Htag +'>'+ self.WPHPl1Htag +')' 
@@ -289,22 +291,22 @@ class cuts():
                 self.cuts['VV_all'] = '('+  '||'.join([self.cuts['VV_HPHP'],self.cuts['VV_HPLP']]) + ')'
                 self.cuts['VV_VH']= '('+  '||'.join([self.cuts['VH_all'],self.cuts['VV_all']]) + ')'
 
-                '''
-                #control region (invert w-tag)
-                catsAll['VH_NPHP'] = '('+'&&'.join([self.catVtag['NP1'],self.catHtag['HP2']])+')'
-                catsAll['HV_HPNP'] = '('+'&&'.join([self.catHtag['HP1'],self.catVtag['NP2']])+')'
-                # I am excluding only the VH categories because it is already othogonal to VV and TTree.Draw doesn't like "overlapping" conditions
-                self.cuts['VH_NPHP_control_region'] = '('+'('+'||'.join([catsAll['VH_NPHP'],catsAll['HV_HPNP']])+')'+'&&'+'('+'!'+self.cuts['VH_all']+')'+')'
 
+                #control region (invert w-tag)
+                catsAll['VV_NPHP'] = '('+'&&'.join([self.catVtag['NP1'],self.catVtag['HP2']])+')'
+                catsAll['VV_HPNP'] = '('+'&&'.join([self.catVtag['HP1'],self.catVtag['NP2']])+')'
+                # I am excluding only the VH categories because it is already othogonal to VV and TTree.Draw doesn't like "overlapping" conditions
+                self.cuts['VV_NPHP_control_region'] = '('+'('+'||'.join([catsAll['VV_NPHP'],catsAll['VV_HPNP']])+')'+'&&'+'('+'!'+self.cuts['VH_all']+')'+')'
+                '''
                 #control region (invert h-tag)
                 catsAll['VH_HPNP'] = '('+'&&'.join([self.catVtag['HP1'],self.catHtag['NP2']])+')'
                 catsAll['HV_NPHP'] = '('+'&&'.join([self.catHtag['NP1'],self.catVtag['HP2']])+')'
                 self.cuts['VH_HPNP_control_region'] = '('+'('+'||'.join([catsAll['VH_HPNP'],catsAll['HV_NPHP']])+')'+'&&'+'('+'!'+'('+ '||'.join([self.cuts['VV_all'],self.cuts['VH_NPHP_control_region']]) +')'+')'+')'
                 '''
                 #only one CR inverting H-tag
-                catsAll['VH_HPNP'] = '('+'&&'.join([self.catVtag['HP1'],self.catHtag['NP2']])+')'
-                catsAll['HV_NPHP'] = '('+'&&'.join([self.catHtag['NP1'],self.catVtag['HP2']])+')'
-                self.cuts['VH_HPNP_control_region'] = '('+'('+'||'.join([catsAll['VH_HPNP'],catsAll['HV_NPHP']])+')'+'&&'+'('+'!'+self.cuts['VV_all']+')'+')'
+                #catsAll['VH_HPNP'] = '('+'&&'.join([self.catVtag['HP1'],self.catHtag['NP2']])+')'
+                #catsAll['HV_NPHP'] = '('+'&&'.join([self.catHtag['NP1'],self.catVtag['HP2']])+')'
+                #self.cuts['VH_HPNP_control_region'] = '('+'('+'||'.join([catsAll['VH_HPNP'],catsAll['HV_NPHP']])+')'+'&&'+'('+'!'+self.cuts['VV_all']+')'+')'
             else:
                 #print "Use b-tagging sorting"
                 self.cuts['VH_HPHP'] = '('+  '&&'.join([self.catHtag['HP1'],self.catVtag['HP2']]) + ')'
