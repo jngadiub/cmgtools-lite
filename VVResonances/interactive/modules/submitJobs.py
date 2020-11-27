@@ -1094,14 +1094,18 @@ def merge1DMVVTemplate(jobList,files,jobname,purity,binsMVV,minMVV,maxMVV,HCALbi
             histo_nominal.GetYaxis().SetTitleOffset(1.5)
             histo_nominal.GetXaxis().SetTitle("dijet mass")
             histo_nominal.SetMinimum(0.0000000000001)
-            histo_noreweight     .Scale(sf/histo_noreweight.Integral())
+            if histo_noreweight.Integral() !=0 :
+                histo_noreweight     .Scale(sf/histo_noreweight.Integral())
+            else: print "histo_noreweight  not scaled! !!!!!!!!!!!!!!!!!!!!!!!!!!!    Integral = 0!!!!! "
             histo_nominal.Draw("hist")
             histo_noreweight.SetLineColor(ROOT.kRed)
             histo_noreweight.SetLineWidth(2)
             histo_noreweight.Draw("histsame")
             text = ROOT.TLatex()
             text.DrawLatexNDC(0.13,0.92,"#font[62]{CMS} #font[52]{Simulation}")
-            mvv_nominal.Scale(sf/mvv_nominal.Integral())
+            if mvv_nominal.Integral() !=0:
+                mvv_nominal.Scale(sf/mvv_nominal.Integral())
+            else: print "mvv_nominal  not scaled! !!!!!!!!!!!!!!!!!!!!!!!!!!!    Integral = 0!!!!! "
             mvv_nominal.SetMarkerColor(ROOT.kBlack)
             mvv_nominal.SetMarkerStyle(7)
             mvv_nominal.Draw("same")
@@ -1577,7 +1581,7 @@ def makeData(template,cut,rootFile,binsMVV,binsMJ,minMVV,maxMVV,minMJ,maxMJ,fact
     NumberOfJobs= len(files)
     print " ###### total number of files ",NumberOfJobs 
     OutputFileNames = rootFile.replace(".root","")
-    cmd='vvMakeData.py -d {data} -c "{cut}"  -v "jj_l1_softDrop_mass,jj_l2_softDrop_mass,jj_LV_mass" {binning} -b "{bins},{bins},{BINS}" -m "{mini},{mini},{MINI}" -M "{maxi},{maxi},{MAXI}" -f {factors} -n "{name}" {addOption} '.format(cut=cut,BINS=binsMVV,bins=binsMJ,MINI=minMVV,MAXI=maxMVV,mini=minMJ,maxi=maxMJ,factors=factors,name=name,data=data,infolder=samples,binning=binning,addOption=addOption)  
+    cmd='vvMakeData.py -d {data} -c "{cut}"  -v "jj_l1_softDrop_mass,jj_l2_softDrop_mass,jj_LV_mass" {binning} -b "{bins},{bins},{BINS}" -m "{mini},{mini},{MINI}" -M "{maxi},{maxi},{MAXI}" -f "{factors}" -n "{name}" {addOption} '.format(cut=cut,BINS=binsMVV,bins=binsMJ,MINI=minMVV,MAXI=maxMVV,mini=minMJ,maxi=maxMJ,factors=factors,name=name,data=data,infolder=samples,binning=binning,addOption=addOption)
     queue = "1nd" # give bsub queue -- 8nm (8 minutes), 1nh (1 hour), 8nh, 1nd (1day), 2nd, 1nw (1 week), 2nw 
     if sendjobs == True:
         path = os.getcwd()
