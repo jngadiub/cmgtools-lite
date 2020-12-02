@@ -99,16 +99,19 @@ def selectSignalTree(cs,sample):
         rfile = signal+".root"
         chain.Add(rfile)
         print " entries ",chain.GetEntries()
-
     bigtree = chain.CopyTree("1")
-    finaltree = chain.CopyTree(cs['common']+'*'+cs['acceptance'])
+    print " common_VV * acceptance ",cs['common_VV']+'*'+cs['acceptance']
+    finaltree = chain.CopyTree(cs['common_VV']+'*'+cs['acceptance'])
     print 'overall entries in tree '+str(chain.GetEntries())
     print 'entries after analysis selections '+str(finaltree.GetEntries())
+    print "VH HPHP ",cs['VH_HPHP']
     signaltree_VH_HPHP = finaltree.CopyTree(cs['VH_HPHP'])
+    print "VV HPHP ",cs['VV_HPHP']
     signaltree_VV_HPHP = finaltree.CopyTree(cs['VV_HPHP'])#all other categories before are explicitly removed so that each event can only live in one category!!
     signaltree_VH_LPHP = finaltree.CopyTree(cs['VH_LPHP'])
     signaltree_VH_HPLP = finaltree.CopyTree(cs['VH_HPLP'])
     signaltree_VV_HPLP = finaltree.CopyTree(cs['VV_HPLP'])
+    signaltree_VV_NPHP = finaltree.CopyTree(cs['VV_NPHP_control_region'])
     rest = finaltree.CopyTree('!('+cs['VV_HPLP']+')*!('+cs['VH_LPHP']+')*!('+cs['VH_HPLP']+')*!('+cs['VH_HPHP']+')*!('+cs['VV_HPHP']+')')
     print ' #event VH_HPHP '+str(signaltree_VH_HPHP.GetEntries())+' #event VV_HPHP '+str(signaltree_VV_HPHP.GetEntries())+' #event VH_LPHP '+str(signaltree_VH_LPHP.GetEntries())+' #event VH_LPHP '+str(signaltree_VH_LPHP.GetEntries())+' #event VV_HPLP '+str(signaltree_VV_HPLP.GetEntries())
     print '#event no category '+str(rest.GetEntries())
@@ -125,6 +128,7 @@ def selectSignalTree(cs,sample):
     signaltree_VH_LPHP.SetName('VH_LPHP')
     signaltree_VH_HPLP.SetName('VH_HPLP')
     signaltree_VV_HPLP.SetName('VV_HPLP')
+    signaltree_VV_NPHP.SetName('VV_NPHP')
     bigtree.SetName('all')
     finaltree.SetName('commonacceptance')
     signaltree_VH_HPHP.Write()
@@ -132,6 +136,7 @@ def selectSignalTree(cs,sample):
     signaltree_VH_LPHP.Write()
     signaltree_VH_HPLP.Write()
     signaltree_VV_HPLP.Write()
+    signaltree_VV_NPHP.Write()
     finaltree.Write()
     bigtree.Write()
     outfile.Close()
@@ -161,14 +166,19 @@ def calculateSF(self,event,ctx,year,jet,SF=1,eff_vtag=[1,1],eff_htag=[1,1],mista
     print " TTruth ",TTruth
     print " jetTag ",jetTag
     '''
-    if VTruth ==1 :
+    if TTruth == 1:
+        #print " TTruth "
+        jetTruth = "top"
+    elif VTruth ==1 and TTruth == 0:
+        #print "VTruth "
         jetTruth = "V"
     elif  HTruth ==1 or ZbbTruth ==1 :
-        jetTruth = "H"
-    elif TTruth == 1:
-        jetTruth = "top"
+        #print " HTruth or ZbbTruth "
+        jetTruth = "H"    
+    #else: print "no top, H, V" 
+    
     #print " jetTruth ",jetTruth
-    if (jetTruth=='H' or jetTruth=='V'):
+    if (jetTruth=='H' or jetTruth=='V' ):
         #print " jetTruth H or V"
         if jetTag == 'HPHtag':
             #print "jetTag== HPHtag"
@@ -330,7 +340,15 @@ class myTree:
         WPLP_W_branch_l2 = cattree.GetBranch(ctx.WPLPl2Wtag)
         WPLP_W_leaf_l2 = WPLP_W_branch_l2.GetLeaf(ctx.WPLPl2Wtag)
 
-        
+        noW=0
+        oneW=0
+        twoW=0
+        notop=0
+        onetop=0
+        twotop=0
+        Wintop=0
+        Wnotintop=0
+        twoWnotintop=0
         for event in cattree:
             self.puWeight.rf       = event.puWeight 
             self.genWeight.rf      = event.genWeight
@@ -346,9 +364,15 @@ class myTree:
             try:
                 self.jj_l1_mergedTopTruth.ri = event.jj_l1_mergedTopTruth
                 self.jj_l2_mergedTopTruth.ri = event.jj_l2_mergedTopTruth
+                top1=event.jj_l1_mergedTopTruth
+                top2=event.jj_l2_mergedTopTruth
             except:
                 self.jj_l1_mergedTopTruth.ri = 0
                 self.jj_l2_mergedTopTruth.ri = 0
+                top1=0
+                top2=0
+            #print " event top ",event.jj_l1_mergedTopTruth,event.jj_l2_mergedTopTruth
+            #print " self top ",self.jj_l1_mergedTopTruth.ri,self.jj_l2_mergedTopTruth.ri
 
             self.jj_l1_mergedZbbTruth.ri = event.jj_l1_mergedZbbTruth
             self.jj_l2_mergedZbbTruth.ri = event.jj_l2_mergedZbbTruth
@@ -387,9 +411,9 @@ class myTree:
             CMS_eff_htag_sf = [1.0,1.0]
             CMS_mistag_top_sf = [1.0,1.0]
             jet = 1
-            SF,CMS_eff_vtag_sf,CMS_eff_htag_sf,CMS_mistag_top_sf = calculateSF(self,event,ctx,year,jet,SF,CMS_eff_vtag_sf,CMS_eff_htag_sf,CMS_mistag_top_sf,self.jj_l1_mergedTopTruth,self.jj_l2_mergedTopTruth,tag1,tag2)
+            SF,CMS_eff_vtag_sf,CMS_eff_htag_sf,CMS_mistag_top_sf = calculateSF(self,event,ctx,year,jet,SF,CMS_eff_vtag_sf,CMS_eff_htag_sf,CMS_mistag_top_sf,top1,top2,tag1,tag2)
             jet = 2
-            SF,CMS_eff_vtag_sf,CMS_eff_htag_sf,CMS_mistag_top_sf = calculateSF(self,event,ctx,year,jet,SF,CMS_eff_vtag_sf,CMS_eff_htag_sf,CMS_mistag_top_sf,self.jj_l1_mergedTopTruth,self.jj_l2_mergedTopTruth,tag1,tag2)
+            SF,CMS_eff_vtag_sf,CMS_eff_htag_sf,CMS_mistag_top_sf = calculateSF(self,event,ctx,year,jet,SF,CMS_eff_vtag_sf,CMS_eff_htag_sf,CMS_mistag_top_sf,top1,top2,tag1,tag2)
             #print " final SF ",SF
             #print
             self.sf.rf = SF
@@ -399,11 +423,26 @@ class myTree:
             self.CMS_eff_htag_sf_down.rf = CMS_eff_htag_sf[1]
             self.CMS_mistag_top_sf_up.rf = CMS_mistag_top_sf[0]
             self.CMS_mistag_top_sf_down.rf = CMS_mistag_top_sf[1]
-
-
-            #print self.jj_l1_jetTag
+            if event.jj_l1_mergedVTruth == 0 and event.jj_l2_mergedVTruth ==0 : noW=noW+1 
+            if event.jj_l1_mergedVTruth == 1 and event.jj_l2_mergedVTruth ==1 : twoW=twoW+1
+            if ( (event.jj_l1_mergedVTruth == 0 and event.jj_l2_mergedVTruth ==1) or  (event.jj_l1_mergedVTruth == 1 and event.jj_l2_mergedVTruth ==0)): oneW=oneW+1
+            if ((event.jj_l1_mergedTopTruth ==0 and event.jj_l2_mergedTopTruth ==1) or (event.jj_l1_mergedTopTruth ==1 and event.jj_l2_mergedTopTruth ==0)): onetop=onetop+1
+            if event.jj_l1_mergedTopTruth ==0 and event.jj_l2_mergedTopTruth ==0 : notop=notop+1
+            if ((event.jj_l1_mergedVTruth == 1 and event.jj_l1_mergedTopTruth ==0) or  (event.jj_l2_mergedVTruth == 1 and event.jj_l2_mergedTopTruth ==0)): Wnotintop=Wnotintop+1
+            if ((event.jj_l1_mergedVTruth == 1 and event.jj_l1_mergedTopTruth ==0) and  (event.jj_l2_mergedVTruth == 1 and event.jj_l2_mergedTopTruth ==0)): twoWnotintop=twoWnotintop+1
+            if event.jj_l1_mergedTopTruth ==1 and event.jj_l2_mergedTopTruth ==1 : twotop=twotop+1
+            if((event.jj_l1_mergedVTruth==0 and event.jj_l2_mergedVTruth ==1  and event.jj_l2_mergedTopTruth ==1 ) or  (event.jj_l1_mergedVTruth == 1  and event.jj_l1_mergedTopTruth ==1 and event.jj_l2_mergedVTruth ==0)): Wintop=Wintop+1
             self.newTree.Fill()
-        print 'number of events in this category '+str(self.newTree.GetEntries())
+        #print 'number of events in this category '+str(self.newTree.GetEntries())
+        print 'number of events without Ws in this category '+str(noW)
+        print 'number of events without tops in this category '+str(notop)
+        print 'number of events with 1 W in this category '+str(oneW)
+        print 'number of Ws in top in this category '+str(Wintop)
+        print 'number of event with 1 W not top in this category '+str(Wnotintop)
+        print 'number of event with 2 Ws not top in this category '+str(twoWnotintop)
+        print 'number of events with 1 top in this category '+str(onetop)
+        print 'number of events with 2 Ws in this category '+str(twoW)
+        print 'number of events with 2 tops in this category '+str(twotop)
 
     def test(self):
         for event in self.newTree:
@@ -417,7 +456,7 @@ class myTree:
 if __name__=='__main__':
     if options.directory.find(options.year)== -1: print 'ATTENTION: are you sure you are using the right directory for '+options.year+' data?'    
     period = options.year
-    ctx  = cuts.cuts("init_VV_VH.json",period,"random_dijetbins")
+    ctx  = cuts.cuts("init_VV_VH.json",period,"random_dijetbins",True)
     samples=""
     basedir=options.directory
     filePeriod=options.year
@@ -443,6 +482,8 @@ if __name__=='__main__':
         outtree = myTree(sample,outfile)
         outtreeAll = myTree(sample,outfile)
         print 'select common cuts signal tree' 
+        print " common_VV ",ctx.cuts["common_VV"]
+        print " acceptance ",ctx.cuts["acceptance"]
         tmpfilename = selectSignalTree(ctx.cuts,samplelist[sample])
         print " tmpfilename ",tmpfilename
         outtree.setOutputTreeBranchValues('VH_HPHP',ctx,tmpfilename,filePeriod)
@@ -450,6 +491,7 @@ if __name__=='__main__':
         outtree.setOutputTreeBranchValues('VH_LPHP',ctx,tmpfilename,filePeriod)
         outtree.setOutputTreeBranchValues('VH_HPLP',ctx,tmpfilename,filePeriod)
         outtree.setOutputTreeBranchValues('VV_HPLP',ctx,tmpfilename,filePeriod)
+        outtree.setOutputTreeBranchValues('VV_NPHP',ctx,tmpfilename,filePeriod)
         outfile.cd()
         outtree.write('signalregion')
         outtreeAll.setOutputTreeBranchValues('all',ctx,tmpfilename,filePeriod)
