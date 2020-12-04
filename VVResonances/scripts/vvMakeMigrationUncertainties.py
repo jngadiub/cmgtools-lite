@@ -5,7 +5,7 @@
 # for the moment there are the same scale factors for W-tagging and H-tagging, for 2018 i put the same as for 2017 for now!
 import ROOT
 import optparse
-import sys,os
+import sys,os,time
 import json
 from array import array
 ROOT.gROOT.ProcessLine("struct rootint { Int_t ri;};")
@@ -16,7 +16,7 @@ ROOT.gROOT.ProcessLine("struct rootlong { Long_t li;};")
 from ROOT import rootlong
 sys.path.insert(0, "../interactive/")
 import cuts
-
+from rootpy.tree import CharArrayCol
 
 parser = optparse.OptionParser()
 parser.add_option("-y","--year",dest="year",default='2016',help="year of data taking")
@@ -131,6 +131,8 @@ def calcfinalUnc(final,tag,cats):
             masses.append(key.split('.')[0])
     tmplistu = []
     tmplistd = []
+    ratiodown ={}
+    ratioup ={}
     c = 'Sample '
     for cat in cats:
         c+='              '
@@ -138,6 +140,9 @@ def calcfinalUnc(final,tag,cats):
         tmplistd.append(0.)
         tmplistu.append(0.)
     print c
+
+
+
     print " sorted(masses) ",sorted(masses)
     for m in sorted(masses):
         tmp =str(m)+'  '
@@ -147,18 +152,28 @@ def calcfinalUnc(final,tag,cats):
                 nom= res[str(m)+'.'+cat][0]
                 upvar = res[str(m)+'.'+cat][1]
                 downvar = res[str(m)+'.'+cat][2]
-                tmp+= str(round(downvar/float(nom),2))+' / '+str(round(upvar/float(nom),2))
-                tmplistu[i]+= upvar/float(nom)
-                tmplistd[i]+= downvar/float(nom)
+                ratiodown.update({m:float(downvar)/float(nom)})
+                ratioup.update({m :float(upvar)/float(nom)})
+                tmp+= str(round(float(ratiodown[m]),2))+' / '+str(round(float(ratioup[m]),2))
+                if options.isSignal==True:
+                    tmplistu[i]+= ratioup[m]
+                    tmplistd[i]+= ratiodouwn[m]
                 i+=1
             tmp+='   '
             
         print tmp
     i=0
     for c in cats:
-        #print " averaging on masses for signal???"
-        data[c+'_up']= round(tmplistu[i]/float(len(masses)),2)
-        data[c+'_down']= round(tmplistd[i]/float(len(masses)),2)
+        if options.isSignal==True:
+            #print " averaging on masses for signal???"
+            data[c+'_up']= round(tmplistu[i]/float(len(masses)),2)
+            data[c+'_down']= round(tmplistd[i]/float(len(masses)),2)
+        else:
+            for m in masses:
+                #print " is it working ? ", str(m)
+                #print " ratioup[m]  ",ratioup[m] 
+                data[str(m)+'.'+c+'_up']= ratioup[m]
+                data[str(m)+'.'+c+'_down']= ratiodown[m]
         i+=1
 
     return data
@@ -179,7 +194,8 @@ if __name__=="__main__":
     tags=options.tags.split(",")
     sampleTypes = options.samples.split(",")
     total = {}
-
+    contrib =["resT","resW","nonresT","resTnonresT","resWnonresT","resTresW"]
+    mappdf = {"resT":"TTJetsTop","resW":"TTJetsW","nonresT":"TTJetsNonRes","resTnonresT":"TTJetsTNonResT","resWnonresT":"TTJetsWNonResT","resTresW":"TTJetsResWResT"}
 
 
     print " Doing migration uncertainties! DID YOU EVALUTE THE SF BEFORE?"
@@ -216,7 +232,18 @@ if __name__=="__main__":
             result = {}
             #print finaltree.Print()
             for cat in categories:
-                result[splitstr+'.'+cat] = calculateMigration(chain,tag,cat)
+                if splitstr.find("TT") == -1:
+                    result[splitstr+'.'+cat] = calculateMigration(chain,tag,cat)
+                else:
+                    for con in contrib:
+                        tmpname = "tmp_"+time.strftime("%Y%m%d-%H%M%S")
+                        outfile = ROOT.TFile(tmpname+'.root','RECREATE')
+                        print " %%%%%%%    "+con+"     %%%%%%%%%"
+                        ttcomp = chain.CopyTree(ctx.cuts[con])
+                        print ttcomp.GetEntries()
+                        ttcomp.Write()
+                        result[mappdf[con]+'.'+cat] = calculateMigration(ttcomp,tag,cat)
+                        os.system("rm "+tmpname+".root")
             print '###################   '+tag+'    ######################'
 
             #if splitstr.find("Jets")!=-1 or splitstr.find("TT")!=-1 : printresultbkg(result,categories)
@@ -227,11 +254,11 @@ if __name__=="__main__":
         total[year]=final
 
         print 'CMS_VV_JJ_DeepJet_Htag_eff'
-        data[year] = {options.output+'_'+'CMS_VV_JJ_DeepJet_Htag_eff' : calcfinalUnc(final,'H_tag',categories)}
+        data[year] = {splitstr+'_'+'CMS_VV_JJ_DeepJet_Htag_eff' : calcfinalUnc(final,'H_tag',categories)}
         print 'CMS_VV_JJ_DeepJet_Vtag_eff'
-        data[year].update( {options.output+'_'+'CMS_VV_JJ_DeepJet_Vtag_eff' : calcfinalUnc(final,'V_tag',categories)})
+        data[year].update( {splitstr+'_'+'CMS_VV_JJ_DeepJet_Vtag_eff' : calcfinalUnc(final,'V_tag',categories)})
         print 'CMS_VV_JJ_DeepJet_TOPtag_mistag'
-        data[year].update({options.output+'_'+'CMS_VV_JJ_DeepJet_TOPtag_mistag' : calcfinalUnc(final,'top_tag',categories)})
+        data[year].update({splitstr+'_'+'CMS_VV_JJ_DeepJet_TOPtag_mistag' : calcfinalUnc(final,'top_tag',categories)})
 
         jsonfilename[year] = 'migrationunc_'+splitstr+'_'+year+'.json'
         with open(jsonfilename[year], 'w') as outfile:
@@ -250,22 +277,38 @@ if __name__=="__main__":
                 u = 0
                 d = 0
                 for year in years:
-                    n += total[year][tag][splitstr+'.'+cat][0]*ctx.lumi[year]
-                    u += total[year][tag][splitstr+'.'+cat][1]*ctx.lumi[year]
-                    d += total[year][tag][splitstr+'.'+cat][2]*ctx.lumi[year]
+                    if splitstr.find("TT") == -1:
+                        n += total[year][tag][splitstr+'.'+cat][0]*ctx.lumi[year]
+                        u += total[year][tag][splitstr+'.'+cat][1]*ctx.lumi[year]
+                        d += total[year][tag][splitstr+'.'+cat][2]*ctx.lumi[year]
+                    else:
+                        for con in contrib:
+                            n += total[year][tag][mappdf[con]+'.'+cat][0]*ctx.lumi[year]
+                            u += total[year][tag][mappdf[con]+'.'+cat][1]*ctx.lumi[year]
+                            d += total[year][tag][mappdf[con]+'.'+cat][2]*ctx.lumi[year]
+
                 if  unc_Run2[tag] == None:
-                    unc_Run2[tag] = {splitstr+'.'+cat : [n,u,d] }
+                    if splitstr.find("TT") == -1:
+                        unc_Run2[tag] = {splitstr+'.'+cat : [n,u,d] }
+                    else:
+                        for con in contrib:
+                            unc_Run2[tag] = {mappdf[con]+'.'+cat : [n,u,d] }
                 else:
-                    unc_Run2[tag].update( {splitstr+'.'+cat : [n,u,d] })
+                    if splitstr.find("TT") == -1:
+                        unc_Run2[tag].update( {splitstr+'.'+cat : [n,u,d] })
+                    else:
+                        for con in contrib:
+                            unc_Run2[tag].update( {mappdf[con]+'.'+cat : [n,u,d] })
+
         print " run 2 unc "
         print unc_Run2
 
         print 'CMS_VV_JJ_DeepJet_Htag_eff'
-        data["Run2"] = {options.output+'_'+'CMS_VV_JJ_DeepJet_Htag_eff' : calcfinalUnc(unc_Run2,'H_tag',categories)}
+        data["Run2"] = {splitstr+'_'+'CMS_VV_JJ_DeepJet_Htag_eff' : calcfinalUnc(unc_Run2,'H_tag',categories)}
         print 'CMS_VV_JJ_DeepJet_Vtag_eff'
-        data["Run2"].update( {options.output+'_'+'CMS_VV_JJ_DeepJet_Vtag_eff' : calcfinalUnc(unc_Run2,'V_tag',categories)})
+        data["Run2"].update( {splitstr+'_'+'CMS_VV_JJ_DeepJet_Vtag_eff' : calcfinalUnc(unc_Run2,'V_tag',categories)})
         print 'CMS_VV_JJ_DeepJet_TOPtag_mistag'
-        data["Run2"].update({options.output+'_'+'CMS_VV_JJ_DeepJet_TOPtag_mistag' : calcfinalUnc(unc_Run2,'top_tag',categories)})
+        data["Run2"].update({splitstr+'_'+'CMS_VV_JJ_DeepJet_TOPtag_mistag' : calcfinalUnc(unc_Run2,'top_tag',categories)})
 
         jsonfilename["Run2"] = 'migrationunc_'+splitstr+'_Run2.json'
         with open(jsonfilename["Run2"], 'w') as outfile:
