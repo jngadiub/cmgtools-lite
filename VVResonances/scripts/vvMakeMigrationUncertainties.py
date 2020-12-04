@@ -157,13 +157,14 @@ def calcfinalUnc(final,tag,cats):
                 tmp+= str(round(float(ratiodown[m]),2))+' / '+str(round(float(ratioup[m]),2))
                 if options.isSignal==True:
                     tmplistu[i]+= ratioup[m]
-                    tmplistd[i]+= ratiodouwn[m]
+                    tmplistd[i]+= ratiodown[m]
                 i+=1
             tmp+='   '
             
         print tmp
     i=0
     for c in cats:
+        if c == "VV_NPHP":c="VV_NPHP_control_region"
         if options.isSignal==True:
             #print " averaging on masses for signal???"
             data[c+'_up']= round(tmplistu[i]/float(len(masses)),2)
@@ -172,8 +173,8 @@ def calcfinalUnc(final,tag,cats):
             for m in masses:
                 #print " is it working ? ", str(m)
                 #print " ratioup[m]  ",ratioup[m] 
-                data[str(m)+'.'+c+'_up']= ratioup[m]
-                data[str(m)+'.'+c+'_down']= ratiodown[m]
+                data[str(m)+'.'+c+'_up']= round(ratioup[m],2)
+                data[str(m)+'.'+c+'_down']= round(ratiodown[m],2)
         i+=1
 
     return data
