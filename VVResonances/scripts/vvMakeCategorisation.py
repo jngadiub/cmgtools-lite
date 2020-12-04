@@ -208,7 +208,14 @@ def calculateSF(self,event,ctx,year,jet,SF=1,eff_vtag=[1,1],eff_htag=[1,1],mista
             eff_vtag[1] *= (ctx.LPSF_vtag[year]-ctx.W_tag_unc_LP[year])
             #print "********************      SF ",SF
             #print "eff_wtag[0] ",eff_vtag[0]
-        #else:
+        elif jetTag == 'NPVtag':
+            SF *= ctx.NPSF_vtag[year]
+            eff_vtag[0] *= (ctx.NPSF_vtag[year]+ctx.W_tag_unc_NP[year])
+            eff_vtag[1] *= (ctx.NPSF_vtag[year]-ctx.W_tag_unc_NP[year])
+        else:
+            SF*=1.
+            eff_vtag[0] *=1.
+            eff_vtag[1] *=1.
             #print " jetTag is ",jetTag
     elif jetTruth=='top' :
         #print " this is a top!"
@@ -340,6 +347,13 @@ class myTree:
         WPLP_W_branch_l2 = cattree.GetBranch(ctx.WPLPl2Wtag)
         WPLP_W_leaf_l2 = WPLP_W_branch_l2.GetLeaf(ctx.WPLPl2Wtag)
 
+
+        WPNP_W_branch_l1 = cattree.GetBranch(ctx.WPNPl1Wtag)
+        WPNP_W_leaf_l1 = WPNP_W_branch_l1.GetLeaf(ctx.WPNPl1Wtag)
+        WPNP_W_branch_l2 = cattree.GetBranch(ctx.WPNPl2Wtag)
+        WPNP_W_leaf_l2 = WPNP_W_branch_l2.GetLeaf(ctx.WPNPl2Wtag)
+
+
         noW=0
         oneW=0
         twoW=0
@@ -388,6 +402,8 @@ class myTree:
                 self.jj_l1_jetTag[:6] = 'LPHtag'
             elif W_leaf_l1.GetValue() > WPLP_W_leaf_l1.GetValue():
                 self.jj_l1_jetTag[:6] = 'LPVtag'
+            elif W_leaf_l1.GetValue() < WPNP_W_leaf_l1.GetValue():
+                self.jj_l1_jetTag[:6] = 'NPVtag'
             else:
                 self.jj_l1_jetTag[:6] = 'Notag'
                 
@@ -400,6 +416,8 @@ class myTree:
                 self.jj_l2_jetTag[:6] = 'LPHtag'
             elif W_leaf_l2.GetValue() > WPLP_W_leaf_l2.GetValue():
                 self.jj_l2_jetTag[:6] = 'LPVtag'
+            elif W_leaf_l2.GetValue() < WPNP_W_leaf_l2.GetValue():
+                self.jj_l2_jetTag[:6] = 'NPVtag'
             else:
                 self.jj_l2_jetTag[:6] = 'Notag'
 
