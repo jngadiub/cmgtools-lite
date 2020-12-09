@@ -36,7 +36,7 @@ parser.add_option("--pdfy",dest="pdfy",help="name of pdfs lie PTYUp etc",default
 parser.add_option("-s","--signal",dest="fitSignal",action="store_true",help="do S+B fit",default=False)
 parser.add_option("-t","--addTop",dest="addTop",action="store_true",help="Fit top",default=False)
 parser.add_option("-M","--mass",dest="signalMass",type=float,help="signal mass",default=1560.)
-parser.add_option("--signalScaleF",dest="signalScaleF",type=float,help="scale factor to apply to signal when drawing so its still visible!",default=100.)
+parser.add_option("--signalScaleF",dest="signalScaleF",type=float,help="scale factor to apply to signal when drawing so its still visible!",default=500.)
 parser.add_option("--prelim",dest="prelim",help="add preliminary label",default="Preliminary")
 parser.add_option("--channel",dest="channel",help="which category to use? ",default="VV_HPHP")
 parser.add_option("--doFit",dest="fit",action="store_true",help="actually fit the the distributions",default=False)
@@ -121,8 +121,8 @@ def writeLogfile(options,fitresult):
      		 continue
      	     pi = paramsinit.at(k)
      	     r  = pi.getMax()-1
-     	     logfile.write(pf.GetName()+" & "+str((pf.getVal()-pi.getVal())/r)+"\\\\ \n")
-     	 logfile.close()
+             logfile.write(pf.GetName()+" & "+str((pf.getVal()-pi.getVal())/r)+"\\\\ \n")
+        logfile.close()
 
 if __name__=="__main__":
      finMC = ROOT.TFile(options.input,"READ");
@@ -250,7 +250,7 @@ if __name__=="__main__":
         all_expected[period] = expected
         #save post fit ttbar only normalization to be used as prefit value when fitting all bkg
         if options.name.find("ttbar")!=-1:
-                jsonfile = open(options.jsonname+"_"+options.channel+".json","w")
+                jsonfile = open(options.jsonname+"_"+period+"_"+options.channel+".json","w")
                 json.dump(norms,jsonfile)
                 jsonfile.close()
                 if options.slopes == True:
