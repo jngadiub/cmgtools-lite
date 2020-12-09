@@ -8,6 +8,7 @@ class cuts():
     yeartag = ""
     HPSF_vtag = {}                                
     LPSF_vtag = {}                                
+    NPSF_vtag = {}
     HPSF_htag = {}                                
     LPSF_htag = {}                                
     HPSF_toptag = {}
@@ -15,6 +16,7 @@ class cuts():
 
     W_tag_unc_HP = {}
     W_tag_unc_LP = {}
+    W_tag_unc_NP = {}
     H_tag_unc_HP = {}
     H_tag_unc_LP = {}
     TOP_tag_unc_HP = {}
@@ -122,11 +124,13 @@ class cuts():
                 #print " taggers initialization is the one of run2 ",self.yeartag
                 self.WPHPl1Wtag = data["tagging_variables_and_wp"]["l1Wtag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Wtag"+self.yeartag])
                 self.WPLPl1Wtag = data["tagging_variables_and_wp"]["l1Wtag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Wtag"+self.yeartag])
+                self.WPNPl1Wtag = data["tagging_variables_and_wp"]["l1Wtag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_NP_Wtag"+self.yeartag])
                 self.WPHPl1Htag = data["tagging_variables_and_wp"]["l1Htag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Htag"+self.yeartag])
                 self.WPLPl1Htag = data["tagging_variables_and_wp"]["l1Htag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Htag"+self.yeartag])
                     
                 self.WPHPl2Wtag = data["tagging_variables_and_wp"]["l2Wtag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Wtag"+self.yeartag])
                 self.WPLPl2Wtag = data["tagging_variables_and_wp"]["l2Wtag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Wtag"+self.yeartag])
+                self.WPNPl2Wtag = data["tagging_variables_and_wp"]["l2Wtag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_NP_Wtag"+self.yeartag])
                 self.WPHPl2Htag = data["tagging_variables_and_wp"]["l2Htag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_HP_Htag"+self.yeartag])
                 self.WPLPl2Htag = data["tagging_variables_and_wp"]["l2Htag"+self.yeartag].replace("XX", data["tagging_variables_and_wp"]["WP_LP_Htag"+self.yeartag])
                  
@@ -156,6 +160,7 @@ class cuts():
 
                 self.W_tag_unc_HP[year] = data["W_tag_unc_HP"][year]
                 self.W_tag_unc_LP[year] = data["W_tag_unc_LP"][year]
+                self.W_tag_unc_NP[year] = data["W_tag_unc_NP"][year]
                 self.H_tag_unc_HP[year] = data["H_tag_unc_HP"][year]
                 self.H_tag_unc_LP[year] = data["H_tag_unc_LP"][year]
                 self.TOP_tag_unc_HP[year] = data["TOP_tag_unc_HP"][year]
@@ -163,6 +168,7 @@ class cuts():
 
                 self.HPSF_vtag[year] = data['wtag_SF_HP'][year]
                 self.LPSF_vtag[year] = data['wtag_SF_LP'][year]
+                self.NPSF_vtag[year] = data['wtag_SF_NP'][year]
                 self.HPSF_htag[year] = data['htag_SF_HP'][year]
                 self.LPSF_htag[year] = data['htag_SF_LP'][year]
                 self.HPSF_toptag[year] = data['top_tag_SF_HP'][year]
@@ -219,7 +225,7 @@ class cuts():
 
 
             #print " tagging cuts ",self.WPHPl1Wtag
-            selections = ["common","common_VV","common_VBF","NP","res","nonres","resT","resW","nonresT","resTnonresT","resWnonresT","resTresW","acceptance","acceptanceMJ","acceptanceMVV","acceptanceGEN","looseacceptanceMJ"]
+            selections = ["common","common_VV","common_VBF","NP","res","nonres","resT","resW","nonresT","resTnonresT","resWnonresT","resTresW","acceptance","acceptance_loose","acceptanceMJ","acceptanceMVV","acceptanceGEN","looseacceptanceMJ"]
             for sel in selections:
                 self.cuts[sel] = data["selection_cuts"][sel]
                 self.cuts[sel] = self.cuts[sel].replace("minMJ",str(self.minMJ))
@@ -296,7 +302,8 @@ class cuts():
                 catsAll['VV_NPHP'] = '('+'&&'.join([self.catVtag['NP1'],self.catVtag['HP2']])+')'
                 catsAll['VV_HPNP'] = '('+'&&'.join([self.catVtag['HP1'],self.catVtag['NP2']])+')'
                 # I am excluding only the VH categories because it is already othogonal to VV and TTree.Draw doesn't like "overlapping" conditions
-                self.cuts['VV_NPHP_control_region'] = '('+'('+'||'.join([catsAll['VV_NPHP'],catsAll['VV_HPNP']])+')'+'&&'+'('+'!'+self.cuts['VH_all']+')'+')'
+                self.cuts['VV_NPHP_control_region'] = '('+'('+'||'.join([catsAll['VV_NPHP'],catsAll['VV_HPNP']])+')'+'&&'+'('+'!'+self.cuts['VH_all']+')'+'&&'+'('+'!'+self.cuts['VV_all']+')'+')'
+
                 '''
                 #control region (invert h-tag)
                 catsAll['VH_HPNP'] = '('+'&&'.join([self.catVtag['HP1'],self.catHtag['NP2']])+')'
