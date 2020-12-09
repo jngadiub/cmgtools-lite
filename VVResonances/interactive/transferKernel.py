@@ -109,7 +109,7 @@ def conditional(hist):
             hist.SetBinContent(j,i,hist.GetBinContent(j,i)/integral)
 
 
-def merge_all(dataset):
+def merge_all(dataset,sample="pythia"):
  fin_herwig_mjj = ROOT.TFile.Open('save_new_shapes_%s_herwig_%s_1D.root'%(dataset,purity),'READ')
  histo_altshapeUp_mjj = fin_herwig_mjj.histo_nominal
  histo_altshapeUp_mjj.SetName('histo_altshapeUp')
@@ -201,7 +201,7 @@ def merge_all(dataset):
  inputx=fin_pythia_l1.GetName()
  inputy=fin_pythia_l2.GetName()
  inputz=fin_pythia_mjj.GetName()     
- rootFile="save_new_shapes_%s_pythia_"%dataset+purity+"_3D.root"
+ rootFile="save_new_shapes_%s_%s_"%(dataset,sample)+purity+"_3D.root"
    
  print "Reading " ,inputx
  print "Reading " ,inputy
@@ -402,7 +402,7 @@ def makeNonResCard():
  print "lumi unc",lumi_unc 
  vtag_pt_dependence = ctx.vtag_pt_dependence
  print " vtag_pt_dependence ",vtag_pt_dependence
- vtag_pt_dependence = {'VV_HPHP':'((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))','VV_HPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))','VH_HPHP':'1','VH_HPLP':'1','VH_LPHP':'1','VH_LPLP':'1'}
+ vtag_pt_dependence = {'VV_HPHP':'((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))','VV_HPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))','VH_HPHP':'1','VH_HPLP':'1','VH_LPHP':'1','VH_LPLP':'1','VV_NPHP_control_region':'1'}
  
  scales = [ctx.W_HPmassscale,ctx.W_LPmassscale]
  scalesHiggs = [ctx.H_HPmassscale,ctx.H_LPmassscale]
@@ -471,6 +471,7 @@ if __name__=="__main__":
 
      #################################################
      if options.year.find(",")!=-1: dataset ="Run2"
+     else: dataset =options.year
      print dataset
 
      finMC = ROOT.TFile(options.input,"READ");
@@ -487,6 +488,8 @@ if __name__=="__main__":
      elif purity == '' and 'control_region' in options.input:
          if 'VH_NPHP' in options.input:
              purity = 'VH_NPHP_control_region'
+         if 'VV_NPHP' in options.input:
+             purity = 'VV_NPHP_control_region'
          else:
              purity = 'VH_HPNP_control_region'
      else:
@@ -494,7 +497,7 @@ if __name__=="__main__":
       sys.exit()  
      print "Using purity: " ,purity    
      if options.merge:
-      merge_all(dataset)
+      merge_all(dataset,options.sample)
       sys.exit()       
 
      print " ########################       makeNonResCard      ###"
