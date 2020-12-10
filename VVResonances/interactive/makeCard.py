@@ -132,7 +132,7 @@ for sig in signals:
       rootFileMVV = {ttcon:resultsDir[dataset]+'/JJ_'+dataset+'_TTJets'+ttcon+'_MVV_'+p+'.root' for ttcon in contrib}
       #rootFileMVV = {ttcon:resultsDir[dataset]+'/JJ_'+dataset+'_TTJets'+ttcon+'_MVV_NP.root' for ttcon in contrib}
       rootFileNorm = {ttcon:resultsDir[dataset]+'/JJ_'+dataset+'_TTJets'+ttcon+'_'+p+'.root' for ttcon in contrib}
-      jsonfileNorm = resultsDir[dataset]+'/'+options.jsonname+'_'+p+'.json'
+      jsonfileNorm = resultsDir[dataset]+'/'+options.jsonname+'_'+dataset+"_"+p+'.json'
       if options.fitTTmjj == True:
         print "load fits"
         Tools.AddTTBackground3(card,dataset,p,rootFileMVV,rootFileNorm,resultsDir[dataset],ncontrib,["CMS_VV_JJ_TTJets_slope",0.5],jsonfileNorm)
@@ -189,7 +189,7 @@ for sig in signals:
        scaleData=1.0
       elif pseudodata=="False":
         #rootFileData = resultsDir[dataset]+"/JJ_"+dataset+"_data_"+p+".root" #resultsDir[dataset]+"/pseudo40/JJ_"+p+".root"
-        rootFileData = resultsDir[dataset]+"/JJ_"+p+".root" #resultsDir[dataset]+"/pseudo40/JJ_"+p+".root"
+        rootFileData = resultsDir[dataset]+"/JJ_"+dataset+"_data_"+p+".root" #resultsDir[dataset]+"/pseudo40/JJ_"+p+".root"
         histName="data"
         scaleData=1.0
 
@@ -204,7 +204,7 @@ for sig in signals:
       else:
         Tools.AddResBackgroundSystematics(card,p)
       Tools.AddNonResBackgroundSystematics(card,p)
-      Tools.AddTaggingSystematics(card,sig,p,[resultsDir[dataset]+'/migrationunc_'+sig+'_'+dataset+'.json',resultsDir[dataset]+'/migrationunc_WJets_'+dataset+'.json',resultsDir[dataset]+'/migrationunc_ZJets_'+dataset+'.json',resultsDir[dataset]+'/migrationunc_TTJets_'+dataset+'.json'])
+      Tools.AddTaggingSystematics(card,sig,dataset,p,['./migrationunc_'+sig+'_'+dataset+'.json','./migrationunc_WJets_'+dataset+'.json','./migrationunc_ZJets_'+dataset+'.json','./migrationunc_TTJets_'+dataset+'.json'])
       if options.fitTTmjj == True:
         print "load fits syst"
         Tools.AddTTSystematics4(card,["CMS_VV_JJ_TTJets_slope",0.05],dataset,p)
