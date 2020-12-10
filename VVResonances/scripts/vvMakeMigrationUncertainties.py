@@ -152,12 +152,12 @@ def calcfinalUnc(final,tag,cats):
                 nom= res[str(m)+'.'+cat][0]
                 upvar = res[str(m)+'.'+cat][1]
                 downvar = res[str(m)+'.'+cat][2]
-                ratiodown.update({m:float(downvar)/float(nom)})
-                ratioup.update({m :float(upvar)/float(nom)})
-                tmp+= str(round(float(ratiodown[m]),2))+' / '+str(round(float(ratioup[m]),2))
+                ratiodown.update({m+"."+cat:float(downvar)/float(nom)})
+                ratioup.update({m+"."+cat:float(upvar)/float(nom)})		
+                tmp+= str(round(float(ratiodown[m+"."+cat]),2))+' / '+str(round(float(ratioup[m+"."+cat]),2))
                 if options.isSignal==True:
-                    tmplistu[i]+= ratioup[m]
-                    tmplistd[i]+= ratiodown[m]
+                    tmplistu[i]+= ratioup[m+"."+cat]
+                    tmplistd[i]+= ratiodown[m+"."+cat]
                 i+=1
             tmp+='   '
             
@@ -173,8 +173,8 @@ def calcfinalUnc(final,tag,cats):
             for m in masses:
                 #print " is it working ? ", str(m)
                 #print " ratioup[m]  ",ratioup[m] 
-                data[str(m)+'.'+c+'_up']= round(ratioup[m],2)
-                data[str(m)+'.'+c+'_down']= round(ratiodown[m],2)
+                data[str(m)+'.'+c+'_up']= round(ratioup[m+'.'+c],2)
+                data[str(m)+'.'+c+'_down']= round(ratiodown[m+'.'+c],2)
         i+=1
 
     return data
@@ -260,6 +260,7 @@ if __name__=="__main__":
         data[year].update( {splitstr+'_'+'CMS_VV_JJ_DeepJet_Vtag_eff' : calcfinalUnc(final,'V_tag',categories)})
         print 'CMS_VV_JJ_DeepJet_TOPtag_mistag'
         data[year].update({splitstr+'_'+'CMS_VV_JJ_DeepJet_TOPtag_mistag' : calcfinalUnc(final,'top_tag',categories)})
+	print data[year]
 
         jsonfilename[year] = 'migrationunc_'+splitstr+'_'+year+'.json'
         with open(jsonfilename[year], 'w') as outfile:
