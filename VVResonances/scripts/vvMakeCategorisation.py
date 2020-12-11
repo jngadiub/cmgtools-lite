@@ -13,6 +13,7 @@ ROOT.gROOT.ProcessLine("struct rootfloat { Float_t rf;};")
 from ROOT import rootfloat
 ROOT.gROOT.ProcessLine("struct rootlong { Long_t li;};")
 from ROOT import rootlong
+ROOT.v5.TFormula.SetMaxima(10000)
 
 from rootpy.tree import CharArrayCol
 sys.path.insert(0, "../interactive/")
@@ -27,8 +28,6 @@ parser.add_option("-s","--signal",dest="signal",help="signal to categorise",defa
 parser.add_option("-d","--directory",dest="directory",help="directory with signal samples",default='deepAK8V2/')
 
 (options,args) = parser.parse_args()
-
-
 
 def getSamplelist(directories,signal,minMX=1200.,maxMX=8000.):
     samples = {}
@@ -93,7 +92,7 @@ def getBkgSamplelist(directories,signal):
 def selectSignalTree(cs,sample):
     print sample 
     chain = ROOT.TChain('AnalysisTree')
-    tmpname = "tmp_"+time.strftime("%Y%m%d-%H%M%S")
+    tmpname = "/tmp/tmp_"+time.strftime("%Y%m%d-%H%M%S")
     outfile = ROOT.TFile(tmpname+'.root','RECREATE')
     for signal in sample:
         rfile = signal+".root"
@@ -112,8 +111,9 @@ def selectSignalTree(cs,sample):
     signaltree_VH_HPLP = finaltree.CopyTree(cs['VH_HPLP'])
     signaltree_VV_HPLP = finaltree.CopyTree(cs['VV_HPLP'])
     signaltree_VV_NPHP = finaltree.CopyTree(cs['VV_NPHP_control_region'])
-    rest = finaltree.CopyTree('!('+cs['VV_HPLP']+')*!('+cs['VH_LPHP']+')*!('+cs['VH_HPLP']+')*!('+cs['VH_HPHP']+')*!('+cs['VV_HPHP']+')')
-    print ' #event VH_HPHP '+str(signaltree_VH_HPHP.GetEntries())+' #event VV_HPHP '+str(signaltree_VV_HPHP.GetEntries())+' #event VH_LPHP '+str(signaltree_VH_LPHP.GetEntries())+' #event VH_LPHP '+str(signaltree_VH_LPHP.GetEntries())+' #event VV_HPLP '+str(signaltree_VV_HPLP.GetEntries())
+    rest = finaltree.CopyTree('!('+cs['VV_HPLP']+')*!('+cs['VH_LPHP']+')*!('+cs['VH_HPLP']+')*!('+cs['VH_HPHP']+')*!('+cs['VV_HPHP']+')*!('+cs['VV_NPHP_control_region']+')')
+    print ' #event VH_HPHP '+str(signaltree_VH_HPHP.GetEntries())+' #event VV_HPHP '+str(signaltree_VV_HPHP.GetEntries())+' #event VH_LPHP '+str(signaltree_VH_LPHP.GetEntries())+' #event VH_HPLP '+str(signaltree_VH_HPLP.GetEntries())+' #event VV_HPLP '+str(signaltree_VV_HPLP.GetEntries())
+    print ' #event in control region',signaltree_VV_NPHP.GetEntries()
     print '#event no category '+str(rest.GetEntries())
     sumcat = signaltree_VH_HPHP.GetEntries()+signaltree_VV_HPHP.GetEntries()+signaltree_VH_LPHP.GetEntries()+signaltree_VH_HPLP.GetEntries()+signaltree_VV_HPLP.GetEntries()
     print 'sum '+str(sumcat)
@@ -140,11 +140,10 @@ def selectSignalTree(cs,sample):
     finaltree.Write()
     bigtree.Write()
     outfile.Close()
-
     return tmpname
 
 
-def calculateSF(self,event,ctx,year,jet,SF=1,eff_vtag=[1,1],eff_htag=[1,1],mistag_top=[1,1],TTruth1=0,TTruth2=0,tag1="",tag2=""):
+def calculateSFUnc(self,event,ctx,year,jet,SF,eff_vtag=[1,1],eff_htag=[1,1],mistag_top=[1,1],TTruth1=0,TTruth2=0,tag1="",tag2=""):
     VTruth = event.jj_l1_mergedVTruth
     HTruth = event.jj_l1_mergedHTruth
     ZbbTruth = event.jj_l1_mergedZbbTruth
@@ -158,85 +157,94 @@ def calculateSF(self,event,ctx,year,jet,SF=1,eff_vtag=[1,1],eff_htag=[1,1],mista
         jetTag = tag2
 
     jetTruth = ""
-    '''
-    print " jet ",jet
-    print " VTruth ",VTruth
-    print " HTruth ",HTruth
-    print " ZbbTruth ",ZbbTruth
-    print " TTruth ",TTruth
-    print " jetTag ",jetTag
-    '''
-    if TTruth == 1:
-        #print " TTruth "
-        jetTruth = "top"
-    elif VTruth ==1 and TTruth == 0:
-        #print "VTruth "
-        jetTruth = "V"
-    elif  HTruth ==1 or ZbbTruth ==1 :
-        #print " HTruth or ZbbTruth "
-        jetTruth = "H"    
-    #else: print "no top, H, V" 
+
+    if TTruth == 1: jetTruth = "top"
+    elif VTruth ==1 and TTruth == 0: jetTruth = "V"
+    elif  HTruth ==1 or ZbbTruth ==1 : jetTruth = "H"    
     
-    #print " jetTruth ",jetTruth
     if (jetTruth=='H' or jetTruth=='V' ):
-        #print " jetTruth H or V"
-        if jetTag == 'HPHtag':
-            #print "jetTag== HPHtag"
-            SF *= ctx.HPSF_htag[year]
-            eff_htag[0] *= (ctx.HPSF_htag[year]+ctx.H_tag_unc_HP[year])
-            eff_htag[1] *= (ctx.HPSF_htag[year]-ctx.H_tag_unc_HP[year])
-            #print "********************      SF ",SF
-            #print "eff_htag[0] ",eff_htag[0]
-        elif jetTag == 'LPHtag':
-            #print "LPHtag "
-            SF *= ctx.LPSF_htag[year]
-            eff_htag[0] *= (ctx.LPSF_htag[year]+ctx.H_tag_unc_LP[year])
-            eff_htag[1] *= (ctx.LPSF_htag[year]-ctx.H_tag_unc_LP[year])
-            #print "********************      SF ",SF
-            #print "eff_htag[0] ",eff_htag[0]
-        elif jetTag == 'HPVtag':
-            #print "jetTag== HPVtag"
-            SF *= ctx.HPSF_vtag[year]
-            eff_vtag[0] *= (ctx.HPSF_vtag[year]+ctx.W_tag_unc_HP[year])
-            eff_vtag[1] *= (ctx.HPSF_vtag[year]-ctx.W_tag_unc_HP[year])
-            #print "********************      SF ",SF
-            #print "eff_wtag[0] ",eff_vtag[0]
-        elif jetTag == 'LPVtag':
-            #print "LPVtag "
-            SF *= ctx.LPSF_vtag[year]
-            eff_vtag[0] *= (ctx.LPSF_vtag[year]+ctx.W_tag_unc_LP[year])
-            eff_vtag[1] *= (ctx.LPSF_vtag[year]-ctx.W_tag_unc_LP[year])
-            #print "********************      SF ",SF
-            #print "eff_wtag[0] ",eff_vtag[0]
-        elif jetTag == 'NPVtag':
-            SF *= ctx.NPSF_vtag[year]
-            eff_vtag[0] *= (ctx.NPSF_vtag[year]+ctx.W_tag_unc_NP[year])
-            eff_vtag[1] *= (ctx.NPSF_vtag[year]-ctx.W_tag_unc_NP[year])
+
+        if jetTag == 'HPHtag':            
+            
+            eff_htag[0] *= SF*(ctx.HPSF_htag[year]+ctx.H_tag_unc_HP[year])
+            eff_htag[1] *= SF*(ctx.HPSF_htag[year]-ctx.H_tag_unc_HP[year])
+
+        elif jetTag == 'LPHtag':            
+            
+            eff_htag[0] *= SF*(ctx.LPSF_htag[year]+ctx.H_tag_unc_LP[year])
+            eff_htag[1] *= SF*(ctx.LPSF_htag[year]-ctx.H_tag_unc_LP[year])
+
+        elif jetTag == 'HPVtag':            
+            
+            eff_vtag[0] *= SF*(ctx.HPSF_vtag[year]+ctx.W_tag_unc_HP[year])
+            eff_vtag[1] *= SF*(ctx.HPSF_vtag[year]-ctx.W_tag_unc_HP[year])
+
+        elif jetTag == 'LPVtag':            
+            
+            eff_vtag[0] *= SF*(ctx.LPSF_vtag[year]+ctx.W_tag_unc_LP[year])
+            eff_vtag[1] *= SF*(ctx.LPSF_vtag[year]-ctx.W_tag_unc_LP[year])
+
+        elif jetTag == 'NPVtag':	
+	    
+            eff_vtag[0] *= SF*(ctx.LPSF_vtag[year]+ctx.W_tag_unc_LP[year])
+            eff_vtag[1] *= SF*(ctx.LPSF_vtag[year]-ctx.W_tag_unc_LP[year])
+
         else:
-            SF*=1.
+	
             eff_vtag[0] *=1.
             eff_vtag[1] *=1.
-            #print " jetTag is ",jetTag
+	    
     elif jetTruth=='top' :
-        #print " this is a top!"
-        if jetTag == 'HPHtag':
-            #print "jetTag== HPHtag"
-            SF *= ctx.HPSF_toptag[year]
-            mistag_top[0] *= (ctx.HPSF_toptag[year]+ctx.TOP_tag_unc_HP[year])
-            mistag_top[1] *= (ctx.HPSF_toptag[year]-ctx.TOP_tag_unc_HP[year])
-            #print "********************      SF ",SF
-            #print "mistag_top[0] ",mistag_top[0]
-        elif jetTag == 'LPHtag':
-            SF *= ctx.LPSF_toptag[year]
-            mistag_top[0] *= (ctx.LPSF_toptag[year]+ctx.TOP_tag_unc_LP[year])
-            mistag_top[1] *= (ctx.LPSF_toptag[year]-ctx.TOP_tag_unc_LP[year])
-    #else:
-        #print "***********************       this jet do not contain V, H and top     **************************"
-    #print "SF ",SF
-    #print " mistag_top ",mistag_top
-    #print "eff_vtag ",eff_vtag
-    return SF,eff_vtag,eff_htag,mistag_top
 
+        if jetTag == 'HPHtag':
+
+            mistag_top[0] *= SF*(ctx.HPSF_toptag[year]+ctx.TOP_tag_unc_HP[year])
+            mistag_top[1] *= SF*(ctx.HPSF_toptag[year]-ctx.TOP_tag_unc_HP[year])
+
+        elif jetTag == 'LPHtag':
+
+            mistag_top[0] *= SF*(ctx.LPSF_toptag[year]+ctx.TOP_tag_unc_LP[year])
+            mistag_top[1] *= SF*(ctx.LPSF_toptag[year]-ctx.TOP_tag_unc_LP[year])	    
+     
+    return eff_vtag,eff_htag,mistag_top
+    
+def calculateSF(self,event,ctx,year,jet,TTruth1=0,TTruth2=0,tag1="",tag2=""):
+
+    SF = 1.0
+    VTruth = event.jj_l1_mergedVTruth
+    HTruth = event.jj_l1_mergedHTruth
+    ZbbTruth = event.jj_l1_mergedZbbTruth
+    TTruth = TTruth1
+    jetTag = tag1
+    if jet == 2:
+        VTruth = event.jj_l2_mergedVTruth
+        HTruth = event.jj_l2_mergedHTruth
+        ZbbTruth = event.jj_l2_mergedZbbTruth
+        TTruth = TTruth2
+        jetTag = tag2
+
+    jetTruth = ""
+
+    if TTruth == 1: jetTruth = "top"
+    elif VTruth ==1 and TTruth == 0: jetTruth = "V"
+    elif  HTruth ==1 or ZbbTruth ==1 : jetTruth = "H"    
+    
+    if (jetTruth=='H' or jetTruth=='V' ):
+
+        if jetTag == 'HPHtag': SF *= ctx.HPSF_htag[year]
+        elif jetTag == 'LPHtag': SF *= ctx.LPSF_htag[year]
+        elif jetTag == 'HPVtag': SF *= ctx.HPSF_vtag[year]
+        elif jetTag == 'LPVtag': SF *= ctx.LPSF_vtag[year]
+        elif jetTag == 'NPVtag': SF *= ctx.LPSF_vtag[year]
+        else: SF*=1.
+
+    elif jetTruth=='top' :
+    
+        if jetTag == 'HPHtag': SF *= ctx.HPSF_toptag[year]
+        elif jetTag == 'LPHtag': SF *= ctx.LPSF_toptag[year]
+                
+    return SF
+    
 class myTree:
     
     run = rootint()
@@ -317,15 +325,14 @@ class myTree:
 
 
         ZHbb_branch_l1 = cattree.GetBranch(ctx.varl1Htag)
-        ZHbb_leaf_l1 = ZHbb_branch_l1.GetLeaf(ctx.varl1Htag)
+        ZHbb_leaf_l1 = ZHbb_branch_l1.GetLeaf(ctx.varl1Htag)	
         W_branch_l1 = cattree.GetBranch(ctx.varl1Wtag)
         W_leaf_l1 = W_branch_l1.GetLeaf(ctx.varl1Wtag)
         ZHbb_branch_l2 = cattree.GetBranch(ctx.varl2Htag)
         ZHbb_leaf_l2 = ZHbb_branch_l2.GetLeaf(ctx.varl2Htag)
         W_branch_l2 = cattree.GetBranch(ctx.varl2Wtag)
         W_leaf_l2 = W_branch_l2.GetLeaf(ctx.varl2Wtag)
-        
-        
+        	
         WPHP_ZHbb_branch_l1 = cattree.GetBranch(ctx.WPHPl1Htag)
         WPHP_ZHbb_leaf_l1 = WPHP_ZHbb_branch_l1.GetLeaf(ctx.WPHPl1Htag)
         WPHP_W_branch_l1 = cattree.GetBranch(ctx.WPHPl1Wtag)
@@ -363,7 +370,12 @@ class myTree:
         Wintop=0
         Wnotintop=0
         twoWnotintop=0
-        for event in cattree:
+	count = 0
+	nEvents = cattree.GetEntries()
+        for count,event in enumerate(cattree):
+	    
+	    if count%10000==0: print "Event",count,"/",nEvents
+	    
             self.puWeight.rf       = event.puWeight 
             self.genWeight.rf      = event.genWeight
             self.xsec.rf           = event.xsec     
@@ -393,6 +405,7 @@ class myTree:
             if cat !='all':
                 self.category[:7] = cat
             else: self.category[:7] = "0"
+
             # this depends now on the actual cuts in the analysis!!
             if ZHbb_leaf_l1.GetValue() > WPHP_ZHbb_leaf_l1.GetValue():
                 self.jj_l1_jetTag[:6] = 'HPHtag'
@@ -407,7 +420,6 @@ class myTree:
             else:
                 self.jj_l1_jetTag[:6] = 'Notag'
                 
-            #print   WPLP_W_leaf_l1.GetValue()  
             if ZHbb_leaf_l2.GetValue() > WPHP_ZHbb_leaf_l2.GetValue():
                 self.jj_l2_jetTag[:6] = 'HPHtag'
             elif W_leaf_l2.GetValue() > WPHP_W_leaf_l2.GetValue():
@@ -423,17 +435,28 @@ class myTree:
 
             tag1=self.jj_l1_jetTag[:6]
             tag2=self.jj_l2_jetTag[:6]
-
-            SF = 1.0
+	    
             CMS_eff_vtag_sf = [1.0,1.0] #for up and down variations                                                                                                                                                               
             CMS_eff_htag_sf = [1.0,1.0]
             CMS_mistag_top_sf = [1.0,1.0]
             jet = 1
-            SF,CMS_eff_vtag_sf,CMS_eff_htag_sf,CMS_mistag_top_sf = calculateSF(self,event,ctx,year,jet,SF,CMS_eff_vtag_sf,CMS_eff_htag_sf,CMS_mistag_top_sf,top1,top2,tag1,tag2)
+            SF1 = calculateSF(self,event,ctx,year,jet,top1,top2,tag1,tag2)
             jet = 2
-            SF,CMS_eff_vtag_sf,CMS_eff_htag_sf,CMS_mistag_top_sf = calculateSF(self,event,ctx,year,jet,SF,CMS_eff_vtag_sf,CMS_eff_htag_sf,CMS_mistag_top_sf,top1,top2,tag1,tag2)
-            #print " final SF ",SF
-            #print
+	    SF2 = calculateSF(self,event,ctx,year,jet,top1,top2,tag1,tag2)
+	    SF = SF1*SF2
+	    if (tag1.find('Htag') != tag2.find('Htag')) or (tag1.find('Vtag') != tag2.find('Vtag')):
+	     jet = 1
+             CMS_eff_vtag_sf,CMS_eff_htag_sf,CMS_mistag_top_sf = calculateSFUnc(self,event,ctx,year,jet,SF2,CMS_eff_vtag_sf,CMS_eff_htag_sf,CMS_mistag_top_sf,top1,top2,tag1,tag2)
+	     jet = 2
+             CMS_eff_vtag_sf,CMS_eff_htag_sf,CMS_mistag_top_sf = calculateSFUnc(self,event,ctx,year,jet,SF1,CMS_eff_vtag_sf,CMS_eff_htag_sf,CMS_mistag_top_sf,top1,top2,tag1,tag2)
+	    else:
+	     jet = 1
+             CMS_eff_vtag_sf,CMS_eff_htag_sf,CMS_mistag_top_sf = calculateSFUnc(self,event,ctx,year,jet,1.0,CMS_eff_vtag_sf,CMS_eff_htag_sf,CMS_mistag_top_sf,top1,top2,tag1,tag2)
+	     jet = 2
+             CMS_eff_vtag_sf,CMS_eff_htag_sf,CMS_mistag_top_sf = calculateSFUnc(self,event,ctx,year,jet,1.0,CMS_eff_vtag_sf,CMS_eff_htag_sf,CMS_mistag_top_sf,top1,top2,tag1,tag2)
+            if CMS_eff_htag_sf[0] == 1 and CMS_eff_htag_sf[1] == 1: CMS_eff_htag_sf = [SF,SF]
+	    if CMS_eff_vtag_sf[0] == 1 and CMS_eff_vtag_sf[1] == 1: CMS_eff_vtag_sf = [SF,SF]
+	    if CMS_mistag_top_sf[0] == 1 and CMS_mistag_top_sf[1] == 1: CMS_mistag_top_sf = [SF,SF]
             self.sf.rf = SF
             self.CMS_eff_vtag_sf_up.rf = CMS_eff_vtag_sf[0]
             self.CMS_eff_vtag_sf_down.rf = CMS_eff_vtag_sf[1]
@@ -510,7 +533,6 @@ if __name__=='__main__':
         outtree.setOutputTreeBranchValues('VH_HPLP',ctx,tmpfilename,filePeriod)
         outtree.setOutputTreeBranchValues('VV_HPLP',ctx,tmpfilename,filePeriod)
         outtree.setOutputTreeBranchValues('VV_NPHP',ctx,tmpfilename,filePeriod)
-        outfile.cd()
         outtree.write('signalregion')
         outtreeAll.setOutputTreeBranchValues('all',ctx,tmpfilename,filePeriod)
         outfile.cd()
