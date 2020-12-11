@@ -156,12 +156,13 @@ ctx = cuts.cuts("init_VV_VH.json",year,"dijetbins_random")
 print "lumi for year "+year+" = ",ctx.lumi[year]
 luminosity = ctx.lumi[year]/ctx.lumi["Run2"]
 #smoothstart=ctx.tt_smooth
-smoothstart={ "resT" : { "NP": 3000., "VV_HPHP": 3000. , "VV_HPLP": 1800., "VH_HPHP": 3000., "VH_HPLP": 2000., "VH_LPHP": 3000. },
+smoothstart={ "" : { "NP": 3000., "VV_HPHP": 3000. , "VV_HPLP": 1800., "VH_HPHP": 3000., "VH_HPLP": 2000., "VH_LPHP": 3000. },
+              "resT" : { "NP": 3000., "VV_HPHP": 3000. , "VV_HPLP": 1800., "VH_HPHP": 3000., "VH_HPLP": 2000., "VH_LPHP": 3000. },
               "resW": { "NP": 1800., "VV_HPHP": 1800. , "VV_HPLP": 1400., "VH_HPHP": 1400., "VH_HPLP": 1400., "VH_LPHP": 1200. },
               "resTnonresT": { "NP": 3000., "VV_HPHP": 1600. , "VV_HPLP": 1600., "VH_HPHP": 3000., "VH_HPLP": 3000., "VH_LPHP": 2200. },
               "resWnonresT": { "NP": 2000., "VV_HPHP": 1600. , "VV_HPLP": 1600., "VH_HPHP": 1800., "VH_HPLP": 2000., "VH_LPHP": 1800. },
-              "resTresW" : { "NP": 3000., "VV_HPHP": 1800. , "VV_HPLP": 1800., "VH_HPHP": 1800., "VH_HPLP": 3000., "VH_LPHP": 2200. },
-              "nonresT" : { "NP": 3000., "VV_HPHP": 1600. , "VV_HPLP": 1800., "VH_HPHP": 2000., "VH_HPLP": 1600., "VH_LPHP": 2000. }}
+              "resTresW" : { "NP": 3000., "VV_HPHP": 1800. , "VV_HPLP": 1800., "VH_HPHP": 1800., "VH_HPLP": 2800., "VH_LPHP": 2200. },
+              "nonresT" : { "NP": 3000., "VV_HPHP": 1400. , "VV_HPLP": 1800., "VH_HPHP": 2000., "VH_HPLP": 1800., "VH_LPHP": 2000. }}
 
 print "smooth start",smoothstart 
 if options.output.find("Run2") ==-1: luminosity = 1
