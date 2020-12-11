@@ -414,7 +414,7 @@ class DatacardTools():
    
  def AddNonResBackground(self,card,dataset,category,rootFile3DPDF,rootFileNorm,ncontrib):
       
-      card.addHistoShapeFromFile("nonRes",["MJ1","MJ2","MJJ"],rootFile3DPDF,"histo",['PT:CMS_VV_JJ_nonRes_PT_'+category,'OPT:CMS_VV_JJ_nonRes_OPT_'+category,'OPT3:CMS_VV_JJ_nonRes_OPT3_'+category,'altshape:CMS_VV_JJ_nonRes_altshape_'+category,'altshape2:CMS_VV_JJ_nonRes_altshape2_'+category],False,0) ,    
+      card.addHistoShapeFromFile("nonRes",["MJ1","MJ2","MJJ"],rootFile3DPDF,"histo",['PT:CMS_VV_JJ_nonRes_PT_'+category,'OPT:CMS_VV_JJ_nonRes_OPT_'+category,'OPT3:CMS_VV_JJ_nonRes_OPT3_'+category,'altshape:CMS_VV_JJ_nonRes_altshape_'+category,'altshape2:CMS_VV_JJ_nonRes_altshape2_'+category],False,0)
           
       if self.outlabel.find("sigonly")!=-1 or self.outlabel.find("sigOnly")!=-1 or self.pseudodata.find("ttbar")!=-1:
           card.addFixedYieldFromFile("nonRes",ncontrib,rootFileNorm,"nonRes",0.0000000000001)
@@ -557,10 +557,10 @@ class DatacardTools():
     if signal.find('VBF')!=-1 : sig = "VBF_"+sig
     uncup_s   = data_sig[signal+"_CMS_VV_JJ_DeepJet_Htag_eff"][p+"_up"]
     uncdown_s = data_sig[signal+"_CMS_VV_JJ_DeepJet_Htag_eff"][p+"_down"]
-    uncup_w   = data_w["WJets_CMS_VV_JJ_DeepJet_Htag_eff"][p+"_up"]
-    uncdown_w = data_w["WJets_CMS_VV_JJ_DeepJet_Htag_eff"][p+"_down"]
-    uncup_z   = data_z["ZJets_CMS_VV_JJ_DeepJet_Htag_eff"][p+"_up"]
-    uncdown_z = data_z["ZJets_CMS_VV_JJ_DeepJet_Htag_eff"][p+"_down"]
+    uncup_w   = data_w["WJets_CMS_VV_JJ_DeepJet_Htag_eff"]["WJets."+p+"_up"]
+    uncdown_w = data_w["WJets_CMS_VV_JJ_DeepJet_Htag_eff"]["WJets."+p+"_down"]
+    uncup_z   = data_z["ZJets_CMS_VV_JJ_DeepJet_Htag_eff"]["ZJets."+p+"_up"]
+    uncdown_z = data_z["ZJets_CMS_VV_JJ_DeepJet_Htag_eff"]["ZJets."+p+"_down"]
     for c in contrib:
      uncup_t.update( {mappdf[c] :data_t["TTJets_CMS_VV_JJ_DeepJet_Htag_eff"][mappdf[c]+"."+p+"_up"] })
      uncdown_t.update({mappdf[c] : data_t["TTJets_CMS_VV_JJ_DeepJet_Htag_eff"][mappdf[c]+"."+p+"_down"]})
@@ -569,10 +569,10 @@ class DatacardTools():
     card.addSystematic("CMS_VV_JJ_DeepJet_Htag_eff","lnN",unc)
     uncup_s   = data_sig[signal+"_CMS_VV_JJ_DeepJet_Vtag_eff"][p+"_up"]
     uncdown_s = data_sig[signal+"_CMS_VV_JJ_DeepJet_Vtag_eff"][p+"_down"]
-    uncup_w   = data_w["WJets_CMS_VV_JJ_DeepJet_Vtag_eff"][p+"_up"]
-    uncdown_w = data_w["WJets_CMS_VV_JJ_DeepJet_Vtag_eff"][p+"_down"]
-    uncup_z   = data_z["ZJets_CMS_VV_JJ_DeepJet_Vtag_eff"][p+"_up"]
-    uncdown_z = data_z["ZJets_CMS_VV_JJ_DeepJet_Vtag_eff"][p+"_down"]
+    uncup_w   = data_w["WJets_CMS_VV_JJ_DeepJet_Vtag_eff"]["WJets."+p+"_up"]
+    uncdown_w = data_w["WJets_CMS_VV_JJ_DeepJet_Vtag_eff"]["WJets."+p+"_down"]
+    uncup_z   = data_z["ZJets_CMS_VV_JJ_DeepJet_Vtag_eff"]["ZJets."+p+"_up"]
+    uncdown_z = data_z["ZJets_CMS_VV_JJ_DeepJet_Vtag_eff"]["ZJets."+p+"_down"]
     for c in contrib:
      uncup_t.update( {mappdf[c] :data_t["TTJets_CMS_VV_JJ_DeepJet_Htag_eff"][mappdf[c]+"."+p+"_up"]} )
      uncdown_t.update({mappdf[c] : data_t["TTJets_CMS_VV_JJ_DeepJet_Htag_eff"][mappdf[c]+"."+p+"_down"]})
@@ -581,10 +581,10 @@ class DatacardTools():
     card.addSystematic("CMS_VV_JJ_DeepJet_Vtag_eff","lnN",unc)
     uncup_s   = data_sig[signal+"_CMS_VV_JJ_DeepJet_TOPtag_mistag"][p+"_up"]
     uncdown_s = data_sig[signal+"_CMS_VV_JJ_DeepJet_TOPtag_mistag"][p+"_down"]
-    uncup_w   = data_w["WJets_CMS_VV_JJ_DeepJet_TOPtag_mistag"][p+"_up"]
-    uncdown_w = data_w["WJets_CMS_VV_JJ_DeepJet_TOPtag_mistag"][p+"_down"]
-    uncup_z   = data_z["ZJets_CMS_VV_JJ_DeepJet_TOPtag_mistag"][p+"_up"]
-    uncdown_z = data_z["ZJets_CMS_VV_JJ_DeepJet_TOPtag_mistag"][p+"_down"]
+    uncup_w   = data_w["WJets_CMS_VV_JJ_DeepJet_TOPtag_mistag"]["WJets."+p+"_up"]
+    uncdown_w = data_w["WJets_CMS_VV_JJ_DeepJet_TOPtag_mistag"]["WJets."+p+"_down"]
+    uncup_z   = data_z["ZJets_CMS_VV_JJ_DeepJet_TOPtag_mistag"]["ZJets."+p+"_up"]
+    uncdown_z = data_z["ZJets_CMS_VV_JJ_DeepJet_TOPtag_mistag"]["ZJets."+p+"_down"]
     for c in contrib:
      uncup_t.update( {mappdf[c] :data_t["TTJets_CMS_VV_JJ_DeepJet_Htag_eff"][mappdf[c]+"."+p+"_up"]} )
      uncdown_t.update({mappdf[c] : data_t["TTJets_CMS_VV_JJ_DeepJet_Htag_eff"][mappdf[c]+"."+p+"_down"]})
@@ -610,7 +610,9 @@ class DatacardTools():
       card.addSystematic("CMS_VV_JJ_nonRes_norm","lnN",{'nonRes':1.5})
       
       card.addSystematic("CMS_VV_JJ_nonRes_PT_"+category,"param",[0.0,0.666])
-      card.addSystematic("CMS_VV_JJ_nonRes_OPT_"+category,"param",[0.0,0.333])
-      card.addSystematic('CMS_VV_JJ_nonRes_altshape2_'+category,"param",[0.0,0.333])  
-      card.addSystematic('CMS_VV_JJ_nonRes_altshape_'+category,"param",[0.0,0.333])
-      card.addSystematic("CMS_VV_JJ_nonRes_OPT3_"+category,"param",[0.0,0.333])
+      #card.addSystematic("CMS_VV_JJ_nonRes_PTZ_"+category,"param",[0.0,0.666])
+      #card.addSystematic("CMS_VV_JJ_nonRes_PTXY_"+category,"param",[0.0,0.666])
+      card.addSystematic("CMS_VV_JJ_nonRes_OPT_"+category,"param",[0.0,0.666])
+      card.addSystematic('CMS_VV_JJ_nonRes_altshape2_'+category,"param",[0.0,0.666])
+      card.addSystematic('CMS_VV_JJ_nonRes_altshape_'+category,"param",[0.0,0.666])
+      card.addSystematic("CMS_VV_JJ_nonRes_OPT3_"+category,"param",[0.0,0.666])
