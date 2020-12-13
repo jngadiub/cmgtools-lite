@@ -1,9 +1,10 @@
-from ROOT import TFile, TCanvas, TPaveText, TLegend, gDirectory, TH1F,gROOT,gStyle, TLatex,TF1
+from ROOT import TFile, TCanvas, TPaveText, TLegend, gDirectory, TH1F,gROOT,gStyle, TLatex,TF1,TGraph
 import sys,copy
 import tdrstyle
 tdrstyle.setTDRStyle()
 from  CMGTools.VVResonances.plotting.CMS_lumi import *
-
+from collections import defaultdict
+from array import array
 from time import sleep
 gROOT.SetBatch(True)
 # infile = sys.argv[1]
@@ -83,14 +84,17 @@ def getCanvas(w=800,h=600):
 
 def doSignalEff(directory,signals,titles,categories,ymaxrange=[0.3,0.5,0.05,0.05,0.05,0.05,0.5,0.5,0.05,0.05,0.05,0.05]):
   ky=-1
+  gr = {}
   for category in categories:
     ky+=1
     gStyle.SetOptFit(0)
     fitsHP=[]
     fitstmpHP=[]
     datasHP=[]
-   
-    
+    signalcolor={}
+    signalline={}
+    signalmarker={}
+    gr[category]={}
     c = getCanvas()
     l = getLegend()#0.7788945,0.723362,0.9974874,0.879833)
     l2 = getLegend(0.17,0.5783217,0.4974874,0.7482517)
@@ -106,6 +110,10 @@ def doSignalEff(directory,signals,titles,categories,ymaxrange=[0.3,0.5,0.05,0.05
     for i,fHP in enumerate(filesHP):
         gHPHP = fHP.Get("yield")
         print gHPHP
+        if gr[category]==None:
+           gr[category]= {signals[i] : gHPHP}
+        else: gr[category].update({signals[i] : gHPHP})
+
         #### rescale graphs to remove cross section from yield ####
         for k in range(0,gHPHP.GetN()): gHPHP.GetY()[k] *= 1000.
         
@@ -117,25 +125,31 @@ def doSignalEff(directory,signals,titles,categories,ymaxrange=[0.3,0.5,0.05,0.05
             for o in range(0,ftmpHPHP.GetNpar()): 
                 fHPHP.SetParameter(o,ftmpHPHP.GetParameter(o))
         else: fHPHP = gHPHP
-        
-        beautify(fHPHP ,rt.TColor.GetColor(colors[i]),linestyle[i],markerstyle[i])
-        beautify(gHPHP ,rt.TColor.GetColor(colors[i]),linestyle[i],markerstyle[i])
+        signalcolor[signals[i]] = rt.TColor.GetColor(colors[i])
+        signalline[signals[i]] = linestyle[i]
+        signalmarker[signals[i]] = markerstyle[i]
+        #beautify(fHPHP ,rt.TColor.GetColor(colors[i]),linestyle[i],markerstyle[i])
+        #beautify(gHPHP ,rt.TColor.GetColor(colors[i]),linestyle[i],markerstyle[i])
+        beautify(fHPHP ,rt.TColor.GetColor(colors[i]),1,markerstyle[i])
+        beautify(gHPHP ,rt.TColor.GetColor(colors[i]),1,markerstyle[i])
         datasHP.append(gHPHP)
         fitsHP.append(fHPHP)
         l.AddEntry(fHPHP,titles[i],"L")
-    l2.AddEntry(fitsHP[0],category,"LP")    
+    fitsHP[0].Draw("C")
+    l2.AddEntry(fitsHP[0],category,"")
     fitsHP[0].GetXaxis().SetTitle("m_{X} [GeV]")
     fitsHP[0].GetYaxis().SetTitle("Signal efficiency")
     fitsHP[0].GetYaxis().SetNdivisions(4,5,0)
     fitsHP[0].GetXaxis().SetNdivisions(5,5,0)
     fitsHP[0].GetYaxis().SetTitleOffset(1.15)
     fitsHP[0].GetXaxis().SetTitleOffset(0.9)
-    fitsHP[0].GetXaxis().SetRangeUser(1126, 5550.)
+    fitsHP[0].GetXaxis().SetRangeUser(1126, 6050.)
     fitsHP[0].GetYaxis().SetRangeUser(0.0, ymaxrange[ky])
-    fitsHP[0].Draw("AC")
+    #fitsHP[0].Draw("AC")
+    c.Update()
     for i,(gHP) in enumerate(datasHP): 
         gHP.Draw("Psame")
-        fitsHP[i].Draw("Csame")
+        fitsHP[i].Draw("Csame") #"Csame")
     c.Update()
     l.Draw("same")
     l2.Draw("same")
@@ -152,12 +166,68 @@ def doSignalEff(directory,signals,titles,categories,ymaxrange=[0.3,0.5,0.05,0.05
     print ky
     print ymaxrange[ky]
 
-    
-        canvas.Update()
-        name = path+"signalEff"+prelim+"_"+signals[s]
-        canvas.SaveAs(name+".png")
-        canvas.SaveAs(name+".pdf")
-        canvas.SaveAs(name+".C")
+  print " total signal eff!!! "
+
+  flipped = defaultdict(dict)
+  for key, val in gr.items():
+    for subkey, subval in val.items():
+        print " key ",key
+        print " subkey ",subkey
+        flipped[subkey][key] = subval
+
+  print "flipped ",flipped
+
+
+  tot = {}
+  Mass = {}
+
+  ct = getCanvas()
+  legt = getLegend()
+  ptt = getPavetext()
+  ct.Draw()
+  i=0
+  datatot = []
+  for s,l in zip(signals,titles):
+    tot[s],Mass[s] = array( 'd' ), array( 'd' )
+    print " flipped "+s+" ",flipped[s]
+    for i in range(flipped[s][categories[0]].GetN()) :
+        tot[s].append( flipped[s][categories[0]].GetY()[i]+flipped[s][categories[1]].GetY()[i]+flipped[s][categories[2]].GetY()[i]+flipped[s][categories[3]].GetY()[i]+flipped[s][categories[4]].GetY()[i])
+        Mass[s].append(flipped[s][categories[0]].GetX()[i] )
+
+    print tot[s]
+
+    gr_tot = TGraph(gr['Run2_VV_HPHP'][s].GetN(),Mass[s],tot[s])
+    gr_tot.SetLineColor(signalcolor[s])
+    gr_tot.SetLineStyle(1)
+    gr_tot.SetLineWidth(2)
+    gr_tot.GetXaxis().SetTitle("m_{X} [GeV]")
+    gr_tot.GetYaxis().SetTitle("Signal efficiency")
+    gr_tot.GetYaxis().SetNdivisions(4,5,0)
+    gr_tot.GetXaxis().SetNdivisions(5,5,0)
+
+    gr_tot.SetMarkerColor(signalcolor[s])
+    gr_tot.SetMarkerStyle(signalmarker[s])
+    gr_tot.SetMinimum(0.)
+    gr_tot.SetMaximum(0.4)
+    gr_tot.GetXaxis().SetLimits(1000.,8500.)
+    gr_tot.SetTitle("")
+    datatot.append(gr_tot)
+
+    legt.AddEntry(gr_tot,l, "LP")
+    i=i+1
+    datatot[0].Draw("AC")
+    for i,(g) in enumerate(datatot):
+        g.Draw("PLsame")
+
+
+  legt.Draw("same")
+ 
+  name = path+"signalEff_TotalVVVH_%s"  %(prelim)
+  ct.SaveAs(name+".png")
+  ct.SaveAs(name+".pdf" )
+  ct.SaveAs(name+".C"   )
+  ct.SaveAs(name+".root")
+
 
 def doJetMass(leg,signals,titles,categories):
     print signals
@@ -170,20 +240,20 @@ def doJetMass(leg,signals,titles,categories):
     for i,s in enumerate(signals):
         if len(categories)==1:
             if categories[0].find("NP")!=-1:
-                files.append(TFile("debug_JJ_"+s+"_"+categories[0].split("_")[0]+"_MJ"+leg+"_"+categories[0].split("_")[1]+".json.root","READ"))
+                files.append(TFile(path+"debug_JJ_"+s+"_"+categories[0].split("_")[0]+"_MJ"+leg+"_"+categories[0].split("_")[1]+".json.root","READ"))
                 filesHjet.append(None)
             else:
-                files.append(TFile("debug_JJ_"+s+"_"+categories[0].split("_")[0]+"_MJ"+leg+"_"+categories[0].split("_")[1]+"_"+categories[0].split("_")[2]+".json.root","READ"))
+                files.append(TFile(path+"debug_JJ_"+s+"_"+categories[0].split("_")[0]+"_MJ"+leg+"_"+categories[0].split("_")[1]+"_"+categories[0].split("_")[2]+".json.root","READ"))
             if files[-1].IsZombie()==1:
                 if categories[0].find("NP")!=-1:
-                    files[-1] =(TFile("debug_JJ_Vjet_"+s+"_"+categories[0].split("_")[0]+"_MJ"+leg+"_"+categories[0].split("_")[1]+".json.root","READ"))
-                    filesHjet[-1] =(TFile("debug_JJ_Hjet_"+s+"_"+categories[0].split("_")[0]+"_MJ"+leg+"_"+categories[0].split("_")[1]+".json.root","READ"))
+                    files[-1] =(TFile(path+"debug_JJ_Vjet_"+s+"_"+categories[0].split("_")[0]+"_MJ"+leg+"_"+categories[0].split("_")[1]+".json.root","READ"))
+                    filesHjet[-1] =(TFile(path+"debug_JJ_Hjet_"+s+"_"+categories[0].split("_")[0]+"_MJ"+leg+"_"+categories[0].split("_")[1]+".json.root","READ"))
                 else:
-                    files[-1] =(TFile("debug_JJ_Vjet_"+s+"_"+categories[0].split("_")[0]+"_MJ"+leg+"_"+categories[0].split("_")[1]+"_"+categories[0].split("_")[2]+".json.root","READ"))
-                    filesHjet[-1] = (TFile("debug_JJ_Hjet_"+s+"_"+categories[0].split("_")[0]+"_MJ"+leg+"_"+categories[0].split("_")[1]+"_"+categories[0].split("_")[2]+".json.root","READ"))
+                    files[-1] =(TFile(path+"debug_JJ_Vjet_"+s+"_"+categories[0].split("_")[0]+"_MJ"+leg+"_"+categories[0].split("_")[1]+"_"+categories[0].split("_")[2]+".json.root","READ"))
+                    filesHjet[-1] = (TFile(path+"debug_JJ_Hjet_"+s+"_"+categories[0].split("_")[0]+"_MJ"+leg+"_"+categories[0].split("_")[1]+"_"+categories[0].split("_")[2]+".json.root","READ"))
         if len(categories)> 1:    
             for categ in categories:
-                files.append(TFile("debug_JJ_"+s+"_"+categ.split("_")[0]+"_MJ"+leg+"_"+categ.split("_")[1]+"_"+categ.split("_")[2]+".json.root","READ"))
+                files.append(TFile(path+"debug_JJ_"+s+"_"+categ.split("_")[0]+"_MJ"+leg+"_"+categ.split("_")[1]+"_"+categ.split("_")[2]+".json.root","READ"))
     
     vars = ["mean","sigma","alpha","n","alpha2","n2"]
     for var in vars:
@@ -234,7 +304,7 @@ def doJetMass(leg,signals,titles,categories):
        datas[0].GetXaxis().SetNdivisions(5,5,0)
        datas[0].GetYaxis().SetTitleOffset(1.05)
        datas[0].GetXaxis().SetTitleOffset(0.9)
-       datas[0].GetXaxis().SetRangeUser(1126, 5500.)
+       datas[0].GetXaxis().SetRangeUser(1126, 6050.)
        datas[0].GetXaxis().SetLabelSize(0.05)
        datas[0].GetXaxis().SetTitleSize(0.06)
        datas[0].GetYaxis().SetLabelSize(0.05)
@@ -251,7 +321,7 @@ def doJetMass(leg,signals,titles,categories):
            gHP.Draw("Psame")
            fits[i].Draw("Csame")
            fitsHjet[i].Draw("Csame")
-       datas[0].GetXaxis().SetRangeUser(1126, 5500.)
+       datas[0].GetXaxis().SetRangeUser(1126, 6500.)
        l.Draw("same")
        l2.Draw("same")
        if prelim.find("prelim")!=-1:
@@ -335,10 +405,10 @@ def doMVV(signals,titles,year):
     
     for i,s in enumerate(signals):
         # filesLP.append(TFile("debug_JJ_"+s+"_MVV_jer.json.root","READ"))
-        if TFile("debug_JJ_"+s+"_"+year+"_MVV.json.root","READ").IsZombie() ==1:
-            filesHP.append(TFile("debug_JJ_j1"+s+"_"+year+"_MVV.json.root","READ"))
+        if TFile(path+"debug_JJ_"+s+"_"+year+"_MVV.json.root","READ").IsZombie() ==1:
+            filesHP.append(TFile(path+"debug_JJ_j1"+s+"_"+year+"_MVV.json.root","READ"))
         else:
-            filesHP.append(TFile("debug_JJ_"+s+"_"+year+"_MVV.json.root","READ"))
+            filesHP.append(TFile(path+"debug_JJ_"+s+"_"+year+"_MVV.json.root","READ"))
     
     for var in vars:
         fitsHP=[]
@@ -379,7 +449,7 @@ def doMVV(signals,titles,year):
         datasHP[0].GetYaxis().SetTitleOffset(0.97)
         datasHP[0].GetYaxis().SetMaxDigits(2)
         datasHP[0].GetXaxis().SetTitleOffset(0.94)
-        datasHP[0].GetXaxis().SetRangeUser(1126, 5500.)
+        datasHP[0].GetXaxis().SetRangeUser(1126, 6050.)
         datasHP[0].GetYaxis().SetRangeUser(-2., 3.)
         if var.find("ALPHA1")!=-1: datasHP[0].GetYaxis().SetRangeUser(0., 4.)
         if var.find("ALPHA2")!=-1: datasHP[0].GetYaxis().SetRangeUser(0., 20.)
@@ -826,23 +896,13 @@ def compSignalMVV():
         
 if __name__ == '__main__':
   prelim = ""
-#  signals = ["ZprimeWW","BulkGWW","WprimeWZ","BulkGZZ","ZprimeZH"]
-#  titles =  ["Z' #rightarrow WW","G_{B}#rightarrow WW","W' #rightarrow WZ","G_{B}#rightarrow ZZ","Z' #rightarrow ZH"]
-#  signals = ["ZprimeZH","BulkGWW"]
-#  titles =  ["Z' #rightarrow ZH","G_{B}#rightarrow WW"]
-  signals = ["BulkGWW"]
-  titles =  ["G_{B}#rightarrow WW"]
-  categories = ["2016_NP"]
+  signals = ["ZprimeWW","BulkGWW","WprimeWZ","BulkGZZ","ZprimeZH","WprimeWH"]
+  titles =  ["Z' #rightarrow WW","G_{B}#rightarrow WW","W' #rightarrow WZ","G_{B}#rightarrow ZZ","Z' #rightarrow ZH","W' #rightarrow WH"]
+
+  categories = ["Run2_NP"]
   doJetMass("random",signals,titles,categories)
+  doMVV(signals,titles,"Run2")
 
-#  categories = ["2016_VV_HPHP","2016_VV_HPLP"] #,"2016_VH_HPHP","2016_VH_LPHP"]
-  categories = ["2016_VV_HPHP","2016_VV_HPLP","2016_VH_HPHP","2016_VH_HPLP","2016_VH_LPHP"]
-
-
-  doMVV(signals,titles,"2016")
-
-
-
-  categories = ["2016_VH_HPHP","2016_VH_HPLP","2016_VH_LPHP","2016_VV_HPHP","2016_VV_HPLP"]
+  categories = ["Run2_VV_HPHP","Run2_VV_HPLP","Run2_VH_HPHP","Run2_VH_HPLP","Run2_VH_LPHP"]
   doSignalEff(sys.argv[1],signals,titles,categories,[0.3,0.03,0.06,0.2,0.05])
 
