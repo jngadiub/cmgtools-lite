@@ -109,7 +109,7 @@ def conditional(hist):
             hist.SetBinContent(j,i,hist.GetBinContent(j,i)/integral)
 
 
-def merge_all(dataset,sample="pythia"):
+def merge_all(dataset):
  fin_herwig_mjj = ROOT.TFile.Open('save_new_shapes_%s_herwig_%s_1D.root'%(dataset,purity),'READ')
  histo_altshapeUp_mjj = fin_herwig_mjj.histo_nominal
  histo_altshapeUp_mjj.SetName('histo_altshapeUp')
@@ -201,7 +201,7 @@ def merge_all(dataset,sample="pythia"):
  inputx=fin_pythia_l1.GetName()
  inputy=fin_pythia_l2.GetName()
  inputz=fin_pythia_mjj.GetName()     
- rootFile="save_new_shapes_%s_%s_"%(dataset,sample)+purity+"_3D.root"
+ rootFile="save_new_shapes_%s_pythia_"%dataset+purity+"_3D.root"
    
  print "Reading " ,inputx
  print "Reading " ,inputy
@@ -497,7 +497,7 @@ if __name__=="__main__":
       sys.exit()  
      print "Using purity: " ,purity    
      if options.merge:
-      merge_all(dataset,options.sample)
+      merge_all(dataset)
       sys.exit()       
 
      print " ########################       makeNonResCard      ###"
