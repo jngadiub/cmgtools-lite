@@ -144,5 +144,6 @@ def doDetPar(leg,years):
 
 if __name__ == '__main__':
   prelim = ""
-  years = ["2016","2017","2018","Run2"]
+  #years = ["2016","2017","2018","Run2"]
+  years = ["Run2"]
   doDetPar("l1l2",years)
