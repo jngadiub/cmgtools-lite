@@ -355,10 +355,12 @@ class Postfitplotter():
         CMS_lumi.lumi_8TeV = "18.3 fb^{-1}"
         period = "2016"
         if self.options.name.find("2017")!=-1: period = "2017"
+        if self.options.name.find("2018")!=-1: period = "2018"
         if self.options.name.find("16+17")!=-1: period = "16+17"
         if self.options.name.find("Run2")!=-1: period = "Run2"
         if period =="2016":  CMS_lumi.lumi_13TeV = "35.9 fb^{-1}"
-        if period =="2017":  CMS_lumi.lumi_13TeV = "77.3 fb^{-1}"
+        if period =="2017":  CMS_lumi.lumi_13TeV = "41.5 fb^{-1}"
+        if period =="2018":  CMS_lumi.lumi_13TeV = "59.7 fb^{-1}"
         if period =="16+17":  CMS_lumi.lumi_13TeV = "113.2 fb^{-1}"
         if period =="Run2":  CMS_lumi.lumi_13TeV = "137.2 fb^{-1}"
         CMS_lumi.writeExtraText = 1
@@ -392,7 +394,7 @@ class Postfitplotter():
 
 
 
-    def MakePlots(self,histos,hdata,hsig,axis,nBins,maxY=-1.,normsig = 1.,errors=None,binwidth=2):
+    def MakePlots(self,histos,hdata,hsig,axis,nBins,maxY=-1.,normsig = 1.,errors=None,pseudo=False,binwidth=2):
         print histos
         extra1 = ''
         extra2 = ''
@@ -556,7 +558,9 @@ class Postfitplotter():
         
         nevents = {}
         nevents["data"]=hdata.Integral()
-        leg.AddEntry(hdata,"Data","ep")
+        if pseudo == False:
+            leg.AddEntry(hdata,"Data","ep")
+        else: leg.AddEntry(hdata,"Simulation","ep")
         leg.AddEntry(histos[0],"Signal+background fit","l")
         if errors!=None:
             leg.AddEntry(errors[0],"#pm 1#sigma unc.","f")

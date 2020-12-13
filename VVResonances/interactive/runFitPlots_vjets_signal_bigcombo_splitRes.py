@@ -42,6 +42,7 @@ parser.add_option("--channel",dest="channel",help="which category to use? ",defa
 parser.add_option("--doFit",dest="fit",action="store_true",help="actually fit the the distributions",default=False)
 parser.add_option("-v","--doVjets",dest="doVjets",action="store_true",help="Fit top",default=False)
 parser.add_option("--slopes",dest="slopes",action="store_true",help="save ttbar slopes",default=False)
+parser.add_option("--pseudo",dest="pseudo",action="store_true",help="write pseudodata in legend",default=False)
 (options,args) = parser.parse_args()
 ROOT.gStyle.SetOptStat(0)
 ROOT.RooMsgService.instance().setGlobalKillBelow(ROOT.RooFit.FATAL)
@@ -122,7 +123,7 @@ def writeLogfile(options,fitresult):
      	     pi = paramsinit.at(k)
      	     r  = pi.getMax()-1
              logfile.write(pf.GetName()+" & "+str((pf.getVal()-pi.getVal())/r)+"\\\\ \n")
-        logfile.close()
+         logfile.close()
 
 if __name__=="__main__":
      finMC = ROOT.TFile(options.input,"READ");
@@ -272,17 +273,17 @@ if __name__=="__main__":
      if options.projection =="z" or options.projection =="xyz":
          results = []
          res = forproj.doProjection(data[period],allpdfsz[period],all_expected[period],"z",allsignalpdfs[period],signal_expected[period])
-         forplotting.MakePlots(res[0],res[1],res[2],res[3],res[4],res[5], res[6],res[7])
+         forplotting.MakePlots(res[0],res[1],res[2],res[3],res[4],res[5], res[6],res[7],options.pseudo)
      #make projections onto MJ1 axis
      if options.projection =="x" or options.projection =="xyz":
          results = []
          res = forproj.doProjection(data[period],allpdfsx[period],all_expected[period],"x",allsignalpdfs[period],signal_expected[period])
-         forplotting.MakePlots(res[0],res[1],res[2],res[3],res[4],res[5], res[6],res[7],binwidth)
+         forplotting.MakePlots(res[0],res[1],res[2],res[3],res[4],res[5], res[6],res[7],options.pseudo,binwidth)
      #make projections onto MJ2 axis
      if options.projection =="y" or options.projection =="xyz":
          results = []
          res = forproj.doProjection(data[period],allpdfsy[period],all_expected[period],"y",allsignalpdfs[period],signal_expected[period])
-         forplotting.MakePlots(res[0],res[1],res[2],res[3],res[4],res[5], res[6],res[7],binwidth)
+         forplotting.MakePlots(res[0],res[1],res[2],res[3],res[4],res[5], res[6],res[7],options.pseudo,binwidth)
 
 
         
