@@ -36,7 +36,7 @@ def getCanvasPaper(cname):
     T = 0.3*H_ref
     B = 0.35*H_ref 
     L = 0.10*W_ref
-    R = 0.07*W_ref
+    R = 0.10*W_ref #0.07*W_ref
  else:
     T = 0.08*H_ref
     B = 0.12*H_ref
@@ -138,11 +138,11 @@ path = options.outdir
 purity  = options.category
 
 inFileName = options.file
-massPoints = [1200,1400,1600,1800,2000,2500,3000,3500,4000] #,4500]
+massPoints = [1200,1400,1600,1800,2000,2500,3000,3500,4000,4500,5000,5500,6000]
 postfix = "Jet 1 "
 if options.leg == "l2" !=-1: postfix = "Jet 2 "
 varName = {'mVV':'Dijet invariant mass [GeV]','mJ':'%sJet mass [GeV]'%postfix}
-varBins = {'mVV':'[37,1000,5500]','mJ':'[80,55,215]'}
+varBins = {'mVV':'[40,1000,6500]','mJ':'[80,55,215]'}
 #w=ROOT.RooWorkspace("w","w")
 #w.factory(options.var+varBins[options.var])
 #w.var(options.var).SetTitle(varName[options.var])
@@ -367,20 +367,19 @@ if __name__ == '__main__':
 #    categories = ["VV_HPLP","VV_HPHP"]
 #    categories = ["VV_HPHP","VV_HPLP","VH_HPLP","VH_HPHP","VH_LPHP"]
 #    categories = ["VV_HPHP","VV_HPLP","VH_HPHP","VH_LPHP"]
-
+    categories = ["NP"]
 #    legs = ["G_{bulk} #rightarrow ZZ","W' #rightarrow WZ","G_{bulk} #rightarrow WW","Z'#rightarrow WW","Z' #rightarrow ZH","W' #rightarrow WH"]
 #    signals = ["BulkGZZ","WprimeWZ","BulkGWW","ZprimeWW","ZprimeZH","WprimeWH"]
-
-    categories = options.category.split(',')
+#    categories = options.category.split(',')
     for category in categories:
       jsons=[]
       for s in signals:
         print "################################     signal      "+s+"       #######################"
         if options.var =="mJ":
           if s.find("H")==-1 :
-            jsons.append("JJ_"+s+"_2016_MJrandom_"+category+".json")
-          else : jsons.append("JJ_Hjet_"+s+"_2016_MJrandom_"+category+".json")
+            jsons.append("JJ_"+s+"_Run2_MJrandom_"+category+".json")
+          else : jsons.append("JJ_Hjet_"+s+"_Run2_MJrandom_"+category+".json")
         if options.var =="mVV":
-          jsons.append("JJ_"+s+"_2016_MVV.json")
+          jsons.append("JJ_"+s+"_Run2_MVV.json")
 
       doAll(category,jsons,legs)
