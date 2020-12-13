@@ -24,7 +24,7 @@ def get_canvas(cname):
  CMS_lumi.lumi_8TeV = "18.3 fb^{-1}"
  CMS_lumi.writeExtraText = 1
  CMS_lumi.extraText = "Simulation"
- CMS_lumi.lumi_sqrtS = "13 TeV (2016)" # used with iPeriod = 0, e.g. for simulation-only plots (default is an empty string)
+ CMS_lumi.lumi_sqrtS = "13 TeV ("+options.period+")" # used with iPeriod = 0, e.g. for simulation-only plots (default is an empty string)
 
  iPos = 11
  if( iPos==0 ): CMS_lumi.relPosX = 0.12
@@ -61,6 +61,7 @@ parser.add_option("--mc","--mc",dest="mc",help="File with mc events and histo na
 parser.add_option("-k","--kernel",dest="kernel",help="File with kernel and histo name (separated by comma)",default='JJ_nonRes_3D_HPHP.root,histo')
 parser.add_option("-o","--outdir",dest="outdir",help="Output directory for plots",default='control-plots')
 parser.add_option("-l","--label",dest="label",help="MC type label (Pythia8, Herwig, Madgraph, Powheg)",default='Pythia8')
+parser.add_option("-p","--period",dest="period",help="year or Run2",default='Run2')
 (options,args) = parser.parse_args()
 
 #void Projections3DHisto(std::string dataFile, std::string hdataName, std::string fitFile, std::string hfitName, std::string outDirName){
