@@ -9,13 +9,15 @@ import optparse, time, sys, math
 from CMGTools.VVResonances.plotting.CMS_lumi import *
 from CMGTools.VVResonances.plotting.tdrstyle import *
 from array import array
+import numpy as np
+
 parser = optparse.OptionParser()
 parser.add_option("-o","--output",dest="output",default='limitPlot',help="Limit plot")
 parser.add_option("-s","--signal",dest="sig",type=str,help="Signal sample",default='BulkGWW')
 parser.add_option("--sigscale",dest="sigscale",type=float,help="maximum y",default=0.001)
 parser.add_option("-x","--minX",dest="minX",type=float,help="minimum x",default=1000.0)
 parser.add_option("-X","--maxX",dest="maxX",type=float,help="maximum x",default=5000.0)
-parser.add_option("-y","--minY",dest="minY",type=float,help="minimum y",default=0.0001)
+parser.add_option("-y","--minY",dest="minY",type=float,help="minimum y",default=0.00001)
 parser.add_option("-Y","--maxY",dest="maxY",type=float,help="maximum y",default=10)
 parser.add_option("-b","--blind",dest="blind",type=int,help="Not do observed ",default=1)
 parser.add_option("-l","--log",dest="log",type=int,help="Log plot",default=1)
@@ -73,27 +75,21 @@ if options.hvt>=0: #the = is only needed to get the right xsec sf for the single
  shade_y = array('d',[])
 
  for m in masses:
-
+  year=options.period
+  if options.period == 'ALL': year = 'Run2'
   argset = ROOT.RooArgSet()
   MH=w.var("MH")
   argset.add(MH)
   MH.setVal(m)
   if options.hvt == 1:
-   func1 = w.function('ZprimeWW_JJ_VV_HPHP_13TeV_2016_sigma')
-   func2 = w.function('WprimeWZ_JJ_VV_HPHP_13TeV_2016_sigma')  
+   func1 = w.function('ZprimeWW_JJ_VV_HPHP_13TeV_'+year+'_sigma')
+   func2 = w.function('WprimeWZ_JJ_VV_HPHP_13TeV_'+year+'_sigma')
   elif options.hvt == 2: 
-   func1 = w.function('BulkGWW_JJ_VV_HPHP_13TeV_2016_sigma') #orig
-   func2 = w.function('BulkGZZ_JJ_VV_HPHP_13TeV_2016_sigma') #orig 
+   func1 = w.function('BulkGWW_JJ_VV_HPHP_13TeV_'+year+'_sigma') #orig
+   func2 = w.function('BulkGZZ_JJ_VV_HPHP_13TeV_'+year+'_sigma') #orig
   elif options.hvt == 0 :
-   if "WprimeWZ"  in options.sig:
-    func = w.function('WprimeWZ_JJ_VV_HPHP_13TeV_2016_sigma')
-   if "BulkGWW" in options.sig:
-    func = w.function('BulkGWW_JJ_VV_HPHP_13TeV_2016_sigma') 
-   if "BulkGZZ" in options.sig:
-    func = w.function('BulkGZZ_JJ_VV_HPHP_13TeV_2016_sigma') 
-   if "ZprimeWW"  in options.sig:
-    func = w.function('ZprimeWW_JJ_VV_HPHP_13TeV_2016_sigma')
- 
+   func = w.function(options.sig+'_JJ_VV_HPHP_13TeV_'+year+'_sigma')
+
   if options.hvt == 1 or options.hvt == 2:
    scaleLimits[str(int(m))] = func1.getVal(argset)+func2.getVal(argset) 
   else :
@@ -153,10 +149,10 @@ if options.hvt>=0: #the = is only needed to get the right xsec sf for the single
  for m in masses:
  
   MH.setVal(m)
-  
+
   tot = spline_zp.getVal(argset)+spline_wp.getVal(argset)
   xsecTot.append(tot)
-  
+
   uncUp_zp = spline_zpUP.getVal(argset)-spline_zp.getVal(argset)
   uncUp_wp = spline_wpUP.getVal(argset)-spline_wp.getVal(argset)
   xsecTotUp.append( tot+math.sqrt(uncUp_zp*uncUp_zp+uncUp_wp*uncUp_wp) )
@@ -184,7 +180,7 @@ if options.hvt>=0: #the = is only needed to get the right xsec sf for the single
  gtheorySHADE = ROOT.TGraphErrors(len(shade_x),shade_x,shade_y)
  gtheorySHADE.SetLineColor(ROOT.kRed-2)
  gtheorySHADE.SetLineWidth(3)
- 
+
 f=ROOT.TFile(args[0])
 limit=f.Get("limit")
 data={}
@@ -331,7 +327,7 @@ if not options.hvt:
  gtheorySHADE = ROOT.TGraphErrors(1)
  gtheorySHADE.SetLineColor(ROOT.kRed-2)
  gtheorySHADE.SetLineWidth(3)
- 
+
  filenameTH = "$CMSSW_BASE/src/CMGTools/VVResonances/scripts/theoryXsec/%s.root"%options.sig
  thFile       = ROOT.TFile.Open(filenameTH,'READ')   
  print "Opening file " ,thFile.GetName()
@@ -387,30 +383,38 @@ c.SetLogy()
 c.cd()
 
 
-if "Wprime"  in options.sig: 
+if "WprimeWZ"  in options.sig:
   ltheory="#sigma_{TH}#timesBR(W'#rightarrowWZ) HVT_{B}"
   ytitle ="#sigma x BR(W' #rightarrow WZ) [pb]  "
   xtitle = "M_{W'} [GeV]"
-if "BulkGWW" in options.sig: 
+if "BulkGWW" in options.sig:
   ltheory="#sigma_{TH}#timesBR(G_{Bulk}#rightarrowWW) #tilde{k}=0.5"
   ytitle ="#sigma x BR(G_{Bulk} #rightarrow WW) [pb]  "
   xtitle = "M_{G_{Bulk}} [GeV]"
-if "BulkGZZ" in options.sig: 
+if "BulkGZZ" in options.sig:
   ltheory="#sigma_{TH}#timesBR(G_{Bulk}#rightarrowZZ) #tilde{k}=0.5"  
   ytitle ="#sigma x BR(G_{Bulk} #rightarrow ZZ) [pb]  "
   xtitle = "M_{G_{Bulk}} [GeV]"
-if "Zprime"  in options.sig: 
+if "ZprimeWW"  in options.sig:
   ltheory="#sigma_{TH}#timesBR(Z'#rightarrowWW) HVT_{B}"
   ytitle ="#sigma x BR(Z' #rightarrow WW) [pb]  "
   xtitle = "M_{Z'} [GeV]"
-if "Vprime"  in options.sig: 
+if "Vprime"  in options.sig:
   ltheory="#sigma_{TH}#timesBR(V'#rightarrowWV) HVT_{B}"
   ytitle ="#sigma x BR(V' #rightarrow WV) [pb]  "
   xtitle = "M_{V'} [GeV]"
-if "BulkGVV"  in options.sig: 
+if "BulkGVV"  in options.sig:
   ltheory="#sigma_{TH}#timesBR(G_{Bulk}#rightarrowVV) #tilde{k}=0.5"  
   ytitle ="#sigma x BR(G_{Bulk} #rightarrow VV) [pb]  "
   xtitle = "M_{G_{Bulk}} [GeV]"
+if "ZprimeZH"  in options.sig:
+  ltheory="#sigma_{TH}#timesBR(Z'#rightarrowZH) HVT_{B}"
+  ytitle ="#sigma x BR(Z' #rightarrow ZH) [pb]  "
+  xtitle = "M_{Z'} [GeV]"
+if "WprimeWH"  in options.sig:
+  ltheory="#sigma_{TH}#timesBR(W'#rightarrowWH) HVT_{B}"
+  ytitle ="#sigma x BR(W' #rightarrow WH) [pb]  "
+  xtitle = "M_{W'} [GeV]"
     
 frame=c.DrawFrame(options.minX,options.minY,options.maxX,options.maxY)
 frame.GetXaxis().SetTitle(xtitle)
@@ -458,6 +462,124 @@ leg2.SetFillStyle(0)
 leg2.SetMargin(0.35)
 leg.SetBorderSize(1)
 
+leg3 = ROOT.TLegend(0.498995,0.5,0.9446734,0.6)
+leg3.SetTextSize(0.028)
+leg3.SetLineColor(1)
+leg3.SetShadowColor(0)
+leg3.SetLineStyle(1)
+leg3.SetLineWidth(1)
+leg3.SetFillColor(ROOT.kWhite)
+leg3.SetBorderSize(0)
+
+MASSLONG, limits_b2g18_001 = array( 'd' ), array( 'd' )
+MASSLONG=[
+   1200.,
+   1300.,
+   1400.,
+   1500.,
+   1600.,
+   1700.,
+   1800.,
+   1900.,
+   2000.,
+   2100.,
+   2200.,
+   2300.,
+   2400.,
+   2500.,
+   2600.,
+   2700.,
+   2800.,
+   2900.,
+   3000.,
+   3100.,
+   3200.,
+   3300.,
+   3400.,
+   3500.,
+   3600.,
+   3700.,
+   3800.,
+   3900.,
+   4000.,
+   4100.,
+   4200.,
+   4300.,
+   4400.,
+   4500.,
+   4600.,
+   4700.,
+   4800.,
+   4900.,
+   5000.,
+   5100.,
+   5200.]
+limits_b2g18_001=[
+     0.0176875,
+     0.010875,
+     0.00809375,
+     0.005671875,
+     0.00446875,
+     0.003703125,
+     0.003046875,
+     0.0025625,
+     0.002179688,
+     0.001875,
+     0.001570313,
+     0.00140625,
+     0.001316406,
+     0.001128906,
+     0.001074219,
+     0.0009765625,
+     0.0008945313,
+     0.000828125,
+     0.0007617188,
+     0.0006992187,
+     0.0006464844,
+     0.0006015625,
+     0.0005605469,
+     0.0005019531,
+     0.0004921875,
+     0.0004589844,
+     0.0004296875,
+     0.0004042969,
+     0.0003798828,
+     0.0003574219,
+     0.0003398438,
+     0.0003193359,
+     0.0003027344,
+     0.0002871094,
+     0.0002753906,
+     0.000265625,
+     0.0002587891,
+     0.0002558594,
+     0.0002568359,
+     0.0002548828,
+     0.0002675781]
+VV3D= ROOT.TGraph(41,np.array(MASSLONG),np.array(limits_b2g18_001))
+VV3D.SetName("VV3D")
+VV3D.SetTitle("");
+#VV3D.SetFillColor(1);
+VV3D.SetLineColor(429);
+VV3D.SetLineStyle(1);
+VV3D.SetLineWidth(3);
+VV3D.SetMarkerStyle(20);
+if options.sig.find("H")==-1: leg3.AddEntry(VV3D,"B2G-18-002 (16+17)","L")
+
+
+MASSSHORT=[1200.,1300.,1400.,1500.,1600.,1700.,1800.,1900.,2000.,2100.,2200.,2300.,2400.,2500.,2600.,2700.,2800.,2900.,3000.]
+limits_VH_2016=[0.050,0.032,0.027,0.020,0.017,0.014,0.012, 0.010,0.009,0.008,0.0068,0.006,0.0052,0.0049,0.0045,0.004,0.0038,0.0034,0.0031]
+VH2016=ROOT.TGraph(19,np.array(MASSSHORT),np.array(limits_VH_2016))
+VH2016.SetName("VH2016")
+VH2016.SetTitle("");
+#VH2016.SetFillColor(1);
+VH2016.SetLineColor(427);
+VH2016.SetLineStyle(5);
+VH2016.SetLineWidth(3);
+VH2016.SetMarkerStyle(20);
+if options.sig.find("H")!=-1: leg3.AddEntry(VH2016,"B2G-17-002 (2016)","L")
+
+
 if options.blind==0: leg.AddEntry(bandObs, "Observed", "Lp")
 leg.AddEntry(band68, "Expected #pm 1 std. deviation", "f")
 leg.AddEntry(band95 , "Expected #pm 2 std. deviation", "f")
@@ -466,7 +588,7 @@ leg.AddEntry(gtheory, ltheory, "L")
 if not options.blind: leg2.AddEntry(bandObs, " ", "")
 leg2.AddEntry(mean, " ", "L")
 leg2.AddEntry(mean, " ", "L")
-leg2.AddEntry(gtheory, " ", "")      
+leg2.AddEntry(gtheory, " ", "")
       
 
 
@@ -478,11 +600,18 @@ else:
     cmslabel_prelim(c,options.period,11)
 leg.Draw()
 leg2.Draw()
+leg3.Draw()
 c.Update()
 c.RedrawAxis()
 
 if options.blind==0:
     bandObs.Draw("PLsame")
+
+
+if options.sig.find("H")==-1:
+ print " draw VV3D"
+ VV3D.Draw("Lsame")
+if options.sig.find("H")!=-1: VH2016.Draw("Lsame")
 
 c.SaveAs(filename+".png")    
 c.SaveAs(filename+".pdf")    
