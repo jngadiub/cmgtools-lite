@@ -54,7 +54,6 @@ rescale=False #for pseudodata: set to True if files comes from splitting Run2
 if options.period.find(",")!=-1: 
     period = options.period.split(',') 
     filePeriod="Run2"
-    rescale=True
     for year in period:
         print year
         if year==period[-1]: samples+=basedir+year+"/"
@@ -204,7 +203,7 @@ if options.run.find("all")!=-1 or options.run.find("sig")!=-1:
         f.makeMigrationUnc(signaltemplate_inuse,str(signal_inuse),options.period,isSignal=True)
     if options.run.find("all")!=-1 or options.run.find("norm")!=-1:
         print "fit signal norm, DID YOU MAKE SF "
-        f.makeSignalYields("JJ_"+str(signal_inuse)+"_"+filePeriod,signaltemplate_inuse,xsec_inuse,'"pol2"') #'"[0]*TMath::Log10(x)"')
+        f.makeSignalYields("JJ_"+str(signal_inuse)+"_"+filePeriod,signaltemplate_inuse,xsec_inuse,'"pol4"') #'"[0]*TMath::Log10(x)"')
         #f.makeNormalizations("sigonly_M2000","JJ_"+filePeriod+"_"+str(signal_inuse),signaltemplate_inuse+"narrow_2000",0,ctx.cuts['nonres'],"sig")
         #f.makeNormalizations("sigonly_M4000","JJ_"+filePeriod+"_"+str(signal_inuse),signaltemplate_inuse+"narrow_4000",0,ctx.cuts['nonres'],"sig")
 
@@ -338,7 +337,7 @@ if options.run.find("all")!=-1 or options.run.find("pseudoALL")!=-1:
                                                "results_"+filePeriod+"/JJ_"+filePeriod+"_TTJets_"+p+".root",
 					       "results_"+filePeriod+"/save_new_shapes_"+filePeriod+"_pythia_%s_3D.root"%p,
 					       "pythia","JJ_%s_PDALL_%s.root"%(filePeriod,p),ctx.lumi[filePeriod],
-					       "results_"+filePeriod+"/workspace_JJ_BulkGWW_"+p+"_13TeV_"+filePeriod+"_PrepPseudo.root",
-					       filePeriod,p)
+                                              "results_"+filePeriod+"/workspace_JJ_BulkGWW_"+p+"_13TeV_"+filePeriod+"_PrepPseudo.root",
+                                              filePeriod,p,rescale)
 
 print " ########## I did everything I could! ###### "
