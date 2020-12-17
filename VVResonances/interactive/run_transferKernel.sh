@@ -21,6 +21,6 @@ python transferKernel.py -i results_${period}/JJ_${period}_nonRes_${catOut}.root
 #make post-fit validation plots for category catOut
 for i in ${!samples[*]}
 do
-        python Projections3DHisto.py --mc results_${period}/JJ_${period}_nonRes_${catOut}${labels[$i]}.root,nonRes -k save_new_shapes_${period}_${samples[$i]}_${catOut}_3D.root,histo -o control-plots-${period}-${catOut}-${samples[$i]}
+        python Projections3DHisto.py --mc results_${period}/JJ_${period}_nonRes_${catOut}${labels[$i]}.root,nonRes -k save_new_shapes_${period}_${samples[$i]}_${catOut}_3D.root,histo -o control-plots-${period}-${catOut}-${samples[$i]} --period "${period}"
         python Projections3DHisto_HPHP.py --mc results_${period}/JJ_${period}_nonRes_${catOut}${labels[$i]}.root,nonRes -k save_new_shapes_${period}_${samples[$i]}_${catOut}_3D.root,histo -o control-plots-coarse-${period}-${catOut}-${samples[$i]} --period "${period}"
 done	
