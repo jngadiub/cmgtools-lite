@@ -81,12 +81,15 @@ and non VBF for the same year) an additional label can be added with `-l`.
 ### Make inputs to 3D fit ###
 
 Make the 3D templates. Several options can be specified to produce QCD, V+Jets, ttbar or signal templates, normalization etc.
+Except for signals, when running on Run2, use the batc submission!!
+
  
 ```
  python makeInputs.py -p 2016 --run "signorm" --signal "ZprimeWW" --batch False 
  python makeInputs.py -p 2016 --run "sigmvv" --signal "ZprimeWW" --batch False 
  python makeInputs.py -p 2016 --run "sigmjet" --signal "ZprimeWW" --batch False 
- python makeInputs.py -p 2016 --run "vjets" --batch False                                                                                                                                      
+ python makeInputs.py -p 2016 --run "vjets" --batch False   
+ python makeInputs.py -p "2016,2017,2018" --run "vjets" 
  python makeInputs.py -p 2016 --run "qcdtemplates"
  python makeInputs.py -p 2016 --run "qcdkernel"
  python makeInputs.py -p 2016 --run "qcdnorm"

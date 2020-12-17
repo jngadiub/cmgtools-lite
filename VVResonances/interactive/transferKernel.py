@@ -402,7 +402,7 @@ def makeNonResCard():
  print "lumi unc",lumi_unc 
  vtag_pt_dependence = ctx.vtag_pt_dependence
  print " vtag_pt_dependence ",vtag_pt_dependence
- vtag_pt_dependence = {'VV_HPHP':'((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))','VV_HPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))','VH_HPHP':'1','VH_HPLP':'1','VH_LPHP':'1','VH_LPLP':'1'}
+ vtag_pt_dependence = {'VV_HPHP':'((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))','VV_HPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))','VH_HPHP':'1','VH_HPLP':'1','VH_LPHP':'1','VH_LPLP':'1','VV_NPHP_control_region':'1'}
  
  scales = [ctx.W_HPmassscale,ctx.W_LPmassscale]
  scalesHiggs = [ctx.H_HPmassscale,ctx.H_LPmassscale]
@@ -429,7 +429,7 @@ def makeNonResCard():
  fin.Close() 
  print "adding shapes bkg"
  card.addHistoShapeFromFile("nonRes",["MJ1","MJ2","MJJ"],options.pdfIn,hname,['OPTXY:CMS_VV_JJ_nonRes_OPTXY_'+category_pdf,'OPTZ:CMS_VV_JJ_nonRes_OPTZ_'+category_pdf,'OPT3:CMS_VV_JJ_nonRes_OPT3_'+category_pdf],False,0) 
- #card.addHistoShapeFromFile("nonRes",["MJ1","MJ2","MJJ"],options.pdfIn,hname,['PT:CMS_VV_JJ_nonRes_PT_'+category_pdf,'OPTXY:CMS_VV_JJ_nonRes_OPTXY_'+category_pdf,'OPTZ:CMS_VV_JJ_nonRes_OPTZ_'+category_pdf,'OPT3:CMS_VV_JJ_nonRes_OPT3_'+category_pdf],False,0) 
+ #card.addHistoShapeFromFile("nonRes",["MJ1","MJ2","MJJ"],options.pdfIn,hname,['PT:CMS_VV_JJ_nonRes_PT_'+category_pdf,'OPTXY:CMS_VV_JJ_nonRes_OPTXY_'+category_pdf,'OPTZ:CMS_VV_JJ_nonRes_OPTZ_'+category_pdf,'OPT3:CMS_VV_JJ_nonRes_OPT3_'+category_pdf],False,0)
  print "adding yield"
  card.addFixedYieldFromFile("nonRes",1,options.input,"nonRes",1)
  print "adding data"
@@ -445,7 +445,7 @@ def makeNonResCard():
  print "OPTXY"
  card.addSystematic("CMS_VV_JJ_nonRes_OPTXY_"+category_pdf,"param",[0.,2.]) #0,2
  print "OPT3"
- card.addSystematic("CMS_VV_JJ_nonRes_OPT3_"+category_pdf,"param",[1.,2.]) #test for VH_HPHP  
+ card.addSystematic("CMS_VV_JJ_nonRes_OPT3_"+category_pdf,"param",[1.,2.]) #test for VH_HPHP
  #print "PT"
  #card.addSystematic("CMS_VV_JJ_nonRes_PT_"+category_pdf,"param",[0.0,0.333]) #orig
   
@@ -471,6 +471,7 @@ if __name__=="__main__":
 
      #################################################
      if options.year.find(",")!=-1: dataset ="Run2"
+     else: dataset =options.year
      print dataset
 
      finMC = ROOT.TFile(options.input,"READ");
@@ -487,6 +488,8 @@ if __name__=="__main__":
      elif purity == '' and 'control_region' in options.input:
          if 'VH_NPHP' in options.input:
              purity = 'VH_NPHP_control_region'
+         if 'VV_NPHP' in options.input:
+             purity = 'VV_NPHP_control_region'
          else:
              purity = 'VH_HPNP_control_region'
      else:

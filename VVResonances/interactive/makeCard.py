@@ -45,7 +45,9 @@ purities= options.category.split(",")
 signals = options.signal.split(",")
 print "signals ",signals
 doVjets= True
+rescale = False
 sf_qcd=1.
+
 if outlabel.find("sigonly")!=-1 or outlabel.find("qcdonly")!=-1: doVjets = False
 if outlabel.find("sigonly")!=-1 or outlabel.find("Vjetsonly")!=-1: sf_qcd = 0.00001
 
@@ -56,6 +58,7 @@ ctx = cuts.cuts("init_VV_VH.json",options.period,"dijetbins_random")
 
 lumi = ctx.lumi
 lumi_unc = ctx.lumi_unc
+if rescale == True: sf_qcd=lumi["Run2"]/lumi[options.period]
 
 scales = [1.,1.]
 scalesHiggs = [1.,1.]
@@ -80,7 +83,7 @@ print "datasets ",datasets
 print "result dir ",resultsDir
 
 
-vtag_pt_dependence = {'VV_HPHP':'((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))','VV_HPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))','VH_HPHP':'1','VH_HPLP':'1','VH_LPHP':'1','VH_LPLP':'1'}
+vtag_pt_dependence = {'VV_HPHP':'((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))','VV_HPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))','VH_HPHP':'1','VH_HPLP':'1','VH_LPHP':'1','VH_LPLP':'1','VV_NPHP_control_region':'1'}
 
 
 doCorrelation = True 
@@ -132,7 +135,7 @@ for sig in signals:
       rootFileMVV = {ttcon:resultsDir[dataset]+'/JJ_'+dataset+'_TTJets'+ttcon+'_MVV_'+p+'.root' for ttcon in contrib}
       #rootFileMVV = {ttcon:resultsDir[dataset]+'/JJ_'+dataset+'_TTJets'+ttcon+'_MVV_NP.root' for ttcon in contrib}
       rootFileNorm = {ttcon:resultsDir[dataset]+'/JJ_'+dataset+'_TTJets'+ttcon+'_'+p+'.root' for ttcon in contrib}
-      jsonfileNorm = resultsDir[dataset]+'/'+options.jsonname+'_'+dataset+"_"+p+'.json'
+      jsonfileNorm = resultsDir[dataset]+'/'+options.jsonname+'_'+dataset+'_'+p+'.json'
       if options.fitTTmjj == True:
         print "load fits"
         Tools.AddTTBackground3(card,dataset,p,rootFileMVV,rootFileNorm,resultsDir[dataset],ncontrib,["CMS_VV_JJ_TTJets_slope",0.5],jsonfileNorm)
@@ -149,8 +152,10 @@ for sig in signals:
       print "##########################       including QCD in datacard      ######################"
       #rootFile3DPDF = resultsDir[dataset]+'/JJ_2016_nonRes_3D_VV_HPLP.root'
       rootFile3DPDF = resultsDir[dataset]+"/save_new_shapes_{year}_pythia_{purity}_3D.root".format(year=dataset,purity=p)#    save_new_shapes_%s_pythia_"%dataset+"_""VVVH_all"+"_3D.root"
+      #rootFile3DPDF = resultsDir[dataset]+"/save_new_shapes_{year}_madgraph_{purity}_3D.root".format(year=dataset,purity=p)#    save_new_shapes_%s_pythia_"%dataset+"_""VVVH_all"+"_3D.root"
       print "rootFile3DPDF ",rootFile3DPDF
       rootFileNorm = resultsDir[dataset]+"/JJ_%s_nonRes_"%dataset+p+".root"
+      #rootFileNorm = resultsDir[dataset]+"/JJ_%s_nonRes_"%dataset+p+"_altshape2.root"
       print "rootFileNorm ",rootFileNorm
 
       Tools.AddNonResBackground(card,dataset,p,rootFile3DPDF,rootFileNorm,ncontrib)
@@ -166,6 +171,7 @@ for sig in signals:
       elif pseudodata=="True":
         print "Using pseudodata with all backgrounds (QCD, V+jets and tt+jets)"
         rootFileData = resultsDir[dataset]+"/JJ_"+dataset+"_PDALL_"+p+".root"
+        #rootFileData = resultsDir[dataset]+"/JJ_"+dataset+"_PDALL_"+p+"_mad.root"
         histName="data"
         scaleData=1.0
       elif pseudodata=="ttjets":
@@ -188,8 +194,8 @@ for sig in signals:
        histName="data_obs" 
        scaleData=1.0
       elif pseudodata=="False":
-        #rootFileData = resultsDir[dataset]+"/JJ_"+dataset+"_data_"+p+".root" #resultsDir[dataset]+"/pseudo40/JJ_"+p+".root"
-        rootFileData = resultsDir[dataset]+"/JJ_"+dataset+"_data_"+p+".root" #resultsDir[dataset]+"/pseudo40/JJ_"+p+".root"
+        rootFileData = resultsDir[dataset]+"/JJ_"+dataset+"_data_"+p+".root"
+        if dataset == "Run2": rootFileData = resultsDir[dataset]+"/JJ_"+p+".root"
         histName="data"
         scaleData=1.0
 
@@ -204,7 +210,7 @@ for sig in signals:
       else:
         Tools.AddResBackgroundSystematics(card,p)
       Tools.AddNonResBackgroundSystematics(card,p)
-      Tools.AddTaggingSystematics(card,sig,dataset,p,['./migrationunc_'+sig+'_'+dataset+'.json','./migrationunc_WJets_'+dataset+'.json','./migrationunc_ZJets_'+dataset+'.json','./migrationunc_TTJets_'+dataset+'.json'])
+      Tools.AddTaggingSystematics(card,sig,p,[resultsDir[dataset]+'/migrationunc_'+sig+'_'+dataset+'.json',resultsDir[dataset]+'/migrationunc_WJets_'+dataset+'.json',resultsDir[dataset]+'/migrationunc_ZJets_'+dataset+'.json',resultsDir[dataset]+'/migrationunc_TTJets_'+dataset+'.json'])
       if options.fitTTmjj == True:
         print "load fits syst"
         Tools.AddTTSystematics4(card,["CMS_VV_JJ_TTJets_slope",0.05],dataset,p)

@@ -1,7 +1,6 @@
 from functions import *
 from optparse import OptionParser
 #from cuts import cuts, HPSF16, HPSF17, LPSF16, LPSF17, dijetbins, HCALbinsMVVSignal, minMJ,maxMJ,binsMJ, minMVV, maxMVV, binsMVV, minMX, maxMX, catVtag, catHtag
-import ROOT
 import cuts
 
 ## import cuts of the analysis from separate file
@@ -54,7 +53,6 @@ rescale=False #for pseudodata: set to True if files comes from splitting Run2
 if options.period.find(",")!=-1: 
     period = options.period.split(',') 
     filePeriod="Run2"
-    rescale=True
     for year in period:
         print year
         if year==period[-1]: samples+=basedir+year+"/"
@@ -200,11 +198,11 @@ if options.run.find("all")!=-1 or options.run.find("sig")!=-1:
         print " make SF "
         f.makeSF(signaltemplate_inuse,isSignal=True)
     if options.run.find("all")!=-1 or options.run.find("MU")!=-1:
-        print " make MU "
+        print " make migration uncertainties "
         f.makeMigrationUnc(signaltemplate_inuse,str(signal_inuse),options.period,isSignal=True)
     if options.run.find("all")!=-1 or options.run.find("norm")!=-1:
         print "fit signal norm, DID YOU MAKE SF "
-        f.makeSignalYields("JJ_"+str(signal_inuse)+"_"+filePeriod,signaltemplate_inuse,xsec_inuse,'"pol2"') #'"[0]*TMath::Log10(x)"')
+        f.makeSignalYields("JJ_"+str(signal_inuse)+"_"+filePeriod,signaltemplate_inuse,xsec_inuse,'"pol4"') #'"[0]*TMath::Log10(x)"')
         #f.makeNormalizations("sigonly_M2000","JJ_"+filePeriod+"_"+str(signal_inuse),signaltemplate_inuse+"narrow_2000",0,ctx.cuts['nonres'],"sig")
         #f.makeNormalizations("sigonly_M4000","JJ_"+filePeriod+"_"+str(signal_inuse),signaltemplate_inuse+"narrow_4000",0,ctx.cuts['nonres'],"sig")
 
@@ -263,9 +261,9 @@ if options.run.find("all")!=-1 or options.run.find("vjets")!=-1:
         print "then SF Z"
         f.makeSF(ZresTemplate)
     if options.run.find("all")!=-1 or options.run.find("MU")!=-1 or options.run.find("All")!=-1:
-        print "then MU W"
+        print "then migration uncertainties W"
         f.makeMigrationUnc(WresTemplate,"WJets",options.period)
-        print "then MU Z"
+        print "then migration uncertainties Z"
         f.makeMigrationUnc(ZresTemplate,"ZJets",options.period)
     if options.run.find("all")!=-1 or options.run.find("vjetsnorm")!=-1 or options.run.find("All")!=-1:
         print " DID YOU PRODUCE THE SF TREES?? "
@@ -286,7 +284,7 @@ if options.run.find("all")!=-1 or options.run.find("tt")!=-1:
         print " Making SF "
         f.makeSF(TTemplate)
     if options.run.find("all")!=-1 or options.run.find("MU")!=-1 or options.run.find("ALL")!=-1:
-        print " Making MU "
+        print " Making migration uncertainties "
         f.makeMigrationUnc(TTemplate,"TTJets",options.period)
     if options.run.find("all")!=-1 or options.run.find("norm")!=-1 or options.run.find("ALL")!=-1:
         print "make norm for all contributions of ttbar together, DID YOU MAKE SF?"
@@ -338,7 +336,7 @@ if options.run.find("all")!=-1 or options.run.find("pseudoALL")!=-1:
                                                "results_"+filePeriod+"/JJ_"+filePeriod+"_TTJets_"+p+".root",
 					       "results_"+filePeriod+"/save_new_shapes_"+filePeriod+"_pythia_%s_3D.root"%p,
 					       "pythia","JJ_%s_PDALL_%s.root"%(filePeriod,p),ctx.lumi[filePeriod],
-					       "results_"+filePeriod+"/workspace_JJ_BulkGWW_"+p+"_13TeV_"+filePeriod+"_PrepPseudo.root",
-					       filePeriod,p)
+                                              "results_"+filePeriod+"/workspace_JJ_BulkGWW_"+p+"_13TeV_"+filePeriod+"_PrepPseudo.root",
+                                              filePeriod,p,rescale)
 
 print " ########## I did everything I could! ###### "

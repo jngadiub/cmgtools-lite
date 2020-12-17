@@ -83,10 +83,20 @@ for string in graphStr:
     parameterization[comps[0]]=returnString(func,comps[1])
 
     c = ROOT.TCanvas()
-    graph.Draw()
+    c.SetRightMargin(0.2)
+    if comps[0].find("corr")!=-1:
+        graph.GetXaxis().SetTitle("jet-1 mass [GeV]")
+        graph.GetYaxis().SetTitle("jet-2 mass [GeV]")
+        graph.Draw("COLZ")
+    else:
+        graph.Draw()
     func.SetLineColor(ROOT.kRed)
     func.Draw("lcsame")
-    c.SaveAs("debug_"+options.output+"_"+comps[0]+".png")
+    name="debug_"+options.output+"_"+comps[0]
+    name=name.replace(".","_")
+    c.SaveAs(name+".png")
+    c.SaveAs(name+".pdf")
+    c.SaveAs(name".C")
     graph.Write(comps[0])
     func.Write(comps[0]+"_func")
 ff.Close()
