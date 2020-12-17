@@ -56,6 +56,8 @@ class AllFunctions():
    yieldFile=filename+"_"+c+"_yield"
    fnc = functype
    cmd='vvMakeSignalYields.py -s {template} -c "{cut}" -o {output} -V "jj_LV_mass" -m {minMVV} -M {maxMVV} -f {fnc} -b {BR} --minMX {minMX} --maxMX {maxMX} {samples} '.format(template=template, cut=cut, output=yieldFile,minMVV=self.minMVV,maxMVV=self.maxMVV,fnc=fnc,BR=branchingFraction,minMX=self.minMX,maxMX=self.maxMX,samples=self.samples)
+   print "&&&&&&&&&&&&&&&&&&&&&&&&   command         &&&&&&&&&&&&&&&&&&&&&&&&&&&"
+   print cmd
    os.system(cmd)
 
  def makeDetectorResponse(self,name,filename,template,addCut="1",jobName="DetPar",wait=True):

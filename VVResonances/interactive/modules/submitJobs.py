@@ -1078,6 +1078,58 @@ def merge1DMVVTemplate(jobList,files,jobname,purity,binsMVV,minMVV,maxMVV,HCALbi
                 histogram_NLODown.SetTitle('histo_NLODown')
                 histogram_NLODown.Write('histo_NLODown')
 
+
+            c = ROOT.TCanvas("c","C",600,400)
+            c.SetRightMargin(0.11)
+            c.SetLeftMargin(0.11)
+            c.SetTopMargin(0.11)
+            histo_NLO.SetLineColor(ROOT.kBlue)
+            histo_NLO.GetYaxis().SetTitle("arbitrary scale")
+            histo_NLO.GetYaxis().SetTitleOffset(1.5)
+            histo_NLO.GetXaxis().SetTitle("dijet mass")
+            sf = histo_NLO.Integral()
+            histogram_pt_up     .Scale(sf/histogram_pt_up.Integral())
+            histogram_pt_down   .Scale(sf/histogram_pt_down.Integral())
+            histogram_opt_up    .Scale(sf/histogram_opt_up.Integral())
+            histogram_opt_down  .Scale(sf/histogram_opt_down.Integral())
+            histo_NLO.Draw("hist")
+
+            histogram_pt_up.SetLineColor(ROOT.kRed)
+            histogram_pt_up.SetLineWidth(2)
+            histogram_pt_up.Draw("histsame")
+            histogram_pt_down.SetLineColor(ROOT.kRed)
+            histogram_pt_down.SetLineWidth(2)
+            histogram_pt_down.Draw("histsame")
+            histogram_opt_up.SetLineColor(ROOT.kGreen)
+            histogram_opt_up.SetLineWidth(2)
+            histogram_opt_up.Draw("histsame")
+            histogram_opt_down.SetLineColor(ROOT.kGreen)
+            histogram_opt_down.SetLineWidth(2)
+            histogram_opt_down.Draw("histsame")
+            text = ROOT.TLatex()
+            text.DrawLatexNDC(0.13,0.92,"#font[62]{CMS} #font[52]{Simulation}")
+            mvv_NLO.Scale(sf/mvv_NLO.Integral())
+            mvv_NLO.SetMarkerColor(ROOT.kBlack)
+            mvv_NLO.SetMarkerStyle(7)
+            mvv_NLO.Draw("same")
+            c.SetLogy()
+
+
+            l = ROOT.TLegend(0.17,0.2,0.6,0.33)
+            l.AddEntry(mvv_NLO,"simulation","lp")
+            l.AddEntry(histo_NLO,"template","l")
+            l.AddEntry(histogram_pt_up,"#propto m_{jj}","l")
+            l.AddEntry(histogram_opt_up,"#propto 1/m_{jj}","l")
+            l.Draw("same")
+
+            tmplabel = name
+            label=filename.split("_")[1]
+            print "label ",label
+            tmplabel += "_"+label+"_"+purity
+            c.SaveAs("debug_mVV_kernels_"+tmplabel+".pdf")
+            print "for debugging save","debug_mVV_kernels_"+tmplabel+".pdf"
+
+
         if doTT:
             print "doing TTbar!!"
             mvv_nominal.Write('mvv_nominal')
@@ -1094,14 +1146,18 @@ def merge1DMVVTemplate(jobList,files,jobname,purity,binsMVV,minMVV,maxMVV,HCALbi
             histo_nominal.GetYaxis().SetTitleOffset(1.5)
             histo_nominal.GetXaxis().SetTitle("dijet mass")
             histo_nominal.SetMinimum(0.0000000000001)
-            histo_noreweight     .Scale(sf/histo_noreweight.Integral())
+            if histo_noreweight.Integral() !=0 :
+                histo_noreweight     .Scale(sf/histo_noreweight.Integral())
+            else: print "histo_noreweight  not scaled! !!!!!!!!!!!!!!!!!!!!!!!!!!!    Integral = 0!!!!! "
             histo_nominal.Draw("hist")
             histo_noreweight.SetLineColor(ROOT.kRed)
             histo_noreweight.SetLineWidth(2)
             histo_noreweight.Draw("histsame")
             text = ROOT.TLatex()
             text.DrawLatexNDC(0.13,0.92,"#font[62]{CMS} #font[52]{Simulation}")
-            mvv_nominal.Scale(sf/mvv_nominal.Integral())
+            if mvv_nominal.Integral() !=0:
+                mvv_nominal.Scale(sf/mvv_nominal.Integral())
+            else: print "mvv_nominal  not scaled! !!!!!!!!!!!!!!!!!!!!!!!!!!!    Integral = 0!!!!! "
             mvv_nominal.SetMarkerColor(ROOT.kBlack)
             mvv_nominal.SetMarkerStyle(7)
             mvv_nominal.Draw("same")
@@ -1577,7 +1633,7 @@ def makeData(template,cut,rootFile,binsMVV,binsMJ,minMVV,maxMVV,minMJ,maxMJ,fact
     NumberOfJobs= len(files)
     print " ###### total number of files ",NumberOfJobs 
     OutputFileNames = rootFile.replace(".root","")
-    cmd='vvMakeData.py -d {data} -c "{cut}"  -v "jj_l1_softDrop_mass,jj_l2_softDrop_mass,jj_LV_mass" {binning} -b "{bins},{bins},{BINS}" -m "{mini},{mini},{MINI}" -M "{maxi},{maxi},{MAXI}" -f {factors} -n "{name}" {addOption} '.format(cut=cut,BINS=binsMVV,bins=binsMJ,MINI=minMVV,MAXI=maxMVV,mini=minMJ,maxi=maxMJ,factors=factors,name=name,data=data,infolder=samples,binning=binning,addOption=addOption)  
+    cmd='vvMakeData.py -d {data} -c "{cut}"  -v "jj_l1_softDrop_mass,jj_l2_softDrop_mass,jj_LV_mass" {binning} -b "{bins},{bins},{BINS}" -m "{mini},{mini},{MINI}" -M "{maxi},{maxi},{MAXI}" -f "{factors}" -n "{name}" {addOption} '.format(cut=cut,BINS=binsMVV,bins=binsMJ,MINI=minMVV,MAXI=maxMVV,mini=minMJ,maxi=maxMJ,factors=factors,name=name,data=data,infolder=samples,binning=binning,addOption=addOption)
     queue = "1nd" # give bsub queue -- 8nm (8 minutes), 1nh (1 hour), 8nh, 1nd (1day), 2nd, 1nw (1 week), 2nw 
     if sendjobs == True:
         path = os.getcwd()
@@ -2100,7 +2156,7 @@ def makePseudoDataVjets(input,kernel,mc,output,lumi,workspace,year,purity,rescal
 
 
 
-def makePseudoDataVjetsTT(input,input_tt,kernel,mc,output,lumi,workspace,year,purity):
+def makePseudoDataVjetsTT(input,input_tt,kernel,mc,output,lumi,workspace,year,purity,rescale):
 
  pwd = os.getcwd()
  pwd = "/"
@@ -2125,13 +2181,14 @@ def makePseudoDataVjetsTT(input,input_tt,kernel,mc,output,lumi,workspace,year,pu
  zbins = array("f",getListOfBinsLowEdge(hmcin,"z"))
  hout = ROOT.TH3F('data','data',len(xbins)-1,xbins,len(xbins)-1,xbins,len(zbins)-1,zbins)
  nEventsQCD = int(hmcin.Integral()*lumi)
+ #if rescale == True: nEventsQCD = int(hmcin.Integral()*137190.0)
  print "Expected QCD events: ",nEventsQCD
  hout.FillRandom(hdata,nEventsQCD)
  
  ws_file = ROOT.TFile.Open(workspace,'READ')
  ws = ws_file.Get('w')
  ws_file.Close()
- ws.Print()
+ #ws.Print()
 
  modelWjets = ws.pdf('shapeBkg_Wjets_JJ_%s_13TeV_%s'%(purity,year))
  modelZjets = ws.pdf('shapeBkg_Zjets_JJ_%s_13TeV_%s'%(purity,year))

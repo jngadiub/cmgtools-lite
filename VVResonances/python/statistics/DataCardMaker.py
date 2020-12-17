@@ -1893,7 +1893,7 @@ class DataCardMaker:
 	    print m,value
 
         pdfSigma="_".join([name,self.tag,"sigma"])
-        spline=ROOT.RooSpline1D(pdfSigma,pdfSigma,self.w.var("MH"),len(xArr),array('d',xArr),array('d',yArr))    
+        spline=ROOT.RooSpline1D(pdfSigma,pdfSigma,self.w.var("MH"),len(xArr),array('d',xArr),array('d',yArr),"AKIMA")
         getattr(self.w,'import')(spline,ROOT.RooFit.RenameVariable(pdfSigma,pdfSigma))
 
         f=open(jsonFile)
