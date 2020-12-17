@@ -194,8 +194,8 @@ for sig in signals:
        histName="data_obs" 
        scaleData=1.0
       elif pseudodata=="False":
-        #rootFileData = resultsDir[dataset]+"/JJ_"+dataset+"_data_"+p+".root" #resultsDir[dataset]+"/pseudo40/JJ_"+p+".root"
-        rootFileData = resultsDir[dataset]+"/JJ_"+dataset+"_data_"+p+".root" #resultsDir[dataset]+"/pseudo40/JJ_"+p+".root"
+        rootFileData = resultsDir[dataset]+"/JJ_"+dataset+"_data_"+p+".root"
+        if dataset == "Run2": rootFileData = resultsDir[dataset]+"/JJ_"+p+".root"
         histName="data"
         scaleData=1.0
 
