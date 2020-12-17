@@ -10,16 +10,16 @@
     "unc_lumi161718": 1.018,
 
     "_commentOnSF":"from Loukas https://www.dropbox.com/sh/fvmvnub5whffl2o/AADtbetcJlViSVBIG7Yge9epa?dl=0&preview=dak8ddt_sf.xlsx for pt 400-800, at the moment WvsQCD values used for all SF",
-    "wtag_SF_HP" : {"2016": 0.87, "2017": 0.78, "2018": 0.77},
+    "wtag_SF_HP" : {"2016": 1.287, "2017": 0.823, "2018": 0.757},
     "wtag_SF_LP" : {"2016": 1.02, "2017": 0.93, "2018": 0.98},
 
-    "W_tag_unc_HP" : {"2016": 0.07, "2017": 0.06, "2018": 0.04},
+    "W_tag_unc_HP" : {"2016": 0.197, "2017": 0.059, "2018": 0.057},
     "W_tag_unc_LP" : {"2016": 0.18, "2017": 0.15, "2018": 0.13},
 
-    "htag_SF_HP" : {"2016": 0.87, "2017": 0.78, "2018": 0.77},
+    "htag_SF_HP" : {"2016": 1.287, "2017": 0.823, "2018": 0.757},
     "htag_SF_LP" : {"2016": 1.02, "2017": 0.93, "2018": 0.98},
 
-    "H_tag_unc_HP" : {"2016": 0.07, "2017": 0.06, "2018": 0.04},
+    "H_tag_unc_HP" : {"2016": 0.197, "2017": 0.059, "2018": 0.057},
     "H_tag_unc_LP" : {"2016": 0.18, "2017": 0.15, "2018": 0.13},
 
     "top_tag_SF_HP" : {"2016": 1.00, "2017": 1.00, "2018": 1.00},
@@ -77,41 +77,41 @@
 
 
     "tagging_variables_and_wp" : {
-   "varl1Wtag": "jj_l1_DeepBoosted_WvsQCD",
-   "varl2Wtag": "jj_l2_DeepBoosted_WvsQCD",
-   "l1Wtag16" : "jj_l1_DeepBoosted_WvsQCD__XX_default_161718",
-   "l2Wtag16" : "jj_l2_DeepBoosted_WvsQCD__XX_default_161718",
-   "l1Wtag17" : "jj_l1_DeepBoosted_WvsQCD__XX_default_161718",
-   "l2Wtag17" : "jj_l2_DeepBoosted_WvsQCD__XX_default_161718",
-   "l1Wtag18" : "jj_l1_DeepBoosted_WvsQCD__XX_default_161718",
-   "l2Wtag18" : "jj_l2_DeepBoosted_WvsQCD__XX_default_161718",
-   "l1Wtag161718" : "jj_l1_DeepBoosted_WvsQCD__XX_default_161718",
-   "l2Wtag161718" : "jj_l2_DeepBoosted_WvsQCD__XX_default_161718",
-
-
-
-    "varl1Htag": "jj_l1_DeepBoosted_ZHbbvsQCD",
-    "varl2Htag": "jj_l2_DeepBoosted_ZHbbvsQCD",
-    "l1Htag16" : "jj_l1_DeepBoosted_ZHbbvsQCD__XX_default_161718",
-    "l2Htag16" : "jj_l2_DeepBoosted_ZHbbvsQCD__XX_default_161718",
-    "l1Htag17" : "jj_l1_DeepBoosted_ZHbbvsQCD__XX_default_161718",
-    "l2Htag17" : "jj_l2_DeepBoosted_ZHbbvsQCD__XX_default_161718",
-    "l1Htag18" : "jj_l1_DeepBoosted_ZHbbvsQCD__XX_default_161718",
-    "l2Htag18" : "jj_l2_DeepBoosted_ZHbbvsQCD__XX_default_161718",
-    "l1Htag161718" : "jj_l1_DeepBoosted_ZHbbvsQCD__XX_default_161718",
-    "l2Htag161718" : "jj_l2_DeepBoosted_ZHbbvsQCD__XX_default_161718",
+   "varl1Wtag": "jj_l1_MassDecorrelatedDeepBoosted_WvsQCD",
+   "varl2Wtag": "jj_l2_MassDecorrelatedDeepBoosted_WvsQCD",
+   "l1Wtag16" : "jj_l1_DeepBoosted_WvsQCD__XX_MD_default_16",
+   "l2Wtag16" : "jj_l2_DeepBoosted_WvsQCD__XX_MD_default_16",
+   "l1Wtag17" : "jj_l1_DeepBoosted_WvsQCD__XX_MD_default_17",
+   "l2Wtag17" : "jj_l2_DeepBoosted_WvsQCD__XX_MD_default_17",
+   "l1Wtag18" : "jj_l1_DeepBoosted_WvsQCD__XX_MD_default_18",
+   "l2Wtag18" : "jj_l2_DeepBoosted_WvsQCD__XX_MD_default_18",
+   "l1Wtag161718" : "jj_l1_DeepBoosted_WvsQCD__XX_MD_default_161718",
+   "l2Wtag161718" : "jj_l2_DeepBoosted_WvsQCD__XX_MD_default_161718",
+    
+    
+    
+    "varl1Htag": "jj_l1_MassDecorrelatedDeepBoosted_ZHbbvsQCD",
+    "varl2Htag": "jj_l2_MassDecorrelatedDeepBoosted_ZHbbvsQCD",
+    "l1Htag16" : "jj_l1_DeepBoosted_ZHbbvsQCD__XX_MD_default_16",
+    "l2Htag16" : "jj_l2_DeepBoosted_ZHbbvsQCD__XX_MD_default_16",
+    "l1Htag17" : "jj_l1_DeepBoosted_ZHbbvsQCD__XX_MD_default_17",
+    "l2Htag17" : "jj_l2_DeepBoosted_ZHbbvsQCD__XX_MD_default_17",
+    "l1Htag18" : "jj_l1_DeepBoosted_ZHbbvsQCD__XX_MD_default_18",
+    "l2Htag18" : "jj_l2_DeepBoosted_ZHbbvsQCD__XX_MD_default_18",
+    "l1Htag161718" : "jj_l1_DeepBoosted_ZHbbvsQCD__XX_MD_default_161718",
+    "l2Htag161718" : "jj_l2_DeepBoosted_ZHbbvsQCD__XX_MD_default_161718",
     
     "WP_HP_Wtag16" : "0p05",
     "WP_HP_Wtag17" : "0p05",
     "WP_HP_Wtag18" : "0p05",
-    "WP_LP_Wtag16" : "0p10",
-    "WP_LP_Wtag17" : "0p10",
-    "WP_LP_Wtag18" : "0p10",
+    "WP_LP_Wtag16" : "0p20",
+    "WP_LP_Wtag17" : "0p20",
+    "WP_LP_Wtag18" : "0p20",
     "WP_HP_Wtag161718" : "0p05",
-    "WP_LP_Wtag161718" : "0p10",
-    "WP_NP_Wtag16" : "0p10",
-    "WP_NP_Wtag17" : "0p10",
-    "WP_NP_Wtag18" : "0p10",
+    "WP_LP_Wtag161718" : "0p20",
+    "WP_NP_Wtag16" : "0p20",
+    "WP_NP_Wtag17" : "0p20",
+    "WP_NP_Wtag18" : "0p20",
     "WP_NPLP_Wtag16" : "0p20",
     "WP_NPLP_Wtag17" : "0p20",
     "WP_NPLP_Wtag18" : "0p20",
@@ -136,6 +136,7 @@
     "selection_cuts" : {
     
         "common" : "((HLT_JJ)*(run>500) + (run<500))*(passed_METfilters&&passed_PVfilter&&njj>0&&jj_LV_mass>700&&abs(jj_l1_eta-jj_l2_eta)<1.3&&jj_l1_softDrop_mass>0.&&jj_l2_softDrop_mass>0.&&TMath::Log(jj_l1_softDrop_mass**2/jj_l1_pt**2)<-1.8&&TMath::Log(jj_l2_softDrop_mass**2/jj_l2_pt**2)<-1.8)",
+        "common_norho" : "((HLT_JJ)*(run>500) + (run<500))*(passed_METfilters&&passed_PVfilter&&njj>0&&jj_LV_mass>700&&abs(jj_l1_eta-jj_l2_eta)<1.3&&jj_l1_softDrop_mass>0.&&jj_l2_softDrop_mass>0.)",
         "common_VV" : "((HLT_JJ)*(run>500) + (run<500))*(passed_METfilters&&passed_PVfilter&&njj&&!njj_vbf&&jj_LV_mass>700&&abs(jj_l1_eta-jj_l2_eta)<1.3&&jj_l1_softDrop_mass>0.&&jj_l2_softDrop_mass>0.&&TMath::Log(jj_l1_softDrop_mass**2/jj_l1_pt**2)<-1.8&&TMath::Log(jj_l2_softDrop_mass**2/jj_l2_pt**2)<-1.8)", 
         "common_VBF" :  "((HLT_JJ)*(run>500) + (run<500))*(passed_METfilters&&passed_PVfilter&&njj_vbf&&jj_LV_mass>700&&abs(jj_l1_eta-jj_l2_eta)<1.3&&jj_l1_softDrop_mass>0.&&jj_l2_softDrop_mass>0.&&TMath::Log(jj_l1_softDrop_mass**2/jj_l1_pt**2)<-1.8&&TMath::Log(jj_l2_softDrop_mass**2/jj_l2_pt**2)<-1.8)",
     
@@ -149,6 +150,7 @@
         "resTnonresT":"(((jj_l1_mergedTopTruth==1 && jj_l1_mergedVTruth==1) && (jj_l2_mergedTopTruth==0 && jj_l2_mergedVTruth==0)) || ((jj_l2_mergedTopTruth==1 && jj_l2_mergedVTruth==1) && ( jj_l1_mergedVTruth==0 && jj_l1_mergedTopTruth==0)))" , "resWnonresT":"((jj_l1_mergedVTruth==1&&jj_l1_mergedTopTruth==0&&jj_l2_mergedVTruth==0&&jj_l2_mergedTopTruth==0)|| (jj_l2_mergedVTruth==1&&jj_l2_mergedTopTruth==0&&jj_l1_mergedVTruth==0&&jj_l1_mergedTopTruth==0))" , 
 
         "acceptance" :  "(jj_LV_mass> minMVV &&jj_LV_mass< maxMVV &&jj_l1_softDrop_mass> minMJ &&jj_l1_softDrop_mass< maxMJ &&jj_l2_softDrop_mass> minMJ &&jj_l2_softDrop_mass< maxMJ )",
+        "acceptance_loose" : "(jj_LV_mass > minMVV && jj_l1_softDrop_mass > minMJ && jj_l1_softDrop_mass < maxMJ && jj_l2_softDrop_mass > minMJ && jj_l2_softDrop_mass < maxMJ)",
         "acceptanceMJ":  "(jj_l1_softDrop_mass> minMJ &&jj_l1_softDrop_mass< maxMJ &&jj_l2_softDrop_mass> minMJ &&jj_l2_softDrop_mass< maxMJ )"  ,
         "acceptanceMVV" : "(jj_LV_mass> minMVV &&jj_LV_mass< maxMVV )",
         "acceptanceGEN"  :  "(jj_l1_gen_softDrop_mass> minGenMJ &&jj_l2_gen_softDrop_mass> minGenMJ &&jj_l1_gen_softDrop_mass< maxGenMJ &&jj_l2_gen_softDrop_mass< maxGenMJ &&jj_gen_partialMass> minGenMVV &&jj_gen_partialMass< maxGenMVV &&TMath::Log(jj_l1_gen_softDrop_mass**2/jj_l1_gen_pt**2)<-1.5&&TMath::Log(jj_l2_gen_softDrop_mass**2/jj_l2_gen_pt**2)<-1.5)" ,
