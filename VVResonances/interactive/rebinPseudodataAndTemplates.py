@@ -35,7 +35,7 @@ if options.wtd.find("pseudo")!= -1 :
     data.RebinX(rebin)
 
     print data.GetXaxis().GetNbins()
-    
+
     data.RebinY(rebin)
 
     nonRes.RebinX(rebin)
@@ -63,9 +63,56 @@ if options.wtd.find("tt")!= -1 :
     r_file_out = ROOT.TFile(str(options.outdir)+pseudo,"RECREATE")
     data.Write()
 
+if options.wtd.find("data")!= -1 :
+    print "####        rebinning  data "
+    pseudo = "JJ_"+str(period)+"_data_"+str(purity)+".root"
+    if period == "Run2": pseudo = "JJ_"+str(purity)+".root"
+
+    r_file = ROOT.TFile(str(options.indir)+pseudo,"READ")
+    data = r_file.Get("data")
+    print data.GetXaxis().GetNbins()
+
+    data.RebinX(rebin)
+
+    print data.GetXaxis().GetNbins()
+    
+    data.RebinY(rebin)
+
+    r_file_out = ROOT.TFile(str(options.outdir)+pseudo,"RECREATE")
+    data.Write("data")
+
+
 if options.wtd.find("norm")!= -1 :
-    print "####        rebinning norm "
+    print "####        rebinning norm pythia"
     pseudo = "JJ_"+str(period)+"_nonRes_"+str(purity)+".root"
+
+    r_file = ROOT.TFile(str(options.indir)+pseudo,"READ")
+    nonRes = r_file.Get("nonRes")
+
+
+    nonRes.RebinX(rebin)
+    nonRes.RebinY(rebin)
+
+
+    r_file_out = ROOT.TFile(str(options.outdir)+pseudo,"RECREATE")
+    nonRes.Write("nonRes")
+
+    print "####        rebinning norm herwig"
+    pseudo = "JJ_"+str(period)+"_nonRes_"+str(purity)+"_altshapeUp.root"
+
+    r_file = ROOT.TFile(str(options.indir)+pseudo,"READ")
+    nonRes = r_file.Get("nonRes")
+
+
+    nonRes.RebinX(rebin)
+    nonRes.RebinY(rebin)
+
+
+    r_file_out = ROOT.TFile(str(options.outdir)+pseudo,"RECREATE")
+    nonRes.Write("nonRes")
+
+    print "####        rebinning norm mad"
+    pseudo = "JJ_"+str(period)+"_nonRes_"+str(purity)+"_altshape2.root"
 
     r_file = ROOT.TFile(str(options.indir)+pseudo,"READ")
     nonRes = r_file.Get("nonRes")
