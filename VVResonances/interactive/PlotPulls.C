@@ -53,7 +53,7 @@ void PlotPulls()
     
       //RooRealVar* param_s = (RooRealVar*)fpf_s.at(k);
       RooRealVar*param_b = (RooRealVar*)fpf_b.at(k);   
-      if(name.find("Wjet") != -1 && (name.find("2016") != -1 || name.find("2017") != -1) ) continue;
+      //if(name.find("Wjet") != -1 && (name.find("2016") != -1 || name.find("2017") != -1) ) continue;
 
       std::cout << name << std::endl;
       std::cout << "   * post-fit val: " << param_s->getVal()<< " (S+B) " << param_b->getVal() << " (B) " << std::endl;
@@ -133,7 +133,7 @@ void PlotPulls()
   l_m2->Draw();
   l_p2->Draw();
 
-  TLegend* legend = new TLegend(0.450010112,0.9,0.9,0.99);
+  TLegend* legend = new TLegend(0.6,0.92,0.9,0.99);
   legend->SetTextSize(0.032);
   legend->SetNColumns(2);
   legend->SetLineColor(0);
@@ -145,16 +145,17 @@ void PlotPulls()
   //legend->SetMargin(0.35);
   legend->AddEntry(np_gr_b,"B-only","LP");
   legend->AddEntry(np_gr_s,"S+B","LP");
-  //legend->Draw();
+  legend->Draw();
    
   np_gr_b->SetMarkerStyle(20);
   np_gr_b->SetMarkerColor(kPink-1);
   np_gr_b->SetLineColor(kPink-1);
   np_gr_s->SetMarkerStyle(20);
   np_gr_s->Draw("Psame");
-  //np_gr_b->Draw("Psame");
+  np_gr_b->Draw("Psame");
   c1->SaveAs("pulls.C");
   c1->SaveAs("pulls.png");
+  c1->SaveAs("pulls.pdf");
   
   tf->Close();
 

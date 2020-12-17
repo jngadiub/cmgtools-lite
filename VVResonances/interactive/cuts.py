@@ -219,7 +219,7 @@ class cuts():
 
 
             #print " tagging cuts ",self.WPHPl1Wtag
-            selections = ["common","common_VV","common_VBF","NP","res","nonres","resT","resW","nonresT","resTnonresT","resWnonresT","resTresW","acceptance","acceptanceMJ","acceptanceMVV","acceptanceGEN","looseacceptanceMJ"]
+            selections = ["common_norho","common","common_VV","common_VBF","NP","res","nonres","resT","resW","nonresT","resTnonresT","resWnonresT","resTresW","acceptance","acceptance_loose","acceptanceMJ","acceptanceMVV","acceptanceGEN","looseacceptanceMJ"]
             for sel in selections:
                 self.cuts[sel] = data["selection_cuts"][sel]
                 self.cuts[sel] = self.cuts[sel].replace("minMJ",str(self.minMJ))

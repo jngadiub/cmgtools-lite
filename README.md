@@ -1,5 +1,10 @@
 # VV statistical analysis in 10X
 
+Further information on each part of the 3D fit code can be found at:
+https://docs.google.com/document/d/1hU84u27mY85UaAK5R11OHYctBMckDU6kX7IcorboZf8/edit?usp=sharing
+
+### Setup ###
+
 Prepare the working directory with Higgs Combine Tools. Use the 10X release compatible with the [UHH framework](https://github.com/UHH2/UHH2). If you have that already installed you do
 not need to check out the CMSSW release again.
 
@@ -46,7 +51,36 @@ Current sample location with random sorting of jet1 and jet2
 ```
 Before running, initialiaze the `basedir` variable in `makeInputs.py` to your `simboliklinkname`
 
-Make the 3D templates. Several options can be specified to produce QCD, V+Jets or signal templates, normalization etc.
+### Make inclusive control plots with data ###
+
+Control plots to check data versus MC agreement with just preselections applied can be made for several variables with the script `make-control-plots-submit.py` where the list of
+observables can be found and/or modified.
+
+To plot one variable (ex: the jet 1 mass) for one year (ex: 2016) run:
+
+```
+python make-control-plots.py -y 2016 -v jj_l1_softDrop_mass
+
+```
+
+A folder called `control-plots-2016` will contain the plot in several formats. This takes about 1 hour to run (all year data and MC including all QCD samples flavour). If it
+was done once and you just want to change in the script the plotting style or legends you can use the option `-H` and it will load the histograms from saved root files.
+
+To plot all variables listed in the script for one year (ex: 2016) it is better to parallelize sending one condor job per each observable as:
+
+```
+python make-control-plots.py -y 2016 -s
+
+```
+
+By default, the non-VBF preselections and plots are run. To make plots with the VBF selections to also obtain control plots of VBF jets observables in addition, you have to add option `--vbf`.
+
+When running over multiple years simultaneously the year label is added to the output folders. If additional labels are needed (for instance when running simultaneously VBF
+and non VBF for the same year) an additional label can be added with `-l`.
+
+### Make inputs to 3D fit ###
+
+Make the 3D templates. Several options can be specified to produce QCD, V+Jets, ttbar or signal templates, normalization etc.
  
 ```
  python makeInputs.py -p 2016 --run "signorm" --signal "ZprimeWW" --batch False 
@@ -60,15 +94,7 @@ Make the 3D templates. Several options can be specified to produce QCD, V+Jets o
  # python makeInputs.py -p 2016 --run "pseudo"
 ```
 
-Run closure test of signal fits:
-
-```
-python plotSignalShapesFromJSON.py -f JJ_BulkGravWW_2016_MJl1_VV_HPLP.json -v mJ
-python plotSignalShapesFromJSON.py -f JJ_BulkGravWW_2016_MJl2_VV_HPLP.json -v mJ -l "l2"
-python plotSignalShapesFromJSON.py -f JJ_BulkGravWW_2016_MVV.json -v mVV
-```
-
-After producing the QCD background templetes, to improve the agreement between MC and template, it is necessary to fit the  HPLP MC with HPLP kernel ( with the option -p it is possible to select different projections: x for mjet1, y for mjet2 and z for mjj - use just one option at the time to avoid crashes! - e.g. -p z -x 65,105 -y 65,105 gives mjj projection in the mjet1&2 range 65,105).
+After producing the QCD background templates, to improve the agreement between MC and template, it is necessary to fit the  HPLP MC with HPLP kernel ( with the option -p it is possible to select different projections: x for mjet1, y for mjet2 and z for mjj - use just one option at the time to avoid crashes! - e.g. -p z -x 65,105 -y 65,105 gives mjj projection in the mjet1&2 range 65,105).
 
 The script expects to find the files in a directory called results_year.
 
@@ -86,23 +112,17 @@ HPLP to HPHP and from ggF/DY to VBF categories as follows:
 
 The first argument is the input pdfs taken from the high statistics category; the second argument is the MC in the low statistics category to be fit.
 
-Create datacard and workspaces: in order to call the 'addParametricYieldHVTBR' function the signal name BulkGVV or VprimeWV should be used
+### Closure tests ###
+
+Check signal fits:
 
 ```
-python makeCard.py
-#text2workspace.py datacard_JJ_HPHP_13TeV.txt -o JJ_BulkGWW_HPHP_13TeV_workspace.root
-#python runPostFit.py 
+python plotSignalShapesFromJSON.py -f JJ_BulkGravWW_2016_MJl1_VV_HPLP.json -v mJ
+python plotSignalShapesFromJSON.py -f JJ_BulkGravWW_2016_MJl2_VV_HPLP.json -v mJ -l "l2"
+python plotSignalShapesFromJSON.py -f JJ_BulkGravWW_2016_MVV.json -v mVV
 ```
 
-Run the limits with combine and make final plot
-
-```
-vvSubmitLimits.py workspace_JJ_BulkGVV_VV_13TeV_2016.root -s 100 -q "tomorrow" -m 1200 -M 4200 -C 1
-find higgsCombineTest.AsymptoticLimits.* -size +1500c | xargs hadd Limits_BulkGVV_13TeV_2016.root
-vvMakeLimitPlot.py Limits_BulkGVV_13TeV_2016.root -x 1200 -X 4200 -s BulkGVV  --hvt 2 --HVTworkspace workspace_JJ_BulkGVV_VV_13TeV_2016.root -p 2016 #(expected limits)
-vvMakeLimitPlot.py Limits_BulkGWW_HPHP_13TeV.root -x 1200 -X 4200 -b 0 #(expected+observed limits)
-```
-Run post fit control plots
+Make post-fit plots
 
 ```
 python runFitPlots_vjets_signal_oneyear_splitRes.py -n results_2016/workspace_JJ_BulkGVV_VV_13TeV_2016.root  -l sigonly -i results_2016/JJ_2016_nonRes_VV_HPLP.root -M 2000 -s
@@ -115,6 +135,28 @@ combine -M FitDiagnostics -m 1200 workspace.root
 root -l PlotPulls.C
 ```
 
-Further instructions on how to run the code can be found at:
-https://docs.google.com/document/d/1hU84u27mY85UaAK5R11OHYctBMckDU6kX7IcorboZf8/edit?usp=sharing
+### Make datacards and workspaces ###
+
+Create datacard and workspaces: in order to have all decays (WW+ZZ or WV+WW+WH+ZH) interpretation BulkGVV or VprimeWV should be used
+
+```
+python makeCard.py
+#text2workspace.py datacard_JJ_HPHP_13TeV.txt -o JJ_BulkGWW_HPHP_13TeV_workspace.root
+#python runPostFit.py 
+```
+
+### Run and plot limits ###
+
+```
+vvSubmitLimits.py workspace_JJ_BulkGVV_VV_13TeV_2016.root -s 100 -q "tomorrow" -m 1200 -M 4200 -C 1
+find higgsCombineTest.AsymptoticLimits.* -size +1500c | xargs hadd Limits_BulkGVV_13TeV_2016.root
+vvMakeLimitPlot.py Limits_BulkGVV_13TeV_2016.root -x 1200 -X 4200 -s BulkGVV  --hvt 2 --HVTworkspace workspace_JJ_BulkGVV_VV_13TeV_2016.root -p 2016 #(expected limits)
+vvMakeLimitPlot.py Limits_BulkGWW_HPHP_13TeV.root -x 1200 -X 4200 -b 0 #(expected+observed limits)
+```
+
+
+
+
+
+
 
