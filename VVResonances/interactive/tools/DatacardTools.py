@@ -535,7 +535,7 @@ class DatacardTools():
        card.addSystematic("CMS_lumi","lnN",{'%s'%sig:self.lumi_unc[dataset]})
       
     
- def AddTaggingSystematics(self,card,signal,dataset,p,jsonfile): 
+ def AddTaggingSystematics(self,card,signal,p,jsonfile): 
     contrib =["resT","resW","nonresT","resTnonresT","resWnonresT","resTresW"]
     mappdf = {"resT":"TTJetsTop","resW":"TTJetsW","nonresT":"TTJetsNonRes","resTnonresT":"TTJetsTNonResT","resWnonresT":"TTJetsWNonResT","resTresW":"TTJetsResWResT"}
     uncup_t = {}
@@ -556,7 +556,7 @@ class DatacardTools():
     if signal.find('BulkGWW')!=-1 : sig = "BulkGravToWW"
     if signal.find('BulkGZZ')!=-1 : sig = "BulkGravToZZ"
     if signal.find('VBF')!=-1 : sig = "VBF_"+sig
-    
+
     uncup_s   = data_sig[signal+"_CMS_VV_JJ_DeepJet_Htag_eff"][p+"_up"]
     uncdown_s = data_sig[signal+"_CMS_VV_JJ_DeepJet_Htag_eff"][p+"_down"]
     uncup_w   = data_w["WJets_CMS_VV_JJ_DeepJet_Htag_eff"]["WJets."+p+"_up"]
