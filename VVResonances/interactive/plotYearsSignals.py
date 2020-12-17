@@ -116,11 +116,12 @@ def doYields(signal,legend,years,colorindex):
       c1,leg,pt = getCanvasPaper("c1")
       c1.Draw()
       data = [] 
+      gr[purity]={}
       for year in years : 
-        #tot[year],Mass[year] = array( 'd' ), array( 'd' )
         print " getting year ",year
-        r_file = ROOT.TFile("results_"+year+"/"+"JJ_"+signal+"_"+year+"_"+purity+"_yield.root","READ")
-        if year == "2016" :gr[purity]={year : r_file.Get("yield")} 
+        r_file = ROOT.TFile(options.folder+"/"+"JJ_"+signal+"_"+year+"_"+purity+"_yield.root","READ")
+        if gr[purity]==None:
+           gr[purity]= {year : r_file.Get("yield")}
         else: gr[purity].update({year : r_file.Get("yield")})
 
         print " get number of points ", gr[purity][year].GetN()
@@ -450,14 +451,7 @@ if __name__ == '__main__':
 
     signals = ["BulkGZZ","WprimeWZ","BulkGWW","ZprimeWW","ZprimeZH","WprimeWH"]
     legs = ["G_{bulk} #rightarrow ZZ","W' #rightarrow WZ","G_{bulk} #rightarrow WW","Z'#rightarrow WW","Z'#rightarrow ZH","W'#rightarrow WH"]
-#    signals = ["BulkGWW","ZprimeZH"]
-#    legs = ["G_{bulk} #rightarrow WW","Z'#rightarrow ZH"]
-#    signals = ["ZprimeZH"]
-#    legs = ["Z'#rightarrow ZH"]
-#    signals = ["BulkGWW"] 
-#    legs = ["G_{bulk} #rightarrow WW"] 
-
-    years = ["2016","2017","2018","Run2"]    
+    years = ["2016","2017","2018","Run2"]
     for i in range(len(signals)):
       print i
       print signals[i]
