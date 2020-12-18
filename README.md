@@ -78,81 +78,137 @@ By default, the non-VBF preselections and plots are run. To make plots with the 
 When running over multiple years simultaneously the year label is added to the output folders. If additional labels are needed (for instance when running simultaneously VBF
 and non VBF for the same year) an additional label can be added with `-l`.
 
-### Make inputs to 3D fit ###
+# Make inputs to 3D fit #
 
-Make the 3D templates. Several options can be specified to produce QCD, V+Jets, ttbar or signal templates, normalization etc.
-Except for signals, when running on Run2, use the batc submission!!
+The `makeInputs.py` script allows to create all the simulation templates, normalizations and data inputs. To run on a single year use `-p "year"`, to run on more years separate them with a coma. Except for signals, when running on Run2, use the batch submission and the option `--sendjobs False` to merge the batch jobs. In the script it is possible to select on which analysis category to run. 
 
+## 1. Make the normalizations ##
+ * QCD (in batch it will automatically produce pythia, madgraph and herwig)
  
-```
- python makeInputs.py -p 2016 --run "signorm" --signal "ZprimeWW" --batch False 
- python makeInputs.py -p 2016 --run "sigmvv" --signal "ZprimeWW" --batch False 
- python makeInputs.py -p 2016 --run "sigmjet" --signal "ZprimeWW" --batch False 
- python makeInputs.py -p 2016 --run "vjets" --batch False   
- python makeInputs.py -p "2016,2017,2018" --run "vjets" 
+ `python makeInputs.py -p 2016 --run "qcdnorm"`
+ 
+  * V+jets: 
+  
+   make SF (need a directory called `migrationunc`, it is long and not set up for batch): 
+   
+   `python makeInputs.py -p 2016 --run "vjetsSF"`
+  
+   make normalization: `python makeInputs.py -p 2016 --run "vjetsnorm"`
+  
+   make migration uncertainty file: `python makeInputs.py -p 2016 --run "vjetsMU"`
+  
+  * ttbar: 
+  
+   make SF (need a directory called `migrationunc`, it is long and not set up for batch): `python makeInputs.py -p 2016 --run "ttSF"`
+  
+   make normalization: `python makeInputs.py -p 2016 --run "ttnorm"`
+  
+   make migration uncertainty file: `python makeInputs.py -p 2016 --run "ttMU"`
+
+  * signals ("ZprimeZH" "WprimeWH" "ZprimeWW" "BGWW" "BGZZ"  "WprimeWZ" + the same for VBF ):
+
+   make SF (need a directory called `migrationunc`, it is long and not set up for batch): `python makeInputs.py -p 2016 --run "sigSF" --signal "BGWW"`
+  
+   make normalization: `python makeInputs.py -p 2016 --run "signorm" --signal "BGWW"`
+  
+   make migration uncertainty file: `python makeInputs.py -p 2016 --run "sigMU" --signal "BGWW"`
+  
+  * data:
+  `python makeInputs.py -p 2016 --run "data"` 
+
+
+## 2. Make the 3D templates. ##
+ * QCD (tipically for NP category, in batch it will automatically produce pythia, madgraph and herwig):
+ ```
  python makeInputs.py -p 2016 --run "qcdtemplates"
+ ```
+ when all jobs are over:
+ ```
  python makeInputs.py -p 2016 --run "qcdkernel"
- python makeInputs.py -p 2016 --run "qcdnorm"
- python makeInputs.py -p 2016 --run "data"
- # python makeInputs.py -p 2016 --run "pseudo"
-```
+ ```
+ Once also QCD normalizations files a produced, a further step should be carried out to improve the agreement between MC and templates. The MC (normalization) for a certain category can be fit with the `NP` high statistics kernels (or a different category)( with the option -p it is possible to select different projections: x for mjet1, y for mjet2 and z for mjj - use just one option at the time to avoid crashes! - e.g. -p z -x 65,105 -y 65,105 gives mjj projection in the mjet1&2 range 65,105).
 
-After producing the QCD background templates, to improve the agreement between MC and template, it is necessary to fit the  HPLP MC with HPLP kernel ( with the option -p it is possible to select different projections: x for mjet1, y for mjet2 and z for mjj - use just one option at the time to avoid crashes! - e.g. -p z -x 65,105 -y 65,105 gives mjj projection in the mjet1&2 range 65,105).
-
-The script expects to find the files in a directory called results_year.
+The script expects to find the files in a directory called results_year. The first argument is the input pdfs taken from the high statistics category; the second argument is the MC in the low statistics category to be fit.
 
 ```
-./run_transferKernel.sh VV_HPLP VV_HPLP
+./run_transferKernel.sh NP VV_HPLP year year 
+./run_transferKernel.sh NP VV_HPLP Run2 "2016,2017,2018"
 ```
 
-The same script can be used to extrapolate the templates from a high statistics category to a low statistics one. In the analysis this is done to extrapolate from
-HPLP to HPHP and from ggF/DY to VBF categories as follows:
+* V+jets:
+ 
+ jet mass shapes: `python makeInputs.py -p 2016 --run "vjetsfits" --batch False`
+ 
+ dijet mass templates:  `python makeInputs.py -p "2016,2017,2018"  --run "vjetskernel"`
+ 
+ * ttbar
+ 
+ jet mass shapes: `python makeInputs.py -p 2016 --run "ttfits" --batch False`
+ 
+ dijet mass templates: `python makeInputs.py -p "2016,2017,2018"  --run "tttemplates"`
+ 
+ * signals ("ZprimeZH" "WprimeWH" "ZprimeWW" "BGWW" "BGZZ"  "WprimeWZ" + the same for VBF )
+ 
+ jet mass shapes: `python makeInputs.py -p 2016 --run "sigmjet" --signal "BGWW" --batch False` 
+ 
+ dijet mass templates: `python makeInputs.py -p 2016 --run "sigmvv" --signal "BGWW" --batch False`
+ 
 
+## 3. Closure tests, datacards and workspaces ###
+
+**NB: usually all script excpet the inputs to be in a `results_period` directory**
+* A special treatment is need to obtain the correct ttbar normalization that will be given as input to the postifits and limits with all workspaces
+
+Produce pseudodata with ttbar only, make a workspace and run postfits-> this will produce a json file with the ttbar normalizations. The postfit should be run on one category at the time.
 ```
-./run_transferKernel.sh VV_HPLP VV_HPHP
-./run_transferKernel.sh VV_HPLP VBF_VV_HPLP
+python makeInputs.py -p 2016 --run "pseudoTT" 
+python makeCard.py -p "2016,2017,2018" --signal "BulkGWW" -c "VH_HPLP" --outlabel "_ttbar" --pseudodata "ttbar"
+source makeTTbarFits.sh VH_HPLP # python runFitPlots_vjets_signal_bigcombo_splitRes.py -n results_${period}/workspace_JJ_BulkGWW_${c}_13TeV_${period}_ttbar.root  -i  results_${period}/JJ_${period}_nonRes_${c}.root -M 2000  -o ${outputdir} --channel ${c} -l ${c} --doVjets --addTop --doFit --pseudo 
 ```
-
-The first argument is the input pdfs taken from the high statistics category; the second argument is the MC in the low statistics category to be fit.
-
-### Closure tests ###
-
-Check signal fits:
-
+* produce pseudodata with all backgrounds
 ```
-python plotSignalShapesFromJSON.py -f JJ_BulkGravWW_2016_MJl1_VV_HPLP.json -v mJ
-python plotSignalShapesFromJSON.py -f JJ_BulkGravWW_2016_MJl2_VV_HPLP.json -v mJ -l "l2"
-python plotSignalShapesFromJSON.py -f JJ_BulkGravWW_2016_MVV.json -v mVV
+python makeCard.py -p "2016,2017,2018" --signal "BulkGWW" -c "VH_HPLP,VH_LPHP,VH_HPHP,VV_HPHP,VV_HPLP" --outlabel "_PrepPseudo" --pseudodata "PrepPseudo"
+python makeInputs.py -p 2016 --run "pseudoALL"
 ```
+* before preparing workspaces with all categories, to reduce the size of the workspace, some distributions need to be rebinned `source rebinPseudodataAndTemplates.sh`. This script expect the templates, qcd   normalizations and data and pseudodata to be in `results_period/pseudo80/` and will put the output in  `results_period/pseudo40/`. Once files are created, they should be copied in`results_period/` for the next step.
 
-Make post-fit plots
+* prepare workspace and run postfits on pseudodata
+```
+python makeInputs.py -p 2016 --run "pseudoALL"
+python makeCard.py -p "2016,2017,2018" --signal "BulkGWW" -c "VH_HPLP,VH_LPHP,VH_HPHP,VV_HPHP,VV_HPLP" --outlabel "_pseudodata" --pseudodata "True"
+source makePseudoFits.sh results_Run2 label #label can be any string to identify the outputs #python runFitPlots_vjets_signal_bigcombo_splitRes.py -n ${inputdir}/workspace_JJ_BulkGWW_VVVH_13TeV_${period}_pseudodata.root  -i  ${inputdir}/JJ_${period}_nonRes_${c}.root -M 2000  -o ${outputdir} --channel ${c} -l ${c} --doVjets --addTop --doFit --pseudo
+```
+* prepare workspace and run postfits on data
+```
+python makeCard.py -p "2016,2017,2018" --signal "BulkGWW" -c "VH_HPLP,VH_LPHP,VH_HPHP,VV_HPHP,VV_HPLP" --outlabel "_data" --pseudodata "False"
+```
+If the analysis is still blinded, use the script `makeBlindFits.sh` to run postfits on data blinding part of the jet mass or the command:
+`python runFitPlots_vjets_signal_bigcombo_splitRes.py -n ${inputdir}/workspace_JJ_BulkGWW_VVVH_13TeV_${period}_data.root  -i  ${inputdir}/JJ_${period}_nonRes_${c}.root -M 2000  -o ${outputdir} --channel ${c} -l ${c} --doVjets --addTop --doFit --blind -x 55,65,140,215 -y 55,65,140,215`
 
-```
-python runFitPlots_vjets_signal_oneyear_splitRes.py -n results_2016/workspace_JJ_BulkGVV_VV_13TeV_2016.root  -l sigonly -i results_2016/JJ_2016_nonRes_VV_HPLP.root -M 2000 -s
-```
+Add the option `-s` to run S+B fits.
 
 Get pulls of systematics for 1 mass points and produce a nice plot:
 
 ```
-combine -M FitDiagnostics -m 1200 workspace.root
+combine -M FitDiagnostics -m 1200 workspace.root -v 2 --noErrors --minos none
 root -l PlotPulls.C
 ```
 
-### Make datacards and workspaces ###
-
-Create datacard and workspaces: in order to have all decays (WW+ZZ or WV+WW+WH+ZH) interpretation BulkGVV or VprimeWV should be used
+* Check signal fits:
 
 ```
-python makeCard.py
-#text2workspace.py datacard_JJ_HPHP_13TeV.txt -o JJ_BulkGWW_HPHP_13TeV_workspace.root
-#python runPostFit.py 
+python plotSignalShapesFromJSON.py -i signalShapesRun2/ -y "Run2" -v mJ
+python plotSignalShapesFromJSON.py -i signalShapesRun2/ -y "Run2" -v mVV
 ```
 
-### Run and plot limits ###
+## 4. Run and plot limits ###
 
 ```
-vvSubmitLimits.py workspace_JJ_BulkGVV_VV_13TeV_2016.root -s 100 -q "tomorrow" -m 1200 -M 4200 -C 1
+vvSubmitLimits.py Run2_MD_WHP10_WLP20/workspace_JJ_BulkGWW_VVVH_13TeV_Run2_pseudodata.root -s 1000 -q "testmatch" -m 3000 -M 6000 -C 1 -o "-M AsymptoticLimits -n BulkGWW_MD_WHP10_WLP20_VVVH_Run2" -n "BulkGWW_MD_WHP10_WLP20_VVVH_Run2_pt2" 
 find higgsCombineTest.AsymptoticLimits.* -size +1500c | xargs hadd Limits_BulkGVV_13TeV_2016.root
+```
+The following script still needs some fixes:
+```
 vvMakeLimitPlot.py Limits_BulkGVV_13TeV_2016.root -x 1200 -X 4200 -s BulkGVV  --hvt 2 --HVTworkspace workspace_JJ_BulkGVV_VV_13TeV_2016.root -p 2016 #(expected limits)
 vvMakeLimitPlot.py Limits_BulkGWW_HPHP_13TeV.root -x 1200 -X 4200 -b 0 #(expected+observed limits)
 ```
