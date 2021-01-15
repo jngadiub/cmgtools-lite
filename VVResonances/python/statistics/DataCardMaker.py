@@ -1904,7 +1904,7 @@ class DataCardMaker:
         self.w.factory(uncertaintyName+'[0,-1,1]')
 
         if isinstance(info['yield'],list) == False:
-            self.w.factory("expr::{name}('({param})*{lumi}*({sigma})*({constant}+{unc}*{form})',MH,{lumi},{sigma},{unc})".format(name=pdfNorm,param=info['yield'],lumi=self.physics+"_"+self.period+"_lumi",sigma=pdfSigma,constant=constant,unc=uncertaintyName,form=uncertaintyFormula)) 
+            self.w.factory("expr::{name}('({param})*{lumi}*({sigma})*({constant})*(1.0+{unc}*{form})',MH,{lumi},{sigma},{unc})".format(name=pdfNorm,param=info['yield'],lumi=self.physics+"_"+self.period+"_lumi",sigma=pdfSigma,constant=constant,unc=uncertaintyName,form=uncertaintyFormula))
         else:
             l = info['yield']
             xArr =[]
@@ -1914,7 +1914,7 @@ class DataCardMaker:
                 yArr.append(l[i][1])
             spline=ROOT.RooSpline1D(pdfNorm+'spline',pdfNorm+'spline',self.w.var("MH"),len(xArr),array("d",xArr),array("d",yArr))    
             getattr(self.w,'import')(spline,ROOT.RooFit.RenameVariable(pdfNorm+'spline',pdfNorm+'spline'))
-            self.w.factory("expr::{name}('{lumi}*({sigma})*({constant}+{unc}*{form})',MH,{lumi},{sigma},{unc})".format(name=pdfNorm+'expr',lumi=self.physics+"_"+self.period+"_lumi",sigma=pdfSigma,constant=constant,unc=uncertaintyName,form=uncertaintyFormula))
+            self.w.factory("expr::{name}('{lumi}*({sigma})*({constant})*(1.0+{unc}*{form})',MH,{lumi},{sigma},{unc})".format(name=pdfNorm+'expr',lumi=self.physics+"_"+self.period+"_lumi",sigma=pdfSigma,constant=constant,unc=uncertaintyName,form=uncertaintyFormula))
             prd = ROOT.RooProduct(pdfNorm,pdfNorm,ROOT.RooArgList(self.w.function(pdfNorm+'spline'),self.w.function(pdfNorm+'expr')))
             getattr(self.w,'import')(prd,ROOT.RooFit.RenameVariable(pdfNorm,pdfNorm))
            
@@ -1942,6 +1942,16 @@ class DataCardMaker:
         pdfName="_".join([name,self.tag])
         self.contributions.append({'name':name,'pdf':pdfName,'ID':ID,'yield':events})
 
+    def addYieldWithUncertainty(self,name,ID,events,uncertaintyName,uncertaintyFormula,uncertaintyValue):
+        pdfName="_".join([name,self.tag])
+        self.contributions.append({'name':name,'pdf':pdfName,'ID':ID,'yield':events})
+        pdfNorm="_".join([name,self.tag,"norm"])
+        if not self.w.var(uncertaintyName):
+         self.w.factory(uncertaintyName+'[0,-1,1]')
+         self.addSystematic(uncertaintyName,"param",[0,uncertaintyValue])
+        self.w.factory("expr::{name}('(1+{form}*{unc})',MH,{unc})".format(name=pdfNorm,unc=uncertaintyName,form=uncertaintyFormula))
+
+
     def addConstrainedYieldFromFile(self,name,ID,filename,histoName,nuisance,uncertainty,scale=1.):
         pdfName="_".join([name,self.tag])
 
@@ -1953,6 +1963,19 @@ class DataCardMaker:
 
     def addFixedYieldFromFile(self,name,ID,filename,histoName,constant=1.0):
         print " addFixedYieldFromFile ",filename
+        pdfName="_".join([name,self.tag])
+        f=ROOT.TFile(filename)
+        print "using histogram ",histoName
+        histogram=f.Get(histoName)
+        print "integral ",histogram.Integral()
+        print "lumi ",self.luminosity
+        print "constant ",constant
+        events=histogram.Integral()*self.luminosity*constant
+        print "events ",events
+        self.contributions.append({'name':name,'pdf':pdfName,'ID':ID,'yield':events})
+
+    def addFixedYieldFromFileWithUncertainty(self,name,ID,filename,histoName,constant,uncertaintyName,uncertaintyFormula,uncertaintyValue):
+        print " addFixedYieldFromFile ",filename
         pdfName="_".join([name,self.tag])        
         f=ROOT.TFile(filename)
         print "using histogram ",histoName
@@ -1963,6 +1986,11 @@ class DataCardMaker:
         events=histogram.Integral()*self.luminosity*constant
         print "events ",events
         self.contributions.append({'name':name,'pdf':pdfName,'ID':ID,'yield':events})
+        pdfNorm="_".join([name,self.tag,"norm"])
+        if not self.w.var(uncertaintyName):
+         self.w.factory(uncertaintyName+'[0,-1,1]')
+         self.addSystematic(uncertaintyName,"param",[0,uncertaintyValue])
+        self.w.factory("expr::{name}('(1+{form}*{unc})',MH,{unc})".format(name=pdfNorm,unc=uncertaintyName,form=uncertaintyFormula))
 
     def addYieldWithRateParameter(self,name,ID,paramName,formula,values):#jen        
         pdfName="_".join([name,self.tag])
