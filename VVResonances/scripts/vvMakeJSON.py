@@ -96,7 +96,7 @@ for string in graphStr:
     name=name.replace(".","_")
     c.SaveAs(name+".png")
     c.SaveAs(name+".pdf")
-    c.SaveAs(name".C")
+    c.SaveAs(name+".C")
     graph.Write(comps[0])
     func.Write(comps[0]+"_func")
 ff.Close()
