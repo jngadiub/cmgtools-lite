@@ -22,6 +22,11 @@ class cuts():
     TOP_tag_unc_HP = {}
     TOP_tag_unc_LP = {}
 
+    Wtag_slope = 0.
+    Wtag_intercept = 1.
+    Htag_slope = 0.
+    Htag_intercept = 1.
+
     W_LPmassscale = 1.
     W_HPmassscale = 1.
                   
@@ -79,7 +84,7 @@ class cuts():
     WPNPl2Htag = ""
     WPNPLPl2Htag = ""
 
-    vtag_pt_dependence ={}
+    tagger_pt_dependence = 1.
 
     cuts={}
     
@@ -142,9 +147,14 @@ class cuts():
                 self.H_HPmassscale = data["H_HPmassscale"+self.yeartag]
                 self.H_LPmassscale = data["H_LPmassscale"+self.yeartag]
 
-            self.vtag_pt_dependence["Run2"] = data["vtag_pt_dependence"+self.yeartag]
             self.lumi["Run2"] =  data["lumi"+self.yeartag]
             self.lumi_unc["Run2"] = data["unc_lumi"+self.yeartag]
+            self.Wtag_slope = data["wtag_slope"]
+            self.Wtag_intercept = data["wtag_intercept"]
+            self.Htag_slope = data["htag_slope"]
+            self.Htag_intercept = data["htag_intercept"]
+            self.tagger_pt_dependence = data["tagger_pt_dependence"]
+
             #print " lumi run2 ",self.lumi["Run2"]
             for year in years:
                 if year=="2016":
@@ -175,7 +185,6 @@ class cuts():
                 self.LPSF_toptag[year] = data['top_tag_SF_LP'][year]
                 #print " ALL SF PROPERLY READ"
 
-                self.vtag_pt_dependence[year] = data["vtag_pt_dependence"+self.yeartag]
 
                 #    https://twiki.cern.ch/twiki/bin/viewauth/CMS/TWikiLUM
                 self.lumi[year] =  data["lumi"+self.yeartag]
