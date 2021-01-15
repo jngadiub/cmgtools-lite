@@ -66,9 +66,7 @@ if pseudodata == "False":
   scales = [ctx.W_HPmassscale,ctx.W_LPmassscale]
   scalesHiggs = [ctx.H_HPmassscale,ctx.H_LPmassscale]
 
-
-#quick fix to add VH !!!
-vtag_pt_dependence = ctx.vtag_pt_dependence
+vtag_pt_dependence = ctx.tagger_pt_dependence
 
 
 
@@ -81,10 +79,6 @@ if len(datasets) == 3 and options.combo == True:
   resultsDir.update({"Run2" : "results_Run2"})
 print "datasets ",datasets
 print "result dir ",resultsDir
-
-
-vtag_pt_dependence = {'VV_HPHP':'((1+0.06*log(MH/2/300))*(1+0.06*log(MH/2/300)))','VV_HPLP':'((1+0.06*log(MH/2/300))*(1+0.07*log(MH/2/300)))','VH_HPHP':'1','VH_HPLP':'1','VH_LPHP':'1','VH_LPLP':'1','VV_NPHP_control_region':'1'}
-
 
 doCorrelation = True 
 Tools = DatacardTools(scales,scalesHiggs,vtag_pt_dependence,lumi_unc,sf_qcd,pseudodata,outlabel,doCorrelation,options.fitvjetsmjj)

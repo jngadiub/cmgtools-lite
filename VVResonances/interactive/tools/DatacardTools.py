@@ -5,10 +5,10 @@ import ROOT
   
 class DatacardTools():
 
- def __init__(self,scales,scalesHiggs,vtag_pt_dependence,lumi_unc,sfQCD,pseudodata,outlabel,doCorrelation=True,fitvjetsmjj=False):
+ def __init__(self,scales,scalesHiggs,tagger_pt_dependence,lumi_unc,sfQCD,pseudodata,outlabel,doCorrelation=True,fitvjetsmjj=False):
   
   self.scales=scales
-  self.vtag_pt_dependence=vtag_pt_dependence
+  self.tagger_pt_dependence=tagger_pt_dependence
   self.lumi_unc = lumi_unc
   self.sfQCD = sfQCD
   self.pseudodata = pseudodata
@@ -26,7 +26,7 @@ class DatacardTools():
         card.addMVVSignalParametricShape("%s_MVV"%sig1,"MJJ",resultsDir+"/JJ_%s_%s_MVV.json"%(sig1,dataset),{'CMS_scale_j':1},{'CMS_res_j':1.0})
         card.addMJJSignalParametricShapeNOEXP("%s_Wqq1"%sig1,"MJ1" ,resultsDir+"/JJ_%s_%s_MJrandom_"%(sig1,dataset)+"NP.json",{'CMS_scale_prunedj':1.},{'CMS_res_prunedj':1.},self.scales)
         card.addMJJSignalParametricShapeNOEXP("%s_Wqq2"%sig1,"MJ2" ,resultsDir+"/JJ_%s_%s_MJrandom_"%(sig1,dataset)+"NP.json",{'CMS_scale_prunedj':1.},{'CMS_res_prunedj':1.},self.scales)
-        card.addParametricYieldHVTBR("%s"%sig1,ncontrib-1,resultsDir+"/JJ_%s_%s_"%(sig1,dataset)+category+"_yield.json","../scripts/theoryXsec/HVTB.json","CX0(pb)","BRWW",1000.,'CMS_tau21_PtDependence',self.vtag_pt_dependence[category],1.0)
+        card.addParametricYieldHVTBR("%s"%sig1,ncontrib-1,resultsDir+"/JJ_%s_%s_"%(sig1,dataset)+category+"_yield.json","../scripts/theoryXsec/HVTB.json","CX0(pb)","BRWW",1000.,'CMS_tagger_PtDependence',self.tagger_pt_dependence["signal"],1.0)
         card.product3D("%s"%sig1,"%s_Wqq1"%sig1,"%s_Wqq2"%sig1,"%s_MVV"%sig1)
        if sig.find('VprimeWV')!= -1 or sig.find('WprimeWZ')!= -1:
         sig2 = 'WprimeWZ'
@@ -54,9 +54,9 @@ class DatacardTools():
         card.sumSimple("%s"%sig,"%s_c1"%sig,"%s_c2"%sig,"0.5")
        
         if self.outlabel.find("sigOnly")==-1:
-         card.addParametricYieldHVTBR("%s"%sig2,ncontrib,resultsDir+"/JJ_%s_%s_"%(sig2,dataset)+category+"_yield.json","../scripts/theoryXsec/HVTB.json","CX+(pb),CX-(pb)","BRWZ",1000.,'CMS_tau21_PtDependence',self.vtag_pt_dependence[category],1.0)
+         card.addParametricYieldHVTBR("%s"%sig2,ncontrib,resultsDir+"/JJ_%s_%s_"%(sig2,dataset)+category+"_yield.json","../scripts/theoryXsec/HVTB.json","CX+(pb),CX-(pb)","BRWZ",1000.,'CMS_tagger_PtDependence',self.tagger_pt_dependence["signal"],1.0)
         else:
-           card.addParametricYieldHVTBR("%s"%sig2,ncontrib,resultsDir+"/JJ_%s_%s_"%(sig2,dataset)+category+"_yield.json","../scripts/theoryXsec/HVTB.json","CX+(pb),CX-(pb)","BRWZ",1000.,'CMS_tau21_PtDependence',self.vtag_pt_dependence[category],500.0)
+           card.addParametricYieldHVTBR("%s"%sig2,ncontrib,resultsDir+"/JJ_%s_%s_"%(sig2,dataset)+category+"_yield.json","../scripts/theoryXsec/HVTB.json","CX+(pb),CX-(pb)","BRWZ",1000.,'CMS_tagger_PtDependence',self.tagger_pt_dependence["signal"],500.0)
 
         
         
@@ -68,19 +68,19 @@ class DatacardTools():
         card.addMJJSignalParametricShapeNOEXP("%s_Wqq1"%sig1,"MJ1" ,resultsDir+"/JJ_%s_%s_MJrandom_"%(sig1,dataset)+"NP.json",{'CMS_scale_prunedj':1.},{'CMS_res_prunedj':1.},self.scales)
         print " added addMJJSignalParametricShapeNOEXP 1 "
         card.addMJJSignalParametricShapeNOEXP("%s_Wqq2"%sig1,"MJ2" ,resultsDir+"/JJ_%s_%s_MJrandom_"%(sig1,dataset)+"NP.json",{'CMS_scale_prunedj':1.},{'CMS_res_prunedj':1.},self.scales)
-        print " self.vtag_pt_dependence ",self.vtag_pt_dependence
+        print " self.tagger_pt_dependence ",self.tagger_pt_dependence
         print "dataset ",dataset
-        print "self.vtag_pt_dependence ",self.vtag_pt_dependence
+        print "self.tagger_pt_dependence ",self.tagger_pt_dependence
         print "category ",category
-        print " self.vtag_pt_dependence[category] ",self.vtag_pt_dependence[category]
-        card.addParametricYieldHVTBR("%s"%sig1,ncontrib-1,resultsDir+"/JJ_%s_%s_"%(sig1,dataset)+category+"_yield.json","../scripts/theoryXsec/BulkG.json","sigma","BRWW",1000.,'CMS_tau21_PtDependence',self.vtag_pt_dependence[category],1.0)
+        print " self.tagger_pt_dependence['signal'] ",self.tagger_pt_dependence["signal"]
+        card.addParametricYieldHVTBR("%s"%sig1,ncontrib-1,resultsDir+"/JJ_%s_%s_"%(sig1,dataset)+category+"_yield.json","../scripts/theoryXsec/BulkG.json","sigma","BRWW",1000.,'CMS_tagger_PtDependence',self.tagger_pt_dependence["signal"],1.0)
         card.product3D("%s"%sig1,"%s_Wqq1"%sig1,"%s_Wqq2"%sig1,"%s_MVV"%sig1)
        if sig.find('BulkGVV')!= -1 or sig.find('BulkGZZ')!= -1:
         sig2 = 'BulkGZZ'
         card.addMVVSignalParametricShape("%s_MVV"%sig2,"MJJ",resultsDir+"/JJ_%s_%s_MVV.json"%(sig2,dataset),{'CMS_scale_j':1},{'CMS_res_j':1.0})
         card.addMJJSignalParametricShapeNOEXP("%s_Wqq1"%sig2,"MJ1" ,resultsDir+"/JJ_%s_%s_MJrandom_"%(sig2,dataset)+"NP.json",{'CMS_scale_prunedj':1.},{'CMS_res_prunedj':1.},self.scales)
         card.addMJJSignalParametricShapeNOEXP("%s_Wqq2"%sig2,"MJ2" ,resultsDir+"/JJ_%s_%s_MJrandom_"%(sig2,dataset)+"NP.json",{'CMS_scale_prunedj':1.},{'CMS_res_prunedj':1.},self.scales)
-        card.addParametricYieldHVTBR("%s"%sig2,ncontrib,resultsDir+"/JJ_%s_%s_"%(sig2,dataset)+category+"_yield.json","../scripts/theoryXsec/BulkG.json","sigma","BRZZ",1000.,'CMS_tau21_PtDependence',self.vtag_pt_dependence[category],1.0)
+        card.addParametricYieldHVTBR("%s"%sig2,ncontrib,resultsDir+"/JJ_%s_%s_"%(sig2,dataset)+category+"_yield.json","../scripts/theoryXsec/BulkG.json","sigma","BRZZ",1000.,'CMS_tagger_PtDependence',self.tagger_pt_dependence["signal"],1.0)
         card.product3D("%s"%sig2,"%s_Wqq1"%sig2,"%s_Wqq2"%sig2,"%s_MVV"%sig2)
 
        
@@ -112,9 +112,9 @@ class DatacardTools():
        card.sumSimple("%s"%sig,"%s_c1"%sig,"%s_c2"%sig,"0.5")
 
        if self.outlabel.find("sigOnly")==-1:
-          card.addParametricYieldWithUncertainty("%s"%sig,ncontrib,resultsDir+"/JJ_%s_%s_%s_yield.json"%(sig,dataset,category),1,'CMS_tau21_PtDependence',self.vtag_pt_dependence[category],1.0)
+          card.addParametricYieldWithUncertainty("%s"%sig,ncontrib,resultsDir+"/JJ_%s_%s_%s_yield.json"%(sig,dataset,category),1,'CMS_tagger_PtDependence',self.tagger_pt_dependence["signal"],1.0)
        else:
-           card.addParametricYieldWithUncertainty("%s"%sig,ncontrib,resultsDir+"/JJ_%s_%s_%s_yield.json"%(sig,dataset,category),1,'CMS_tau21_PtDependence',self.vtag_pt_dependence[category],500.)
+           card.addParametricYieldWithUncertainty("%s"%sig,ncontrib,resultsDir+"/JJ_%s_%s_%s_yield.json"%(sig,dataset,category),1,'CMS_tagger_PtDependence',self.tagger_pt_dependence["signal"],500.)
 
 
  #default implementation not working
@@ -334,7 +334,13 @@ class DatacardTools():
         norm = open(normjson,"r")
         norms = json.load(norm)
         for i in range(0,len(contrib)):
-            card.addYield(mappdf[contrib[i]],ncontrib+i,norms[contrib[i]])
+            print " contrib "+contrib[i]+" tagger_pt_dependence "+self.tagger_pt_dependence[contrib[i]]
+            if self.tagger_pt_dependence[contrib[i]] == "1" :
+             print " no pt dep"
+             card.addYield(mappdf[contrib[i]],ncontrib+i,norms[contrib[i]])
+            else:
+             print " pt dep"
+             card.addYieldWithUncertainty(mappdf[contrib[i]],ncontrib+i,norms[contrib[i]],"CMS_tagger_PtDependence",self.tagger_pt_dependence[contrib[i]],1.0)
 	          
  def AddWResBackground(self,card,dataset,category,rootFileMVV,rootFileNorm,resultsDir,ncontrib,uncertainty=[]):
        print "add Wres background"  
@@ -354,7 +360,7 @@ class DatacardTools():
         card.product3D("Wjets_c2","Wjets_mjetRes_l2","Wjets_mjetNonRes_l1","Wjets_mjj")
        else:
         card.product3D("Wjets_c1","Wjets_mjetRes_l1","Wjets_mjetNonRes_l2","Wjets_mjj_c1")
-      
+
        # jets + W
        if self.fitvjetsmjj == False:
         card.addHistoShapeFromFile("Wjets_mjj_c2",["MJJ"],rootFileMVV,"histo_nominal",['PT:CMS_VV_JJ_Wjets_PTZ_'+category,'OPT:CMS_VV_JJ_Wjets_OPTZ_'+category],False,0)
@@ -365,7 +371,7 @@ class DatacardTools():
        else:
         card.product3D("Wjets_c2","Wjets_mjetRes_l2","Wjets_mjetNonRes_l1","Wjets_mjj_c2")
        card.sumPdf('Wjets',"Wjets_c1","Wjets_c2","CMS_ratio_Wjets_"+category)
-     
+
        print "outlabel "+self.outlabel
        if self.pseudodata=="" or self.pseudodata=="Vjets":
            card.addFixedYieldFromFile('Wjets',ncontrib,rootFileNorm,"WJets")
@@ -373,7 +379,7 @@ class DatacardTools():
            print "add small yield"
            card.addFixedYieldFromFile('Wjets',ncontrib,rootFileNorm,"WJets",0.0000000000001)
        else:
-           card.addFixedYieldFromFile('Wjets',ncontrib,rootFileNorm,"WJets")
+           card.addFixedYieldFromFileWithUncertainty('Wjets',ncontrib,rootFileNorm,"WJets",1.0,"CMS_tagger_PtDependence",self.tagger_pt_dependence["Wjets"],1.0)
 
  def AddZResBackground(self,card,dataset,category,rootFileMVV,rootFileNorm,resultsDir,ncontrib,uncertainty=[]):
        print "add Zres background"
@@ -410,7 +416,7 @@ class DatacardTools():
        elif self.outlabel.find("sigOnly")!=-1 or self.outlabel.find("sigonly")!=-1 or self.pseudodata.find("ttbar")!=-1:
            card.addFixedYieldFromFile('Zjets',ncontrib,rootFileNorm,"ZJets",0.0000000000001)
        else:
-             card.addFixedYieldFromFile('Zjets',ncontrib,rootFileNorm,"ZJets") 
+           card.addFixedYieldFromFileWithUncertainty('Zjets',ncontrib,rootFileNorm,"ZJets",1.0,"CMS_tagger_PtDependence",self.tagger_pt_dependence["Zjets"],1.0)
        print "stop Zres background"
    
  def AddNonResBackground(self,card,dataset,category,rootFile3DPDF,rootFileNorm,ncontrib):
@@ -513,7 +519,7 @@ class DatacardTools():
     mappdf = {"resT":"TTJetsTop","resW":"TTJetsW","nonresT":"TTJetsNonRes","resTnonresT":"TTJetsTNonResT","resWnonresT":"TTJetsWNonResT","resTresW":"TTJetsResWResT"}
    
     if self.pseudodata.find("ttbar")==-1:
-        card.addSystematic("CMS_VV_JJ_TTJets_norm","lnN",{mappdf[ttcon]:1.05 for ttcon in contrib})
+        card.addSystematic("CMS_VV_JJ_TTJets_norm","lnN",{mappdf[ttcon]:1.06 for ttcon in contrib})
         card.addSystematic("CMS_VV_JJ_TTJets_TOPPTZ_"+category,"param",[0,1.])
     else:
         for i in range(0,len(contrib)):
@@ -623,8 +629,8 @@ class DatacardTools():
      
  def AddResBackgroundSystematics(self,card,category,extra_uncertainty=[]):
  
-       card.addSystematic("CMS_VV_JJ_Wjets_norm","lnN",{'Wjets':1.05})
-       card.addSystematic("CMS_VV_JJ_Zjets_norm","lnN",{'Zjets':1.05}) 
+       card.addSystematic("CMS_VV_JJ_Wjets_norm","lnN",{'Wjets':1.10})
+       card.addSystematic("CMS_VV_JJ_Zjets_norm","lnN",{'Zjets':1.10})
        if self.fitvjetsmjj == True:
         card.addSystematic(extra_uncertainty[0],"param",[0.0,extra_uncertainty[1]])
         card.addSystematic(extra_uncertainty[2],"param",[0.0,extra_uncertainty[3]])
