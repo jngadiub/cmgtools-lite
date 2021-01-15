@@ -17,6 +17,9 @@ from ROOT import rootlong
 sys.path.insert(0, "../interactive/")
 import cuts
 from rootpy.tree import CharArrayCol
+ROOT.gROOT.SetBatch(True)
+import tdrstyle
+tdrstyle.setTDRStyle()
 
 parser = optparse.OptionParser()
 parser.add_option("-y","--year",dest="year",default='2016',help="year of data taking")
@@ -27,9 +30,33 @@ parser.add_option("-M","--maxMX",dest="maxMX",type=float, help="mVV variable",de
 parser.add_option("-c","--categories",dest="categories",help="list of considered categories",default='VH_HPHP,VV_HPHP,VH_LPHP,VH_HPLP,VV_HPLP')
 parser.add_option("-t","--tags",dest="tags",help="list of tags",default='H_tag,V_tag,top_tag')
 parser.add_option("--isSignal",dest="isSignal",action="store_true", help="is signal?")
+parser.add_option("--doPtFit",dest="doPtFit",action="store_true", help="do you want to do pt dependence fit?")
 parser.add_option("-o","--output",dest="output",help="Output",default='ZprimeZH')
 (options,args) = parser.parse_args()
 
+def getLegend(x1=0.6,y1=0.6363636,x2=0.85,y2=0.9020979):
+  legend = ROOT.TLegend(x1,y1,x2,y2)
+  legend.SetTextSize(0.08)
+  legend.SetLineColor(0)
+  legend.SetShadowColor(0)
+  legend.SetLineStyle(1)
+  legend.SetLineWidth(1)
+  legend.SetFillColor(0)
+  legend.SetFillStyle(0)
+  legend.SetMargin(0.35)
+  legend.SetTextFont(42)
+  return legend
+
+def getPavetext():
+  addInfo = TPaveText(0.3010112,0.2066292,0.4202143,0.3523546,"NDC")
+  addInfo.SetFillColor(0)
+  addInfo.SetLineColor(0)
+  addInfo.SetFillStyle(0)
+  addInfo.SetBorderSize(0)
+  addInfo.SetTextFont(42)
+  addInfo.SetTextSize(0.040)
+  addInfo.SetTextAlign(12)
+  return addInfo
 
 
 def calculateMigration(tree,uncertainty_var,category):
@@ -67,6 +94,150 @@ def calculateMigration(tree,uncertainty_var,category):
     print "up ",events_wup
     print " down ", events_wdown
     return [events, events_wup,events_wdown]
+
+
+def GetHistsRatio(h1pt,h1nom):
+    #ratio:
+    h3 = h1pt.Clone("h1nom")
+    h3.SetLineColor(1)
+    h3.SetMarkerStyle(21)
+    h3.SetTitle("")
+    h3.SetMinimum(0.8)
+    h3.SetMaximum(3.)
+    # Set up plot for markers and errors
+    h3.Sumw2()
+    h3.SetStats(0)
+    h3.Divide(h1nom)
+
+    # Adjust y-axis settings
+    y = h3.GetYaxis()
+    y.SetTitle("ratio hpt/hnom ")
+    y.SetNdivisions(505)
+    y.SetTitleSize(20)
+    y.SetTitleFont(43)
+    y.SetTitleOffset(1.55)
+    y.SetLabelFont(43)
+    y.SetLabelSize(15)
+
+    # Adjust x-axis settings
+    x = h3.GetXaxis()
+    x.SetTitleSize(20)
+    x.SetTitleFont(43)
+    x.SetTitle("p_T [GeV]")
+    x.SetTitleOffset(4.0)
+    x.SetLabelFont(43)
+    x.SetLabelSize(15)
+
+    return h3
+
+def fitFunc(h3,func,x1,x2): #[0]*TMath::Log10(x)
+  fit1 = ROOT.TF1("fit",func,x1,x2) #"[0]*TMath::Log(x)",x1,x2)
+  h3.Fit(fit1,"R")
+  return fit1
+
+def calculateSFPT(tree,uncertainty_var,category,name,year,func):
+    print " CAT ",category
+    # calculate effect of the pt dependence of SF for one particular category
+    # loop through tree
+    h1nom = ROOT.TH1F("h1nom","h1nom",14,200.,3000.)
+    h2nom = ROOT.TH1F("h2nom","h2nom",14,200.,3000.)
+    h1pt = ROOT.TH1F("h1pt","h1pt",14,200.,3000.)
+    h2pt = ROOT.TH1F("h2pt","h2pt",14,200.,3000.)
+    luminosity = ctx.lumi[year]/ctx.lumi["Run2"]
+    tmpname = "/tmp/tmp_"+time.strftime("%Y%m%d-%H%M%S")
+    outfile = ROOT.TFile(tmpname+'.root','RECREATE')
+    cattree = ROOT.TTree()
+    if name.find("TT") == -1:
+      cattree = tree.CopyTree('strstr(category,\"{cat}\")'.format(cat=category))
+    else:
+      cattree = tree.CopyTree('strstr(category,\"{cat}\")*'+ctx.cuts[name].format(cat=category))
+    print " cattree has entries ? ",cattree.GetEntries()
+    cattree.Draw("jj_l1_pt>>h1nom(14,200.,3000)","genWeight*puWeight*SF*{lumi}".format(lumi=str(luminosity)),"goff")
+    h1nom = ROOT.gROOT.FindObject('h1nom')
+    print " h1nom ",h1nom.GetEntries()
+    cattree.Draw("jj_l2_pt>>h2nom(14,200.,3000)","genWeight*puWeight*SF*{lumi}".format(lumi=str(luminosity)),"goff")
+    h2nom = ROOT.gROOT.FindObject('h2nom')
+    if uncertainty_var == "V_tag":
+        cattree.Draw("jj_l1_pt>>h1pt(14,200.,3000)","genWeight*puWeight*Wsfpt*{lumi}".format(lumi=str(luminosity)),"goff")
+        h1pt = ROOT.gROOT.FindObject('h1pt')
+        cattree.Draw("jj_l2_pt>>h2pt(14,200.,3000)","genWeight*puWeight*Wsfpt*{lumi}".format(lumi=str(luminosity)),"goff")
+        h2pt = ROOT.gROOT.FindObject('h2pt')
+    elif uncertainty_var == "H_tag":
+        cattree.Draw("jj_l1_pt>>h1pt(14,200.,3000)","genWeight*puWeight*Hsfpt*{lumi}".format(lumi=str(luminosity)),"goff")
+        h1pt = ROOT.gROOT.FindObject('h1pt')
+        cattree.Draw("jj_l2_pt>>h2pt(14,200.,3000)","genWeight*puWeight*Hsfpt*{lumi}".format(lumi=str(luminosity)),"goff")
+        h2pt = ROOT.gROOT.FindObject('h2pt')
+    else:
+        print " ATTENTION! unknown uncertainty_var ",uncertainty_var
+
+    h1nom.Add(h2nom)
+    h1pt.Add(h2pt)
+    h3 = GetHistsRatio(h1pt,h1nom)
+    #fit1 = DrawSFPT(h1nom,h1pt,h3,uncertainty_var,category,name,year,func)
+    h1nom.SetDirectory(0)
+    h1pt.SetDirectory(0)
+    outfile.Close()
+    os.system("rm "+tmpname+".root")
+    return h1nom,h1pt,h3 #,fit1
+
+
+
+def DrawSFPT(h1nom,h1pt,h3,uncertainty_var,category,name,year,func):
+    print " CAT ",category
+    # plot ratio
+    c = ROOT.TCanvas("c", "canvas", 800, 800)
+    # Upper histogram plot is pad1
+    pad1 = ROOT.TPad("pad1", "pad1", 0, 0.3, 1, 1.0)
+    pad1.SetBottomMargin(0)  # joins upper and lower plot
+    #pad1.SetGridx()
+    pad1.Draw()
+    # Lower ratio plot is pad2
+    c.cd()  # returns to main canvas before defining pad2
+    pad2 = ROOT.TPad("pad2", "pad2", 0, 0.05, 1, 0.3)
+    pad2.SetTopMargin(0)  # joins upper and lower plot
+    pad2.SetBottomMargin(0.2)
+    #pad2.SetGridx()
+    pad2.Draw()
+    pad1.cd()
+    #h1pt.GetXaxis().SetRangeUser(200.,3000.)
+    h1pt.SetTitle("")
+    h1pt.GetYaxis().SetRangeUser(0.01,1000000)
+    pad2.SetLogy()
+    h1pt.Draw("hist")
+    h1nom.SetLineColor(1)
+    h1pt.SetLineStyle(2)
+    h1nom.SetLineWidth(2)
+    h1pt.SetLineWidth(2)
+    h1nom.Draw("histsame")
+    l=getLegend()
+    l.AddEntry(h1pt,"pt","l")
+    l.AddEntry(h1nom,"nom","l")
+    l.Draw()
+
+    # to avoid clipping the bottom zero, redraw a small axis
+    h1pt.GetYaxis().SetLabelSize(0.0)
+    h1pt.GetYaxis().SetTitle("Events")
+    h1nom.GetYaxis().SetLabelSize(0.0)
+
+    axis = ROOT.TGaxis(-5, 20, -5, 220, 20, 220, 510, "")
+    axis.SetLabelFont(43)
+    axis.SetLabelSize(15)
+    axis.Draw()
+    pad2.cd()
+    h3.Draw("ep")
+    fit1 = fitFunc(h3,func,800.,3000.)
+    fit1.Draw("same")
+    #ROOT.gStyle.SetOptFit(1111)
+    label = func+" p0 "+str(fit1.GetParameter(0))
+    if func == 'pol1' : label=label+" p1 "+str(fit1.GetParameter(1))
+    l2=getLegend(0.2,0.6,0.5,0.9)
+    l2.AddEntry(fit1,label,"l")
+    l2.Draw()
+
+    c.Update()
+
+    c.SaveAs("ratio_"+uncertainty_var+"_"+category+"_"+name+"_"+year+".pdf")
+    return fit1
 
 
 def printresult(res,cats):
@@ -180,7 +351,6 @@ def calcfinalUnc(final,tag,cats):
     return data
 
 
-
 if __name__=="__main__":
     # calculate migration uncertainty for all categories
     # up variation of W-Tag HP Sf -> down variation of W-tag LP sf, down variation of anti W-tag HP category
@@ -189,15 +359,19 @@ if __name__=="__main__":
     
     ######### first apply the usual acceptance cuts to the trees ####################
     data ={}
+    datapt={}
     years = options.year.split(",")
     directory = options.directory
     categories=options.categories.split(",")
     tags=options.tags.split(",")
     sampleTypes = options.samples.split(",")
     total = {}
+    totalnom = {}
+    totalpt = {}
     contrib =["resT","resW","nonresT","resTnonresT","resWnonresT","resTresW"]
     mappdf = {"resT":"TTJetsTop","resW":"TTJetsW","nonresT":"TTJetsNonRes","resTnonresT":"TTJetsTNonResT","resWnonresT":"TTJetsWNonResT","resTresW":"TTJetsResWResT"}
 
+    dofit = options.doPtFit
 
     print " Doing migration uncertainties! DID YOU EVALUTE THE SF BEFORE?"
     jsonfilename = {}
@@ -228,31 +402,65 @@ if __name__=="__main__":
 
 
         final = {}
+        finalfit = {}
+        finalpt = {}
+        finalnom = {}
         splitstr = options.output
         for tag in tags:
             result = {}
+            hnom = {}
+            hpt = {}
+            hratio = {}
+            fit = {}
+            func = "[0]*TMath::Log(x)"
+            par = 1
+            if tag == "V_tag":
+              func = "pol1"
+              par = 2
             #print finaltree.Print()
             for cat in categories:
+                print  " ****** "+cat+" *****"
                 if splitstr.find("TT") == -1:
                     result[splitstr+'.'+cat] = calculateMigration(chain,tag,cat)
+                    if dofit == True:
+                      if tag != "top_tag":
+                        hnom[splitstr+'.'+cat],hpt[splitstr+'.'+cat],hratio[splitstr+'.'+cat] = calculateSFPT(chain,tag,cat,splitstr,year,func)
+                        print " nom ",hnom[splitstr+'.'+cat]
+                        print " pt ",hpt[splitstr+'.'+cat]
                 else:
-                    for con in contrib:
-                        tmpname = "tmp_"+time.strftime("%Y%m%d-%H%M%S")
-                        outfile = ROOT.TFile(tmpname+'.root','RECREATE')
-                        print " %%%%%%%    "+con+"     %%%%%%%%%"
-                        ttcomp = chain.CopyTree(ctx.cuts[con])
-                        print ttcomp.GetEntries()
-                        ttcomp.Write()
-                        result[mappdf[con]+'.'+cat] = calculateMigration(ttcomp,tag,cat)
-                        os.system("rm "+tmpname+".root")
+                  for con in contrib:
+                    tmpname = "tmp_"+time.strftime("%Y%m%d-%H%M%S")
+                    outfile = ROOT.TFile(tmpname+'.root','RECREATE')
+                    print " %%%%%%%    "+con+"     %%%%%%%%%"
+                    ttcomp = chain.CopyTree(ctx.cuts[con])
+                    print ttcomp.GetEntries()
+                    ttcomp.Write()
+                    result[mappdf[con]+'.'+cat] = calculateMigration(ttcomp,tag,cat)
+                    if dofit ==True:
+                      if tag != "top_tag":
+                        hnom[mappdf[con]+'.'+cat],hpt[mappdf[con]+'.'+cat],hratio[mappdf[con]+'.'+cat] = calculateSFPT(ttcomp,tag,cat,con,year,func) 
+                        print " cat "+cat+" tag "+tag+" func "+func #+" parameters ",fit[mappdf[con]+'.'+cat].GetParameters()
+
+                    os.system("rm "+tmpname+".root")
+
             print '###################   '+tag+'    ######################'
 
             #if splitstr.find("Jets")!=-1 or splitstr.find("TT")!=-1 : printresultbkg(result,categories)
             #else: printresult(result,categories)
             printresultbkg(result,categories)
             final[tag]=result
+            finalnom[tag]=hnom
+            print " finalnom ",finalnom[tag]
+            finalpt[tag]=hpt
+            finalfit[tag]=fit
             print "************** FINAL ",final
+            print "************** FINAL FIT",finalfit
         total[year]=final
+        totalnom[year]=finalnom
+        print " totalnom ",totalnom[year]
+        print " totalnom V_tag ",totalnom[year]["V_tag"]
+        totalpt[year]=finalpt
+
 
         print 'CMS_VV_JJ_DeepJet_Htag_eff'
         data[year] = {splitstr+'_'+'CMS_VV_JJ_DeepJet_Htag_eff' : calcfinalUnc(final,'H_tag',categories)}
@@ -270,24 +478,73 @@ if __name__=="__main__":
     if len(years) == 3:
         print "#######################################      Making Run2 combination by average weighted by lumi      ##############################"
         print " All years uncertainties "
-        print total
+        print " TOTAL ",total
+        print " NOM ",totalnom
+        print " PT ",totalpt
+        splitstr = options.output
+        file2write=open("SFpt_dependence_"+splitstr+"_Run2.txt",'w')
         unc_Run2 = {}
         for tag in tags:
+            print "tag ",tag
+            func="[0]*TMath::Log(x)"
+            if tag == "V_tag": func= "pol1"
+
             unc_Run2[tag]={}
             for cat in categories:
+                print "cat ",cat
                 n = 0
                 u = 0
                 d = 0
-                for year in years:
-                    if splitstr.find("TT") == -1:
-                        n += total[year][tag][splitstr+'.'+cat][0]*ctx.lumi[year]
-                        u += total[year][tag][splitstr+'.'+cat][1]*ctx.lumi[year]
-                        d += total[year][tag][splitstr+'.'+cat][2]*ctx.lumi[year]
-                    else:
-                        for con in contrib:
-                            n += total[year][tag][mappdf[con]+'.'+cat][0]*ctx.lumi[year]
-                            u += total[year][tag][mappdf[con]+'.'+cat][1]*ctx.lumi[year]
-                            d += total[year][tag][mappdf[con]+'.'+cat][2]*ctx.lumi[year]
+                if splitstr.find("TT") == -1:
+                  Hnom = ROOT.TH1F("Hnom","Hnom",14,200.,3000.)
+                  Hpt = ROOT.TH1F("Hpt","Hpt",14,200.,3000.)
+                  for year in years:
+                    print " year ",year
+                    n += total[year][tag][splitstr+'.'+cat][0]*ctx.lumi[year]
+                    u += total[year][tag][splitstr+'.'+cat][1]*ctx.lumi[year]
+                    d += total[year][tag][splitstr+'.'+cat][2]*ctx.lumi[year]
+                    if dofit ==True:
+                      if tag != "top_tag":
+                        Hnom.Add(totalnom[year][tag][splitstr+'.'+cat])
+                        print totalpt[year][tag][splitstr+'.'+cat]
+                        Hpt.Add(totalpt[year][tag][splitstr+'.'+cat])
+                        print " Hnom ",Hnom.GetEntries()
+                        print " Hpt ",Hpt.GetEntries()
+                  if dofit ==True:
+                    Hratio = GetHistsRatio(Hpt,Hnom)
+                    print " Hratio ",Hratio.GetEntries()
+                    fitfunc = DrawSFPT(Hnom,Hpt,Hratio,tag,cat,splitstr,"Run2",func)
+                    print " cat "+cat+" tag "+tag+" func "+func
+                    file2write.write(" cat "+cat+" tag "+tag+" func "+func+" \n")
+                    print "N  parameters ",fitfunc.GetNpar()
+                    file2write.write("N  parameters "+str(fitfunc.GetNpar())+" \n")
+                    for i in range(fitfunc.GetNpar()):
+                      print i,fitfunc.GetParameter(i)
+                      file2write.write(" p"+str(i)+" "+str(fitfunc.GetParameter(i))+"\n")
+                else:
+                  for con in contrib:
+                    Hnom = ROOT.TH1F("Hnom","Hnom",14,200.,3000.)
+                    Hpt =ROOT.TH1F("Hpt","Hpt",14,200.,3000.)
+                    for year in years:
+                      n += total[year][tag][mappdf[con]+'.'+cat][0]*ctx.lumi[year]
+                      u += total[year][tag][mappdf[con]+'.'+cat][1]*ctx.lumi[year]
+                      d += total[year][tag][mappdf[con]+'.'+cat][2]*ctx.lumi[year]
+                      if dofit ==True:
+                        if tag != "top_tag":
+                          Hnom.Add(totalnom[year][tag][mappdf[con]+'.'+cat])
+                          Hpt.Add(totalpt[year][tag][mappdf[con]+'.'+cat])
+                    if dofit ==True:
+                      if tag != "top_tag":
+                        print " Hnom ",Hnom.GetEntries()
+                        print " Hpt ",Hpt.GetEntries()
+                        Hratio = GetHistsRatio(Hpt,Hnom)
+                        fitfunc = DrawSFPT(Hnom,Hpt,Hratio,tag,cat,mappdf[con],"Run2",func)
+                        file2write.write(" cat "+cat+" tag "+tag+" func "+func+" \n")
+                        print "N  parameters ",fitfunc.GetNpar()
+                        file2write.write("N  parameters "+str(fitfunc.GetNpar())+" \n")
+                        for i in range(par):
+                          print i,fitfunc.GetParameter(i)
+                          file2write.write(" p"+str(i)+" "+str(fitfunc.GetParameter(i))+"\n")
 
                 if  unc_Run2[tag] == None:
                     if splitstr.find("TT") == -1:
@@ -304,7 +561,7 @@ if __name__=="__main__":
 
         print " run 2 unc "
         print unc_Run2
-
+        file2write.close()
         print 'CMS_VV_JJ_DeepJet_Htag_eff'
         data["Run2"] = {splitstr+'_'+'CMS_VV_JJ_DeepJet_Htag_eff' : calcfinalUnc(unc_Run2,'H_tag',categories)}
         print 'CMS_VV_JJ_DeepJet_Vtag_eff'

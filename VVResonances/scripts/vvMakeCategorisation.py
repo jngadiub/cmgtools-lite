@@ -207,22 +207,25 @@ def calculateSFUnc(self,event,ctx,year,jet,SF,eff_vtag=[1,1],eff_htag=[1,1],mist
             mistag_top[1] *= SF*(ctx.LPSF_toptag[year]-ctx.TOP_tag_unc_LP[year])	    
      
     return eff_vtag,eff_htag,mistag_top
-    
+
 def calculateSF(self,event,ctx,year,jet,TTruth1=0,TTruth2=0,tag1="",tag2=""):
 
     SF = 1.0
+    SFW = 1.0
+    SFH =1.0
     VTruth = event.jj_l1_mergedVTruth
     HTruth = event.jj_l1_mergedHTruth
     ZbbTruth = event.jj_l1_mergedZbbTruth
     TTruth = TTruth1
     jetTag = tag1
+    pt = event.jj_l1_pt
     if jet == 2:
         VTruth = event.jj_l2_mergedVTruth
         HTruth = event.jj_l2_mergedHTruth
         ZbbTruth = event.jj_l2_mergedZbbTruth
         TTruth = TTruth2
         jetTag = tag2
-
+        pt = event.jj_l2_pt
     jetTruth = ""
 
     if TTruth == 1: jetTruth = "top"
@@ -242,8 +245,26 @@ def calculateSF(self,event,ctx,year,jet,TTruth1=0,TTruth2=0,tag1="",tag2=""):
     
         if jetTag == 'HPHtag': SF *= ctx.HPSF_toptag[year]
         elif jetTag == 'LPHtag': SF *= ctx.LPSF_toptag[year]
-                
-    return SF
+
+    #pt dependent part
+    # I calculate 2 additional SF to take into account the impact the tagger pt dependence separately for each tagger
+    # if the jet is W tagged, the SF to take into account the pt dependence for the W gets modified while the one taking into account the H tagger gets the nominal value
+    if (jetTruth=='H' or jetTruth=='V' ):
+        if jetTag == 'HPHtag' or jetTag == 'LPHtag':
+            SFH *= (ctx.Htag_intercept+ pt*ctx.Htag_slope)
+            SFW *=SF
+        elif jetTag == 'HPVtag' or jetTag == 'LPVtag':
+            SFH *=SF
+            SFW *= (ctx.Wtag_intercept+ pt*ctx.Wtag_slope)
+        else:
+            SFH *=SF
+            SFW *=SF
+    else:
+        SFH *=SF
+        SFW *=SF
+
+    return SF,SFW,SFH
+
     
 class myTree:
     
@@ -280,6 +301,12 @@ class myTree:
     category               =  bytearray(7)
     newTree = None
     File = None
+
+    #parameters for pt dependence
+    Wsfpt = rootfloat()
+    Hsfpt = rootfloat()
+    jj_l1_pt = rootfloat()
+    jj_l2_pt = rootfloat()
     
     def __init__(self, treename,outfile):
         self.File = outfile
@@ -316,7 +343,13 @@ class myTree:
         self.newTree.Branch("jj_l2_jetTag",self.jj_l2_jetTag,"jj_l2_jetTag[6]/C")
      
         self.newTree.Branch("category",self.category,"category[7]/C")
-        
+        #parameters for pt dependence
+        self.newTree.Branch("Hsfpt",self.Hsfpt,"Hsfpt/F")
+        self.newTree.Branch("Wsfpt",self.Wsfpt,"Wsfpt/F")
+        self.newTree.Branch("jj_l1_pt",self.jj_l1_pt,"jj_l1_pt/F")
+        self.newTree.Branch("jj_l2_pt",self.jj_l2_pt,"jj_l2_pt/F")
+
+
     def setOutputTreeBranchValues(self,cat,ctx,tmpname,year):
         print " setOutputTreeBranchValues ",cat
         rf = ROOT.TFile(tmpname+'.root','READ')
@@ -435,15 +468,19 @@ class myTree:
 
             tag1=self.jj_l1_jetTag[:6]
             tag2=self.jj_l2_jetTag[:6]
-	    
-            CMS_eff_vtag_sf = [1.0,1.0] #for up and down variations                                                                                                                                                               
+            CMS_eff_vtag_sf = [1.0,1.0] #for up and down variations
             CMS_eff_htag_sf = [1.0,1.0]
             CMS_mistag_top_sf = [1.0,1.0]
             jet = 1
-            SF1 = calculateSF(self,event,ctx,year,jet,top1,top2,tag1,tag2)
+            SF1,SFW1,SFH1 = calculateSF(self,event,ctx,year,jet,top1,top2,tag1,tag2)
             jet = 2
-	    SF2 = calculateSF(self,event,ctx,year,jet,top1,top2,tag1,tag2)
-	    SF = SF1*SF2
+            SF2,SFW2,SFH2 = calculateSF(self,event,ctx,year,jet,top1,top2,tag1,tag2)
+            SF = SF1*SF2
+            #pt dependent part
+            # I calculate 2 additional SF to take into account the impact the tagger pt dependence separately for each tagger
+            # if the jet is W tagged, the SF to take into account the pt dependence for the W gets modified while the one taking into account the H tagger gets the nominal value
+            Hsfpt= SFH1*SFH2
+            Wsfpt= SFW1*SFW2
 	    if (tag1.find('Htag') != tag2.find('Htag')) or (tag1.find('Vtag') != tag2.find('Vtag')):
 	     jet = 1
              CMS_eff_vtag_sf,CMS_eff_htag_sf,CMS_mistag_top_sf = calculateSFUnc(self,event,ctx,year,jet,SF2,CMS_eff_vtag_sf,CMS_eff_htag_sf,CMS_mistag_top_sf,top1,top2,tag1,tag2)
@@ -458,6 +495,10 @@ class myTree:
 	    if CMS_eff_vtag_sf[0] == 1 and CMS_eff_vtag_sf[1] == 1: CMS_eff_vtag_sf = [SF,SF]
 	    if CMS_mistag_top_sf[0] == 1 and CMS_mistag_top_sf[1] == 1: CMS_mistag_top_sf = [SF,SF]
             self.sf.rf = SF
+            self.Wsfpt.rf = Wsfpt
+            self.Hsfpt.rf = Hsfpt
+            self.jj_l1_pt.rf = event.jj_l1_pt
+            self.jj_l2_pt.rf = event.jj_l2_pt
             self.CMS_eff_vtag_sf_up.rf = CMS_eff_vtag_sf[0]
             self.CMS_eff_vtag_sf_down.rf = CMS_eff_vtag_sf[1]
             self.CMS_eff_htag_sf_up.rf = CMS_eff_htag_sf[0]
