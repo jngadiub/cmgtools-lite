@@ -9,7 +9,7 @@
     "unc_lumi18": 1.025,
     "unc_lumi161718": 1.018,
 
-    "_commentOnSF":"from Loukas for map-decorrelated MD pt 400-800, at the moment WvsQCD values used for all SF",
+    "_commentOnSF":"from Loukas for map-decorrelated MD pt 400-800 for WvsQCD, pt >600 for ZHbbvsQCD",
     "wtag_SF_HP" : {"2016": 1.000, "2017": 0.873, "2018": 0.840},
     "wtag_SF_LP" : {"2016": 1.055, "2017": 1.301, "2018": 1.164},
     "wtag_SF_NP" : {"2016": 1.055, "2017": 1.301, "2018": 1.164},
