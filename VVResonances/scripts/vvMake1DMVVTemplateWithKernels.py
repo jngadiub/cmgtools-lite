@@ -172,6 +172,10 @@ for filename in os.listdir(folder):
             if filename.find("TT")!=-1:
                 #we consider ttbar with reweight applyied as nominal!
                 dataPlotters[-1].addCorrectionFactor('TopPTWeight','tree')
+            if filename.find("W") !=-1 or filename.find('Z') != -1:
+                print "applying k factors "
+                dataPlotters[-1].addCorrectionFactor("kfactor",'tree')
+
             dataPlotters[-1].filename=fname
 
             dataPlottersNW.append(TreePlotter(folder+'/'+fname+'.root','AnalysisTree'))
