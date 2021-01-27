@@ -4,7 +4,7 @@ import ROOT
 from ROOT import *
 
 ############## gluon fusion ##############
-fin = ROOT.TFile.Open('BulkGWW.root','READ')
+fin = ROOT.TFile.Open('RadionWW.root','READ')
 graph = fin.Get('gtheory')
 
 xsec = {}
@@ -24,7 +24,7 @@ for i in range(graph.GetN()):
 
 fin.Close()
 
-fin = ROOT.TFile.Open('BulkGZZ.root','READ')
+fin = ROOT.TFile.Open('RadionZZ.root','READ')
 graph = fin.Get('gtheory')
 
 for i in range(graph.GetN()):
@@ -35,7 +35,7 @@ for i in range(graph.GetN()):
 
 fin.Close()
 
-f=open("BulkG.json","w")
+f=open("Radion.json","w")
 json.dump(xsec,f)
 f.close()
 
@@ -43,7 +43,7 @@ f.close()
 
 
 ############## VBF ##############
-fin = ROOT.TFile.Open('VBF_BulkGWW.root','READ')
+fin = ROOT.TFile.Open('VBF_RadionWW.root','READ')
 graph = fin.Get('gtheory')
 
 xsec = {}
@@ -63,7 +63,7 @@ for i in range(graph.GetN()):
 
 fin.Close()
 
-fin = ROOT.TFile.Open('VBF_BulkGZZ.root','READ')
+fin = ROOT.TFile.Open('VBF_RadionZZ.root','READ')
 graph = fin.Get('gtheory')
 
 for i in range(graph.GetN()):
@@ -74,6 +74,6 @@ for i in range(graph.GetN()):
 
 fin.Close()
 
-f=open("VBF_BulkG.json","w")
+f=open("VBF_Radion.json","w")
 json.dump(xsec,f)
 f.close()
