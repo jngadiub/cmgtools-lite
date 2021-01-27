@@ -93,7 +93,9 @@ for filename in os.listdir(args[0]):
                     print "applying tagging SF"
                     dataPlotters[-1].addFriend("all","../interactive/migrationunc/"+fname+"_"+year+".root")
                     dataPlotters[-1].addCorrectionFactor("all.SF",'tree')
-
+                if fname.find("Jets") !=-1:
+                    print "applying k factors "
+                    dataPlotters[-1].addCorrectionFactor("kfactor",'tree')
 
 data=MergedPlotter(dataPlotters)
 
