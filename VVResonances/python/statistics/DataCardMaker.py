@@ -1,7 +1,7 @@
 import ROOT
 ROOT.gSystem.Load("libHiggsAnalysisCombinedLimit")
 import json
-import sys
+import sys, math
 from array import array
 ROOT.RooMsgService.instance().setGlobalKillBelow(ROOT.RooFit.WARNING)
 
@@ -1888,12 +1888,12 @@ class DataCardMaker:
             #I know this is stupid 
 	    value = 0
 	    for i,s in enumerate(sigmaStr):
-	     value+=float(info[str(int(m))][sigmaStr[i]])*float(info[str(int(m))][BRStr])
+	     value+=math.log(float(info[str(int(m))][sigmaStr[i]])*float(info[str(int(m))][BRStr]))
             yArr.append(value)
 	    print m,value
 
         pdfSigma="_".join([name,self.tag,"sigma"])
-        spline=ROOT.RooSpline1D(pdfSigma,pdfSigma,self.w.var("MH"),len(xArr),array('d',xArr),array('d',yArr),"AKIMA")
+        spline=ROOT.RooSpline1D(pdfSigma,pdfSigma,self.w.var("MH"),len(xArr),array('d',xArr),array('d',yArr))
         getattr(self.w,'import')(spline,ROOT.RooFit.RenameVariable(pdfSigma,pdfSigma))
 
         f=open(jsonFile)
@@ -1904,7 +1904,7 @@ class DataCardMaker:
         self.w.factory(uncertaintyName+'[0,-1,1]')
 
         if isinstance(info['yield'],list) == False:
-            self.w.factory("expr::{name}('({param})*{lumi}*({sigma})*({constant})*(1.0+{unc}*{form})',MH,{lumi},{sigma},{unc})".format(name=pdfNorm,param=info['yield'],lumi=self.physics+"_"+self.period+"_lumi",sigma=pdfSigma,constant=constant,unc=uncertaintyName,form=uncertaintyFormula))
+            self.w.factory("expr::{name}('({param})*{lumi}*(TMath::Exp({sigma}))*({constant})*(1.0+{unc}*{form})',MH,{lumi},{sigma},{unc})".format(name=pdfNorm,param=info['yield'],lumi=self.physics+"_"+self.period+"_lumi",sigma=pdfSigma,constant=constant,unc=uncertaintyName,form=uncertaintyFormula))
         else:
             l = info['yield']
             xArr =[]
@@ -1914,7 +1914,7 @@ class DataCardMaker:
                 yArr.append(l[i][1])
             spline=ROOT.RooSpline1D(pdfNorm+'spline',pdfNorm+'spline',self.w.var("MH"),len(xArr),array("d",xArr),array("d",yArr))    
             getattr(self.w,'import')(spline,ROOT.RooFit.RenameVariable(pdfNorm+'spline',pdfNorm+'spline'))
-            self.w.factory("expr::{name}('{lumi}*({sigma})*({constant})*(1.0+{unc}*{form})',MH,{lumi},{sigma},{unc})".format(name=pdfNorm+'expr',lumi=self.physics+"_"+self.period+"_lumi",sigma=pdfSigma,constant=constant,unc=uncertaintyName,form=uncertaintyFormula))
+            self.w.factory("expr::{name}('{lumi}*(TMath::Exp({sigma}))*({constant})*(1.0+{unc}*{form})',MH,{lumi},{sigma},{unc})".format(name=pdfNorm+'expr',lumi=self.physics+"_"+self.period+"_lumi",sigma=pdfSigma,constant=constant,unc=uncertaintyName,form=uncertaintyFormula))
             prd = ROOT.RooProduct(pdfNorm,pdfNorm,ROOT.RooArgList(self.w.function(pdfNorm+'spline'),self.w.function(pdfNorm+'expr')))
             getattr(self.w,'import')(prd,ROOT.RooFit.RenameVariable(pdfNorm,pdfNorm))
            
