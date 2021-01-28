@@ -103,8 +103,10 @@ for sig in signals:
       cardName='datacard_'+cat+'.txt '
       workspaceName='workspace_'+cat+outlabel+'.root'
 
-      Tools.AddSignal(card,dataset,p,sig,resultsDir[dataset],ncontrib)
-      ncontrib+=1
+      if 'WW' in sig or 'ZZ' in sig or 'WH' in sig or 'ZH' in sig: Tools.AddOneSignal(card,dataset,p,sig,resultsDir[dataset],ncontrib)             
+      else: Tools.AddMultipleSignals(card,dataset,p,sig,resultsDir[dataset],ncontrib)
+      
+      ncontrib+=1      
       print "##########################       including W/Z jets in datacard      ######################"
       rootFileNorm = resultsDir[dataset]+'/JJ_%s_WJets_%s.root'%(dataset,p)
       if options.fitvjetsmjj == True:

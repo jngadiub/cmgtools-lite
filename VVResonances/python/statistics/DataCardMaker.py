@@ -1888,9 +1888,9 @@ class DataCardMaker:
             #I know this is stupid 
 	    value = 0
 	    for i,s in enumerate(sigmaStr):
-	     value+=math.log(float(info[str(int(m))][sigmaStr[i]])*float(info[str(int(m))][BRStr]))
-            yArr.append(value)
-	    print m,value
+	     value+=float(info[str(int(m))][sigmaStr[i]])*float(info[str(int(m))][BRStr])
+            yArr.append(math.log(value))
+	    #print m,value,math.log(value)
 
         pdfSigma="_".join([name,self.tag,"sigma"])
         spline=ROOT.RooSpline1D(pdfSigma,pdfSigma,self.w.var("MH"),len(xArr),array('d',xArr),array('d',yArr))
