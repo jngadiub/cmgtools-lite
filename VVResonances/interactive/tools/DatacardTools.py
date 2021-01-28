@@ -106,27 +106,27 @@ class DatacardTools():
 
  def AddMultipleSignals(self,card,dataset,category,sig,resultsDir,ncontrib):
  
-  if sig = 'VprimeWV':
+  if sig == 'VprimeWV':
    self.AddOneSignal(card,dataset,p,'WprimeWZ',resultsDir[dataset],ncontrib)
    self.AddOneSignal(card,dataset,p,'ZprimeWW',resultsDir[dataset],ncontrib-1)
-  elif sig = 'VprimeVH':
+  elif sig == 'VprimeVH':
    self.AddOneSignal(card,dataset,p,'WprimeWH',resultsDir[dataset],ncontrib)
    self.AddOneSignal(card,dataset,p,'ZprimeZH',resultsDir[dataset],ncontrib-1)
-  elif sig = 'Wprime':
+  elif sig == 'Wprime':
    self.AddOneSignal(card,dataset,p,'WprimeWZ',resultsDir[dataset],ncontrib)
    self.AddOneSignal(card,dataset,p,'WprimeWH',resultsDir[dataset],ncontrib-1)
-  elif sig = 'Zprime':
+  elif sig == 'Zprime':
    self.AddOneSignal(card,dataset,p,'ZprimeWW',resultsDir[dataset],ncontrib)
    self.AddOneSignal(card,dataset,p,'ZprimeZH',resultsDir[dataset],ncontrib-1)
-  elif sig = 'Vprime':
+  elif sig == 'Vprime':
    self.AddOneSignal(card,dataset,p,'WprimeWZ',resultsDir[dataset],ncontrib)
    self.AddOneSignal(card,dataset,p,'ZprimeWW',resultsDir[dataset],ncontrib-1)
    self.AddOneSignal(card,dataset,p,'WprimeWH',resultsDir[dataset],ncontrib-2)
    self.AddOneSignal(card,dataset,p,'ZprimeZH',resultsDir[dataset],ncontrib-3)
-  elif sig = 'BulkGVV':
+  elif sig == 'BulkGVV':
    self.AddOneSignal(card,dataset,p,'BulkGWW',resultsDir[dataset],ncontrib)
    self.AddOneSignal(card,dataset,p,'BulkGZZ',resultsDir[dataset],ncontrib-1)
-  elif sig = 'RadionVV':
+  elif sig == 'RadionVV':
    self.AddOneSignal(card,dataset,p,'RadionWW',resultsDir[dataset],ncontrib)
    self.AddOneSignal(card,dataset,p,'RadionZZ',resultsDir[dataset],ncontrib-1)
           
