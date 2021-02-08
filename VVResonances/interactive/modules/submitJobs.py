@@ -391,11 +391,11 @@ def unequalScale(histo,name,alpha,power=1,dim=1):
     else:
 	    for i in range(1,histo.GetNbinsX()+1):
 	        x= histo.GetXaxis().GetBinCenter(i)
-	        nominal=histo.GetBinContent(i) #ROOT.TMath.Log10(histo.GetBinContent(i))
+                nominal=histo.GetBinContent(i) #ROOT.TMath.Log10(histo.GetBinContent(i))
 		factor = 1+alpha*pow(x,power)
 		#print i,x,power,alpha,factor,nominal,nominal*factor,nominal/factor
 	        newHistoU.SetBinContent(i,nominal*factor)
-	        if factor != 0: newHistoD.SetBinContent(i,nominal/factor)	
+	        if factor != 0: newHistoD.SetBinContent(i,nominal/factor)
     return newHistoU,newHistoD 
     
 def mirror(histo,histoNominal,name,dim=1):
@@ -951,6 +951,12 @@ def merge1DMVVTemplate(jobList,files,jobname,purity,binsMVV,minMVV,maxMVV,HCALbi
             histo_noreweight = fhadd_tt.Get('histo_noreweight')
             histo_noreweight.SetName('histo_noreweight')
             histo_noreweight.SetTitle('histo_noreweight')
+            try:
+                histo_doublereweight = fhadd_tt.Get('histo_doublereweight')
+                histo_doublereweight.SetName('histo_doublereweight')
+                histo_doublereweight.SetTitle('histo_doublereweight')
+            except:
+                print " no double reweight hist"
 
             doTT = True
 
@@ -982,7 +988,115 @@ def merge1DMVVTemplate(jobList,files,jobname,purity,binsMVV,minMVV,maxMVV,HCALbi
             histogram_opt_up.SetName('histo_nominal_OPTUp')
             histogram_opt_up.SetTitle('histo_nominal_OPTUp')
             histogram_opt_up.Write('histo_nominal_OPTUp')
-            
+
+            print "Now pT2"
+            alpha=15./(5000.*5000.)
+            histogram_pt2_up,histogram_pt2_down=unequalScale(histo_nominal,"histo_nominal_PT2",alpha,2)
+            histogram_pt2_down.SetName('histo_nominal_PT2Down')
+            histogram_pt2_down.SetTitle('histo_nominal_PT2Down')
+            histogram_pt2_down.Write('histo_nominal_PT2Down')
+            histogram_pt2_up.SetName('histo_nominal_PT2Up')
+            histogram_pt2_up.SetTitle('histo_nominal_PT2Up')
+            histogram_pt2_up.Write('histo_nominal_PT2Up')
+            print "Now opT2"
+            alpha=15.*1000.*1000.
+            histogram_opt2_up,histogram_opt2_down=unequalScale(histo_nominal,"histo_nominal_OPT2",alpha,-2)
+            histogram_opt2_up.SetName('histo_nominal_OPT2Up')
+            histogram_opt2_up.SetTitle('histo_nominal_OPT2Up')
+            histogram_opt2_up.Write('histo_nominal_OPT2Up')
+            histogram_opt2_down.SetName('histo_nominal_OPT2Down')
+            histogram_opt2_down.SetTitle('histo_nominal_OPT2Down')
+            histogram_opt2_down.Write('histo_nominal_OPT2Down')
+
+            #alpha=5000.*5000.*5000.
+            alpha=150./(7000.*7000.*7000.)
+            histogram_pt3_down,histogram_pt3_up=unequalScale(histo_nominal,"histo_nominal_PT3",alpha,3)
+            histogram_pt3_down.SetName('histo_nominal_PT3Down')
+            histogram_pt3_down.SetTitle('histo_nominal_PT3Down')
+            histogram_pt3_down.Write('histo_nominal_PT3Down')
+            histogram_pt3_up.SetName('histo_nominal_PT3Up')
+            histogram_pt3_up.SetTitle('histo_nominal_PT3Up')
+            histogram_pt3_up.Write('histo_nominal_PT3Up')
+            alpha=150.*1000.*1000.*1000.
+            histogram_opt3_down,histogram_opt3_up=unequalScale(histo_nominal,"histo_nominal_OPT3",alpha,-3)
+            histogram_opt3_up.SetName('histo_nominal_OPT3Up')
+            histogram_opt3_up.SetTitle('histo_nominal_OPT3Up')
+            histogram_opt3_up.Write('histo_nominal_OPT3Up')
+            histogram_opt3_down.SetName('histo_nominal_OPT3Down')
+            histogram_opt3_down.SetTitle('histo_nominal_OPT3Down')
+            histogram_opt3_down.Write('histo_nominal_OPT3Down')
+
+            #alpha=5000.*5000.*5000.
+            alpha=1500./(7000.*7000.*7000.*7000.)
+            histogram_pt4_down,histogram_pt4_up=unequalScale(histo_nominal,"histo_nominal_PT4",alpha,4)
+            histogram_pt4_down.SetName('histo_nominal_PT4Down')
+            histogram_pt4_down.SetTitle('histo_nominal_PT4Down')
+            histogram_pt4_down.Write('histo_nominal_PT4Down')
+            histogram_pt4_up.SetName('histo_nominal_PT4Up')
+            histogram_pt4_up.SetTitle('histo_nominal_PT4Up')
+            histogram_pt4_up.Write('histo_nominal_PT4Up')
+            alpha=1500.*1000.*1000.*1000.*1000.
+            histogram_opt4_down,histogram_opt4_up=unequalScale(histo_nominal,"histo_nominal_OPT4",alpha,-4)
+            histogram_opt4_up.SetName('histo_nominal_OPT4Up')
+            histogram_opt4_up.SetTitle('histo_nominal_OPT4Up')
+            histogram_opt4_up.Write('histo_nominal_OPT4Up')
+            histogram_opt4_down.SetName('histo_nominal_OPT4Down')
+            histogram_opt4_down.SetTitle('histo_nominal_OPT4Down')
+            histogram_opt4_down.Write('histo_nominal_OPT4Down')
+            #alpha=5000.*5000.*5000.
+            alpha=15000./(7000.*7000.*7000.*7000.*7000.)
+            histogram_pt5_down,histogram_pt5_up=unequalScale(histo_nominal,"histo_nominal_PT5",alpha,5)
+            histogram_pt5_down.SetName('histo_nominal_PT5Down')
+            histogram_pt5_down.SetTitle('histo_nominal_PT5Down')
+            histogram_pt5_down.Write('histo_nominal_PT5Down')
+            histogram_pt5_up.SetName('histo_nominal_PT5Up')
+            histogram_pt5_up.SetTitle('histo_nominal_PT5Up')
+            histogram_pt5_up.Write('histo_nominal_PT5Up')
+            alpha=15000.*1000.*1000.*1000.*1000.*1000.
+            histogram_opt5_down,histogram_opt5_up=unequalScale(histo_nominal,"histo_nominal_OPT5",alpha,-5)
+            histogram_opt5_up.SetName('histo_nominal_OPT5Up')
+            histogram_opt5_up.SetTitle('histo_nominal_OPT5Up')
+            histogram_opt5_up.Write('histo_nominal_OPT5Up')
+            histogram_opt5_down.SetName('histo_nominal_OPT5Down')
+            histogram_opt5_down.SetTitle('histo_nominal_OPT5Down')
+            histogram_opt5_down.Write('histo_nominal_OPT5Down')
+            #alpha=5000.*5000.*5000.
+            alpha=150000./(7000.*7000.*7000.*7000.*7000.*7000)
+            histogram_pt6_down,histogram_pt6_up=unequalScale(histo_nominal,"histo_nominal_PT6",alpha,6)
+            histogram_pt6_down.SetName('histo_nominal_PT6Down')
+            histogram_pt6_down.SetTitle('histo_nominal_PT6Down')
+            histogram_pt6_down.Write('histo_nominal_PT6Down')
+            histogram_pt6_up.SetName('histo_nominal_PT6Up')
+            histogram_pt6_up.SetTitle('histo_nominal_PT6Up')
+            histogram_pt6_up.Write('histo_nominal_PT6Up')
+            alpha=150000.*1000.*1000.*1000.*1000.*1000.*1000
+            histogram_opt6_down,histogram_opt6_up=unequalScale(histo_nominal,"histo_nominal_OPT6",alpha,-6)
+            histogram_opt6_up.SetName('histo_nominal_OPT6Up')
+            histogram_opt6_up.SetTitle('histo_nominal_OPT6Up')
+            histogram_opt6_up.Write('histo_nominal_OPT6Up')
+            histogram_opt6_down.SetName('histo_nominal_OPT6Down')
+            histogram_opt6_down.SetTitle('histo_nominal_OPT6Down')
+            histogram_opt6_down.Write('histo_nominal_OPT6Down')
+            #alpha=5000.*5000.*5000.
+            alpha=0.
+            histogram_ptn_down,histogram_ptn_up=unequalScale(histo_nominal,"histo_nominal_PTN",alpha,0)
+            histogram_ptn_down.SetName('histo_nominal_PTNDown')
+            histogram_ptn_down.SetTitle('histo_nominal_PTNDown')
+            histogram_ptn_down.Write('histo_nominal_PTNDown')
+            histogram_ptn_up.SetName('histo_nominal_PTNUp')
+            histogram_ptn_up.SetTitle('histo_nominal_PTNUp')
+            histogram_ptn_up.Write('histo_nominal_PTNUp')
+            '''
+            alpha=0.
+            histogram_optn_down,histogram_optn_up=unequalScale(histo_nominal,"histo_nominal_OPTN",alpha,100)
+            histogram_optn_up.SetName('histo_nominal_OPTNUp')
+            histogram_optn_up.SetTitle('histo_nominal_OPTNUp')
+            histogram_optn_up.Write('histo_nominal_OPTNUp')
+            histogram_optn_down.SetName('histo_nominal_OPTNDown')
+            histogram_optn_down.SetTitle('histo_nominal_OPTNDown')
+            histogram_optn_down.Write('histo_nominal_OPTNDown')
+            '''
+
         if doHerwig:
             print "doing Herwig"
             mvv_altshapeUp.Write('mvv_altshapeUp')
@@ -1135,6 +1249,10 @@ def merge1DMVVTemplate(jobList,files,jobname,purity,binsMVV,minMVV,maxMVV,HCALbi
             mvv_nominal.Write('mvv_nominal')
             histo_nominal.Write('histo_nominal')
             histo_noreweight.Write('histo_noreweight')
+            try:
+                histo_doublereweight.Write('histo_doublereweight')
+            except:
+                print " no double"
             c = ROOT.TCanvas("c","C",600,400)
             c.SetRightMargin(0.11)
             c.SetLeftMargin(0.11)
@@ -1149,10 +1267,27 @@ def merge1DMVVTemplate(jobList,files,jobname,purity,binsMVV,minMVV,maxMVV,HCALbi
             if histo_noreweight.Integral() !=0 :
                 histo_noreweight     .Scale(sf/histo_noreweight.Integral())
             else: print "histo_noreweight  not scaled! !!!!!!!!!!!!!!!!!!!!!!!!!!!    Integral = 0!!!!! "
+            try:
+                if histo_doublereweight.Integral() !=0 :
+                    histo_doublereweight     .Scale(sf/histo_doublereweight.Integral())
+                else: print "histo_noreweight  not scaled! !!!!!!!!!!!!!!!!!!!!!!!!!!!    Integral = 0!!!!! "
+            except:
+                print " no double"
+            histo_nominal.SetLineColor(ROOT.kRed)
+            histo_nominal.SetLineWidth(2)
             histo_nominal.Draw("hist")
-            histo_noreweight.SetLineColor(ROOT.kRed)
+            histo_noreweight.SetLineColor(ROOT.kBlue)
             histo_noreweight.SetLineWidth(2)
+            histo_noreweight.SetLineStyle(2)
             histo_noreweight.Draw("histsame")
+            try:
+                histo_doublereweight.SetLineColor(ROOT.kRed)
+                histo_doublereweight.SetLineWidth(2)
+                histo_doublereweight.SetLineStyle(2)
+                histo_doublereweight.Draw("histsame")
+            except:
+                print " no double"
+
             text = ROOT.TLatex()
             text.DrawLatexNDC(0.13,0.92,"#font[62]{CMS} #font[52]{Simulation}")
             if mvv_nominal.Integral() !=0:
@@ -1168,6 +1303,11 @@ def merge1DMVVTemplate(jobList,files,jobname,purity,binsMVV,minMVV,maxMVV,HCALbi
             l.AddEntry(mvv_nominal,"simulation","lp")
             l.AddEntry(histo_nominal,"template","l")
             l.AddEntry(histo_noreweight,"no pt reweigh","l")
+            try:
+                l.AddEntry(histo_doublereweight,"double pt reweigh","l")
+            except:
+                print " no double"
+
             l.Draw("same")
 
 
@@ -1417,6 +1557,8 @@ def merge2DTemplate(jobList,files,jobname,purity,leg,binsMVV,binsMJ,minMVV,maxMV
             conditional(histogram_pt_down)
             histogram_pt_down.SetName('histo_nominal_PTDown')
             histogram_pt_down.SetTitle('histo_nominal_PTDown')
+
+
             histogram_pt_down.Write('histo_nominal_PTDown')
             conditional(histogram_pt_up)
             histogram_pt_up.SetName('histo_nominal_PTUp')
@@ -1455,6 +1597,94 @@ def merge2DTemplate(jobList,files,jobname,purity,leg,binsMVV,binsMJ,minMVV,maxMV
             histogram_opt2_up.SetName('histo_nominal_OPT2Up')
             histogram_opt2_up.SetTitle('histo_nominal_OPT2Up')
             histogram_opt2_up.Write('histo_nominal_OPT2Up')
+
+            #alpha=5000.*5000.*5000.
+            alpha=150./(7000.*7000.*7000.)
+            histogram_pt3_down,histogram_pt3_up=unequalScale(histo_nominal,"histo_nominal_PT3",alpha,3)
+            histogram_pt3_down.SetName('histo_nominal_PT3Down')
+            histogram_pt3_down.SetTitle('histo_nominal_PT3Down')
+            histogram_pt3_down.Write('histo_nominal_PT3Down')
+            histogram_pt3_up.SetName('histo_nominal_PT3Up')
+            histogram_pt3_up.SetTitle('histo_nominal_PT3Up')
+            histogram_pt3_up.Write('histo_nominal_PT3Up')
+            alpha=150.*1000.*1000.*1000.
+            histogram_opt3_down,histogram_opt3_up=unequalScale(histo_nominal,"histo_nominal_OPT3",alpha,-3)
+            histogram_opt3_up.SetName('histo_nominal_OPT3Up')
+            histogram_opt3_up.SetTitle('histo_nominal_OPT3Up')
+            histogram_opt3_up.Write('histo_nominal_OPT3Up')
+            histogram_opt3_down.SetName('histo_nominal_OPT3Down')
+            histogram_opt3_down.SetTitle('histo_nominal_OPT3Down')
+            histogram_opt3_down.Write('histo_nominal_OPT3Down')
+
+            #alpha=5000.*5000.*5000.
+            alpha=1500./(7000.*7000.*7000.*7000.)
+            histogram_pt4_down,histogram_pt4_up=unequalScale(histo_nominal,"histo_nominal_PT4",alpha,4)
+            histogram_pt4_down.SetName('histo_nominal_PT4Down')
+            histogram_pt4_down.SetTitle('histo_nominal_PT4Down')
+            histogram_pt4_down.Write('histo_nominal_PT4Down')
+            histogram_pt4_up.SetName('histo_nominal_PT4Up')
+            histogram_pt4_up.SetTitle('histo_nominal_PT4Up')
+            histogram_pt4_up.Write('histo_nominal_PT4Up')
+            alpha=1500.*1000.*1000.*1000.*1000.
+            histogram_opt4_down,histogram_opt4_up=unequalScale(histo_nominal,"histo_nominal_OPT4",alpha,-4)
+            histogram_opt4_up.SetName('histo_nominal_OPT4Up')
+            histogram_opt4_up.SetTitle('histo_nominal_OPT4Up')
+            histogram_opt4_up.Write('histo_nominal_OPT4Up')
+            histogram_opt4_down.SetName('histo_nominal_OPT4Down')
+            histogram_opt4_down.SetTitle('histo_nominal_OPT4Down')
+            histogram_opt4_down.Write('histo_nominal_OPT4Down')
+            #alpha=5000.*5000.*5000.
+            alpha=15000./(7000.*7000.*7000.*7000.*7000.)
+            histogram_pt5_down,histogram_pt5_up=unequalScale(histo_nominal,"histo_nominal_PT5",alpha,5)
+            histogram_pt5_down.SetName('histo_nominal_PT5Down')
+            histogram_pt5_down.SetTitle('histo_nominal_PT5Down')
+            histogram_pt5_down.Write('histo_nominal_PT5Down')
+            histogram_pt5_up.SetName('histo_nominal_PT5Up')
+            histogram_pt5_up.SetTitle('histo_nominal_PT5Up')
+            histogram_pt5_up.Write('histo_nominal_PT5Up')
+            alpha=15000.*1000.*1000.*1000.*1000.*1000.
+            histogram_opt5_down,histogram_opt5_up=unequalScale(histo_nominal,"histo_nominal_OPT5",alpha,-5)
+            histogram_opt5_up.SetName('histo_nominal_OPT5Up')
+            histogram_opt5_up.SetTitle('histo_nominal_OPT5Up')
+            histogram_opt5_up.Write('histo_nominal_OPT5Up')
+            histogram_opt5_down.SetName('histo_nominal_OPT5Down')
+            histogram_opt5_down.SetTitle('histo_nominal_OPT5Down')
+            histogram_opt5_down.Write('histo_nominal_OPT5Down')
+            #alpha=5000.*5000.*5000.
+            alpha=150000./(7000.*7000.*7000.*7000.*7000.*7000)
+            histogram_pt6_down,histogram_pt6_up=unequalScale(histo_nominal,"histo_nominal_PT6",alpha,6)
+            histogram_pt6_down.SetName('histo_nominal_PT6Down')
+            histogram_pt6_down.SetTitle('histo_nominal_PT6Down')
+            histogram_pt6_down.Write('histo_nominal_PT6Down')
+            histogram_pt6_up.SetName('histo_nominal_PT6Up')
+            histogram_pt6_up.SetTitle('histo_nominal_PT6Up')
+            histogram_pt6_up.Write('histo_nominal_PT6Up')
+            alpha=150000.*1000.*1000.*1000.*1000.*1000.*1000
+            histogram_opt6_down,histogram_opt6_up=unequalScale(histo_nominal,"histo_nominal_OPT6",alpha,-6)
+            histogram_opt6_up.SetName('histo_nominal_OPT6Up')
+            histogram_opt6_up.SetTitle('histo_nominal_OPT6Up')
+            histogram_opt6_up.Write('histo_nominal_OPT6Up')
+            histogram_opt6_down.SetName('histo_nominal_OPT6Down')
+            histogram_opt6_down.SetTitle('histo_nominal_OPT6Down')
+            histogram_opt6_down.Write('histo_nominal_OPT6Down')
+            #alpha=5000.*5000.*5000.
+            alpha=0.
+            histogram_ptn_down,histogram_ptn_up=unequalScale(histo_nominal,"histo_nominal_PTN",alpha,0)
+            histogram_ptn_down.SetName('histo_nominal_PTNDown')
+            histogram_ptn_down.SetTitle('histo_nominal_PTNDown')
+            histogram_ptn_down.Write('histo_nominal_PTNDown')
+            histogram_ptn_up.SetName('histo_nominal_PTNUp')
+            histogram_ptn_up.SetTitle('histo_nominal_PTNUp')
+            histogram_ptn_up.Write('histo_nominal_PTNUp')
+            alpha=0.
+            histogram_optn_down,histogram_optn_up=unequalScale(histo_nominal,"histo_nominal_OPTN",alpha,100)
+            histogram_optn_up.SetName('histo_nominal_OPTNUp')
+            histogram_optn_up.SetTitle('histo_nominal_OPTNUp')
+            histogram_optn_up.Write('histo_nominal_OPTNUp')
+            histogram_optn_down.SetName('histo_nominal_OPTNDown')
+            histogram_optn_down.SetTitle('histo_nominal_OPTNDown')
+            histogram_optn_down.Write('histo_nominal_OPTNDown')
+
             
         if doHerwig:
             histo_altshapeUp.Write('histo_altshapeUp_coarse')
