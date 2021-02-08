@@ -96,6 +96,9 @@ for filename in os.listdir(args[0]):
                 if fname.find("Jets") !=-1:
                     print "applying k factors "
                     dataPlotters[-1].addCorrectionFactor("kfactor",'tree')
+                if fname.find("Jets") !=-1 or  fname.find("TT")!=-1 or fname.find("QCD_Pt") !=-1:
+                    print "applying L1 prefiring weights "
+                    dataPlotters[-1].addCorrectionFactor("L1prefWeight",'tree')
 
 data=MergedPlotter(dataPlotters)
 
