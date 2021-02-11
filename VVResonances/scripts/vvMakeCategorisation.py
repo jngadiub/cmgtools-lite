@@ -159,7 +159,6 @@ def selectSignalTree(cs,sample):
     signaltree_VV_HPLP.Write()
     signaltree_VV_NPHP.Write()
     finaltree.Write()
-    finaltree.Print()
     bigtree.Write()
     outfile.Close()
     return tmpname
