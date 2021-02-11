@@ -99,18 +99,27 @@ def selectSignalTree(cs,sample):
         chain.Add(rfile)
         print " entries ",chain.GetEntries()
     bigtree = chain.CopyTree("1")
+
+    finaltree = chain.CopyTree(cs['common']+'*'+cs['acceptance'])
+    print "VBF "
+    finaltreeVBF = chain.CopyTree(cs['common_VBF']+'*'+cs['acceptance'])
+    signaltree_VBF_VH_HPHP = finaltreeVBF.CopyTree(cs['VH_HPHP'])
+    signaltree_VBF_VV_HPHP = finaltreeVBF.CopyTree(cs['VV_HPHP'])#all other categories before are explicitly removed so that each event can only live in one category!!
+    signaltree_VBF_VH_LPHP = finaltreeVBF.CopyTree(cs['VH_LPHP'])
+    signaltree_VBF_VH_HPLP = finaltreeVBF.CopyTree(cs['VH_HPLP'])
+    signaltree_VBF_VV_HPLP = finaltreeVBF.CopyTree(cs['VV_HPLP'])
     print " common_VV * acceptance ",cs['common_VV']+'*'+cs['acceptance']
-    finaltree = chain.CopyTree(cs['common_VV']+'*'+cs['acceptance'])
+    finaltreeVV = chain.CopyTree(cs['common_VV']+'*'+cs['acceptance'])
     print 'overall entries in tree '+str(chain.GetEntries())
     print 'entries after analysis selections '+str(finaltree.GetEntries())
     print "VH HPHP ",cs['VH_HPHP']
-    signaltree_VH_HPHP = finaltree.CopyTree(cs['VH_HPHP'])
+    signaltree_VH_HPHP = finaltreeVV.CopyTree(cs['VH_HPHP'])
     print "VV HPHP ",cs['VV_HPHP']
-    signaltree_VV_HPHP = finaltree.CopyTree(cs['VV_HPHP'])#all other categories before are explicitly removed so that each event can only live in one category!!
-    signaltree_VH_LPHP = finaltree.CopyTree(cs['VH_LPHP'])
-    signaltree_VH_HPLP = finaltree.CopyTree(cs['VH_HPLP'])
-    signaltree_VV_HPLP = finaltree.CopyTree(cs['VV_HPLP'])
-    signaltree_VV_NPHP = finaltree.CopyTree(cs['VV_NPHP_control_region'])
+    signaltree_VV_HPHP = finaltreeVV.CopyTree(cs['VV_HPHP'])#all other categories before are explicitly removed so that each event can only live in one category!!
+    signaltree_VH_LPHP = finaltreeVV.CopyTree(cs['VH_LPHP'])
+    signaltree_VH_HPLP = finaltreeVV.CopyTree(cs['VH_HPLP'])
+    signaltree_VV_HPLP = finaltreeVV.CopyTree(cs['VV_HPLP'])
+    signaltree_VV_NPHP = finaltreeVV.CopyTree(cs['VV_NPHP_control_region'])
     #rest = finaltree.CopyTree('!('+cs['VV_HPLP']+')*!('+cs['VH_LPHP']+')*!('+cs['VH_HPLP']+')*!('+cs['VH_HPHP']+')*!('+cs['VV_HPHP']+')*!('+cs['VV_NPHP_control_region']+')')
     print ' #event VH_HPHP '+str(signaltree_VH_HPHP.GetEntries())+' #event VV_HPHP '+str(signaltree_VV_HPHP.GetEntries())+' #event VH_LPHP '+str(signaltree_VH_LPHP.GetEntries())+' #event VH_HPLP '+str(signaltree_VH_HPLP.GetEntries())+' #event VV_HPLP '+str(signaltree_VV_HPLP.GetEntries())
     print ' #event in control region',signaltree_VV_NPHP.GetEntries()
@@ -123,6 +132,12 @@ def selectSignalTree(cs,sample):
         print 'efficiency of all category cuts '+str(sumcat/float(finaltree.GetEntries()))
     else: 
         print ' no events left after preselection, presumably it is a low pt bin sample '
+    signaltree_VBF_VH_HPHP.SetName('VBF_VH_HPHP')
+    signaltree_VBF_VV_HPHP.SetName('VBF_VV_HPHP')
+    signaltree_VBF_VH_LPHP.SetName('VBF_VH_LPHP')
+    signaltree_VBF_VH_HPLP.SetName('VBF_VH_HPLP')
+    signaltree_VBF_VV_HPLP.SetName('VBF_VV_HPLP')
+
     signaltree_VH_HPHP.SetName('VH_HPHP')
     signaltree_VV_HPHP.SetName('VV_HPHP')
     signaltree_VH_LPHP.SetName('VH_LPHP')
@@ -131,6 +146,12 @@ def selectSignalTree(cs,sample):
     signaltree_VV_NPHP.SetName('VV_NPHP')
     bigtree.SetName('all')
     finaltree.SetName('commonacceptance')
+    signaltree_VBF_VH_HPHP.Write()
+    signaltree_VBF_VV_HPHP.Write()
+    signaltree_VBF_VH_LPHP.Write()
+    signaltree_VBF_VH_HPLP.Write()
+    signaltree_VBF_VV_HPLP.Write()
+
     signaltree_VH_HPHP.Write()
     signaltree_VV_HPHP.Write()
     signaltree_VH_LPHP.Write()
@@ -138,6 +159,7 @@ def selectSignalTree(cs,sample):
     signaltree_VV_HPLP.Write()
     signaltree_VV_NPHP.Write()
     finaltree.Write()
+    finaltree.Print()
     bigtree.Write()
     outfile.Close()
     return tmpname
@@ -342,7 +364,7 @@ class myTree:
         self.newTree.Branch("jj_l1_jetTag",self.jj_l1_jetTag,"jj_l1_jetTag[6]/C")
         self.newTree.Branch("jj_l2_jetTag",self.jj_l2_jetTag,"jj_l2_jetTag[6]/C")
      
-        self.newTree.Branch("category",self.category,"category[7]/C")
+        self.newTree.Branch("category",self.category,"category[12]/C")
         #parameters for pt dependence
         self.newTree.Branch("Hsfpt",self.Hsfpt,"Hsfpt/F")
         self.newTree.Branch("Wsfpt",self.Wsfpt,"Wsfpt/F")
@@ -436,8 +458,8 @@ class myTree:
             self.jj_l1_mergedZbbTruth.ri = event.jj_l1_mergedZbbTruth
             self.jj_l2_mergedZbbTruth.ri = event.jj_l2_mergedZbbTruth
             if cat !='all':
-                self.category[:7] = cat
-            else: self.category[:7] = "0"
+                self.category[:12] = cat
+            else: self.category[:12] = "0"
 
             # this depends now on the actual cuts in the analysis!!
             if ZHbb_leaf_l1.GetValue() > WPHP_ZHbb_leaf_l1.GetValue():
@@ -563,11 +585,14 @@ if __name__=='__main__':
         print 'init new tree'
         outtree = myTree(sample,outfile)
         outtreeAll = myTree(sample,outfile)
-        print 'select common cuts signal tree' 
-        print " common_VV ",ctx.cuts["common_VV"]
-        print " acceptance ",ctx.cuts["acceptance"]
         tmpfilename = selectSignalTree(ctx.cuts,samplelist[sample])
         print " tmpfilename ",tmpfilename
+        outtree.setOutputTreeBranchValues('VBF_VH_HPHP',ctx,tmpfilename,filePeriod)
+        outtree.setOutputTreeBranchValues('VBF_VV_HPHP',ctx,tmpfilename,filePeriod)
+        outtree.setOutputTreeBranchValues('VBF_VH_LPHP',ctx,tmpfilename,filePeriod)
+        outtree.setOutputTreeBranchValues('VBF_VH_HPLP',ctx,tmpfilename,filePeriod)
+        outtree.setOutputTreeBranchValues('VBF_VV_HPLP',ctx,tmpfilename,filePeriod)
+
         outtree.setOutputTreeBranchValues('VH_HPHP',ctx,tmpfilename,filePeriod)
         outtree.setOutputTreeBranchValues('VV_HPHP',ctx,tmpfilename,filePeriod)
         outtree.setOutputTreeBranchValues('VH_LPHP',ctx,tmpfilename,filePeriod)
