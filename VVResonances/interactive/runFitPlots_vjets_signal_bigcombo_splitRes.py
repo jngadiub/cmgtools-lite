@@ -52,7 +52,7 @@ if options.name.find("2017")!=-1: period = "2017"
 if options.name.find("2018")!=-1: period = "2018"
 if options.name.find("Run2")!=-1: period = "Run2"
 
-
+showallTT=False
 signalName = "ZprimeZH"
 if options.name.find("WZ")!=-1:
     signalName="WprimeWZ"
@@ -284,17 +284,17 @@ if __name__=="__main__":
      #make projections onto MJJ axis 
      if options.projection =="z" or options.projection =="xyz":
          results = []
-         res = forproj.doProjection(data[period],allpdfsz[period],all_expected[period],"z",allsignalpdfs[period],signal_expected[period])
+         res = forproj.doProjection(data[period],allpdfsz[period],all_expected[period],"z",allsignalpdfs[period],signal_expected[period],showallTT)
          forplotting.MakePlots(res[0],res[1],res[2],res[3],res[4],res[5], res[6],res[7],options.pseudo)
      #make projections onto MJ1 axis
      if options.projection =="x" or options.projection =="xyz":
          results = []
-         res = forproj.doProjection(data[period],allpdfsx[period],all_expected[period],"x",allsignalpdfs[period],signal_expected[period])
+         res = forproj.doProjection(data[period],allpdfsx[period],all_expected[period],"x",allsignalpdfs[period],signal_expected[period],showallTT)
          forplotting.MakePlots(res[0],res[1],res[2],res[3],res[4],res[5], res[6],res[7],options.pseudo,binwidth)
      #make projections onto MJ2 axis
      if options.projection =="y" or options.projection =="xyz":
          results = []
-         res = forproj.doProjection(data[period],allpdfsy[period],all_expected[period],"y",allsignalpdfs[period],signal_expected[period])
+         res = forproj.doProjection(data[period],allpdfsy[period],all_expected[period],"y",allsignalpdfs[period],signal_expected[period],showallTT)
          forplotting.MakePlots(res[0],res[1],res[2],res[3],res[4],res[5], res[6],res[7],options.pseudo,binwidth)
 
 
