@@ -46,7 +46,7 @@ signals = options.signal.split(",")
 print "signals ",signals
 doVjets= True
 rescale = False
-sf_qcd=1.
+sf_qcd=1.8
 
 if outlabel.find("sigonly")!=-1 or outlabel.find("qcdonly")!=-1: doVjets = False
 if outlabel.find("sigonly")!=-1 or outlabel.find("Vjetsonly")!=-1: sf_qcd = 0.00001
@@ -67,7 +67,7 @@ if pseudodata == "False":
   scalesHiggs = [ctx.H_HPmassscale,ctx.H_LPmassscale]
 
 vtag_pt_dependence = ctx.tagger_pt_dependence
-
+PU_unc = ctx.PU_uncertainties
 
 
 datasets= options.period.split(",")
@@ -81,7 +81,7 @@ print "datasets ",datasets
 print "result dir ",resultsDir
 
 doCorrelation = True 
-Tools = DatacardTools(scales,scalesHiggs,vtag_pt_dependence,lumi_unc,sf_qcd,pseudodata,outlabel,doCorrelation,options.fitvjetsmjj)
+Tools = DatacardTools(scales,scalesHiggs,vtag_pt_dependence,PU_unc,lumi_unc,sf_qcd,pseudodata,outlabel,doCorrelation,options.fitvjetsmjj)
 
 
 for sig in signals:
@@ -91,7 +91,9 @@ for sig in signals:
     print dataset
     cmd_combo="combineCards.py"
     for p in purities:
-
+      shape_purity = p
+      if p.find("VBF") !=-1 : shape_purity= p.replace("VBF_","")
+      print " purity "+p+" shape to use "+shape_purity
       ncontrib = 0
       print dataset," has lumi ",lumi[dataset]
       print type(lumi[dataset])
@@ -111,7 +113,7 @@ for sig in signals:
         rootFileMVV =  resultsDir[dataset]+'/JJ_%s_WJets_MVV_NP_Wjets'%dataset+'.json'
         Tools.AddWResBackground(card,dataset,p,rootFileMVV,rootFileNorm,resultsDir[dataset],ncontrib,["CMS_VV_JJ_WJets_slope",0.5])
       else:
-        rootFileMVV = resultsDir[dataset]+'/JJ_%s_WJets_MVV_'%dataset+p+'.root'
+        rootFileMVV = resultsDir[dataset]+'/JJ_%s_WJets_MVV_'%dataset+shape_purity+'.root'
         Tools.AddWResBackground(card,dataset,p,rootFileMVV,rootFileNorm,resultsDir[dataset],ncontrib)
       ncontrib+=1
       
@@ -120,13 +122,13 @@ for sig in signals:
         rootFileMVV =  resultsDir[dataset]+'/JJ_%s_ZJets_MVV_NP_Zjets'%dataset+'.json'
         Tools.AddZResBackground(card,dataset,p,rootFileMVV,rootFileNorm,resultsDir[dataset],ncontrib,["CMS_VV_JJ_ZJets_slope",0.5])
       else:
-        rootFileMVV = resultsDir[dataset]+'/JJ_%s_ZJets_MVV_'%dataset+p+'.root'
+        rootFileMVV = resultsDir[dataset]+'/JJ_%s_ZJets_MVV_'%dataset+shape_purity+'.root'
         Tools.AddZResBackground(card,dataset,p,rootFileMVV,rootFileNorm,resultsDir[dataset],ncontrib)
       ncontrib+=1
         
       print "##########################       including tt+jets in datacard      ######################"
       contrib =["resT","resW","nonresT","resTnonresT","resWnonresT","resTresW"]
-      rootFileMVV = {ttcon:resultsDir[dataset]+'/JJ_'+dataset+'_TTJets'+ttcon+'_MVV_'+p+'.root' for ttcon in contrib}
+      rootFileMVV = {ttcon:resultsDir[dataset]+'/JJ_'+dataset+'_TTJets'+ttcon+'_MVV_'+shape_purity+'.root' for ttcon in contrib}
       #rootFileMVV = {ttcon:resultsDir[dataset]+'/JJ_'+dataset+'_TTJets'+ttcon+'_MVV_NP.root' for ttcon in contrib}
       rootFileNorm = {ttcon:resultsDir[dataset]+'/JJ_'+dataset+'_TTJets'+ttcon+'_'+p+'.root' for ttcon in contrib}
       jsonfileNorm = resultsDir[dataset]+'/'+options.jsonname+'_'+dataset+'_'+p+'.json'
@@ -145,7 +147,7 @@ for sig in signals:
 
       print "##########################       including QCD in datacard      ######################"
       #rootFile3DPDF = resultsDir[dataset]+'/JJ_2016_nonRes_3D_VV_HPLP.root'
-      rootFile3DPDF = resultsDir[dataset]+"/save_new_shapes_{year}_pythia_{purity}_3D.root".format(year=dataset,purity=p)#    save_new_shapes_%s_pythia_"%dataset+"_""VVVH_all"+"_3D.root"
+      rootFile3DPDF = resultsDir[dataset]+"/save_new_shapes_{year}_pythia_{purity}_3D.root".format(year=dataset,purity=shape_purity)#    save_new_shapes_%s_pythia_"%dataset+"_""VVVH_all"+"_3D.root"
       #rootFile3DPDF = resultsDir[dataset]+"/save_new_shapes_{year}_madgraph_{purity}_3D.root".format(year=dataset,purity=p)#    save_new_shapes_%s_pythia_"%dataset+"_""VVVH_all"+"_3D.root"
       print "rootFile3DPDF ",rootFile3DPDF
       rootFileNorm = resultsDir[dataset]+"/JJ_%s_nonRes_"%dataset+p+".root"
@@ -197,8 +199,8 @@ for sig in signals:
       Tools.AddData(card,rootFileData,histName,scaleData)
 
       print "##########################       data/pseudodata added in datacard      ######################"  
-       
-      Tools.AddSigSystematics(card,sig,dataset,p,1)
+      correlateyields=1
+      Tools.AddSigSystematics(card,sig,dataset,p,correlateyields)
       if options.fitvjetsmjj == True:
         Tools.AddResBackgroundSystematics(card,p,["CMS_VV_JJ_WJets_slope",0.2,"CMS_VV_JJ_ZJets_slope",0.2])
       else:
