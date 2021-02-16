@@ -45,12 +45,34 @@ print " tmplabel ",tmplabel
 ttlabel = tmplabel.replace("TTJets","")
 print " ttlabel ",ttlabel
 
-if options.output.find('VV_HPLP')!=-1: purity='VV_HPLP'
-if options.output.find('VV_HPHP')!=-1: purity='VV_HPHP'
-if options.output.find('VH_HPLP')!=-1: purity='VH_HPLP'
-if options.output.find('VH_HPHP')!=-1: purity='VH_HPHP'
-if options.output.find('VH_LPHP')!=-1: purity='VH_LPHP'
-if options.output.find('NP')!=-1: purity='NP'
+if options.output.find('VV_HPLP')!=-1:
+    purity='VV_HPLP'
+    if options.output.find('VBF')!=-1: 
+        purity='VBF_'+purity
+elif options.output.find('VV_HPHP')!=-1:
+    purity='VV_HPHP'
+    if options.output.find('VBF')!=-1:
+        purity='VBF_'+purity
+elif options.output.find('VH_HPLP')!=-1:
+    purity='VH_HPLP'
+    if options.output.find('VBF')!=-1:
+        purity='VBF_'+purity
+elif options.output.find('VH_HPHP')!=-1:
+    purity='VH_HPHP'
+    if options.output.find('VBF')!=-1:
+        purity='VBF_'+purity
+elif options.output.find('VH_LPHP')!=-1:
+    purity='VH_LPHP'
+    if options.output.find('VBF')!=-1:
+        purity='VBF_'+purity
+elif options.output.find('NP')!=-1:
+    purity='NP'
+    if options.output.find('VBF')!=-1:
+        purity='VBF_'+purity
+else :
+    print "options.output "+options.output+" doesn't have a known purity!"
+    sys.exit()
+
 print "purity ",purity
 def getBinning(binsMVV,minx,maxx,bins):
     l=[]
@@ -98,12 +120,17 @@ def smoothTail1D(proj,smooth=3000):
     
     
     beginFitX = 2100#1500
-    if smooth < 2600 : beginFitX = 1200
+    if smooth < 2600 :
+        beginFitX = options.minx
     endX = smooth #2800
+
+
     #if options.output.find("HPHP")!=-1: 
         #beginFitX=1100
         #endX = 1500
-    expo=ROOT.TF1("expo","[0]*(1-x/13000.)^[1]/(x/13000)^[2]",2000,8000)
+    #expo=ROOT.TF1("expo","[0]*(1-x/13000.)^[1]/(x/13000)^[2]",2000,8000) #orig
+    expo=ROOT.TF1("expo","[0]*(1-x/13000.)^(min([1],[2]))/(x/13000)^[2]",2000,8000) #Andreas suggestion 1
+    #expo=ROOT.TF1("expo","[0]*(1-x/30000.)^[1]/(x/30000)^[2]",2000,8000) #Andreas suggestion 2
     expo.SetParameters(0,16.,2.)
     expo.SetParLimits(2,1.,20.)
     proj.Fit(expo,"LLMR","",beginFitX,8000)
@@ -143,64 +170,90 @@ stack = ROOT.THStack("stack","")
 print "Creating datasets for samples: " ,sampleTypes
 dataPlotters=[]
 dataPlottersNW=[]
+dataPlotters2W=[]
 
-#folders=[]
 print "args[0] ",args[0]
-folder = args[0] #.split(',')
-print "folder ",folder
-print "split ",folder.split("/")
-year=folder.split("/")[-2]
-print "year ",year
-print "now working with cuts "
-ctx = cuts.cuts("init_VV_VH.json",year,"dijetbins_random")
-print "lumi for year "+year+" = ",ctx.lumi[year]
-luminosity = ctx.lumi[year]/ctx.lumi["Run2"]
-#smoothstart=ctx.tt_smooth
-smoothstart={ "" : { "NP": 3000., "VV_HPHP": 3000. , "VV_HPLP": 1800., "VH_HPHP": 3000., "VH_HPLP": 2000., "VH_LPHP": 3000. },
-              "resT" : { "NP": 3000., "VV_HPHP": 3000. , "VV_HPLP": 1800., "VH_HPHP": 3000., "VH_HPLP": 2000., "VH_LPHP": 3000. },
-              "resW": { "NP": 1800., "VV_HPHP": 1800. , "VV_HPLP": 1400., "VH_HPHP": 1400., "VH_HPLP": 1400., "VH_LPHP": 1200. },
-              "resTnonresT": { "NP": 3000., "VV_HPHP": 1600. , "VV_HPLP": 1600., "VH_HPHP": 3000., "VH_HPLP": 3000., "VH_LPHP": 2200. },
-              "resWnonresT": { "NP": 2000., "VV_HPHP": 1600. , "VV_HPLP": 1600., "VH_HPHP": 1800., "VH_HPLP": 2000., "VH_LPHP": 1800. },
-              "resTresW" : { "NP": 3000., "VV_HPHP": 1800. , "VV_HPLP": 1800., "VH_HPHP": 1800., "VH_HPLP": 2800., "VH_LPHP": 2200. },
-              "nonresT" : { "NP": 3000., "VV_HPHP": 1400. , "VV_HPLP": 1800., "VH_HPHP": 2000., "VH_HPLP": 1800., "VH_LPHP": 2000. }}
+folders = args[0].split(',')
+print "folders ",folders
+context = cuts.cuts("init_VV_VH.json","2016","dijetbins_random")
+smoothstart=context.tt_smooth
 
 print "smooth start",smoothstart 
-if options.output.find("Run2") ==-1: luminosity = 1
-for filename in os.listdir(folder):
-    for sampleType in sampleTypes:
-        if filename.find(sampleType)!=-1:
-            fnameParts=filename.split('.')
-            fname=fnameParts[0]
-            ext=fnameParts[1]
-            if ext.find("root") ==-1: continue
-            dataPlotters.append(TreePlotter(folder+'/'+fname+'.root','AnalysisTree'))
-            dataPlotters[-1].setupFromFile(folder+'/'+fname+'.pck')
-            dataPlotters[-1].addCorrectionFactor('xsec','tree')
-            dataPlotters[-1].addCorrectionFactor('genWeight','tree')
-            dataPlotters[-1].addCorrectionFactor('puWeight','tree')
-            dataPlotters[-1].addCorrectionFactor(luminosity,'flat')
-            if options.triggerW:
-                dataPlotters[-1].addCorrectionFactor('triggerWeight','tree')
-                print "Using trigger weights from tree"
-            for w in weights_:
-                if w != '': dataPlotters[-1].addCorrectionFactor(w,'branch')
-            corrFactor = 1
-            dataPlotters[-1].addCorrectionFactor(corrFactor,'flat') 
-            if filename.find("TT")!=-1:
-                #we consider ttbar with reweight applyied as nominal!
-                dataPlotters[-1].addCorrectionFactor('TopPTWeight','tree')
-            dataPlotters[-1].filename=fname
+for folder in folders:
+    print " folder "
+    for filename in os.listdir(folder):
+        print "split ",folder.split("/")
+        year=folder.split("/")[-2]
+        print "year ",year
+        print "now working with cuts "
+        ctx = cuts.cuts("init_VV_VH.json",year,"dijetbins_random")
+        print "lumi for year "+year+" = ",ctx.lumi[year]
+        luminosity = ctx.lumi[year]/ctx.lumi["Run2"]
+        if options.output.find("Run2") ==-1: luminosity = 1
 
-            dataPlottersNW.append(TreePlotter(folder+'/'+fname+'.root','AnalysisTree'))
-            dataPlottersNW[-1].addCorrectionFactor('puWeight','tree')
-            dataPlottersNW[-1].addCorrectionFactor('genWeight','tree')
-            dataPlottersNW[-1].addCorrectionFactor(corrFactor,'flat')
-            for w in weights_: 
-                if w != '': dataPlottersNW[-1].addCorrectionFactor(w,'branch')
-            if options.triggerW: dataPlottersNW[-1].addCorrectionFactor('triggerWeight','tree')
-            dataPlottersNW[-1].addCorrectionFactor(corrFactor,'flat')
-            dataPlottersNW[-1].addCorrectionFactor(luminosity,'flat') 
-            dataPlottersNW[-1].filename=fname
+        for sampleType in sampleTypes:
+            if filename.find(sampleType)!=-1:
+                fnameParts=filename.split('.')
+                fname=fnameParts[0]
+                ext=fnameParts[1]
+                if ext.find("root") ==-1: continue
+                dataPlotters.append(TreePlotter(folder+'/'+fname+'.root','AnalysisTree'))
+                dataPlotters[-1].setupFromFile(folder+'/'+fname+'.pck')
+                dataPlotters[-1].addCorrectionFactor('xsec','tree')
+                dataPlotters[-1].addCorrectionFactor('genWeight','tree')
+                dataPlotters[-1].addCorrectionFactor('puWeight','tree')
+                dataPlotters[-1].addCorrectionFactor(luminosity,'flat')
+                #print "applying tagging SF"
+                #dataPlotters[-1].addFriend("all","../interactive/migrationunc/"+fname+"_"+year+".root")
+                #dataPlotters[-1].addCorrectionFactor("all.SF",'tree')
+                if options.triggerW:
+                    dataPlotters[-1].addCorrectionFactor('triggerWeight','tree')
+                    print "Using trigger weights from tree"
+                for w in weights_:
+                    if w != '': dataPlotters[-1].addCorrectionFactor(w,'branch')
+                corrFactor = 1
+                dataPlotters[-1].addCorrectionFactor(corrFactor,'flat')
+                if filename.find("TT")!=-1:
+                    #we consider ttbar with reweight applyied as nominal!
+                    dataPlotters[-1].addCorrectionFactor('TopPTWeight','tree')
+                dataPlotters[-1].filename=fname
+
+                dataPlottersNW.append(TreePlotter(folder+'/'+fname+'.root','AnalysisTree'))
+                dataPlottersNW[-1].setupFromFile(folder+'/'+fname+'.pck')
+                dataPlottersNW[-1].addCorrectionFactor('puWeight','tree')
+                dataPlottersNW[-1].addCorrectionFactor('xsec','tree')
+                dataPlottersNW[-1].addCorrectionFactor('genWeight','tree')
+                #dataPlottersNW[-1].addFriend("all","../interactive/migrationunc/"+fname+"_"+year+".root")
+                #dataPlottersNW[-1].addCorrectionFactor("all.SF",'tree')
+                dataPlottersNW[-1].addCorrectionFactor(corrFactor,'flat')
+                for w in weights_:
+                    if w != '': dataPlottersNW[-1].addCorrectionFactor(w,'branch')
+                if options.triggerW: dataPlottersNW[-1].addCorrectionFactor('triggerWeight','tree')
+                dataPlottersNW[-1].addCorrectionFactor(corrFactor,'flat')
+                dataPlottersNW[-1].addCorrectionFactor(luminosity,'flat')
+                dataPlottersNW[-1].filename=fname
+
+                dataPlotters2W.append(TreePlotter(folder+'/'+fname+'.root','AnalysisTree'))
+                dataPlotters2W[-1].setupFromFile(folder+'/'+fname+'.pck')
+                dataPlotters2W[-1].addCorrectionFactor('xsec','tree')
+                dataPlotters2W[-1].addCorrectionFactor('genWeight','tree')
+                dataPlotters2W[-1].addCorrectionFactor('puWeight','tree')
+                #dataPlotters2W[-1].addFriend("all","../interactive/migrationunc/"+fname+"_"+year+".root")
+                #dataPlotters2W[-1].addCorrectionFactor("all.SF",'tree')
+                dataPlotters2W[-1].addCorrectionFactor(luminosity,'flat')
+                if options.triggerW:
+                    dataPlotters2W[-1].addCorrectionFactor('triggerWeight','tree')
+                    print "Using trigger weights from tree"
+                for w in weights_:
+                    if w != '': dataPlotters2W[-1].addCorrectionFactor(w,'branch')
+                corrFactor = 1
+                dataPlotters2W[-1].addCorrectionFactor(corrFactor,'flat')
+                if filename.find("TT")!=-1:
+                    #we consider ttbar with reweight applyied as nominal!
+                    #this is wrong!! But it didn't find an easy way to do x2 at the moment
+                    dataPlotters2W[-1].addCorrectionFactor('TopPTWeight','tree')
+                    dataPlotters2W[-1].addCorrectionFactor('TopPTWeight','tree')
+                dataPlotters2W[-1].filename=fname
 
 
 data=MergedPlotter(dataPlotters)
@@ -218,13 +271,15 @@ histogram_nominal = ROOT.TH1F("histo_nominal","histo_nominal",options.binsx,arra
 histogram_nominal.Sumw2()
 histogram_noreweight = ROOT.TH1F("histo_noreweight","histo_noreweight",options.binsx,array('f',binning))
 histogram_noreweight.Sumw2()
+histogram_doublereweight = ROOT.TH1F("histo_doublereweight","histo_doublereweight",options.binsx,array('f',binning))
+histogram_doublereweight.Sumw2()
 
 mvv_nominal = ROOT.TH1F("mvv_nominal","mvv_nominal",options.binsx,array('f',binning))
 mvv_nominal.Sumw2()
 
 maxEvents = -1
 #ok lets populate!
-for plotter,plotterNW in zip(dataPlotters,dataPlottersNW):
+for plotter,plotterNW,plotter2W in zip(dataPlotters,dataPlottersNW,dataPlotters2W):
  '''
  if plotter.filename.find("Jets") != -1 or plotter.filename.find("TT") !=-1:
    print "Preparing nominal histogram for "
@@ -255,18 +310,23 @@ for plotter,plotterNW in zip(dataPlotters,dataPlottersNW):
    print "filename: ", plotter.filename
    histI2=plotter.drawTH1Binned('jj_LV_mass',options.cut,"1",array('f',binning))
    histI2nw=plotterNW.drawTH1Binned('jj_LV_mass',options.cut,"1",array('f',binning))
+   histI22w=plotter2W.drawTH1Binned('jj_LV_mass',options.cut,"1",array('f',binning))
    canv = ROOT.TCanvas("c1","c1",800,600)
    dataset=plotter.makeDataSet('jj_gen_partialMass,jj_l1_gen_pt,jj_l1_gen_softDrop_mass',options.cut,options.firstEv,options.lastEv)
    datasetNW=plotterNW.makeDataSet('jj_gen_partialMass,jj_l1_gen_pt,jj_l1_gen_softDrop_mass',options.cut,options.firstEv,options.lastEv)
+   dataset2W=plotter2W.makeDataSet('jj_gen_partialMass,jj_l1_gen_pt,jj_l1_gen_softDrop_mass',options.cut,options.firstEv,options.lastEv)
 
    histTMP=ROOT.TH1F("histoTMP","histo",options.binsx,array('f',binning))
    histTMPnw=ROOT.TH1F("histoTMPnw","histo",options.binsx,array('f',binning))
+   histTMP2w=ROOT.TH1F("histoTMP2w","histo",options.binsx,array('f',binning))
    if not(options.usegenmass):
     datamaker=ROOT.cmg.GaussianSumTemplateMaker1D(dataset,options.var,'jj_l1_gen_pt',scale,res,histTMP)
     datamaker2=ROOT.cmg.GaussianSumTemplateMaker1D(datasetNW,options.var,'jj_l1_gen_pt',scale,res,histTMPnw)
+    datamaker2w=ROOT.cmg.GaussianSumTemplateMaker1D(dataset2W,options.var,'jj_l1_gen_pt',scale,res,histTMP2w)
    else: 
        datamaker=ROOT.cmg.GaussianSumTemplateMaker1D(dataset,options.var,'jj_l1_gen_softDrop_mass',scale,res,histTMP)
        datamaker2=ROOT.cmg.GaussianSumTemplateMaker1D(datasetNW,options.var,'jj_l1_gen_softDrop_mass',scale,res,histTMPnw)
+       datamaker2w=ROOT.cmg.GaussianSumTemplateMaker1D(dataset2W,options.var,'jj_l1_gen_softDrop_mass',scale,res,histTMP2w)
 
    if histTMP.Integral()>0:
     histTMP.Scale(histI2.Integral()/histTMP.Integral())
@@ -275,12 +335,17 @@ for plotter,plotterNW in zip(dataPlotters,dataPlottersNW):
    if histTMPnw.Integral()>0:
     histTMPnw.Scale(histI2nw.Integral()/histTMPnw.Integral())
     histogram_noreweight.Add(histTMPnw)
+   if histTMP2w.Integral()>0:
+    histTMP2w.Scale(histI22w.Integral()/histTMP2w.Integral())
+    histogram_doublereweight.Add(histTMP2w)
 
 
    histI2.Delete()
    histTMP.Delete()
    histI2nw.Delete()
    histTMPnw.Delete()
+   histI22w.Delete()
+   histTMP2w.Delete()
 
 
  if len(sampleTypes)<2: continue
@@ -289,18 +354,23 @@ for plotter,plotterNW in zip(dataPlotters,dataPlottersNW):
    print "filename: ", plotter.filename
    histI2=plotter.drawTH1Binned('jj_LV_mass',options.cut,"1",array('f',binning))
    histI2nw=plotterNW.drawTH1Binned('jj_LV_mass',options.cut,"1",array('f',binning))
+   histI22w=plotter2W.drawTH1Binned('jj_LV_mass',options.cut,"1",array('f',binning))
    canv = ROOT.TCanvas("c1","c1",800,600)
    dataset=plotter.makeDataSet('jj_gen_partialMass,jj_l1_gen_pt,jj_l1_gen_softDrop_mass',options.cut,options.firstEv,options.lastEv)
    datasetNW=plotterNW.makeDataSet('jj_gen_partialMass,jj_l1_gen_pt,jj_l1_gen_softDrop_mass',options.cut,options.firstEv,options.lastEv)
+   dataset2W=plotter2W.makeDataSet('jj_gen_partialMass,jj_l1_gen_pt,jj_l1_gen_softDrop_mass',options.cut,options.firstEv,options.lastEv)
 
    histTMP=ROOT.TH1F("histoTMP","histo",options.binsx,array('f',binning))
    histTMPnw=ROOT.TH1F("histoTMPnw","histo",options.binsx,array('f',binning))
+   histTMP2w=ROOT.TH1F("histoTMP2w","histo",options.binsx,array('f',binning))
    if not(options.usegenmass):
     datamaker=ROOT.cmg.GaussianSumTemplateMaker1D(dataset,options.var,'jj_l1_gen_pt',scale,res,histTMP)
     datamaker2=ROOT.cmg.GaussianSumTemplateMaker1D(datasetNW,options.var,'jj_l1_gen_pt',scale,res,histTMPnw)
+    datamaker2w=ROOT.cmg.GaussianSumTemplateMaker1D(dataset2W,options.var,'jj_l1_gen_pt',scale,res,histTMP2w)
    else:
        datamaker=ROOT.cmg.GaussianSumTemplateMaker1D(dataset,options.var,'jj_l1_gen_softDrop_mass',scale,res,histTMP)
        datamaker2=ROOT.cmg.GaussianSumTemplateMaker1D(datasetNW,options.var,'jj_l1_gen_softDrop_mass',scale,res,histTMPnw)
+       datamaker2w=ROOT.cmg.GaussianSumTemplateMaker1D(dataset2W,options.var,'jj_l1_gen_softDrop_mass',scale,res,histTMP2w)
 
    if histTMP.Integral()>0:
     histTMP.Scale(histI2.Integral()/histTMP.Integral())
@@ -309,11 +379,16 @@ for plotter,plotterNW in zip(dataPlotters,dataPlottersNW):
    if histTMPnw.Integral()>0:
     histTMPnw.Scale(histI2nw.Integral()/histTMPnw.Integral())
     histogram_noreweight.Add(histTMPnw)
+   if histTMP2w.Integral()>0:
+    histTMP2w.Scale(histI22w.Integral()/histTMP2w.Integral())
+    histogram_doublereweight.Add(histTMP2w)
 
    histI2.Delete()
    histTMP.Delete()
    histI2nw.Delete()
    histTMPnw.Delete()
+   histI22w.Delete()
+   histTMP2w.Delete()
 
 
 
@@ -323,18 +398,23 @@ for plotter,plotterNW in zip(dataPlotters,dataPlottersNW):
    print "filename: ", plotter.filename
    histI2=plotter.drawTH1Binned('jj_LV_mass',options.cut,"1",array('f',binning))
    histI2nw=plotterNW.drawTH1Binned('jj_LV_mass',options.cut,"1",array('f',binning))
+   histI22w=plotter2W.drawTH1Binned('jj_LV_mass',options.cut,"1",array('f',binning))
    canv = ROOT.TCanvas("c1","c1",800,600)
    dataset=plotter.makeDataSet('jj_gen_partialMass,jj_l1_gen_pt,jj_l1_gen_softDrop_mass',options.cut,options.firstEv,options.lastEv)
    datasetNW=plotterNW.makeDataSet('jj_gen_partialMass,jj_l1_gen_pt,jj_l1_gen_softDrop_mass',options.cut,options.firstEv,options.lastEv)
+   dataset2W=plotter2W.makeDataSet('jj_gen_partialMass,jj_l1_gen_pt,jj_l1_gen_softDrop_mass',options.cut,options.firstEv,options.lastEv)
 
    histTMP=ROOT.TH1F("histoTMP","histo",options.binsx,array('f',binning))
    histTMPnw=ROOT.TH1F("histoTMPnw","histo",options.binsx,array('f',binning))
+   histTMP2w=ROOT.TH1F("histoTMP2w","histo",options.binsx,array('f',binning))
    if not(options.usegenmass):
     datamaker=ROOT.cmg.GaussianSumTemplateMaker1D(dataset,options.var,'jj_l1_gen_pt',scale,res,histTMP)
     datamaker2=ROOT.cmg.GaussianSumTemplateMaker1D(datasetNW,options.var,'jj_l1_gen_pt',scale,res,histTMPnw)
+    datamaker2w=ROOT.cmg.GaussianSumTemplateMaker1D(dataset2W,options.var,'jj_l1_gen_pt',scale,res,histTMP2w)
    else:
        datamaker=ROOT.cmg.GaussianSumTemplateMaker1D(dataset,options.var,'jj_l1_gen_softDrop_mass',scale,res,histTMP)
        datamaker2=ROOT.cmg.GaussianSumTemplateMaker1D(datasetNW,options.var,'jj_l1_gen_softDrop_mass',scale,res,histTMPnw)
+       datamaker2w=ROOT.cmg.GaussianSumTemplateMaker1D(dataset2W,options.var,'jj_l1_gen_softDrop_mass',scale,res,histTMP2w)
 
    if histTMP.Integral()>0:
     histTMP.Scale(histI2.Integral()/histTMP.Integral())
@@ -343,11 +423,16 @@ for plotter,plotterNW in zip(dataPlotters,dataPlottersNW):
    if histTMPnw.Integral()>0:
     histTMPnw.Scale(histI2nw.Integral()/histTMPnw.Integral())
     histogram_noreweight.Add(histTMPnw)
+   if histTMP2w.Integral()>0:
+    histTMP2w.Scale(histI22w.Integral()/histTMP2w.Integral())
+    histogram_doublereweight.Add(histTMP2w)
 
    histI2.Delete()
    histTMP.Delete()
    histI2nw.Delete()
    histTMPnw.Delete()
+   histI22w.Delete()
+   histTMP2w.Delete()
 
 
 print " ********** ALL DONE, now save in output file ", options.output
@@ -357,18 +442,28 @@ scale = histogram_nominal.Integral()
 scale2 = mvv_nominal.Integral()
 finalHistograms={histogram_nominal.GetName(): histogram_nominal,
                  histogram_noreweight.GetName(): histogram_noreweight,
+                 histogram_doublereweight.GetName(): histogram_doublereweight,
                  mvv_nominal.GetName(): mvv_nominal
 }
 print ttlabel
 print purity
-smooth = smoothstart[ttlabel][purity]
+
+smooth = smoothstart[ttlabel] #[purity]
 print " smooth ",smooth
+smooth_cat=smooth.split(",")
+startsmooth = 3000.
+for entry in smooth_cat:
+    cat = entry.split(":")[0]
+    if cat == purity:
+        startsmooth= entry.split(":")[1]
+print "startsmooth ",startsmooth
 for hist in finalHistograms.itervalues():
  # hist.Write(hist.GetName()+"_raw")
  if (options.output).find("Jets")!=-1 and hist.GetName().find("hist")!=-1:
-     print "smooth tails of 1D histogram for vjets background of histo "+hist.GetName()
      if hist.Integral() > 0:
-        smoothTail1D(hist,smooth)
+        #print  " NO SMOOTHENING!"
+        smoothTail1D(hist,startsmooth)
+        print "smooth tails of 1D histogram for tt background of histo "+hist.GetName()
         if hist.GetName().find("hist_nominal")!=-1:
             hist.Scale(scale)
         #if hist.GetName().find("mvv_nominal")!=-1:
@@ -378,7 +473,7 @@ for hist in finalHistograms.itervalues():
  finalHistograms[hist.GetName()]=hist
 
 #################################
-if histogram_nominal.Integral()!=0 and histogram_noreweight.Integral()!=0: 
+if histogram_nominal.Integral()!=0 and histogram_noreweight.Integral()!=0 and histogram_doublereweight.Integral()!=0:
     c = ROOT.TCanvas("c","C",600,400)
     c.SetRightMargin(0.11)
     c.SetLeftMargin(0.11)
@@ -391,10 +486,15 @@ if histogram_nominal.Integral()!=0 and histogram_noreweight.Integral()!=0:
     finalHistograms["histo_nominal"].SetMinimum(0.0000000000001)
     sf = finalHistograms["histo_nominal"].Integral()
     histogram_noreweight     .Scale(sf/histogram_noreweight.Integral())
+    histogram_doublereweight     .Scale(sf/histogram_doublereweight.Integral())
     finalHistograms["histo_nominal"].Draw("hist")
     histogram_noreweight.SetLineColor(ROOT.kRed)
+    histogram_doublereweight.SetLineColor(ROOT.kRed)
+    histogram_doublereweight.SetLineStyle(2)
     histogram_noreweight.SetLineWidth(2)
     histogram_noreweight.Draw("histsame")
+    histogram_doublereweight.SetLineWidth(2)
+    histogram_doublereweight.Draw("histsame")
     text = ROOT.TLatex()
     text.DrawLatexNDC(0.13,0.92,"#font[62]{CMS} #font[52]{Simulation}")
     data = finalHistograms["mvv_nominal"]
@@ -409,6 +509,7 @@ if histogram_nominal.Integral()!=0 and histogram_noreweight.Integral()!=0:
     l.AddEntry(data,"simulation","lp")
     l.AddEntry(finalHistograms["histo_nominal"],"template","l")
     l.AddEntry(histogram_noreweight,"no pt reweigh","l")
+    l.AddEntry(histogram_doublereweight,"double pt reweigh","l")
     l.Draw("same")
 
     
