@@ -283,21 +283,31 @@ histos_nonRes = {}
 scales={}
 scales_nonRes={}
 
-#purity = "LPLP"
-#if options.output.find("HPHP")!=-1:purity = "HPHP"
-#if options.output.find("HPLP")!=-1:purity = "HPLP"
-#if options.output.find("LPHP")!=-1:purity = "LPHP"
-#if options.output.find("VV")!=-1: purity = 'VV_'+purity
-#else: purity = 'VH_'+purity
 purity = ''
 if options.output.find("HPHP")!=-1: purity = "HPHP"
 elif options.output.find("HPLP")!=-1: purity = "HPLP"
 elif options.output.find("LPHP")!=-1: purity = "LPHP"
 elif options.output.find("LPLP")!=-1: purity = "LPLP"
+elif options.output.find("NP")!=-1:
+    purity = "NP"
+    if options.output.find('VBF')!=-1:
+        purity = 'VBF_'+purity
+elif options.output.find("all")!=-1:
+    purity = "all"
+
 if not 'control_region' in options.output:
- if 'VH' in options.output: purity = 'VH_'+purity
- else: purity = 'VV_'+purity
- if options.output.find('VBF')!=-1: purity = 'VBF_'+purity  
+ if 'VH' in options.output:
+     purity = 'VH_'+purity
+     if options.output.find('VBF')!=-1:
+         purity = 'VBF_'+purity
+ if 'VV' in options.output:
+     purity = 'VV_'+purity
+     if options.output.find('VBF')!=-1:
+         purity = 'VBF_'+purity
+ if 'VV_VH' in options.output:
+     purity = 'VV_VH'
+     if options.output.find('VBF')!=-1:
+         purity = 'VBF_'+purity
 elif purity == '' and 'control_region' in options.output: 
     purity = 'VH_NPHP_control_region'
     if options.output.find('HPNP')!=-1: purity = 'VH_HPNP_control_region'
