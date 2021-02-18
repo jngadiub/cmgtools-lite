@@ -695,12 +695,13 @@ def makeNonResCard():
  print "lumi unc",lumi_unc 
  vtag_pt_dependence = ctx.tagger_pt_dependence
  print " vtag_pt_dependence ",vtag_pt_dependence
- 
+ PU_unc = ctx.PU_uncertainties
+
  scales = [ctx.W_HPmassscale,ctx.W_LPmassscale]
  scalesHiggs = [ctx.H_HPmassscale,ctx.H_LPmassscale]
 
 
- DTools = DatacardTools(scales,scalesHiggs,vtag_pt_dependence,lumi_unc,1.0,"","",doCorrelation)
+ DTools = DatacardTools(scales,scalesHiggs,vtag_pt_dependence,PU_unc,lumi_unc,1.0,"","",doCorrelation)
  print '##########      PURITY      :', purity 
 
  cat='_'.join(['JJ',sig,purity,'13TeV_'+dataset])
