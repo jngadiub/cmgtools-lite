@@ -2,7 +2,7 @@ from functions import *
 from optparse import OptionParser
 #from cuts import cuts, HPSF16, HPSF17, LPSF16, LPSF17, dijetbins, HCALbinsMVVSignal, minMJ,maxMJ,binsMJ, minMVV, maxMVV, binsMVV, minMX, maxMX, catVtag, catHtag
 import cuts
-
+import argparse
 ## import cuts of the analysis from separate file
 
 # python makeInputs.py -p 2016 --run "detector" --batch False
@@ -36,6 +36,7 @@ parser.add_option("--fitsmjj",dest="fitsmjj",default=False,action="store_true",h
 parser.add_option("--single",dest="single",default=False,help="set to True to merge kernels also for single years when processing full run2 data")
 parser.add_option("--sendjobs",dest="sendjobs",default=True,help="make job list without submitting them (useful to only merge jobs if something was not finished")
 parser.add_option("-c",dest="category",default="VH_HPHP,VH_HPLP,VH_LPHP,VV_HPHP,VV_HPLP",help="chose the category, e.g. NP or VV_HPHP")
+parser.add_option("-v","--vbf",dest="vbf",help="make vbf?",action='store_true')
 (options,args) = parser.parse_args()
 
 widerMVV=True
@@ -79,6 +80,9 @@ if useTriggerWeights:
     
 #all categories
 categories=options.category.split(",")
+if options.vbf == True:
+    for cat in options.category.split(","):
+        categories.append("VBF_"+cat)
 print " ********* running on categories: ",categories
 
 #list of signal samples --> nb, radion and vbf samples to be added
