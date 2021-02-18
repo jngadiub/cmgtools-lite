@@ -440,11 +440,11 @@ class DataCardMaker:
         f=open(jsonFile)
         info=json.load(f)
 
-        mean1Var="_".join(["mean1",name,self.tag])
-        self.w.factory("expr::{name}('({param})*(1+{vv_syst})*{sc}',MJJ,{vv_systs})".format(name=mean1Var,param=info['mean1'],vv_syst=scaleStr,vv_systs=','.join(scaleSysts),sc=scales[0]))
+        mean1Var="_".join(["meanW",name,self.tag])
+        self.w.factory("expr::{name}('({param})*(1+{vv_syst})*{sc}',MJJ,{vv_systs})".format(name=mean1Var,param=info['meanW'],vv_syst=scaleStr,vv_systs=','.join(scaleSysts),sc=scales[0]))
 
-        sigma1Var="_".join(["sigma1",name,self.tag])
-        self.w.factory("expr::{name}('({param})*(1+{vv_syst})*{sc}',MJJ,{vv_systs})".format(name=sigma1Var,param=info['sigma1'],vv_syst=resolutionStr,vv_systs=','.join(resolutionSysts),sc=scales[1]))
+        sigma1Var="_".join(["sigmaW",name,self.tag])
+        self.w.factory("expr::{name}('({param})*(1+{vv_syst})*{sc}',MJJ,{vv_systs})".format(name=sigma1Var,param=info['sigmaW'],vv_syst=resolutionStr,vv_systs=','.join(resolutionSysts),sc=scales[1]))
 
         pdfName="_".join([name,self.tag])
         self.w.factory("RooGaussian::{name}({var},{mean1},{sigma1})".format(name=pdfName,var=MJJ,mean1=mean1Var,sigma1=sigma1Var))
@@ -452,7 +452,164 @@ class DataCardMaker:
         print("SUCCESS!!!!!")
         f.close()
 
+    def addMJJTTJetsParametricCBShapeResW(self,name,variable,jsonFile,scale ={},resolution={},scales=[1,1],fractionGauss={},fractionRes={},varToReplace="MJJ"):
+        self.w.factory("MH[2000]")
+        self.w.var("MH").setConstant(1)
+        print " making W"
+        scaleStr='0'
+        resolutionStr='0'
+        fractionGaussStr='0'
+        fractionResStr='0'
+
+        scaleSysts=[]
+        resolutionSysts=[]
+        fractionGaussSysts=[]
+        fractionResSysts=[]
+        for syst,factor in scale.iteritems():
+            self.w.factory(syst+"[0,-0.1,0.1]")
+            scaleStr=scaleStr+"+{factor}*{syst}".format(factor=factor,syst=syst)
+            scaleSysts.append(syst)
+        for syst,factor in resolution.iteritems():
+            self.w.factory(syst+"[0,-0.5,0.5]")
+            resolutionStr=resolutionStr+"+{factor}*{syst}".format(factor=factor,syst=syst)
+            resolutionSysts.append(syst)
+        for syst,factor in fractionGauss.iteritems():
+            self.w.factory(syst+"[0,-50,50]")
+            fractionGaussStr=fractionGaussStr+"+{factor}*{syst}".format(factor=factor,syst=syst)
+            fractionGaussSysts.append(syst)
+        for syst,factor in fractionRes.iteritems():
+            self.w.factory(syst+"[0,-50,50]")
+            fractionResStr=fractionResStr+"+{factor}*{syst}".format(factor=factor,syst=syst)
+            fractionResSysts.append(syst)
+
+        MJJ=variable
+
+        f=open(jsonFile)
+        info=json.load(f)
+        mean1Var="_".join(["meanW",name,self.tag])
+        self.w.factory("expr::{name}('({param})*(1+{vv_syst})*{sc}',MJJ,{vv_systs})".format(name=mean1Var,param=info['meanW'],vv_syst=scaleStr,vv_systs=','.join(scaleSysts),sc=scales[0]))
+        sigma1Var="_".join(["sigmaW",name,self.tag])
+        self.w.factory("expr::{name}('({param})*(1+{vv_syst})*{sc}',MJJ,{vv_systs})".format(name=sigma1Var,param=info['sigmaW'],vv_syst=resolutionStr,vv_systs=','.join(resolutionSysts),sc=scales[1]))
+
+        ALPHAVar="_".join(["alpha1W",name,self.tag])
+        const=info['alpha1W'].split("(0+(")[1].split("+")[0]
+        self.w.factory("{name}[{param}]".format(name=ALPHAVar,param=const).replace("MH",varToReplace))
+
+        NVar="_".join(["n1W",name,self.tag])
+        const=info['n1W'].split("(0+(")[1].split("+")[0]
+        self.w.factory("{name}[{param}]".format(name=NVar,param=const).replace("MH",varToReplace))
+
+        pdfName="_".join([name,self.tag])
+	cbW = ROOT.RooCBShape(pdfName,pdfName,self.w.var('MH'),self.w.function(mean1Var),self.w.function(sigma1Var),self.w.function(ALPHAVar),self.w.function(NVar))
+        getattr(self.w,'import')(cbW,ROOT.RooFit.RenameVariable(pdfName,pdfName))
+
+        print("SUCCESS!!!!!")
+        f.close()
+
+    def addMJJTTJetsParametricCBShapeResT(self,name,variable,jsonFile,scale ={},resolution={},scales=[1,1],fractionGauss={},fractionRes={},varToReplace="MJJ"):
+        self.w.factory("MH[2000]")
+        self.w.var("MH").setConstant(1)
+       
+        scaleStr='0'
+        resolutionStr='0'
+        fractionGaussStr='0'
+        fractionResStr='0'
+
+        scaleSysts=[]
+        resolutionSysts=[]
+        fractionGaussSysts=[]
+        fractionResSysts=[]
+        for syst,factor in scale.iteritems():
+            self.w.factory(syst+"[0,-0.1,0.1]")
+            scaleStr=scaleStr+"+{factor}*{syst}".format(factor=factor,syst=syst)
+            scaleSysts.append(syst)
+        for syst,factor in resolution.iteritems():
+            self.w.factory(syst+"[0,-0.5,0.5]")
+            resolutionStr=resolutionStr+"+{factor}*{syst}".format(factor=factor,syst=syst)
+            resolutionSysts.append(syst)
+        for syst,factor in fractionGauss.iteritems():
+            self.w.factory(syst+"[0,-50,50]")
+            fractionGaussStr=fractionGaussStr+"+{factor}*{syst}".format(factor=factor,syst=syst)
+            fractionGaussSysts.append(syst)
+        for syst,factor in fractionRes.iteritems():
+            self.w.factory(syst+"[0,-50,50]")
+            fractionResStr=fractionResStr+"+{factor}*{syst}".format(factor=factor,syst=syst)
+            fractionResSysts.append(syst)
+
+        MJJ=variable
+
+        f=open(jsonFile)
+        info=json.load(f)
+
+        mean1Var="_".join(["meanT",name,self.tag])
+        self.w.factory("expr::{name}('({param})*(1+{vv_syst})',MJJ,{vv_systs})".format(name=mean1Var,param=info['meanT'],vv_syst=scaleStr,vv_systs=','.join(scaleSysts)))
+
+        sigma1Var="_".join(["sigmaT",name,self.tag])
+        self.w.factory("expr::{name}('({param})*(1+{vv_syst})',MJJ,{vv_systs})".format(name=sigma1Var,param=info['sigmaT'],vv_syst=resolutionStr,vv_systs=','.join(resolutionSysts)))
+
+        ALPHAVar="_".join(["alpha1T",name,self.tag])
+        const=info['alpha1T'].split("(0+(")[1].split("+")[0]
+        self.w.factory("{name}[{param}]".format(name=ALPHAVar,param=const).replace("MH",varToReplace))
+
+        NVar="_".join(["n1T",name,self.tag])
+        const=info['n1T'].split("(0+(")[1].split("+")[0]
+        self.w.factory("{name}[{param}]".format(name=NVar,param=const).replace("MH",varToReplace))
+
+        pdfName="_".join([name,self.tag])
+	cbT = ROOT.RooCBShape(pdfName,pdfName,self.w.var('MH'),self.w.function(mean1Var),self.w.function(sigma1Var),self.w.function(ALPHAVar),self.w.function(NVar))
+        getattr(self.w,'import')(cbT,ROOT.RooFit.RenameVariable(pdfName,pdfName))
+
+        print("SUCCESS!!!!!")
+        f.close()
+
     def addMJJTTJetsParametricShapeResT(self,name,variable,jsonFile,scale ={},resolution={},fractionGauss={},fractionRes={},varToReplace="MJJ"):
+        self.w.factory("MH[2000]")
+        self.w.var("MH").setConstant(1)
+
+        scaleStr='0'
+        resolutionStr='0'
+        fractionGaussStr='0'
+        fractionResStr='0'
+
+        scaleSysts=[]
+        resolutionSysts=[]
+        fractionGaussSysts=[]
+        fractionResSysts=[]
+        for syst,factor in scale.iteritems():
+            self.w.factory(syst+"[0,-0.1,0.1]")
+            scaleStr=scaleStr+"+{factor}*{syst}".format(factor=factor,syst=syst)
+            scaleSysts.append(syst)
+        for syst,factor in resolution.iteritems():
+            self.w.factory(syst+"[0,-0.5,0.5]")
+            resolutionStr=resolutionStr+"+{factor}*{syst}".format(factor=factor,syst=syst)
+            resolutionSysts.append(syst)
+        for syst,factor in fractionGauss.iteritems():
+            self.w.factory(syst+"[0,-50,50]")
+            fractionGaussStr=fractionGaussStr+"+{factor}*{syst}".format(factor=factor,syst=syst)
+            fractionGaussSysts.append(syst)
+        for syst,factor in fractionRes.iteritems():
+            self.w.factory(syst+"[0,-50,50]")
+            fractionResStr=fractionResStr+"+{factor}*{syst}".format(factor=factor,syst=syst)
+            fractionResSysts.append(syst)
+
+        MJJ=variable
+
+        f=open(jsonFile)
+        info=json.load(f)
+
+        mean2Var="_".join(["meanT",name,self.tag])
+        self.w.factory("expr::{name}('({param})*(1+{vv_syst})',MJJ,{vv_systs})".format(name=mean2Var,param=info['meanT'],vv_syst=scaleStr,vv_systs=','.join(scaleSysts)))
+
+        sigma2Var="_".join(["sigmaT",name,self.tag])
+        self.w.factory("expr::{name}('({param})*(1+{vv_syst})',MJJ,{vv_systs})".format(name=sigma2Var,param=info['sigmaT'],vv_syst=resolutionStr,vv_systs=','.join(resolutionSysts)))
+
+        pdfName="_".join([name,self.tag])
+        self.w.factory("RooGaussian::{name}({var},{mean2},{sigma2})".format(name=pdfName,var=MJJ,mean2=mean2Var,sigma2=sigma2Var))
+
+        print("SUCCESS!!!!!")
+        f.close()
+
+    def addMJJTTJetsParametricShapeNonResGaus(self,name,variable,jsonFile,scale ={},resolution={},fractionGauss={},fractionRes={},varToReplace="MJJ"):
         self.w.factory("MH[2000]")
         self.w.var("MH").setConstant(1)
        
@@ -487,11 +644,11 @@ class DataCardMaker:
         f=open(jsonFile)
         info=json.load(f)
 
-        mean2Var="_".join(["mean2",name,self.tag])
-        self.w.factory("expr::{name}('({param})*(1+{vv_syst})',MJJ,{vv_systs})".format(name=mean2Var,param=info['mean2'],vv_syst=scaleStr,vv_systs=','.join(scaleSysts)))
+        mean2Var="_".join(["meanN",name,self.tag])
+        self.w.factory("expr::{name}('({param})*(1+{vv_syst})',MJJ,{vv_systs})".format(name=mean2Var,param=info['meanN'],vv_syst=scaleStr,vv_systs=','.join(scaleSysts)))
 
-        sigma2Var="_".join(["sigma2",name,self.tag])
-        self.w.factory("expr::{name}('({param})*(1+{vv_syst})',MJJ,{vv_systs})".format(name=sigma2Var,param=info['sigma2'],vv_syst=resolutionStr,vv_systs=','.join(resolutionSysts)))
+        sigma2Var="_".join(["sigmaN",name,self.tag])
+        self.w.factory("expr::{name}('({param})*(1+{vv_syst})',MJJ,{vv_systs})".format(name=sigma2Var,param=info['sigmaN'],vv_syst=resolutionStr,vv_systs=','.join(resolutionSysts)))
 
         pdfName="_".join([name,self.tag])
         self.w.factory("RooGaussian::{name}({var},{mean2},{sigma2})".format(name=pdfName,var=MJJ,mean2=mean2Var,sigma2=sigma2Var))
@@ -500,8 +657,9 @@ class DataCardMaker:
         f.close()
 
 
+
     def addMJJTTJetsParametricShapeNonRes(self,name,variable,jsonFile,scale ={},resolution={},fractionGauss={},fractionRes={},varToReplace="MJJ"):
-                 
+
         MJJ=variable            
 
         f=open(jsonFile)
@@ -1923,6 +2081,60 @@ class DataCardMaker:
         self.contributions.append({'name':name,'pdf':pdfName,'ID':ID,'yield':1.0})
 
 
+    def addMultiParametricYieldHVTBR(self,name,ID,jsonFile,jsonFileCS,sigmaStr,BRStr,constant,uncertaintyName,uncertaintyFormula,uncertaintyValue,uncertaintyName1,uncertaintyFormula1,uncertaintyValue1,uncertaintyName2,uncertaintyFormula2,uncertaintyValue2):
+        print 'I will only assume the BRs from HVT and float the cross section'
+        ROOT.gSystem.Load("libHiggsAnalysisCombinedLimit")
+        from array import array
+        #first load cross section
+        fCS=open(jsonFileCS)
+        info=json.load(fCS)
+        xArr=[]
+        yArr=[]
+        yErrArr=[]
+
+        sigmaStr = sigmaStr.split(",")
+        for m in sorted(map(float,info.keys())):
+            xArr.append(float(m))
+            #I know this is stupid
+	    value = 0
+	    for i,s in enumerate(sigmaStr):
+	     value+=float(info[str(int(m))][sigmaStr[i]])*float(info[str(int(m))][BRStr])
+            yArr.append(value)
+	    print m,value
+
+        pdfSigma="_".join([name,self.tag,"sigma"])
+        spline=ROOT.RooSpline1D(pdfSigma,pdfSigma,self.w.var("MH"),len(xArr),array('d',xArr),array('d',yArr),"AKIMA")
+        getattr(self.w,'import')(spline,ROOT.RooFit.RenameVariable(pdfSigma,pdfSigma))
+
+        f=open(jsonFile)
+        info=json.load(f)
+        pdfName="_".join([name,self.tag])
+        pdfNorm="_".join([name,self.tag,"norm"])
+
+        self.w.factory(uncertaintyName+'[0,-1,1]')
+        self.w.factory(uncertaintyName1+'[0,-1,1]')
+        self.w.factory(uncertaintyName2+'[0,-1,1]')
+
+        if isinstance(info['yield'],list) == False:
+            self.w.factory("expr::{name}('({param})*{lumi}*({sigma})*({constant})*(1.0+{unc}*{form})*(1.0+{unc1}*{form1})*(1.0+{unc2}*{form2})',MH,{lumi},{sigma},{unc},{unc1},{unc2})".format(name=pdfNorm,param=info['yield'],lumi=self.physics+"_"+self.period+"_lumi",sigma=pdfSigma,constant=constant,unc=uncertaintyName,form=uncertaintyFormula,unc1=uncertaintyName1,form1=uncertaintyFormula1,unc2=uncertaintyName2,form2=uncertaintyFormula2))
+        else:
+            l = info['yield']
+            xArr =[]
+            yArr =[]
+            for i in range(0,len(l)):
+                xArr.append(l[i][0])
+                yArr.append(l[i][1])
+            spline=ROOT.RooSpline1D(pdfNorm+'spline',pdfNorm+'spline',self.w.var("MH"),len(xArr),array("d",xArr),array("d",yArr))
+            getattr(self.w,'import')(spline,ROOT.RooFit.RenameVariable(pdfNorm+'spline',pdfNorm+'spline'))
+            self.w.factory("expr::{name}('{lumi}*({sigma})*({constant})*(1.0+{unc}*{form})*(1.0+{unc1}*{form1})*(1.0+{unc2}*{form2})',MH,{lumi},{sigma},{unc},{unc1},{unc2})".format(name=pdfNorm+'expr',lumi=self.physics+"_"+self.period+"_lumi",sigma=pdfSigma,constant=constant,unc=uncertaintyName,form=uncertaintyFormula,unc1=uncertaintyName1,form1=uncertaintyFormula1,unc2=uncertaintyName2,form2=uncertaintyFormula2))
+            prd = ROOT.RooProduct(pdfNorm,pdfNorm,ROOT.RooArgList(self.w.function(pdfNorm+'spline'),self.w.function(pdfNorm+'expr')))
+            getattr(self.w,'import')(prd,ROOT.RooFit.RenameVariable(pdfNorm,pdfNorm))
+
+        f.close()
+        self.addSystematic(uncertaintyName,"param",[0,uncertaintyValue])
+        self.addSystematic(uncertaintyName1,"param",[0,uncertaintyValue1])
+        self.addSystematic(uncertaintyName2,"param",[0,uncertaintyValue2])
+        self.contributions.append({'name':name,'pdf':pdfName,'ID':ID,'yield':1.0})
 
     def addFloatingYield(self,name,ID,events,mini=0,maxi=1e+9,constant=False):
         pdfName="_".join([name,self.tag])
@@ -1950,6 +2162,21 @@ class DataCardMaker:
          self.w.factory(uncertaintyName+'[0,-1,1]')
          self.addSystematic(uncertaintyName,"param",[0,uncertaintyValue])
         self.w.factory("expr::{name}('(1+{form}*{unc})',MH,{unc})".format(name=pdfNorm,unc=uncertaintyName,form=uncertaintyFormula))
+
+    def addYieldWithMultiUncertainty(self,name,ID,events,uncertaintyName,uncertaintyFormula,uncertaintyValue,uncertaintyName1,uncertaintyFormula1,uncertaintyValue1,uncertaintyName2,uncertaintyFormula2,uncertaintyValue2):
+        pdfName="_".join([name,self.tag])
+        self.contributions.append({'name':name,'pdf':pdfName,'ID':ID,'yield':events})
+        pdfNorm="_".join([name,self.tag,"norm"])
+        if not self.w.var(uncertaintyName):
+         self.w.factory(uncertaintyName+'[0,-1,1]')
+         self.addSystematic(uncertaintyName,"param",[0,uncertaintyValue])
+        if not self.w.var(uncertaintyName1):
+         self.w.factory(uncertaintyName1+'[0,-1,1]')
+         self.addSystematic(uncertaintyName1,"param",[0,uncertaintyValue1])
+        if not self.w.var(uncertaintyName2):
+         self.w.factory(uncertaintyName2+'[0,-1,1]')
+         self.addSystematic(uncertaintyName2,"param",[0,uncertaintyValue2])
+        self.w.factory("expr::{name}('(1+{form}*{unc})*(1+{form1}*{unc1})*(1+{form2}*{unc2})',MH,{unc},{unc1},{unc2})".format(name=pdfNorm,unc=uncertaintyName,form=uncertaintyFormula,unc1=uncertaintyName1,form1=uncertaintyFormula1,unc2=uncertaintyName2,form2=uncertaintyFormula2))
 
 
     def addConstrainedYieldFromFile(self,name,ID,filename,histoName,nuisance,uncertainty,scale=1.):
@@ -1991,6 +2218,31 @@ class DataCardMaker:
          self.w.factory(uncertaintyName+'[0,-1,1]')
          self.addSystematic(uncertaintyName,"param",[0,uncertaintyValue])
         self.w.factory("expr::{name}('(1+{form}*{unc})',MH,{unc})".format(name=pdfNorm,unc=uncertaintyName,form=uncertaintyFormula))
+
+    def addFixedYieldFromFileWithMultiUncertainty(self,name,ID,filename,histoName,constant,uncertaintyName,uncertaintyFormula,uncertaintyValue,uncertaintyName1,uncertaintyFormula1,uncertaintyValue1,uncertaintyName2,uncertaintyFormula2,uncertaintyValue2):
+        print " addFixedYieldFromFile ",filename
+        pdfName="_".join([name,self.tag])
+        f=ROOT.TFile(filename)
+        print "using histogram ",histoName
+        histogram=f.Get(histoName)
+        print "integral ",histogram.Integral()
+        print "lumi ",self.luminosity
+        print "constant ",constant
+        events=histogram.Integral()*self.luminosity*constant
+        print "events ",events
+        self.contributions.append({'name':name,'pdf':pdfName,'ID':ID,'yield':events})
+        pdfNorm="_".join([name,self.tag,"norm"])
+        if not self.w.var(uncertaintyName):
+         self.w.factory(uncertaintyName+'[0,-1,1]')
+         self.addSystematic(uncertaintyName,"param",[0,uncertaintyValue])
+        if not self.w.var(uncertaintyName1):
+         self.w.factory(uncertaintyName1+'[0,-1,1]')
+         self.addSystematic(uncertaintyName1,"param",[0,uncertaintyValue1])
+        if not self.w.var(uncertaintyName2):
+         self.w.factory(uncertaintyName2+'[0,-1,1]')
+         self.addSystematic(uncertaintyName2,"param",[0,uncertaintyValue2])
+        self.w.factory("expr::{name}('(1+{form}*{unc})*(1+{form1}*{unc1})*(1+{form2}*{unc2})',MH,{unc},{unc1},{unc2})".format(name=pdfNorm,unc=uncertaintyName,form=uncertaintyFormula,unc1=uncertaintyName1,form1=uncertaintyFormula1,unc2=uncertaintyName2,form2=uncertaintyFormula2))
+
 
     def addYieldWithRateParameter(self,name,ID,paramName,formula,values):#jen        
         pdfName="_".join([name,self.tag])
