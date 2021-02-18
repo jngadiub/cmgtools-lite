@@ -2,7 +2,7 @@ void PlotPulls()
 {
 
   int nfiles = 1;
-  const int nlabels = 64; // number of nuissance parameters
+  const int nlabels = 78; // number of nuissance parameters
   std::string labels[nlabels] = {""};
   // To get the fitDiagnostics.root file run ~ this command  'combine -M FitDiagnostics -m 2000 results_2016/workspace_JJ_BulkGWW_VH_NPHP_control_region_13TeV_2016_newdata.root -v 2 --noErrors --minos none' on the workspace
   TFile* tf = new TFile("fitDiagnostics.root","READ");
@@ -29,13 +29,12 @@ void PlotPulls()
   RooArgList fpf_b = postfit_b->floatParsFinal();
 
   for(int k=0; k<fpf_s.getSize(); ++k){
-
     RooRealVar* param_s = (RooRealVar*)fpf_s.at(k);
     std::string name = param_s->GetName();
     RooRealVar* nuis_p = (RooRealVar*)prefit->find(name.c_str());
    
     if( std::string(param_s->GetName()) == "r" ){
-  
+
       std::cout << name << " " << param_s->getVal() << " " << param_s->getError() << " " << (param_s->getVal()-10.0)/param_s->getError() << std::endl;
       double pull_s = 0;//(param_s->getVal()-0.0)/param_s->getError();
       double pull_b = 0;
@@ -88,7 +87,7 @@ void PlotPulls()
   const Int_t ny=nlabels;
   TCanvas *c1 = new TCanvas("c1","demo bin labels",10,10,800,800);
   c1->SetLeftMargin(0.5);
-  c1->SetBottomMargin(0.15);
+  c1->SetTopMargin(0.01);
   c1->SetRightMargin(0.02);
   TH2F *h = new TH2F("h","test",8,-4,4,ny,0,ny);
 
@@ -96,8 +95,8 @@ void PlotPulls()
   h->SetTitle(0);
   //h->GetXaxis()->SetLabelOffset(99);
   h->GetYaxis()->SetLabelOffset(99);
-  h->GetXaxis()->SetTitleOffset(1.3);
-  h->GetXaxis()->SetTitleSize(0.05);
+  h->GetXaxis()->SetTitleOffset(1.);
+  h->GetXaxis()->SetTitleSize(0.04);
   h->GetXaxis()->SetTitle("(#theta-#theta_{in})/#sigma_{#theta}");
   h->GetXaxis()->CenterTitle();
   h->Draw("text");
@@ -133,7 +132,7 @@ void PlotPulls()
   l_m2->Draw();
   l_p2->Draw();
 
-  TLegend* legend = new TLegend(0.6,0.92,0.9,0.99);
+  TLegend* legend = new TLegend(0.1,0.92,0.3,0.99);
   legend->SetTextSize(0.032);
   legend->SetNColumns(2);
   legend->SetLineColor(0);
