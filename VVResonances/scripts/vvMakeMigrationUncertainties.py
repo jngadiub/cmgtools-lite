@@ -27,7 +27,7 @@ parser.add_option("-s","--samples",dest="samples",help="sample to calculate the 
 parser.add_option("-d","--directory",dest="directory",help="directory with signal samples",default="migrationunc/")
 parser.add_option("-m","--minMX",dest="minMX",type=float,help="mVV variable",default=1200)
 parser.add_option("-M","--maxMX",dest="maxMX",type=float, help="mVV variable",default=8000)
-parser.add_option("-c","--categories",dest="categories",help="list of considered categories",default='VH_HPHP,VV_HPHP,VH_LPHP,VH_HPLP,VV_HPLP')
+parser.add_option("-c","--categories",dest="categories",help="list of considered categories",default='VH_HPHP,VV_HPHP,VH_LPHP,VH_HPLP,VV_HPLP,VBF_VH_HPHP,VBF_VV_HPHP,VBF_VH_LPHP,VBF_VH_HPLP,VBF_VV_HPLP')
 parser.add_option("-t","--tags",dest="tags",help="list of tags",default='H_tag,V_tag,top_tag')
 parser.add_option("--isSignal",dest="isSignal",action="store_true", help="is signal?")
 parser.add_option("--doPtFit",dest="doPtFit",action="store_true", help="do you want to do pt dependence fit?")
@@ -383,7 +383,7 @@ if __name__=="__main__":
             for sampleType in sampleTypes:
                 if filename.find(sampleType)!=-1 and filename.find(year)!=-1:
                     if filename.find(".")==-1: continue
-                    if filename.find("VBF")!=-1 and options.sample.find("VBF")==-1: continue
+                    if filename.find("VBF")!=-1 and sampleType.find("VBF")==-1: continue
                     fnameParts=filename.split('.')
                     fname=fnameParts[0]
                     print "fname ",fname
