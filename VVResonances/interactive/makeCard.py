@@ -26,6 +26,7 @@ parser.add_option("-j","--jsonname",dest="jsonname",help="write the name of the 
 parser.add_option("--fitvjetsmjj",dest="fitvjetsmjj",default=False,action="store_true",help="True makes fits for mjj of vjets, False uses hists")
 parser.add_option("--fitTTmjj",dest="fitTTmjj",default=False,action="store_true",help="True makes fits for mjj of ttbar, False uses hists")
 parser.add_option("--combo",dest="combo",default=True,help="If True inputs from the 3 years combined will be used")
+parser.add_option("-v","--vbf",dest="vbf",help="do you want to keep VBF uncertainties separated?",action='store_true')
 (options,args) = parser.parse_args()
 
 
@@ -111,19 +112,19 @@ for sig in signals:
       rootFileNorm = resultsDir[dataset]+'/JJ_%s_WJets_%s.root'%(dataset,p)
       if options.fitvjetsmjj == True:
         rootFileMVV =  resultsDir[dataset]+'/JJ_%s_WJets_MVV_NP_Wjets'%dataset+'.json'
-        Tools.AddWResBackground(card,dataset,p,rootFileMVV,rootFileNorm,resultsDir[dataset],ncontrib,["CMS_VV_JJ_WJets_slope",0.5])
+        Tools.AddWResBackground(card,dataset,shape_purity,rootFileMVV,rootFileNorm,resultsDir[dataset],ncontrib,["CMS_VV_JJ_WJets_slope",0.5])
       else:
         rootFileMVV = resultsDir[dataset]+'/JJ_%s_WJets_MVV_'%dataset+shape_purity+'.root'
-        Tools.AddWResBackground(card,dataset,p,rootFileMVV,rootFileNorm,resultsDir[dataset],ncontrib)
+        Tools.AddWResBackground(card,dataset,shape_purity,rootFileMVV,rootFileNorm,resultsDir[dataset],ncontrib)
       ncontrib+=1
       
       rootFileNorm = resultsDir[dataset]+"/JJ_%s_ZJets_%s.root"%(dataset,p)
       if options.fitvjetsmjj == True:
         rootFileMVV =  resultsDir[dataset]+'/JJ_%s_ZJets_MVV_NP_Zjets'%dataset+'.json'
-        Tools.AddZResBackground(card,dataset,p,rootFileMVV,rootFileNorm,resultsDir[dataset],ncontrib,["CMS_VV_JJ_ZJets_slope",0.5])
+        Tools.AddZResBackground(card,dataset,shape_purity,rootFileMVV,rootFileNorm,resultsDir[dataset],ncontrib,["CMS_VV_JJ_ZJets_slope",0.5])
       else:
         rootFileMVV = resultsDir[dataset]+'/JJ_%s_ZJets_MVV_'%dataset+shape_purity+'.root'
-        Tools.AddZResBackground(card,dataset,p,rootFileMVV,rootFileNorm,resultsDir[dataset],ncontrib)
+        Tools.AddZResBackground(card,dataset,shape_purity,rootFileMVV,rootFileNorm,resultsDir[dataset],ncontrib)
       ncontrib+=1
         
       print "##########################       including tt+jets in datacard      ######################"
@@ -134,10 +135,10 @@ for sig in signals:
       jsonfileNorm = resultsDir[dataset]+'/'+options.jsonname+'_'+dataset+'_'+p+'.json'
       if options.fitTTmjj == True:
         print "load fits"
-        Tools.AddTTBackground3(card,dataset,p,rootFileMVV,rootFileNorm,resultsDir[dataset],ncontrib,["CMS_VV_JJ_TTJets_slope",0.5],jsonfileNorm)
+        Tools.AddTTBackground3(card,dataset,shape_purity,rootFileMVV,rootFileNorm,resultsDir[dataset],ncontrib,["CMS_VV_JJ_TTJets_slope",0.5],jsonfileNorm)
       else:
         print "load templates"
-        Tools.AddTTBackground4(card,dataset,p,rootFileMVV,rootFileNorm,resultsDir[dataset],ncontrib,jsonfileNorm)
+        Tools.AddTTBackground4(card,dataset,shape_purity,rootFileMVV,rootFileNorm,resultsDir[dataset],ncontrib,jsonfileNorm)
       #rootFileMVV  = resultsDir[dataset]+'/JJ_'+dataset+'_TTJets_MVV_'+p+'.root'
       #rootFileNorm = resultsDir[dataset]+'/JJ_'+dataset+'_TTJets_'+p+'.root'
       #Tools.AddTTBackground2(card,dataset,p,rootFileMVV,rootFileNorm,resultsDir[dataset],ncontrib)
@@ -154,7 +155,7 @@ for sig in signals:
       #rootFileNorm = resultsDir[dataset]+"/JJ_%s_nonRes_"%dataset+p+"_altshape2.root"
       print "rootFileNorm ",rootFileNorm
 
-      Tools.AddNonResBackground(card,dataset,p,rootFile3DPDF,rootFileNorm,ncontrib)
+      Tools.AddNonResBackground(card,dataset,shape_purity,rootFile3DPDF,rootFileNorm,ncontrib)
       print "##########################       QCD added in datacard      ######################"
 
 
@@ -202,17 +203,17 @@ for sig in signals:
       correlateyields=1
       Tools.AddSigSystematics(card,sig,dataset,p,correlateyields)
       if options.fitvjetsmjj == True:
-        Tools.AddResBackgroundSystematics(card,p,["CMS_VV_JJ_WJets_slope",0.2,"CMS_VV_JJ_ZJets_slope",0.2])
+        Tools.AddResBackgroundSystematics(card,p,options.vbf,["CMS_VV_JJ_WJets_slope",0.2,"CMS_VV_JJ_ZJets_slope",0.2])
       else:
-        Tools.AddResBackgroundSystematics(card,p)
-      Tools.AddNonResBackgroundSystematics(card,p)
+        Tools.AddResBackgroundSystematics(card,p,options.vbf)
+      Tools.AddNonResBackgroundSystematics(card,p,options.vbf)
       Tools.AddTaggingSystematics(card,sig,p,[resultsDir[dataset]+'/migrationunc_'+sig+'_'+dataset+'.json',resultsDir[dataset]+'/migrationunc_WJets_'+dataset+'.json',resultsDir[dataset]+'/migrationunc_ZJets_'+dataset+'.json',resultsDir[dataset]+'/migrationunc_TTJets_'+dataset+'.json'])
       if options.fitTTmjj == True:
         print "load fits syst"
         Tools.AddTTSystematics4(card,["CMS_VV_JJ_TTJets_slope",0.05],dataset,p)
       else:
         print "load templates syst"
-        Tools.AddTTSystematics5(card,p)
+        Tools.AddTTSystematics5(card,p,options.vbf)
       print "##########################       systematics added in datacard      ######################"  
 
 
