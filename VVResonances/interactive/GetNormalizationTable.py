@@ -1,6 +1,7 @@
 #!/usr/bin/env python                                                                                                                                                                   
 import ROOT
 from array import array
+import argparse
 import os, sys, re, optparse,pickle,shutil,json, copy
 ROOT.gROOT.SetBatch(True)
 ROOT.gStyle.SetOptStat(0)
@@ -14,7 +15,7 @@ parser.add_option("-o","--output",dest="output",help="outname",default='')
 parser.add_option("-i","--inputdir",dest="inputdir",help="directory where the input files are stored",default="results_Run2")
 parser.add_option("-p","--period",dest="period",help="2016 or 2017 or 2016,2017,2018",default="2016,2017,2018")
 parser.add_option("-c","--categories",dest="categories",help="VV_HPHP etc",default="VH_HPHP,VV_HPHP,VH_LPHP,VH_HPLP,VV_HPLP")
-parser.add_option("-v","--vbf",dest="vbf",help="make vbf?",default=False)
+parser.add_option("-v","--vbf",dest="vbf",help="make vbf?",action='store_true')
 
 (options,args) = parser.parse_args()
 
@@ -33,7 +34,7 @@ def tablePreambole(txtfile,caption):
     txtfile.write("\centering\n")
     txtfile.write("\\begin{tabular}{lccccccc}\n")
     txtfile.write("\hline\n")
-    txtfile.write("Background  & QCD & \PW{}+jets & \PZ{}+jets & \\ttbar{} & other & Total & Data\\\\ \n")
+    txtfile.write("Background & Data & Total  & QCD & \PW{}+jets & \PZ{}+jets & \\ttbar{} & other \\\\ \n")
     txtfile.write("\hline\n")
 
 def tableClosing(txtfile,caption):
@@ -42,6 +43,14 @@ def tableClosing(txtfile,caption):
     txtfile.write("\label{tab:ObsEvents}\n")
     txtfile.write("\end{table}\n")
 
+
+def simpleTablePreambole(txtfile,caption):
+    txtfile.write("\\begin{table}[b]\n")
+    txtfile.write("\centering\n")
+    txtfile.write("\\begin{tabular}{lccccccccccccc}\n")
+    txtfile.write("\hline\n")
+    txtfile.write("Background & Data & Total  & QCD & W+jets & Z+jets & ttbar & 2resT & 2resW & nonresT & resTnonresT & resWnonresT & resTresW \\\\ \n")
+    txtfile.write("\hline\n")
 
 
 if __name__ == "__main__":
@@ -62,42 +71,52 @@ if __name__ == "__main__":
         print " processing ",evt
         events[evt] = {}
         text_file = open(evt+"_"+year+options.output+".txt", "w")
+        simpletext_file = open(evt+"simple_"+year+options.output+".txt", "w")
         tablePreambole(text_file,evt)
- 
+        simpleTablePreambole(simpletext_file,evt)
+        production = ["gg/DY"]
+        if options.vbf == True:
+            production = ["VBF","gg/DY"]
 
         exp = {}
-        for c in category:
-            print " cat ",c
-            exp[c] = loadJson(options.inputdir,c,evt,year)
-            print " non res ",exp[c]["nonRes"]
-            if options.vbf == True:
-                vbfc="VBF_"+c
-                exp[vbfc] = loadJson(options.inputdir,vbfc,evt,year)
+        for prod in production:
+            print " production ",prod
+            for c in category:
+                print " cat ",c
+                if prod == "VBF": c = "VBF_"+c
+                exp[c] = loadJson(options.inputdir,c,evt,year)
+                print " non res ",exp[c]["nonRes"]
                 totalTT=0
                 for con in contrib:
                     if evt == "Expected":
-                        totalTT=totalTT+int(round(exp[vbfc][mappdf[con]]))
+                        totalTT=totalTT+int(round(exp[c][mappdf[con]]))
                     else:
-                        totalTT=totalTT+int(round(exp[vbfc][con]))
-                exp[vbfc]["TTJets"]=totalTT
+                        totalTT=totalTT+int(round(exp[c][con]))
+                exp[c]["TTJets"]=totalTT
                 total = 0
                 for b in bkg:
-                    total=total+int(round(exp[vbfc][b]))
-                text_file.write(" %s %s %s & %.0f & %.0f & %.0f & %.0f & %.0f & %.0f & %.0f \\\\ \n"%(vbfc.split("_")[1],vbfc.split("_")[2],vbfc.split("_")[3],exp[vbfc]["nonRes"],exp[vbfc]["Wjets"],exp[vbfc]["Zjets"],totalTT,0,total,exp[vbfc]["data"]))
-                text_file.write("\hline\n")
-                # end of VBF part
+                    total=total+int(round(exp[c][b]))
+                if prod == "VBF":
+                    text_file.write(" %s %s %s & %.0f & %.0f & %.0f & %.0f & %.0f & %.0f & %.0f \\\\ \n"%(c.split("_")[1],c.split("_")[2],c.split("_")[0],exp[c]["data"],total,exp[c]["nonRes"],exp[c]["Wjets"],exp[c]["Zjets"],totalTT,0))
+                    if evt == "Expected":
+                        simpletext_file.write(" %s %s %s & %.0f & %.0f & %.0f & %.0f & %.0f & %.0f &%.0f & %.0f & %.0f & %.0f & %.0f & %.0f  \\\\ \n"%(c.split("_")[1],c.split("_")[2],c.split("_")[0],exp[c]["data"],total,exp[c]["nonRes"],exp[c]["Wjets"],exp[c]["Zjets"],totalTT,exp[c]["TTJetsTop"],exp[c]["TTJetsW"],exp[c]["TTJetsNonRes"],exp[c]["TTJetsTNonResT"],exp[c]["TTJetsWNonResT"],exp[c]["TTJetsResWResT"]))
+                    else:
+                        simpletext_file.write(" %s %s %s & %.0f & %.0f & %.0f & %.0f & %.0f &%.0f & %.0f & %.0f & %.0f & %.0f & %.0f & %.0f \\\\ \n"%(c.split("_")[1],c.split("_")[2],c.split("_")[0],exp[c]["data"],total,exp[c]["nonRes"],exp[c]["Wjets"],exp[c]["Zjets"],totalTT,exp[c]["resT"],exp[c]["resW"],exp[c]["nonresT"],exp[c]["resTnonresT"],exp[c]["resWnonresT"],exp[c]["resTresW"]))
 
-            totalTT=0
-            for con in contrib:
-                if evt == "Expected":
-                    totalTT=totalTT+int(round(exp[c][mappdf[con]]))
+
                 else:
-                    totalTT=totalTT+int(round(exp[c][con]))
-                exp[c]["TTJets"]=totalTT
-            total =0
-            for b in bkg:
-                total=total+int(round(exp[c][b]))
-            text_file.write(" %s %s %s & %.0f & %.0f & %.0f & %.0f & %.0f & %.0f & %.0f \\\\ \n"%(c.split("_")[0],c.split("_")[1],"DY/gg",exp[c]["nonRes"],exp[c]["Wjets"],exp[c]["Zjets"],totalTT,0,total,exp[c]["data"]))
+                    text_file.write(" %s %s %s & %.0f & %.0f & %.0f & %.0f & %.0f & %.0f & %.0f \\\\ \n"%(c.split("_")[0],c.split("_")[1],"DY/gg",exp[c]["data"],total,exp[c]["nonRes"],exp[c]["Wjets"],exp[c]["Zjets"],totalTT,0))
+                    if evt == "Expected":
+                        simpletext_file.write(" %s %s %s & %.0f & %.0f & %.0f & %.0f & %.0f &%.0f & %.0f & %.0f & %.0f & %.0f & %.0f & %.0f \\\\ \n"%(c.split("_")[0],c.split("_")[1],"DY/gg",exp[c]["data"],total,exp[c]["nonRes"],exp[c]["Wjets"],exp[c]["Zjets"],totalTT,exp[c]["TTJetsTop"],exp[c]["TTJetsW"],exp[c]["TTJetsNonRes"],exp[c]["TTJetsTNonResT"],exp[c]["TTJetsWNonResT"],exp[c]["TTJetsResWResT"]))
+                    else:
+                        simpletext_file.write(" %s %s %s & %.0f & %.0f & %.0f & %.0f & %.0f &%.0f & %.0f & %.0f & %.0f & %.0f & %.0f & %.0f \\\\ \n"%(c.split("_")[0],c.split("_")[1],"DY/gg",exp[c]["data"],total,exp[c]["nonRes"],exp[c]["Wjets"],exp[c]["Zjets"],totalTT,exp[c]["resT"],exp[c]["resW"],exp[c]["nonresT"],exp[c]["resTnonresT"],exp[c]["resWnonresT"],exp[c]["resTresW"]))
+
+            simpletext_file.write("\hline\n")
+            text_file.write("\hline\n")
+
+
         tableClosing(text_file,evt)
         text_file.close()
+        tableClosing(simpletext_file,evt)
+        simpletext_file.close()
 
