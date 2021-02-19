@@ -21,12 +21,14 @@ parser.add_option("-p","--period",dest="period",default="2016,2017",help="run pe
 parser.add_option("--pseudodata",dest="pseudodata",help="make cards with real data(False option) or differen pseudodata sets: Vjets, ZprimeZH etc",default='')
 parser.add_option("--signal",dest="signal",default="BulkGWW,BulkGZZ,ZprimeWW,ZprimeZH,WprimeWH,WprimeWZ",help="which signal do you want to run? options are BulkGWW, BulkGZZ, WprimeWZ, ZprimeWW, ZprimeZH")
 parser.add_option("--outlabel",dest="outlabel",help="lebel for output workspaces for example sigonly_M4500",default='')
-parser.add_option("-c","--category",dest="category",default="VV_HPLP,VV_HPHP,VH_HPLP,VH_HPHP,VH_LPHP",help="run period")
+parser.add_option("-c","--category",dest="category",default="VV_HPLP,VV_HPHP,VH_HPLP,VH_HPHP,VH_LPHP",help="choose category, use a specific category, ggDY, VBF or all")
 parser.add_option("-j","--jsonname",dest="jsonname",help="write the name of the output json file, the category will be automatically inserted",default='ttbarNorm')
 parser.add_option("--fitvjetsmjj",dest="fitvjetsmjj",default=False,action="store_true",help="True makes fits for mjj of vjets, False uses hists")
 parser.add_option("--fitTTmjj",dest="fitTTmjj",default=False,action="store_true",help="True makes fits for mjj of ttbar, False uses hists")
 parser.add_option("--combo",dest="combo",default=True,help="If True inputs from the 3 years combined will be used")
 parser.add_option("-v","--vbf",dest="vbf",help="do you want to keep VBF uncertainties separated?",action='store_true')
+parser.add_option("-m","--merge",dest="merge",help="set to False if you do not want to combine datacards",default=True)
+
 (options,args) = parser.parse_args()
 
 
@@ -42,6 +44,9 @@ outlabel = options.outlabel
 
 
 purities= options.category.split(",")
+if options.category == "all": purities = ["VV_HPLP","VV_HPHP","VH_HPLP","VH_HPHP","VH_LPHP","VBF_VV_HPLP","VBF_VV_HPHP","VBF_VH_HPLP","VBF_VH_HPHP","VBF_VH_LPHP"]
+if options.category == "VBF": purities = ["VBF_VV_HPLP","VBF_VV_HPHP","VBF_VH_HPLP","VBF_VH_HPHP","VBF_VH_LPHP"]
+if options.category == "ggDY": purities = ["VV_HPLP","VV_HPHP","VH_HPLP","VH_HPHP","VH_LPHP"]
 
 signals = options.signal.split(",")
 print "signals ",signals
@@ -106,7 +111,7 @@ for sig in signals:
       cardName='datacard_'+cat+'.txt '
       workspaceName='workspace_'+cat+outlabel+'.root'
 
-      if 'WW' in sig or 'ZZ' in sig or 'WH' in sig or 'ZH' in sig: Tools.AddOneSignal(card,dataset,p,sig,resultsDir[dataset],ncontrib)             
+      if 'WW' in sig or 'ZZ' in sig or 'WH' in sig or 'ZH' in sig or 'WZ' in sig: Tools.AddOneSignal(card,dataset,p,sig,resultsDir[dataset],ncontrib)
       else: Tools.AddMultipleSignals(card,dataset,p,sig,resultsDir[dataset],ncontrib)
       
       ncontrib+=1      
@@ -230,7 +235,7 @@ for sig in signals:
     print "#####################################"
 
     #make combined 
-    if len(purities)>1:
+    if len(purities)>1 and options.merge == True:
       print "#######     going to combine purity categories: ",purities    
       combo_card = cardName.replace("VV_HPHP","").replace("VV_HPLP","").replace("VV_LPLP","").replace("VH_HPHP","").replace("VH_HPLP","").replace("VH_LPHP","").replace("VH_HPNP_control_region","").replace("VH_NPHP_control_region","").replace("__","_VVVH_")
       combo_workspace = workspaceName.replace("VV_HPHP","").replace("VV_HPLP","").replace("VV_LPLP","").replace("VH_HPHP","").replace("VH_HPLP","").replace("VH_LPHP","").replace("VH_HPNP_control_region","").replace("VH_NPHP_control_region","").replace("__","_VVVH_")
