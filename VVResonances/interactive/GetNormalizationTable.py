@@ -112,7 +112,7 @@ if __name__ == "__main__":
                         simpletext_file.write(" %s %s %s & %.0f & %.0f & %.0f & %.0f & %.0f &%.0f & %.0f & %.0f & %.0f & %.0f & %.0f & %.0f \\\\ \n"%(c.split("_")[0],c.split("_")[1],"DY/gg",exp[c]["data"],total,exp[c]["nonRes"],exp[c]["Wjets"],exp[c]["Zjets"],totalTT,exp[c]["resT"],exp[c]["resW"],exp[c]["nonresT"],exp[c]["resTnonresT"],exp[c]["resWnonresT"],exp[c]["resTresW"]))
 
             simpletext_file.write("\hline\n")
-            text_file.write("\hline\n")
+            #text_file.write("\hline\n")
 
 
         tableClosing(text_file,evt)
