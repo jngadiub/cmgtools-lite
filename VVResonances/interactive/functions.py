@@ -51,7 +51,7 @@ class AllFunctions():
  def makeSignalYields(self,filename,template,branchingFraction,functype="pol5"):
   
   for c in self.categories:
-   if 'VBF' in c: cut = "*".join([self.cuts[c.replace('VBF_','')],self.cuts['common_VBF'],self.cuts['acceptance'],str(sfP[c.replace('VBF_','')])])
+   if 'VBF' in c: cut = "*".join([self.cuts[c.replace('VBF_','')],self.cuts['common_VBF'],self.cuts['acceptance']])
    else: cut = "*".join([self.cuts[c],self.cuts['common_VV'],self.cuts['acceptance']]) #,str(sfP[c])])
    yieldFile=filename+"_"+c+"_yield"
    fnc = functype

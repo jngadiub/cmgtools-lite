@@ -130,7 +130,7 @@ for mass in sorted(complete_mass.keys()):
         plotter[-1].addCorrectionFactor(luminosity,'flat')
         plotter[-1].addFriend("all","../interactive/migrationunc/"+complete_mass[mass][folder].split("/")[-1]+"_"+year+".root")
         plotter[-1].addCorrectionFactor("all.SF",'tree')
-
+        plotter[-1].addCorrectionFactor('L1prefWeight','tree')
         if options.triggerW:
             plotter[-1].addCorrectionFactor('jj_triggerWeight','tree')	
             print "Using triggerweight"

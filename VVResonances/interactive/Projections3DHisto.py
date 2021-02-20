@@ -406,10 +406,29 @@ hin_altshape2Down.Scale(1./hin_altshape2Down.Integral())
 #hin_altshape3Up.Scale(1./hin_altshape3Up.Integral())
 #hin_altshape3Down = fin.Get("histo_altshape3Down")
 #hin_altshape3Down.Scale(1./hin_altshape3Down.Integral())
-hin_OPT3Up = fin.histo_OPT3Up
+hin_TurnOnUp = fin.histo_TurnOnUp
+hin_TurnOnUp.Scale(1./hin_TurnOnUp.Integral())
+hin_TurnOnDown = fin.histo_TurnOnDown
+hin_TurnOnDown.Scale(1./hin_TurnOnDown.Integral())
+'''
+hin_PT3Up = fin.Get("histo_PT3Up")
+hin_PT3Up.Scale(1./hin_PT3Up.Integral())
+hin_PT3Down = fin.Get("histo_PT3Down")
+hin_PT3Down.Scale(1./hin_PT3Down.Integral())
+hin_OPT3Up = fin.Get("histo_OPT3Up")
 hin_OPT3Up.Scale(1./hin_OPT3Up.Integral())
-hin_OPT3Down = fin.histo_OPT3Down
+hin_OPT3Down = fin.Get("histo_OPT3Down")
 hin_OPT3Down.Scale(1./hin_OPT3Down.Integral())
+
+hin_PT4Up = fin.Get("histo_PT4Up")
+hin_PT4Up.Scale(1./hin_PT4Up.Integral())
+hin_PT4Down = fin.Get("histo_PT4Down")
+hin_PT4Down.Scale(1./hin_PT4Down.Integral())
+hin_OPT4Up = fin.Get("histo_OPT4Up")
+hin_OPT4Up.Scale(1./hin_OPT4Up.Integral())
+hin_OPT4Down = fin.Get("histo_OPT4Down")
+hin_OPT4Down.Scale(1./hin_OPT4Down.Integral())
+'''
 
 hz_PTUp = hin_PTUp.ProjectionZ("pz_PTUp",xbinMin[0],xbinMax[0],xbinMin[0],xbinMax[0])
 hz_PTUp.SetLineColor(rt.kMagenta)
@@ -439,6 +458,13 @@ hz_altshape2Down.Scale(1./hz_altshape2Down.Integral())
 #hz_altshape3Up.SetLineColor(rt.kOrange+1)
 #hz_altshape3Down = hin_altshape3Down.ProjectionZ("pz_altshape3Down",xbinMin[0],xbinMax[0],xbinMin[0],xbinMax[0])
 #hz_altshape3Down.SetLineColor(rt.kOrange+1)
+hz_TurnOnUp = hin_TurnOnUp.ProjectionZ("pz_TurnOnUp",xbinMin[0],xbinMax[0],xbinMin[0],xbinMax[0])
+hz_TurnOnUp.SetLineColor(rt.kViolet-6)
+hz_TurnOnUp.Scale(1./hz_TurnOnUp.Integral())
+hz_TurnOnDown = hin_TurnOnDown.ProjectionZ("pz_TurnOnDown",xbinMin[0],xbinMax[0],xbinMin[0],xbinMax[0])
+hz_TurnOnDown.SetLineColor(rt.kViolet-6)
+hz_TurnOnDown.Scale(1./hz_TurnOnDown.Integral())
+'''
 hz_OPT3Up = hin_OPT3Up.ProjectionZ("pz_OPT3Up",xbinMin[0],xbinMax[0],xbinMin[0],xbinMax[0])
 hz_OPT3Up.SetLineColor(rt.kViolet-6)
 hz_OPT3Up.Scale(1./hz_OPT3Up.Integral())
@@ -446,6 +472,27 @@ hz_OPT3Down = hin_OPT3Down.ProjectionZ("pz_OPT3Down",xbinMin[0],xbinMax[0],xbinM
 hz_OPT3Down.SetLineColor(rt.kViolet-6)
 hz_OPT3Down.Scale(1./hz_OPT3Down.Integral())
 
+hz_PT3Up = hin_PT3Up.ProjectionZ("pz_PT3Up",xbinMin[0],xbinMax[0],xbinMin[0],xbinMax[0])
+hz_PT3Up.SetLineColor(rt.kViolet-1)
+hz_PT3Up.Scale(1./hz_PT3Up.Integral())
+hz_PT3Down = hin_PT3Down.ProjectionZ("pz_PT3Down",xbinMin[0],xbinMax[0],xbinMin[0],xbinMax[0])
+hz_PT3Down.SetLineColor(rt.kViolet-1)
+hz_PT3Down.Scale(1./hz_PT3Down.Integral())
+
+hz_OPT4Up = hin_OPT4Up.ProjectionZ("pz_OPT4Up",xbinMin[0],xbinMax[0],xbinMin[0],xbinMax[0])
+hz_OPT4Up.SetLineColor(rt.kViolet-7)
+hz_OPT4Up.Scale(1./hz_OPT4Up.Integral())
+hz_OPT4Down = hin_OPT4Down.ProjectionZ("pz_OPT4Down",xbinMin[0],xbinMax[0],xbinMin[0],xbinMax[0])
+hz_OPT4Down.SetLineColor(rt.kViolet-7)
+hz_OPT4Down.Scale(1./hz_OPT4Down.Integral())
+
+hz_PT4Up = hin_PT4Up.ProjectionZ("pz_PT4Up",xbinMin[0],xbinMax[0],xbinMin[0],xbinMax[0])
+hz_PT4Up.SetLineColor(rt.kViolet-2)
+hz_PT4Up.Scale(1./hz_PT4Up.Integral())
+hz_PT4Down = hin_PT4Down.ProjectionZ("pz_PT4Down",xbinMin[0],xbinMax[0],xbinMin[0],xbinMax[0])
+hz_PT4Down.SetLineColor(rt.kViolet-2)
+hz_PT4Down.Scale(1./hz_PT4Down.Integral())
+'''
 hzMC[0].Scale(1./hzMC[0].Integral())
 hz[0].Scale(1./hz[0].Integral())
 
@@ -461,8 +508,13 @@ leg3.AddEntry(hz_OPTUp,"#propto 1/m_{jj} up/down","L")
 leg3.AddEntry(hz_altshapeUp,"HERWIG up/down","L")
 leg3.AddEntry(hz_altshape2Up,"MADGRAPH+PYTHIA up/down","L")
 #leg3.AddEntry(hz_altshape3Up,"POWHEG up/down","L")
-leg3.AddEntry(hz_OPT3Up,"m_{jj} turn-on up/down","L")
-
+leg3.AddEntry(hz_TurnOnUp,"m_{jj} turn-on up/down","L")
+'''
+leg3.AddEntry(hz_OPT3Up,"OPT3","L")
+leg3.AddEntry(hz_PT3Up," PT3","L")
+leg3.AddEntry(hz_OPT4Up,"OPT4","L")
+leg3.AddEntry(hz_PT4Up," PT4","L")
+'''
 czSyst = get_canvas("czSyst")
 czSyst.cd()
 czSyst.SetLogy()
@@ -485,8 +537,18 @@ hz_altshape2Down.Draw("HISTsame")
 #hzMC[4].SetLineColor(rt.kBlack)
 #hzMC[4].SetMarkerColor(rt.kBlack)
 #hzMC[4].Scale(1./0.001)
+hz_TurnOnUp.Draw("HISTsame")
+hz_TurnOnDown.Draw("HISTsame")
+'''
 hz_OPT3Up.Draw("HISTsame")
 hz_OPT3Down.Draw("HISTsame")
+hz_PT3Up.Draw("HISTsame")
+hz_PT3Down.Draw("HISTsame")
+hz_OPT4Up.Draw("HISTsame")
+hz_OPT4Down.Draw("HISTsame")
+hz_PT4Up.Draw("HISTsame")
+hz_PT4Down.Draw("HISTsame")
+'''
 hzMC[0].Draw("same")
 leg3.Draw()
 
@@ -526,6 +588,13 @@ hx_altshape2Down.Scale(1./hx_altshape2Down.Integral())
 #hx_altshape3Up.SetLineColor(rt.kOrange+1)
 #hx_altshape3Down = hin_altshape3Down.ProjectionX("px_altshape3Down",1,binsy,zbinMin[0],zbinMax[0])
 #hx_altshape3Down.SetLineColor(rt.kOrange+1)
+hx_TurnOnUp = hin_TurnOnUp.ProjectionX("px_TurnOnUp",1,binsy,zbinMin[0],zbinMax[0])
+hx_TurnOnUp.SetLineColor(rt.kViolet-6)
+hx_TurnOnUp.Scale(1./hx_TurnOnUp.Integral())
+hx_TurnOnDown = hin_TurnOnDown.ProjectionX("px_TurnOnDown",1,binsy,zbinMin[0],zbinMax[0])
+hx_TurnOnDown.SetLineColor(rt.kViolet-6)
+hx_TurnOnDown.Scale(1./hx_TurnOnDown.Integral())
+'''
 hx_OPT3Up = hin_OPT3Up.ProjectionX("px_OPT3Up",1,binsy,zbinMin[0],zbinMax[0])
 hx_OPT3Up.SetLineColor(rt.kViolet-6)
 hx_OPT3Up.Scale(1./hx_OPT3Up.Integral())
@@ -533,6 +602,28 @@ hx_OPT3Down = hin_OPT3Down.ProjectionX("px_OPT3Down",1,binsy,zbinMin[0],zbinMax[
 hx_OPT3Down.SetLineColor(rt.kViolet-6)
 hx_OPT3Down.Scale(1./hx_OPT3Down.Integral())
 
+
+hx_PT3Up = hin_PT3Up.ProjectionX("px_PT3Up",1,binsy,zbinMin[0],zbinMax[0])
+hx_PT3Up.SetLineColor(rt.kViolet-1)
+hx_PT3Up.Scale(1./hx_PT3Up.Integral())
+hx_PT3Down = hin_PT3Down.ProjectionX("px_PT3Down",1,binsy,zbinMin[0],zbinMax[0])
+hx_PT3Down.SetLineColor(rt.kViolet-1)
+hx_PT3Down.Scale(1./hx_PT3Down.Integral())
+
+hx_OPT4Up = hin_OPT4Up.ProjectionX("px_OPT4Up",1,binsy,zbinMin[0],zbinMax[0])
+hx_OPT4Up.SetLineColor(rt.kViolet-7)
+hx_OPT4Up.Scale(1./hx_OPT4Up.Integral())
+hx_OPT4Down = hin_OPT4Down.ProjectionX("px_OPT4Down",1,binsy,zbinMin[0],zbinMax[0])
+hx_OPT4Down.SetLineColor(rt.kViolet-7)
+hx_OPT4Down.Scale(1./hx_OPT4Down.Integral())
+
+hx_PT4Up = hin_PT4Up.ProjectionX("px_PT4Up",1,binsy,zbinMin[0],zbinMax[0])
+hx_PT4Up.SetLineColor(rt.kViolet-2)
+hx_PT4Up.Scale(1./hx_PT4Up.Integral())
+hx_PT4Down = hin_PT4Down.ProjectionX("px_PT4Down",1,binsy,zbinMin[0],zbinMax[0])
+hx_PT4Down.SetLineColor(rt.kViolet-2)
+hx_PT4Down.Scale(1./hx_PT4Down.Integral())
+'''
 
 hxMC[0].Scale(1./hxMC[0].Integral())
 hx[0].Scale(1./hx[0].Integral())
@@ -547,8 +638,13 @@ leg3.AddEntry(hx_OPTUp,"#propto 1/m_{jj} up/down","L")
 leg3.AddEntry(hx_altshapeUp,"HERWIG up/down","L")
 leg3.AddEntry(hx_altshape2Up,"MADGRAPH+PYTHIA up/down","L")
 #leg3.AddEntry(hx_altshape3Up,"POWHEG up/down","L")
-leg3.AddEntry(hx_OPT3Up,"m_{jj} turn-on up/down","L")
-
+leg3.AddEntry(hx_TurnOnUp,"m_{jj} turn-on up/down","L")
+'''
+leg3.AddEntry(hx_OPT3Up,"OPT3","L")
+leg3.AddEntry(hx_PT3Up,"PT3","L")
+leg3.AddEntry(hx_OPT4Up,"OPT4","L")
+leg3.AddEntry(hx_PT4Up,"PT4","L")
+'''
 cxSyst = get_canvas("cxSyst")
 cxSyst.cd()
 
@@ -565,8 +661,20 @@ hx_altshape2Up.Draw("HISTsame")
 hx_altshape2Down.Draw("HISTsame")
 #hx_altshape3Up.Draw("HISTsame")
 #hx_altshape3Down.Draw("HISTsame")
+hx_TurnOnUp.Draw("HISTsame")
+hx_TurnOnDown.Draw("HISTsame")
+'''
 hx_OPT3Up.Draw("HISTsame")
 hx_OPT3Down.Draw("HISTsame")
+
+hx_PT3Up.Draw("HISTsame")
+hx_PT3Down.Draw("HISTsame")
+
+hx_OPT4Up.Draw("HISTsame")
+hx_OPT4Down.Draw("HISTsame")
+hx_PT4Up.Draw("HISTsame")
+hx_PT4Down.Draw("HISTsame")
+'''
 hxMC[0].Draw("same")
 leg3.Draw()
 
@@ -607,13 +715,20 @@ hy_altshape2Down.Scale(1./hy_altshape2Down.Integral())
 #hy_altshape3Up.SetLineColor(rt.kOrange+1)
 #hy_altshape3Down = hin_altshape3Down.ProjectionY("py_altshape3Down",1,binsy,zbinMin[0],zbinMax[0])
 #hy_altshape3Down.SetLineColor(rt.kOrange+1)
+hy_TurnOnUp = hin_TurnOnUp.ProjectionY("py_TurnOnUp",xbinMin[0],xbinMax[0],zbinMin[0],zbinMax[0])
+hy_TurnOnUp.SetLineColor(rt.kViolet-6)
+hy_TurnOnUp.Scale(1./hy_TurnOnUp.Integral())
+hy_TurnOnDown = hin_TurnOnDown.ProjectionY("py_TurnOnDown",xbinMin[0],xbinMax[0],zbinMin[0],zbinMax[0])
+hy_TurnOnDown.SetLineColor(rt.kViolet-6)
+hy_TurnOnDown.Scale(1./hy_TurnOnDown.Integral())
+'''
 hy_OPT3Up = hin_OPT3Up.ProjectionY("py_OPT3Up",xbinMin[0],xbinMax[0],zbinMin[0],zbinMax[0])
 hy_OPT3Up.SetLineColor(rt.kViolet-6)
 hy_OPT3Up.Scale(1./hy_OPT3Up.Integral())
 hy_OPT3Down = hin_OPT3Down.ProjectionY("py_OPT3Down",xbinMin[0],xbinMax[0],zbinMin[0],zbinMax[0])
 hy_OPT3Down.SetLineColor(rt.kViolet-6)
 hy_OPT3Down.Scale(1./hy_OPT3Down.Integral())
-
+'''
 hyMC[0].Scale(1./hyMC[0].Integral())
 hy[0].Scale(1./hy[0].Integral())
 #leg3 = rt.TLegend(0.6,0.55,0.95,0.8)
@@ -627,7 +742,7 @@ leg3.AddEntry(hy_OPTUp,"#propto 1/m_{jj} up/down","L")
 leg3.AddEntry(hy_altshapeUp,"HERWIG up/down","L")
 leg3.AddEntry(hy_altshape2Up,"MADGRAPH+PYTHIA up/down","L")
 #leg3.AddEntry(hy_altshape3Up,"POWHEG up/down","L")
-leg3.AddEntry(hy_OPT3Up,"m_{jj} turn-on up/down","L")
+leg3.AddEntry(hy_TurnOnUp,"m_{jj} turn on up/down","L")
 
 
 

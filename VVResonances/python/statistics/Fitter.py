@@ -263,13 +263,82 @@ class Fitter(object):
         self.w.factory("c_2[-10,-1000000,100000]")
         erfexp = ROOT.RooErfExpPdf(name+"Erf",name,self.w.var(poi),self.w.var("c_0"),self.w.var("c_1"),self.w.var("c_2"))
         getattr(self.w,'import')(erfexp,ROOT.RooFit.Rename(name))
-        self.w.factory("RooGaussian::gaus1("+poi+",mean1[80.,60.,100.],sigma1[7.,5.,20.])")
-        self.w.factory("RooGaussian::gaus2("+poi+",mean2[170.,150.,200.],sigma2[14,5.,20.])")
-        self.w.factory("SUM::gaus(f_g1[0.05,0.95]*gaus1,gaus2)") #FIXME
+        self.w.factory("RooGaussian::gausW("+poi+",meanW[80.,60.,100.],sigmaW[7.,5.,20.])")
+        self.w.factory("RooGaussian::gausT("+poi+",meanT[170.,150.,200.],sigmaT[14,5.,20.])")
+        self.w.factory("SUM::gaus(f_g1[0.05,0.95]*gausW,gausT)") #FIXME
         self.w.factory("SUM::"+name+"(f_res[0.01,0.99]*gaus,"+name+"Erf)")
         # self.w.factory("PROD::"+name+"(gaus,"+name+"Erf)")
 
+    def erfexp2CB(self,name = 'model',poi='x'):
+        ROOT.gSystem.Load("libHiggsAnalysisCombinedLimit")
 
+        self.w.factory("c_0[0,-1000,1000]")
+        self.w.factory("c_1[20,-30000,30000]")
+        self.w.factory("c_2[-10,-1000000,100000]")
+        erfexp = ROOT.RooErfExpPdf(name+"Erf",name,self.w.var(poi),self.w.var("c_0"),self.w.var("c_1"),self.w.var("c_2"))
+        getattr(self.w,'import')(erfexp,ROOT.RooFit.Rename(name))
+
+        self.w.factory("meanT[170.,150.,200.]")
+        self.w.factory("sigmaT[14.,5.,20]")
+        self.w.factory("alpha1T[20,0,30]")
+        self.w.factory("n1T[80]")
+        peakT = ROOT.RooCBShape(name+'ST',name,self.w.var(poi),self.w.var('meanT'),self.w.var('sigmaT'),self.w.var('alpha1T'),self.w.var('n1T'))
+        getattr(self.w,'import')(peakT,ROOT.RooFit.Rename(name))
+
+        self.w.factory("meanW[80.,60.,100.]")
+        self.w.factory("sigmaW[7.,5.,20]")
+        self.w.factory("alpha1W[1,0,2]")
+        self.w.factory("n1W[10,1,100]")
+        peakW = ROOT.RooCBShape(name+'SW',name,self.w.var(poi),self.w.var('meanW'),self.w.var('sigmaW'),self.w.var('alpha1W'),self.w.var('n1W'))
+        getattr(self.w,'import')(peakW,ROOT.RooFit.Rename(name))
+
+        self.w.factory("SUM::peaks(f_g1[0.05,0.95]*modelSW,modelST)") #FIXME
+        self.w.factory("SUM::"+name+"(f_res[0.01,0.99]*peaks,"+name+"Erf)")
+
+
+    def threeGaus(self,name = 'model',poi='x'):
+        ROOT.gSystem.Load("libHiggsAnalysisCombinedLimit")
+        self.w.factory("RooGaussian::gausW("+poi+",meanW[80.,60.,100.],sigmaW[7.,5.,20.])")
+        self.w.factory("RooGaussian::gausT("+poi+",meanT[170.,150.,200.],sigmaT[14,5.,20.])")
+        self.w.factory("SUM::gausRes(f_g1[0.05,0.95]*gausW,gausT)") #FIXME??
+        self.w.factory("RooGaussian::gausN("+poi+",meanN[125.,100.,150.],sigmaN[20,10.,40.])")
+        self.w.factory("SUM::"+name+"(f_res[0.01,0.99]*gausRes,gausN)")
+
+    def twoCBplusGaus(self,name = 'model',poi='x'):
+        ROOT.gSystem.Load("libHiggsAnalysisCombinedLimit")
+
+        self.w.factory("meanT[170.,150.,200.]")
+        self.w.factory("sigmaT[14.,5.,20]")
+        self.w.factory("alpha1T[2,0,2.5]")
+        self.w.factory("n1T[100,90,110]")
+        peakT = ROOT.RooCBShape(name+'ST','modelST',self.w.var(poi),self.w.var('meanT'),self.w.var('sigmaT'),self.w.var('alpha1T'),self.w.var('n1T'))
+        getattr(self.w,'import')(peakT,ROOT.RooFit.Rename(name+"ST"))
+
+        self.w.factory("meanW[80.,60.,100.]")
+        self.w.factory("sigmaW[7.,5.,20]")
+        self.w.factory("alpha1W[1.5,1.2,1.8]")
+        self.w.factory("n1W[10,1,50]")
+        peakW = ROOT.RooCBShape(name+'SW','modelSW',self.w.var(poi),self.w.var('meanW'),self.w.var('sigmaW'),self.w.var('alpha1W'),self.w.var('n1W')) 
+        getattr(self.w,'import')(peakW,ROOT.RooFit.Rename(name+"SW"))
+
+        self.w.factory("SUM::peaks(f_g1[0.05,0.95]*"+name+"SW,"+name+"ST)") #FIXME??
+        self.w.factory("RooGaussian::gausN("+poi+",meanN[125.,100.,150.],sigmaN[20,10.,100.])")
+        self.w.factory("SUM::"+name+"(f_res[0.01,0.99]*peaks,gausN)")
+
+    def CBplus2Gaus(self,name = 'model',poi='x'):
+        ROOT.gSystem.Load("libHiggsAnalysisCombinedLimit")
+        self.w.factory("meanT[170.,150.,200.]")
+        self.w.factory("sigmaT[14.,5.,20]")
+        self.w.factory("alpha1T[20,0,30]")
+        self.w.factory("n1T[80]")
+        peakT = ROOT.RooCBShape(name+'ST','modelST',self.w.var(poi),self.w.var('meanT'),self.w.var('sigmaT'),self.w.var('alpha1T'),self.w.var('n1T'))
+        getattr(self.w,'import')(peakT,ROOT.RooFit.Rename(name+"ST"))
+
+        self.w.factory("RooGaussian::gausW("+poi+",meanW[80.,60.,100.],sigmaW[7,5.,20.])")
+        self.w.factory("SUM::peaks(f_g1[0.05,0.95]*gausW,"+name+"ST)") #FIXME?? 
+
+        self.w.factory("RooGaussian::gausN("+poi+",meanN[125.,100.,150.],sigmaN[20,10.,100.])")
+        self.w.factory("SUM::"+name+"(f_res[0.01,0.99]*peaks,gausN)")
 
     def twoErfexp(self,name = 'model',poi='x'):      
         self.w.factory("c_0[0,-5,5]")
@@ -1102,6 +1171,11 @@ class Fitter(object):
       self.w.pdf(model).plotOn(self.frame,ROOT.RooFit.Name( "gaus1" ),ROOT.RooFit.Components("gaus1"),ROOT.RooFit.LineStyle(1),ROOT.RooFit.LineColor(ROOT.kPink+2))
       self.w.pdf(model).plotOn(self.frame,ROOT.RooFit.Name( "gaus2" ),ROOT.RooFit.Components("gaus2"),ROOT.RooFit.LineStyle(1),ROOT.RooFit.LineColor(ROOT.kRed-10))
       self.w.pdf(model).plotOn(self.frame,ROOT.RooFit.Name( "modelErf" ),ROOT.RooFit.Components("modelErf"),ROOT.RooFit.LineStyle(1),ROOT.RooFit.LineColor(ROOT.kTeal-7))
+      self.w.pdf(model).plotOn(self.frame,ROOT.RooFit.Name( "gausW" ),ROOT.RooFit.Components("gausW"),ROOT.RooFit.LineStyle(1),ROOT.RooFit.LineColor(ROOT.kPink+2))
+      self.w.pdf(model).plotOn(self.frame,ROOT.RooFit.Name( "gausT" ),ROOT.RooFit.Components("gausT"),ROOT.RooFit.LineStyle(1),ROOT.RooFit.LineColor(ROOT.kRed-10))
+      self.w.pdf(model).plotOn(self.frame,ROOT.RooFit.Name( "gausN" ),ROOT.RooFit.Components("gausN"),ROOT.RooFit.LineStyle(1),ROOT.RooFit.LineColor(ROOT.kTeal-7))
+      self.w.pdf(model).plotOn(self.frame,ROOT.RooFit.Name( "modelSW" ),ROOT.RooFit.Components("modelSW"),ROOT.RooFit.LineStyle(1),ROOT.RooFit.LineColor(ROOT.kPink+2))
+      self.w.pdf(model).plotOn(self.frame,ROOT.RooFit.Name( "modelST" ),ROOT.RooFit.Components("modelST"),ROOT.RooFit.LineStyle(1),ROOT.RooFit.LineColor(ROOT.kRed-10))
       
       self.legend = ROOT.TLegend(0.15010112,0.4583362,0.2502143,0.679833)
       self.legend.SetTextSize(0.032)
@@ -1122,6 +1196,16 @@ class Fitter(object):
         self.legend.AddEntry( self.frame.findObject( "gaus1" ),"Gauss 1 comp.","l")
       if self.frame.findObject( "gaus2"):
         self.legend.AddEntry( self.frame.findObject( "gaus2" ),"Gauss 2 comp.","l")
+      if self.frame.findObject( "gausN"):
+        self.legend.AddEntry( self.frame.findObject( "gausN" ),"Gauss non-res comp.","l")
+      if self.frame.findObject( "gausW"):
+        self.legend.AddEntry( self.frame.findObject( "gausW" ),"Gauss W comp.","l")
+      if self.frame.findObject( "gausT"):
+        self.legend.AddEntry( self.frame.findObject( "gausT" ),"Gauss T comp.","l")
+      if self.frame.findObject( "modelSW"):
+        self.legend.AddEntry( self.frame.findObject( "modelSW" ),"CB W comp.","l")
+      if self.frame.findObject( "modelST"):
+        self.legend.AddEntry( self.frame.findObject( "modelST" ),"CB T comp.","l")
         
       self.frame_pull = self.w.var(poi).frame()
       hpull = self.frame.pullHist(data,model,True)
@@ -1149,7 +1233,7 @@ class Fitter(object):
       self.c.Draw()
       cmslabel_sim_prelim(p11_1,'sim',11)
       self.legend.Draw("same")
-      addInfo = rt.TPaveText(0.8110112,0.8166292,0.8702143,0.8923546,"NDC")
+      addInfo = rt.TPaveText(0.7,0.8166292,0.8702143,0.8923546,"NDC")
       addInfo.AddText(pavetext)
       addInfo.SetFillColor(0)
       addInfo.SetLineColor(0)
@@ -1199,7 +1283,7 @@ class Fitter(object):
       
       
     def projection(self,model = "model",data="data",poi="x",filename="fit.root",binning=0,logy=False,xtitle='x',mass=1000):
-	    
+
         self.frame=self.w.var(poi).frame()
 	
         print "Prining workspace: "
@@ -1242,7 +1326,12 @@ class Fitter(object):
         
         self.w.pdf(model).plotOn(self.frame,ROOT.RooFit.Name( "gaus1" ),ROOT.RooFit.Components("gaus1"),ROOT.RooFit.LineStyle(1),ROOT.RooFit.LineColor(ROOT.kPink+2))
         self.w.pdf(model).plotOn(self.frame,ROOT.RooFit.Name( "gaus2" ),ROOT.RooFit.Components("gaus2"),ROOT.RooFit.LineStyle(1),ROOT.RooFit.LineColor(ROOT.kRed-10))
+        self.w.pdf(model).plotOn(self.frame,ROOT.RooFit.Name( "gausW" ),ROOT.RooFit.Components("gausW"),ROOT.RooFit.LineStyle(1),ROOT.RooFit.LineColor(ROOT.kPink+2))
+        self.w.pdf(model).plotOn(self.frame,ROOT.RooFit.Name( "gausT" ),ROOT.RooFit.Components("gausT"),ROOT.RooFit.LineStyle(1),ROOT.RooFit.LineColor(ROOT.kRed-10))
         self.w.pdf(model).plotOn(self.frame,ROOT.RooFit.Name( "modelErf" ),ROOT.RooFit.Components("modelErf"),ROOT.RooFit.LineStyle(1),ROOT.RooFit.LineColor(ROOT.kTeal-7))
+        self.w.pdf(model).plotOn(self.frame,ROOT.RooFit.Name( "gausN" ),ROOT.RooFit.Components("gausN"),ROOT.RooFit.LineStyle(1),ROOT.RooFit.LineColor(ROOT.kTeal-7))
+        self.w.pdf(model).plotOn(self.frame,ROOT.RooFit.Name( "modelSW" ),ROOT.RooFit.Components("modelSW"),ROOT.RooFit.LineStyle(1),ROOT.RooFit.LineColor(ROOT.kPink+2))
+        self.w.pdf(model).plotOn(self.frame,ROOT.RooFit.Name( "modelST" ),ROOT.RooFit.Components("modelST"),ROOT.RooFit.LineStyle(1),ROOT.RooFit.LineColor(ROOT.kRed-10))
         
         
         
@@ -1250,11 +1339,18 @@ class Fitter(object):
         self.w.pdf(model).plotOn(self.frame,ROOT.RooFit.LineStyle(1),ROOT.RooFit.LineColor(ROOT.kBlack))
         
         self.legend = self.getLegend()
-        if filename.find("TT")!=-1: self.legend.AddEntry(self.frame.findObject( data ),"tt MC","ep")
+        if filename.find("TT")!=-1 and filename.find("debugJ")==-1: self.legend.AddEntry(self.frame.findObject( data ),"tt MC","ep")
+        if filename.find("W")!=-1 and filename.find("debugJ")!=-1: self.legend.AddEntry(self.frame.findObject( data ),"W+jets MC","ep")
+        if filename.find("Z")!=-1 and filename.find("debugJ")!=-1: self.legend.AddEntry(self.frame.findObject( data ),"Z+jets MC","ep")
         self.legend.AddEntry( self.frame.findObject( model )," Full PDF","l")
         if self.frame.findObject( "modelErf"):self.legend.AddEntry( self.frame.findObject( "modelErf" ),"ErfExp comp.","l")
         if self.frame.findObject( "gaus1"):self.legend.AddEntry( self.frame.findObject( "gaus1" ),"Gauss 1 comp.","l")
         if self.frame.findObject( "gaus2"):self.legend.AddEntry( self.frame.findObject( "gaus2" ),"Gauss 2 comp.","l")
+        if self.frame.findObject( "gausN"):self.legend.AddEntry( self.frame.findObject( "gausN" ),"Gaus non-res comp.","l")
+        if self.frame.findObject( "gausW"):self.legend.AddEntry( self.frame.findObject( "gausW" ),"Gauss W comp.","l")
+        if self.frame.findObject( "gausT"):self.legend.AddEntry( self.frame.findObject( "gausT" ),"Gauss T comp.","l")
+        if self.frame.findObject( "modelSW"):self.legend.AddEntry( self.frame.findObject( "modelSW" ),"CB W comp.","l")
+        if self.frame.findObject( "modelST"):self.legend.AddEntry( self.frame.findObject( "modelST" ),"CB T comp.","l")
         
         self.c=ROOT.TCanvas("c","c")
         self.frame.SetMinimum(0.0)

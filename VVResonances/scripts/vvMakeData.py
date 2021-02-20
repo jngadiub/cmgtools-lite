@@ -41,15 +41,6 @@ def getBinning(binsMVV):
 sampleTypes=options.samples.split(',')
 
 dataPlotters=[]
-if options.output.find('control_region')!=-1:
-    if options.output.find('VH_NPHP')!=-1: category = 'VH_NPHP_control_region'
-    elif options.output.find('VV_NPHP')!=-1: category = 'VV_NPHP_control_region'
-    else: category = 'VH_HPNP_control_region'
-elif options.output.find('NP') !=-1: category = 'NP'
-else: category=options.output.split("/")[-1].split(".")[0].split("_")[3]+"_"+options.output.split("/")[-1].split(".")[0].split("_")[4]
-print " cat ",category
-
-
 
 print "args[0] "+str(args[0])
 try: year=str(args[0]).split("/")[-2]
@@ -96,6 +87,9 @@ for filename in os.listdir(args[0]):
                 if fname.find("Jets") !=-1:
                     print "applying k factors "
                     dataPlotters[-1].addCorrectionFactor("kfactor",'tree')
+                if fname.find("Jets") !=-1 or  fname.find("TT")!=-1 or fname.find("QCD") !=-1:
+                    print "applying L1 prefiring weights "
+                    dataPlotters[-1].addCorrectionFactor("L1prefWeight",'tree')
 
 data=MergedPlotter(dataPlotters)
 

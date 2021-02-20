@@ -21,11 +21,14 @@ parser.add_option("-p","--period",dest="period",default="2016,2017",help="run pe
 parser.add_option("--pseudodata",dest="pseudodata",help="make cards with real data(False option) or differen pseudodata sets: Vjets, ZprimeZH etc",default='')
 parser.add_option("--signal",dest="signal",default="BulkGWW,BulkGZZ,ZprimeWW,ZprimeZH,WprimeWH,WprimeWZ",help="which signal do you want to run? options are BulkGWW, BulkGZZ, WprimeWZ, ZprimeWW, ZprimeZH")
 parser.add_option("--outlabel",dest="outlabel",help="lebel for output workspaces for example sigonly_M4500",default='')
-parser.add_option("-c","--category",dest="category",default="VV_HPLP,VV_HPHP,VH_HPLP,VH_HPHP,VH_LPHP",help="run period")
+parser.add_option("-c","--category",dest="category",default="VV_HPLP,VV_HPHP,VH_HPLP,VH_HPHP,VH_LPHP",help="choose category, use a specific category, ggDY, VBF or all")
 parser.add_option("-j","--jsonname",dest="jsonname",help="write the name of the output json file, the category will be automatically inserted",default='ttbarNorm')
 parser.add_option("--fitvjetsmjj",dest="fitvjetsmjj",default=False,action="store_true",help="True makes fits for mjj of vjets, False uses hists")
 parser.add_option("--fitTTmjj",dest="fitTTmjj",default=False,action="store_true",help="True makes fits for mjj of ttbar, False uses hists")
 parser.add_option("--combo",dest="combo",default=True,help="If True inputs from the 3 years combined will be used")
+parser.add_option("-v","--vbf",dest="vbf",help="do you want to keep VBF uncertainties separated?",action='store_true')
+parser.add_option("-m","--merge",dest="merge",help="set to False if you do not want to combine datacards",default=True)
+
 (options,args) = parser.parse_args()
 
 
@@ -41,12 +44,15 @@ outlabel = options.outlabel
 
 
 purities= options.category.split(",")
+if options.category == "all": purities = ["VV_HPLP","VV_HPHP","VH_HPLP","VH_HPHP","VH_LPHP","VBF_VV_HPLP","VBF_VV_HPHP","VBF_VH_HPLP","VBF_VH_HPHP","VBF_VH_LPHP"]
+if options.category == "VBF": purities = ["VBF_VV_HPLP","VBF_VV_HPHP","VBF_VH_HPLP","VBF_VH_HPHP","VBF_VH_LPHP"]
+if options.category == "ggDY": purities = ["VV_HPLP","VV_HPHP","VH_HPLP","VH_HPHP","VH_LPHP"]
 
 signals = options.signal.split(",")
 print "signals ",signals
 doVjets= True
 rescale = False
-sf_qcd=1.
+sf_qcd=1.8
 
 if outlabel.find("sigonly")!=-1 or outlabel.find("qcdonly")!=-1: doVjets = False
 if outlabel.find("sigonly")!=-1 or outlabel.find("Vjetsonly")!=-1: sf_qcd = 0.00001
@@ -67,7 +73,7 @@ if pseudodata == "False":
   scalesHiggs = [ctx.H_HPmassscale,ctx.H_LPmassscale]
 
 vtag_pt_dependence = ctx.tagger_pt_dependence
-
+PU_unc = ctx.PU_uncertainties
 
 
 datasets= options.period.split(",")
@@ -81,7 +87,7 @@ print "datasets ",datasets
 print "result dir ",resultsDir
 
 doCorrelation = True 
-Tools = DatacardTools(scales,scalesHiggs,vtag_pt_dependence,lumi_unc,sf_qcd,pseudodata,outlabel,doCorrelation,options.fitvjetsmjj)
+Tools = DatacardTools(scales,scalesHiggs,vtag_pt_dependence,PU_unc,lumi_unc,sf_qcd,pseudodata,outlabel,doCorrelation,options.fitvjetsmjj)
 
 
 for sig in signals:
@@ -91,7 +97,9 @@ for sig in signals:
     print dataset
     cmd_combo="combineCards.py"
     for p in purities:
-
+      shape_purity = p
+      if p.find("VBF") !=-1 : shape_purity= p.replace("VBF_","")
+      print " purity "+p+" shape to use "+shape_purity
       ncontrib = 0
       print dataset," has lumi ",lumi[dataset]
       print type(lumi[dataset])
@@ -103,7 +111,7 @@ for sig in signals:
       cardName='datacard_'+cat+'.txt '
       workspaceName='workspace_'+cat+outlabel+'.root'
 
-      if 'WW' in sig or 'ZZ' in sig or 'WH' in sig or 'ZH' in sig: Tools.AddOneSignal(card,dataset,p,sig,resultsDir[dataset],ncontrib)             
+      if 'WW' in sig or 'ZZ' in sig or 'WH' in sig or 'ZH' in sig or 'WZ' in sig: Tools.AddOneSignal(card,dataset,p,sig,resultsDir[dataset],ncontrib)
       else: Tools.AddMultipleSignals(card,dataset,p,sig,resultsDir[dataset],ncontrib)
       
       ncontrib+=1      
@@ -111,33 +119,33 @@ for sig in signals:
       rootFileNorm = resultsDir[dataset]+'/JJ_%s_WJets_%s.root'%(dataset,p)
       if options.fitvjetsmjj == True:
         rootFileMVV =  resultsDir[dataset]+'/JJ_%s_WJets_MVV_NP_Wjets'%dataset+'.json'
-        Tools.AddWResBackground(card,dataset,p,rootFileMVV,rootFileNorm,resultsDir[dataset],ncontrib,["CMS_VV_JJ_WJets_slope",0.5])
+        Tools.AddWResBackground(card,dataset,shape_purity,rootFileMVV,rootFileNorm,resultsDir[dataset],ncontrib,["CMS_VV_JJ_WJets_slope",0.5])
       else:
-        rootFileMVV = resultsDir[dataset]+'/JJ_%s_WJets_MVV_'%dataset+p+'.root'
-        Tools.AddWResBackground(card,dataset,p,rootFileMVV,rootFileNorm,resultsDir[dataset],ncontrib)
+        rootFileMVV = resultsDir[dataset]+'/JJ_%s_WJets_MVV_'%dataset+shape_purity+'.root'
+        Tools.AddWResBackground(card,dataset,shape_purity,rootFileMVV,rootFileNorm,resultsDir[dataset],ncontrib)
       ncontrib+=1
       
       rootFileNorm = resultsDir[dataset]+"/JJ_%s_ZJets_%s.root"%(dataset,p)
       if options.fitvjetsmjj == True:
         rootFileMVV =  resultsDir[dataset]+'/JJ_%s_ZJets_MVV_NP_Zjets'%dataset+'.json'
-        Tools.AddZResBackground(card,dataset,p,rootFileMVV,rootFileNorm,resultsDir[dataset],ncontrib,["CMS_VV_JJ_ZJets_slope",0.5])
+        Tools.AddZResBackground(card,dataset,shape_purity,rootFileMVV,rootFileNorm,resultsDir[dataset],ncontrib,["CMS_VV_JJ_ZJets_slope",0.5])
       else:
-        rootFileMVV = resultsDir[dataset]+'/JJ_%s_ZJets_MVV_'%dataset+p+'.root'
-        Tools.AddZResBackground(card,dataset,p,rootFileMVV,rootFileNorm,resultsDir[dataset],ncontrib)
+        rootFileMVV = resultsDir[dataset]+'/JJ_%s_ZJets_MVV_'%dataset+shape_purity+'.root'
+        Tools.AddZResBackground(card,dataset,shape_purity,rootFileMVV,rootFileNorm,resultsDir[dataset],ncontrib)
       ncontrib+=1
         
       print "##########################       including tt+jets in datacard      ######################"
       contrib =["resT","resW","nonresT","resTnonresT","resWnonresT","resTresW"]
-      rootFileMVV = {ttcon:resultsDir[dataset]+'/JJ_'+dataset+'_TTJets'+ttcon+'_MVV_'+p+'.root' for ttcon in contrib}
+      rootFileMVV = {ttcon:resultsDir[dataset]+'/JJ_'+dataset+'_TTJets'+ttcon+'_MVV_'+shape_purity+'.root' for ttcon in contrib}
       #rootFileMVV = {ttcon:resultsDir[dataset]+'/JJ_'+dataset+'_TTJets'+ttcon+'_MVV_NP.root' for ttcon in contrib}
       rootFileNorm = {ttcon:resultsDir[dataset]+'/JJ_'+dataset+'_TTJets'+ttcon+'_'+p+'.root' for ttcon in contrib}
       jsonfileNorm = resultsDir[dataset]+'/'+options.jsonname+'_'+dataset+'_'+p+'.json'
       if options.fitTTmjj == True:
         print "load fits"
-        Tools.AddTTBackground3(card,dataset,p,rootFileMVV,rootFileNorm,resultsDir[dataset],ncontrib,["CMS_VV_JJ_TTJets_slope",0.5],jsonfileNorm)
+        Tools.AddTTBackground3(card,dataset,shape_purity,rootFileMVV,rootFileNorm,resultsDir[dataset],ncontrib,["CMS_VV_JJ_TTJets_slope",0.5],jsonfileNorm)
       else:
         print "load templates"
-        Tools.AddTTBackground4(card,dataset,p,rootFileMVV,rootFileNorm,resultsDir[dataset],ncontrib,jsonfileNorm)
+        Tools.AddTTBackground4(card,dataset,shape_purity,rootFileMVV,rootFileNorm,resultsDir[dataset],ncontrib,jsonfileNorm)
       #rootFileMVV  = resultsDir[dataset]+'/JJ_'+dataset+'_TTJets_MVV_'+p+'.root'
       #rootFileNorm = resultsDir[dataset]+'/JJ_'+dataset+'_TTJets_'+p+'.root'
       #Tools.AddTTBackground2(card,dataset,p,rootFileMVV,rootFileNorm,resultsDir[dataset],ncontrib)
@@ -147,14 +155,14 @@ for sig in signals:
 
       print "##########################       including QCD in datacard      ######################"
       #rootFile3DPDF = resultsDir[dataset]+'/JJ_2016_nonRes_3D_VV_HPLP.root'
-      rootFile3DPDF = resultsDir[dataset]+"/save_new_shapes_{year}_pythia_{purity}_3D.root".format(year=dataset,purity=p)#    save_new_shapes_%s_pythia_"%dataset+"_""VVVH_all"+"_3D.root"
+      rootFile3DPDF = resultsDir[dataset]+"/save_new_shapes_{year}_pythia_{purity}_3D.root".format(year=dataset,purity=shape_purity)#    save_new_shapes_%s_pythia_"%dataset+"_""VVVH_all"+"_3D.root"
       #rootFile3DPDF = resultsDir[dataset]+"/save_new_shapes_{year}_madgraph_{purity}_3D.root".format(year=dataset,purity=p)#    save_new_shapes_%s_pythia_"%dataset+"_""VVVH_all"+"_3D.root"
       print "rootFile3DPDF ",rootFile3DPDF
       rootFileNorm = resultsDir[dataset]+"/JJ_%s_nonRes_"%dataset+p+".root"
       #rootFileNorm = resultsDir[dataset]+"/JJ_%s_nonRes_"%dataset+p+"_altshape2.root"
       print "rootFileNorm ",rootFileNorm
 
-      Tools.AddNonResBackground(card,dataset,p,rootFile3DPDF,rootFileNorm,ncontrib)
+      Tools.AddNonResBackground(card,dataset,shape_purity,rootFile3DPDF,rootFileNorm,ncontrib)
       print "##########################       QCD added in datacard      ######################"
 
 
@@ -199,20 +207,20 @@ for sig in signals:
       Tools.AddData(card,rootFileData,histName,scaleData)
 
       print "##########################       data/pseudodata added in datacard      ######################"  
-       
-      Tools.AddSigSystematics(card,sig,dataset,p,1)
+      correlateyields=1
+      Tools.AddSigSystematics(card,sig,dataset,p,correlateyields)
       if options.fitvjetsmjj == True:
-        Tools.AddResBackgroundSystematics(card,p,["CMS_VV_JJ_WJets_slope",0.2,"CMS_VV_JJ_ZJets_slope",0.2])
+        Tools.AddResBackgroundSystematics(card,p,options.vbf,["CMS_VV_JJ_WJets_slope",0.2,"CMS_VV_JJ_ZJets_slope",0.2])
       else:
-        Tools.AddResBackgroundSystematics(card,p)
-      Tools.AddNonResBackgroundSystematics(card,p)
+        Tools.AddResBackgroundSystematics(card,p,options.vbf)
+      Tools.AddNonResBackgroundSystematics(card,p,options.vbf)
       Tools.AddTaggingSystematics(card,sig,p,[resultsDir[dataset]+'/migrationunc_'+sig+'_'+dataset+'.json',resultsDir[dataset]+'/migrationunc_WJets_'+dataset+'.json',resultsDir[dataset]+'/migrationunc_ZJets_'+dataset+'.json',resultsDir[dataset]+'/migrationunc_TTJets_'+dataset+'.json'])
       if options.fitTTmjj == True:
         print "load fits syst"
         Tools.AddTTSystematics4(card,["CMS_VV_JJ_TTJets_slope",0.05],dataset,p)
       else:
         print "load templates syst"
-        Tools.AddTTSystematics5(card,p)
+        Tools.AddTTSystematics5(card,p,options.vbf)
       print "##########################       systematics added in datacard      ######################"  
 
 
@@ -227,7 +235,7 @@ for sig in signals:
     print "#####################################"
 
     #make combined 
-    if len(purities)>1:
+    if len(purities)>1 and options.merge == True:
       print "#######     going to combine purity categories: ",purities    
       combo_card = cardName.replace("VV_HPHP","").replace("VV_HPLP","").replace("VV_LPLP","").replace("VH_HPHP","").replace("VH_HPLP","").replace("VH_LPHP","").replace("VH_HPNP_control_region","").replace("VH_NPHP_control_region","").replace("__","_VVVH_")
       combo_workspace = workspaceName.replace("VV_HPHP","").replace("VV_HPLP","").replace("VV_LPLP","").replace("VH_HPHP","").replace("VH_HPLP","").replace("VH_LPHP","").replace("VH_HPNP_control_region","").replace("VH_NPHP_control_region","").replace("__","_VVVH_")

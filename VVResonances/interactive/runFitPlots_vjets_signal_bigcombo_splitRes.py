@@ -52,7 +52,7 @@ if options.name.find("2017")!=-1: period = "2017"
 if options.name.find("2018")!=-1: period = "2018"
 if options.name.find("Run2")!=-1: period = "Run2"
 
-
+showallTT=False
 signalName = "ZprimeZH"
 if options.name.find("WZ")!=-1:
     signalName="WprimeWZ"
@@ -122,7 +122,10 @@ def writeLogfile(options,fitresult):
      		 continue
      	     pi = paramsinit.at(k)
      	     r  = pi.getMax()-1
-             logfile.write(pf.GetName()+" & "+str((pf.getVal()-pi.getVal())/r)+"\\\\ \n")
+             if r !=0 :
+                 logfile.write(pf.GetName()+" & "+str((pf.getVal()-pi.getVal())/r)+"\\\\ \n")
+             else:
+                 logfile.write(pf.GetName()+" & "+str((pf.getVal()-pi.getVal()))+"\\\\ \n")
          logfile.close()
 
 if __name__=="__main__":
@@ -161,12 +164,18 @@ if __name__=="__main__":
      print
      print "Observed number of events in",purity,"category:"
      print data[period].sumEntries() ,"   ("+period+")"
+     norms = {}
+     norms["data"] = data[period].sumEntries()
      expected = {}
      for bkg in bkgs:
          if options.doVjets==False and (bkg=="Wjets" or bkg=="Zjets"): expected[bkg] = [None,None]; continue
          if options.addTop==False and (bkg.find("TTJets")!=-1): expected[bkg] = [None,None]; continue
          expected[bkg] = [ (args[pdf1Name[period]].getComponents())["n_exp_binJJ_"+purity+"_13TeV_"+period+"_proc_"+bkg],0.]
+         norms[bkg] = expected[bkg][0].getVal()
          print "Expected number of "+bkg+" events:",(expected[bkg][0].getVal()),"   ("+period+")"
+     jsonfile = open("Expected_"+period+"_"+options.channel+".json","w")
+     json.dump(norms,jsonfile)
+     jsonfile.close()
      all_expected[period] = expected
      if options.fitSignal:
         print "Expected signal yields:",(args[pdf1Name[period]].getComponents())["n_exp_final_binJJ_"+purity+"_13TeV_"+period+"_proc_"+signalName].getVal(),"(",period,")"
@@ -186,7 +195,7 @@ if __name__=="__main__":
         else: fitresult_bkg_only = fitresult
         fitresult.Print() 
         print 
-        writeLogfile(options,fitresult)
+        #writeLogfile(options,fitresult)
      ############################################################################################
      
 
@@ -228,7 +237,7 @@ if __name__=="__main__":
         expected = {}
         norms = {}
         slopes = {}
-
+        norms["data"] = data[period].sumEntries()
         for bkg,bn in zip(bkgs,bkgLabel):
                 if options.doVjets==False and (bkg=="Wjets" or bkg=="Zjets"): expected[bkg] = [0.,0.]; continue
                 if options.addTop==False and (bkg.find("TTJets")!=-1): expected[bkg] = [0.,0.]; continue
@@ -258,6 +267,9 @@ if __name__=="__main__":
                     jsonfileslopes = open(options.jsonname+"Slopes_"+options.channel+".json","w")
                     json.dump(slopes,jsonfileslopes)
                     jsonfileslopes.close()
+        jsonfile = open("Observed_"+period+"_"+options.channel+".json","w")
+        json.dump(norms,jsonfile)
+        jsonfile.close()
         if options.fitSignal:
                 signal_expected[period] = [ (args[pdf1Name[period]].getComponents())["n_exp_final_binJJ_"+purity+"_13TeV_"+period+"_proc_"+signalName], (args[pdf1Name[period]].getComponents())["n_exp_final_binJJ_"+purity+"_13TeV_"+period+"_proc_"+signalName].getPropagatedError(fitresult)]
                 print "Fitted signal yields:",signal_expected[period][0].getVal()," +/- ", signal_expected[period][1] ,"(",period,")"
@@ -272,17 +284,17 @@ if __name__=="__main__":
      #make projections onto MJJ axis 
      if options.projection =="z" or options.projection =="xyz":
          results = []
-         res = forproj.doProjection(data[period],allpdfsz[period],all_expected[period],"z",allsignalpdfs[period],signal_expected[period])
+         res = forproj.doProjection(data[period],allpdfsz[period],all_expected[period],"z",allsignalpdfs[period],signal_expected[period],showallTT)
          forplotting.MakePlots(res[0],res[1],res[2],res[3],res[4],res[5], res[6],res[7],options.pseudo)
      #make projections onto MJ1 axis
      if options.projection =="x" or options.projection =="xyz":
          results = []
-         res = forproj.doProjection(data[period],allpdfsx[period],all_expected[period],"x",allsignalpdfs[period],signal_expected[period])
+         res = forproj.doProjection(data[period],allpdfsx[period],all_expected[period],"x",allsignalpdfs[period],signal_expected[period],showallTT)
          forplotting.MakePlots(res[0],res[1],res[2],res[3],res[4],res[5], res[6],res[7],options.pseudo,binwidth)
      #make projections onto MJ2 axis
      if options.projection =="y" or options.projection =="xyz":
          results = []
-         res = forproj.doProjection(data[period],allpdfsy[period],all_expected[period],"y",allsignalpdfs[period],signal_expected[period])
+         res = forproj.doProjection(data[period],allpdfsy[period],all_expected[period],"y",allsignalpdfs[period],signal_expected[period],showallTT)
          forplotting.MakePlots(res[0],res[1],res[2],res[3],res[4],res[5], res[6],res[7],options.pseudo,binwidth)
 
 

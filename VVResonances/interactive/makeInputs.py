@@ -2,7 +2,7 @@ from functions import *
 from optparse import OptionParser
 #from cuts import cuts, HPSF16, HPSF17, LPSF16, LPSF17, dijetbins, HCALbinsMVVSignal, minMJ,maxMJ,binsMJ, minMVV, maxMVV, binsMVV, minMX, maxMX, catVtag, catHtag
 import cuts
-
+import argparse
 ## import cuts of the analysis from separate file
 
 # python makeInputs.py -p 2016 --run "detector" --batch False
@@ -31,11 +31,12 @@ parser.add_option("-b","--binning",action="store_false",dest="binning",help="use
 parser.add_option("--batch",action="store_false",dest="batch",help="submit to batch or not ",default=True)
 parser.add_option("--trigg",action="store_true",dest="trigg",help="add trigger weights or not ",default=False)
 parser.add_option("--run",dest="run",help="decide which parts of the code should be run right now possible optoins are: all : run everything, sigmvv: run signal mvv fit sigmj: run signal mj fit, signorm: run signal norm, vjets: run vjets, tt: run ttbar , qcdtemplates: run qcd templates, qcdkernel: run qcd kernel, qcdnorm: run qcd merge and norm, detector: run detector fit , data : run the data or pseudodata scripts ",default="all")
-parser.add_option("--signal",dest="signal",default="BGWW",help="which signal do you want to run? options are BulkGWW, BulkGZZ, WprimeWZ, ZprimeWW, ZprimeZH")
+parser.add_option("--signal",dest="signal",default="BGWW",help="which signal do you want to run? options are BGWW, BGZZ, WprimeWZ, ZprimeWW, ZprimeZH, RWW, RZZ and VBF combination")
 parser.add_option("--fitsmjj",dest="fitsmjj",default=False,action="store_true",help="True makes fits for mjj of vjets/tt, False uses hists")
 parser.add_option("--single",dest="single",default=False,help="set to True to merge kernels also for single years when processing full run2 data")
 parser.add_option("--sendjobs",dest="sendjobs",default=True,help="make job list without submitting them (useful to only merge jobs if something was not finished")
 parser.add_option("-c",dest="category",default="VH_HPHP,VH_HPLP,VH_LPHP,VV_HPHP,VV_HPLP",help="chose the category, e.g. NP or VV_HPHP")
+parser.add_option("-v","--vbf",dest="vbf",help="make vbf?",action='store_true')
 (options,args) = parser.parse_args()
 
 widerMVV=True
@@ -79,22 +80,36 @@ if useTriggerWeights:
     
 #all categories
 categories=options.category.split(",")
+if options.vbf == True:
+    for cat in options.category.split(","):
+        categories.append("VBF_"+cat)
 print " ********* running on categories: ",categories
 
 #list of signal samples --> nb, radion and vbf samples to be added
 BulkGravWWTemplate="BulkGravToWW_"
 VBFBulkGravWWTemplate="VBF_BulkGravToWW_"
 BulkGravZZTemplate="BulkGravToZZToZhadZhad_"
+VBFBulkGravZZTemplate="VBF_BulkGravToZZ_"
 ZprimeWWTemplate= "ZprimeToWW_"
+VBFZprimeWWTemplate= "VBF_ZprimeToWW_"
 ZprimeZHTemplate="ZprimeToZhToZhadhbb_"
+VBFZprimeZHTemplate="VBF_ZprimeToZhToZhadhbb_"
 WprimeWZTemplate= "WprimeToWZToWhadZhad_"
+VBFWprimeWZTemplate= "VBF_WprimeToWZ_"
 WprimeWHTemplate="WprimeToWhToWhadhbb_" #"WprimeToWhToWhadhbb_"
+VBFWprimeWHTemplate="VBF_WprimeToWhToWhadhbb_" #"WprimeToWhToWhadhbb_"
+RadionWWTemplate="RadionToWW_"
+VBFRadionWWTemplate="VBF_RadionToWW_"
+RadionZZTemplate="RadionToZZ_"
+VBFRadionZZTemplate="VBF_RadionToZZ_"
 
 # use arbitrary cross section 0.001 so limits converge better
 BRZZ=1.*0.001*0.6991*0.6991
+BRZZincl=1.*0.001
 BRWW=1.*0.001 #ZprimeWW and GBulkWW are inclusive
 BRZH=1.*0.001*0.6991*0.584
 BRWZ=1.*0.001*0.6991*0.676
+BRWZincl=1.*0.001
 BRWH=1.*0.001*0.676*0.584
 
 #data samples
@@ -105,16 +120,9 @@ dataTemplate="JetHT"
 #nonResTemplate="QCD_HT" #medium stat madgraph+pythia
 nonResTemplate="QCD_Pt_" #high stat pythia8
 
-'''
-if(period == "2016"):                                                                                                                                                                                                                        
-    TTemplate= "TT_Mtt-700to1000,TT_Mtt-1000toInf" 
-elif (filePeriod == "Run2"):
-    TTemplate= "TT_Mtt-700to1000,TT_Mtt-1000toInf,TTToHadronic"
-else:                                                                                                                                                                                                                                       
-    TTemplate= "TTToHadronic" 
-'''
-
-TTemplate= "TT_Mtt-700to1000,TT_Mtt-1000toInf"
+STemplate= "ST_tW_antitop,ST_tW_top"
+WWTemplate="SM_WW,SM_WWTo4Q"
+TTemplate= "TT_Mtt-700to1000,TT_Mtt-1000toInf,ST_tW_antitop,ST_tW_top,SM_WW,SM_WWTo4Q"
 WresTemplate= "WJetsToQQ_HT400to600,WJetsToQQ_HT600to800,WJetsToQQ_HT800toInf"
 ZresTemplate= "ZJetsToQQ_HT400to600,ZJetsToQQ_HT600to800,ZJetsToQQ_HT800toInf"
 resTemplate= "ZJetsToQQ_HT400to600,ZJetsToQQ_HT600to800,ZJetsToQQ_HT800toInf,WJetsToQQ_HT400to600,WJetsToQQ_HT600to800,WJetsToQQ_HT800toInf"
@@ -128,9 +136,13 @@ f = AllFunctions(parameters)
 
 #parser.add_option("--signal",dest="signal",default="BGWW",help="which signal do you want to run? options are BGWW, BGZZ, WprimeWZ, ZprimeWW, ZprimeZH")
 if options.run.find("all")!=-1 or options.run.find("sig")!=-1:
-    if options.signal.find("ZprimeZH")!=-1:
+    if options.signal.find("ZprimeZH")!=-1 and not 'VBF' in options.signal:
         signal_inuse="ZprimeZH"
         signaltemplate_inuse=ZprimeZHTemplate
+        xsec_inuse=BRZH
+    elif options.signal.find("VBFZprimeZH")!=-1:
+        signal_inuse="VBF_ZprimeZH"
+        signaltemplate_inuse=VBFZprimeZHTemplate
         xsec_inuse=BRZH
     elif options.signal.find("BGWW")!=-1 and not 'VBF' in options.signal:
         signal_inuse="BulkGWW"
@@ -140,22 +152,54 @@ if options.run.find("all")!=-1 or options.run.find("sig")!=-1:
         signal_inuse="VBF_BulkGWW"
         signaltemplate_inuse=VBFBulkGravWWTemplate
         xsec_inuse=BRWW
-    elif options.signal.find("BGZZ")!=-1:
+    elif options.signal.find("BGZZ")!=-1 and not 'VBF' in options.signal:
         signal_inuse="BulkGZZ"
         signaltemplate_inuse=BulkGravZZTemplate
         xsec_inuse=BRZZ
-    elif options.signal.find("ZprimeWW")!=-1:
+    elif options.signal.find("VBFBGZZ")!=-1:
+        signal_inuse="VBF_BulkGZZ"
+        signaltemplate_inuse=VBFBulkGravZZTemplate
+        xsec_inuse=BRZZincl
+    elif options.signal.find("ZprimeWW")!=-1 and not 'VBF' in options.signal:
         signal_inuse="ZprimeWW"
         signaltemplate_inuse=ZprimeWWTemplate
         xsec_inuse=BRWW
-    elif options.signal.find("WprimeWZ")!=-1:
+    elif options.signal.find("VBFZprimeWW")!=-1:
+        signal_inuse="VBF_ZprimeWW"
+        signaltemplate_inuse=VBFZprimeWWTemplate
+        xsec_inuse=BRWW
+    elif options.signal.find("WprimeWZ")!=-1 and not 'VBF' in options.signal:
         signal_inuse="WprimeWZ"
         signaltemplate_inuse=WprimeWZTemplate
         xsec_inuse=BRWZ
-    elif options.signal.find("WprimeWH")!=-1:
+    elif options.signal.find("VBFWprimeWZ")!=-1:
+        signal_inuse="VBF_WprimeWZ"
+        signaltemplate_inuse=VBFWprimeWZTemplate
+        xsec_inuse=BRWZincl
+    elif options.signal.find("WprimeWH")!=-1 and not 'VBF' in options.signal:
         signal_inuse="WprimeWH"
         signaltemplate_inuse=WprimeWHTemplate
         xsec_inuse=BRWH
+    elif options.signal.find("VBFWprimeWH")!=-1:
+        signal_inuse="VBF_WprimeWH"
+        signaltemplate_inuse=VBFWprimeWHTemplate
+        xsec_inuse=BRWH
+    elif options.signal.find("RWW")!=-1 and not 'VBF' in options.signal:
+        signal_inuse="RadionWW"
+        signaltemplate_inuse=RadionWWTemplate
+        xsec_inuse=BRWW
+    elif options.signal.find("VBFRWW")!=-1:
+        signal_inuse="VBF_RadionWW"
+        signaltemplate_inuse=VBFRadionWWTemplate
+        xsec_inuse=BRWW
+    elif options.signal.find("RZZ")!=-1 and not 'VBF' in options.signal:
+        signal_inuse="RadionZZ"
+        signaltemplate_inuse=RadionZZTemplate
+        xsec_inuse=BRZZ
+    elif options.signal.find("VBFRZZ")!=-1:
+        signal_inuse="VBF_RadionZZ"
+        signaltemplate_inuse=VBFRadionZZTemplate
+        xsec_inuse=BRZZ
     else:
         print "signal "+str(options.signal)+" not found!"
         sys.exit()
@@ -172,26 +216,26 @@ if options.run.find("all")!=-1 or options.run.find("sig")!=-1:
         print "mj fit for signal "
         if sorting == "random":
             if signal_inuse.find("H")!=-1: 
-                f.makeSignalShapesMJ("JJ_Vjet_"+str(signal_inuse)+"_"+filePeriod,signaltemplate_inuse,'random', fixParsSig[signal_inuse],"jj_random_mergedVTruth==1")
-                f.makeSignalShapesMJ("JJ_Hjet_"+str(signal_inuse)+"_"+filePeriod,signaltemplate_inuse,'random',fixParsSig[signal_inuse],"jj_random_mergedHTruth==1")
+                f.makeSignalShapesMJ("JJ_Vjet_"+str(signal_inuse)+"_"+filePeriod,signaltemplate_inuse,'random', fixParsSig[signal_inuse.replace('VBF_','')],"jj_random_mergedVTruth==1")
+                f.makeSignalShapesMJ("JJ_Hjet_"+str(signal_inuse)+"_"+filePeriod,signaltemplate_inuse,'random',fixParsSig[signal_inuse.replace('VBF_','')],"jj_random_mergedHTruth==1")
             else:
                 f.makeSignalShapesMJ("JJ_"+str(signal_inuse)+"_"+filePeriod,signaltemplate_inuse,'random',fixParsSig[signal_inuse.replace('VBF_','')]) 
         else:
             if signal_inuse.find("H")!=-1: 
-                f.makeSignalShapesMJ("JJ_Vjet_"+str(signal_inuse)+"_"+filePeriod,signaltemplate_inuse,'l1',fixParsSig[signal_inuse],"jj_l1_mergedVTruth==1")
-                f.makeSignalShapesMJ("JJ_Vjet_"+str(signal_inuse)+"_"+filePeriod,signaltemplate_inuse,'l2',fixParsSig[signal_inuse],"jj_l2_mergedVTruth==1")
-                f.makeSignalShapesMJ("JJ_Hjet_"+str(signal_inuse)+"_"+filePeriod,signaltemplate_inuse,'l1',fixParsSig[signal_inuse],"jj_l1_mergedHTruth==1")
-                f.makeSignalShapesMJ("JJ_Hjet_"+str(signal_inuse)+"_"+filePeriod,signaltemplate_inuse,'l2',fixParsSig[signal_inuse],"jj_l2_mergedHTruth==1")
+                f.makeSignalShapesMJ("JJ_Vjet_"+str(signal_inuse)+"_"+filePeriod,signaltemplate_inuse,'l1',fixParsSig[signal_inuse.replace('VBF_','')],"jj_l1_mergedVTruth==1")
+                f.makeSignalShapesMJ("JJ_Vjet_"+str(signal_inuse)+"_"+filePeriod,signaltemplate_inuse,'l2',fixParsSig[signal_inuse.replace('VBF_','')],"jj_l2_mergedVTruth==1")
+                f.makeSignalShapesMJ("JJ_Hjet_"+str(signal_inuse)+"_"+filePeriod,signaltemplate_inuse,'l1',fixParsSig[signal_inuse.replace('VBF_','')],"jj_l1_mergedHTruth==1")
+                f.makeSignalShapesMJ("JJ_Hjet_"+str(signal_inuse)+"_"+filePeriod,signaltemplate_inuse,'l2',fixParsSig[signal_inuse.replace('VBF_','')],"jj_l2_mergedHTruth==1")
             else:
-                f.makeSignalShapesMJ("JJ_"+str(signal_inuse)+"_"+filePeriod,signaltemplate_inuse,'l1',fixParsSig[signal_inuse])
-                f.makeSignalShapesMJ("JJ_"+str(signal_inuse)+"_"+filePeriod,signaltemplate_inuse,'l2',fixParsSig[signal_inuse])
+                f.makeSignalShapesMJ("JJ_"+str(signal_inuse)+"_"+filePeriod,signaltemplate_inuse,'l1',fixParsSig[signal_inuse.replace('VBF_','')])
+                f.makeSignalShapesMJ("JJ_"+str(signal_inuse)+"_"+filePeriod,signaltemplate_inuse,'l2',fixParsSig[signal_inuse.replace('VBF_','')])
     if options.run.find("all")!=-1 or options.run.find("mvv")!=-1:
         print "mjj fit for signal ",signal_inuse
         if signal_inuse.find("H")!=-1:
-            f.makeSignalShapesMVV("JJ_"+str(signal_inuse)+"_"+filePeriod,signaltemplate_inuse,fixParsSigMVV[signal_inuse],"( jj_l1_softDrop_mass <= 215 && jj_l1_softDrop_mass > 105 && jj_l2_softDrop_mass <= 105 && jj_l2_softDrop_mass > 55) || (jj_l2_softDrop_mass <= 215 && jj_l2_softDrop_mass > 105 && jj_l1_softDrop_mass <= 105 && jj_l1_softDrop_mass > 55) ")
+            f.makeSignalShapesMVV("JJ_"+str(signal_inuse)+"_"+filePeriod,signaltemplate_inuse,fixParsSigMVV[signal_inuse.replace('VBF_','')],"( jj_l1_softDrop_mass <= 215 && jj_l1_softDrop_mass > 105 && jj_l2_softDrop_mass <= 105 && jj_l2_softDrop_mass > 55) || (jj_l2_softDrop_mass <= 215 && jj_l2_softDrop_mass > 105 && jj_l1_softDrop_mass <= 105 && jj_l1_softDrop_mass > 55) ")
         elif signal_inuse.find("WZ")!=-1:
             #f.makeSignalShapesMVV("JJ_"+str(signal_inuse)+"_"+filePeriod,signaltemplate_inuse,fixParsSigMVV[signal_inuse],"(jj_l1_softDrop_mass <= 105 && jj_l1_softDrop_mass > 85 && jj_l2_softDrop_mass <= 85 && jj_l2_softDrop_mass >= 65) || (jj_l2_softDrop_mass <= 105 && jj_l2_softDrop_mass > 85 && jj_l1_softDrop_mass <= 85 && jj_l1_softDrop_mass >= 65)")
-            f.makeSignalShapesMVV("JJ_"+str(signal_inuse)+"_"+filePeriod,signaltemplate_inuse,fixParsSigMVV[signal_inuse],"1")
+            f.makeSignalShapesMVV("JJ_"+str(signal_inuse)+"_"+filePeriod,signaltemplate_inuse,fixParsSigMVV[signal_inuse.replace('VBF_','')],"1")
         else:
             f.makeSignalShapesMVV("JJ_"+str(signal_inuse)+"_"+filePeriod,signaltemplate_inuse,fixParsSigMVV[signal_inuse.replace('VBF_','')],"1")
     if options.run.find("all")!=-1 or options.run.find("SF")!=-1:
@@ -304,6 +348,32 @@ if options.run.find("all")!=-1 or options.run.find("tt")!=-1:
             print "make norm, DID YOU MAKE SF?"
             f.makeNormalizations("TTJets"+con,"JJ_"+filePeriod,TTemplate,0,ctx.cuts[con],"nResTT"+con,options.single,"1",options.sendjobs)
 
+if options.run.find("all")!=-1 or options.run.find("st")!=-1:
+    wait=False
+    if options.batch == True : wait=True
+    if options.run.find("all")!=-1 or options.run.find("SF")!=-1 or options.run.find("ALL")!=-1:
+        print " Making SF "
+        f.makeSF(STemplate)
+    if options.run.find("all")!=-1 or options.run.find("MU")!=-1 or options.run.find("ALL")!=-1:
+        print " Making migration uncertainties "
+        f.makeMigrationUnc(STemplate,"STJets",options.period)
+    if options.run.find("all")!=-1 or options.run.find("norm")!=-1 or options.run.find("ALL")!=-1:
+        print "make norm for all contributions of ttbar together, DID YOU MAKE SF?"
+        f.makeNormalizations("STJets","JJ_"+filePeriod,STemplate,0,ctx.cuts['nonres'],"nResST",options.single,"1",options.sendjobs)
+
+
+if options.run.find("all")!=-1 or options.run.find("sm")!=-1:
+    wait=False
+    if options.batch == True : wait=True
+    if options.run.find("all")!=-1 or options.run.find("SF")!=-1 or options.run.find("ALL")!=-1:
+        print " Making SF "
+        f.makeSF(WWTemplate)
+    if options.run.find("all")!=-1 or options.run.find("MU")!=-1 or options.run.find("ALL")!=-1:
+        print " Making migration uncertainties "
+        f.makeMigrationUnc(SMTemplate,"STJets",options.period)
+    if options.run.find("all")!=-1 or options.run.find("norm")!=-1 or options.run.find("ALL")!=-1:
+        print "make norm for all contributions of ttbar together, DID YOU MAKE SF?"
+        f.makeNormalizations("WWJets","JJ_"+filePeriod,WWTemplate,0,ctx.cuts['nonres'],"nResWW",options.single,"1",options.sendjobs)
 
 if options.run.find("all")!=-1 or options.run.find("data")!=-1:
     print " Do data "

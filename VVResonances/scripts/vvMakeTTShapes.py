@@ -82,9 +82,14 @@ def getCanvasPaper(cname):
  return canvas, pt
  
 def drawFromJson(jsonfile,category,outname):
-  evalPoints = [1150,1200,1300,1400,1500,2000,2500,3000,3500,5500]
+  evalPoints = [1250,1300,1400,1500,2000,2500,3000,3500,5500]
   fitter=Fitter(['MJ[80,55,215]'])
+  #fitter.threeGaus('model','MJ')
+  #fitter.twoCBplusGaus('model','MJ')
+  #fitter.CBplus2Gaus('model','MJ')
+  #fitter.erfexp2CB('model','MJ')
   fitter.erfexp2Gaus('model','MJ')
+
   var = fitter.w.var('MJJ')
   frame = fitter.w.var('MJ').frame()
   with open(jsonfile) as jsonFile:
@@ -92,17 +97,39 @@ def drawFromJson(jsonfile,category,outname):
     leg = ROOT.TLegend(0.1746231, 0.43, 0.5251256, 0.73)
     leg.SetBorderSize(0)
     c, pt =getCanvasPaper('ttMJ')
-    
+
     for i,MJJ in enumerate(evalPoints):
+      # parametrize non resonant part with exp-err
       fitter.w.var("c_0")   .setVal( eval(j["c_0"   ]) );  fitter.w.var("c_0")   .setConstant(ROOT.kTRUE)
       fitter.w.var("c_1")   .setVal( eval(j["c_1"   ]) );  fitter.w.var("c_1")   .setConstant(ROOT.kTRUE)
       fitter.w.var("c_2")   .setVal( eval(j["c_2"   ]) );  fitter.w.var("c_2")   .setConstant(ROOT.kTRUE)
+      # parametrise non resonant part with a gaussian
+      #fitter.w.var("meanN") .setVal( eval(j["meanN" ]) );  fitter.w.var("meanN") .setConstant(ROOT.kTRUE)
+      #fitter.w.var("sigmaN").setVal( eval(j["sigmaN"]) );  fitter.w.var("sigmaN").setConstant(ROOT.kTRUE)
+      # ratio parameters
       fitter.w.var("f_g1")  .setVal( eval(j["f_g1"  ]) );  fitter.w.var("f_g1")  .setConstant(ROOT.kTRUE)
       fitter.w.var("f_res") .setVal( eval(j["f_res" ]) );  fitter.w.var("f_res") .setConstant(ROOT.kTRUE)
-      fitter.w.var("mean1") .setVal( eval(j["mean1" ]) );  fitter.w.var("mean1") .setConstant(ROOT.kTRUE)
-      fitter.w.var("mean2") .setVal( eval(j["mean2" ]) );  fitter.w.var("mean2") .setConstant(ROOT.kTRUE)
-      fitter.w.var("sigma1").setVal( eval(j["sigma1"]) );  fitter.w.var("sigma1").setConstant(ROOT.kTRUE)
-      fitter.w.var("sigma2").setVal( eval(j["sigma2"]) );  fitter.w.var("sigma2").setConstant(ROOT.kTRUE)
+      # parametrize W with a gaussian
+      fitter.w.var("meanW") .setVal( eval(j["meanW" ]) );  fitter.w.var("meanW") .setConstant(ROOT.kTRUE)
+      fitter.w.var("sigmaW").setVal( eval(j["sigmaW"]) );  fitter.w.var("sigmaW").setConstant(ROOT.kTRUE)
+      # parametrize T with a gaussian
+      fitter.w.var("meanT") .setVal( eval(j["meanT" ]) );  fitter.w.var("meanT") .setConstant(ROOT.kTRUE)
+      fitter.w.var("sigmaT").setVal( eval(j["sigmaT"]) );  fitter.w.var("sigmaT").setConstant(ROOT.kTRUE)
+      # parametrize W with a CB
+      #fitter.w.var("meanW") .setVal( eval(j["meanW" ]) );  fitter.w.var("meanW") .setConstant(ROOT.kTRUE)
+      #fitter.w.var("sigmaW").setVal( eval(j["sigmaW"]) );  fitter.w.var("sigmaW").setConstant(ROOT.kTRUE)
+      #fitter.w.var("alpha1W") .setVal( eval(j["alpha1W" ]) );  fitter.w.var("alpha1W") .setConstant(ROOT.kTRUE)
+      #fitter.w.var("n1W").setVal( eval(j["n1W"]) );  fitter.w.var("n1W").setConstant(ROOT.kTRUE)
+      #fitter.w.var("alpha2W") .setVal( eval(j["alpha2W" ]) );  fitter.w.var("alpha2W") .setConstant(ROOT.kTRUE)
+      #fitter.w.var("n2W").setVal( eval(j["n2W"]) );  fitter.w.var("n2W").setConstant(ROOT.kTRUE)
+      # parametrize T with a CB
+      #fitter.w.var("meanT") .setVal( eval(j["meanT" ]) );  fitter.w.var("meanT") .setConstant(ROOT.kTRUE)
+      #fitter.w.var("sigmaT").setVal( eval(j["sigmaT"]) );  fitter.w.var("sigmaT").setConstant(ROOT.kTRUE)
+      #fitter.w.var("alpha1T") .setVal( eval(j["alpha1T" ]) );  fitter.w.var("alpha1T") .setConstant(ROOT.kTRUE)
+      #fitter.w.var("n1T").setVal( eval(j["n1T"]) );  fitter.w.var("n1T").setConstant(ROOT.kTRUE)
+      #fitter.w.var("alpha2T") .setVal( eval(j["alpha2T" ]) );  fitter.w.var("alpha2T") .setConstant(ROOT.kTRUE)
+      #fitter.w.var("n2T").setVal( eval(j["n2T"]) );  fitter.w.var("n2T").setConstant(ROOT.kTRUE)
+
       
       fitter.w.pdf('model').plotOn(frame, ROOT.RooFit.LineColor(ROOT.TColor.GetColor(colors[i])),ROOT.RooFit.Name(str(MJJ)))
       leg.AddEntry(frame.findObject(str(MJJ)), "%.1f TeV" %(MJJ/1000.), "L")
@@ -143,22 +170,46 @@ def doClosure(histos,xaxis,jsonfile,category):
       fitter=Fitter(['MJ'])
       fitter.importBinnedData(tmp,['MJ'],'data')
       fitter.erfexp2Gaus('model','MJ')
-      
+      #fitter.threeGaus('model','MJ')
+      #fitter.twoCBplusGaus('model','MJ')
+      #fitter.CBplus2Gaus('model','MJ')
+      #fitter.erfexp2CB('model','MJ')
       with open(jsonfile) as jsonFile:
         j = json.load(jsonFile)
       
+      #parametrise non res part with exp err
       fitter.w.var("c_0")   .setVal( eval(j["c_0"   ]) ); print eval(j["c_0"   ])
       fitter.w.var("c_1")   .setVal( eval(j["c_1"   ]) ); print eval(j["c_1"   ])
       fitter.w.var("c_2")   .setVal( eval(j["c_2"   ]) ); print eval(j["c_2"   ])
+      # parametrise non res part with a gaussian
+      #fitter.w.var("meanN") .setVal( eval(j["meanN" ]) ); print eval(j["meanN" ])
+      #fitter.w.var("sigmaN").setVal( eval(j["sigmaN"]) ); print eval(j["sigmaN"])
+      # ratio parameters
       fitter.w.var("f_g1")  .setVal( eval(j["f_g1"  ]) ); print eval(j["f_g1"  ])
       fitter.w.var("f_res") .setVal( eval(j["f_res" ]) ); print eval(j["f_res" ])
-      fitter.w.var("mean1") .setVal( eval(j["mean1" ]) ); print eval(j["mean1" ])
-      fitter.w.var("mean2") .setVal( eval(j["mean2" ]) ); print eval(j["mean2" ])
-      fitter.w.var("sigma1").setVal( eval(j["sigma1"]) ); print eval(j["sigma1"])
-      fitter.w.var("sigma2").setVal( eval(j["sigma2"]) ); print eval(j["sigma2"])
+      # parametrise W with Gaussian
+      fitter.w.var("meanW") .setVal( eval(j["meanW" ]) ); print eval(j["meanW" ])
+      fitter.w.var("sigmaW").setVal( eval(j["sigmaW"]) ); print eval(j["sigmaW"])
+      # parametrise T with Gaussian
+      fitter.w.var("meanT") .setVal( eval(j["meanT" ]) ); print eval(j["meanT" ])
+      fitter.w.var("sigmaT").setVal( eval(j["sigmaT"]) ); print eval(j["sigmaT"])
+      # parametrise W with CB
+      #fitter.w.var("meanW") .setVal( eval(j["meanW" ]) ); print eval(j["meanW" ])
+      #fitter.w.var("sigmaW").setVal( eval(j["sigmaW"]) ); print eval(j["sigmaW"])
+      #fitter.w.var("alpha1W") .setVal( eval(j["alpha1W" ]) );  print eval(j["alpha1W"])
+      #fitter.w.var("n1W").setVal( eval(j["n1W"]) );  print eval(j["n1W"])
+      #fitter.w.var("alpha2W") .setVal( eval(j["alpha2W" ]) );  print eval(j["alpha2W"])
+      #fitter.w.var("n2W").setVal( eval(j["n2W"]) );  print eval(j["n2W"])
+      # parametrise T with CB
+      #fitter.w.var("meanT") .setVal( eval(j["meanT" ]) ); print eval(j["meanT" ])
+      #fitter.w.var("sigmaT").setVal( eval(j["sigmaT"]) ); print eval(j["sigmaT"])
+      #fitter.w.var("alpha1T") .setVal( eval(j["alpha1T" ]) );  print eval(j["alpha1T"])
+      #fitter.w.var("n1T").setVal( eval(j["n1T"]) );  print eval(j["n1T"])
+      #fitter.w.var("alpha2T") .setVal( eval(j["alpha2T" ]) );  print eval(j["alpha2T"])
+      #fitter.w.var("n2T").setVal( eval(j["n2T"]) );  print eval(j["n2T"])
       
       fitter.fit('model','data',[ROOT.RooFit.SumW2Error(1),ROOT.RooFit.Save(1)]) #55,140 works well with fitting only the resonant part 
-      fitter.projection_ratioplot("model","data","MJ","debug_TT/%s_closure_%s_binL%s_binH%s.pdf"%(options.output,xax.replace("{","").replace("}",""),mjjbinL,mjjbinH),0,False,"%s (GeV)"%xax,options.output.split("_")[-2]+" "+options.output.split("_")[-1],55,215)
+      fitter.projection_ratioplot("model","data","MJ","debug_TT/%s_closure_%s_binL%s_binH%s.pdf"%(options.output,xax.replace("{","").replace("}",""),mjjbinL,mjjbinH),0,False,"%s (GeV)"%xax,category,55,215)
     
 def getMean(h2,binL,binH):
   nbins = h2.GetYaxis().GetNbins()
@@ -217,7 +268,7 @@ def getPlotters(samples_in):
       plotters_[-1].addCorrectionFactor(options.corrFactor,'flat')
   return plotters_
   
-def get2DHist(plts):
+def get2DHist(plts,category):
   mergedPlotter = MergedPlotter(plts)
   histo2D_l1 = mergedPlotter.drawTH2("jj_l1_softDrop_mass:jj_LV_mass",options.cut,"1",80,options.minMVV,options.maxMVV,80,options.mini,options.maxi) #y:x
   histo2D_l2 = mergedPlotter.drawTH2("jj_l2_softDrop_mass:jj_LV_mass",options.cut,"1",80,options.minMVV,options.maxMVV,80,options.mini,options.maxi)  
@@ -229,7 +280,7 @@ def get2DHist(plts):
   c, pt = getCanvasPaper('2D')
   histo2D.Draw("COLZ")
   addInfo = getPaveText(x1=0.71,y1=0.15,x2=0.81,y2=0.35)
-  addInfo.AddText(options.output.split("_")[-2]+" "+options.output.split("_")[-1])
+  addInfo.AddText(category)
   addInfo.Draw()
   histo2D.GetXaxis().SetTitle("m_{jj}")
   histo2D.GetYaxis().SetTitle("m_{j}")
@@ -237,50 +288,124 @@ def get2DHist(plts):
   c.SaveAs(debug_out+"/%s_2D.pdf"%options.output)
   return histo2D_l1,histo2D_l2,histo2D
 
-def doFit(th1_projY,mjj_mean,mjj_error,N):
+def doFit(th1_projY,mjj_mean,mjj_error,N,category):
 
   fitter=Fitter(['x'])
   fitter.erfexp2Gaus('model','x')
+  #fitter.erfexp2CB('model','x')
+  #fitter.threeGaus('model','x')
+  #fitter.twoCBplusGaus('model','x')
+  #fitter.CBplus2Gaus('model','x')
   projY.Rebin(2)
   if N == 0:
+    # ****      Initial value
+    # parametrise non res part with exp err
     fitter.w.var("c_0").setVal(-5.8573e-02)
     fitter.w.var("c_1").setVal(350.) #offset
     fitter.w.var("c_2").setVal(1.0707e+02) #width
+    # parametrise non res part with gaus
+    #fitter.w.var("meanN").setVal(1.45e+02)
+    #fitter.w.var("sigmaN").setVal(5e+01)
+
     fitter.w.var("f_g1").setVal(7.8678e-02)
     fitter.w.var("f_res").setVal(5.9669e-01)
-    fitter.w.var("mean1").setVal(8.1225e+01)
-    fitter.w.var("mean2").setVal(1.7409e+02)
-    fitter.w.var("sigma1").setVal(6.7507e+00)
-    fitter.w.var("sigma2").setVal(1.3369e+01)
 
+    # parametrise W with Gaussian
+    fitter.w.var("meanW").setVal(8.1225e+01)
+    fitter.w.var("sigmaW").setVal(6.7507e+00)
+    # parametrise T with Gaussian
+    fitter.w.var("meanT").setVal(1.7409e+02)
+    fitter.w.var("sigmaT").setVal(1.3369e+01)
+
+
+    # parametrise W with CB
+    #fitter.w.var("meanW").setVal(8.1225e+01)
+    #fitter.w.var("sigmaW").setVal(6.7507e+00)
+    #fitter.w.var("alpha1W").setVal(1.5)
+    #fitter.w.var("n1W").setVal(15)
+    #fitter.w.var("alpha2W").setVal(1)
+    #fitter.w.var("n2W").setVal(10)
+    # parametrise T with CB
+    #fitter.w.var("meanT").setVal(1.7409e+02)
+    #fitter.w.var("sigmaT").setVal(1.3369e+01)
+    #fitter.w.var("alpha1T").setVal(2)
+    #fitter.w.var("n1T").setVal(100)
+    #fitter.w.var("alpha2T").setVal(1)
+    #fitter.w.var("n2T").setVal(10)
+
+    # ****      Lower value
+    # parametrise non res part with exp err
     fitter.w.var("c_0")   .setMax(0.2)
     fitter.w.var("c_1")   .setMin(100) #offset
     fitter.w.var("c_2")   .setMin(50) #width
-    fitter.w.var("f_g1")  .setMin(0.05)
-    fitter.w.var("f_res") .setMin(0.3) #following Thea's suggestion to set the minimum to a higher value to make the fit converge
-    fitter.w.var("mean1") .setMin(75.)
-    fitter.w.var("mean2") .setMin(160.)
-    fitter.w.var("sigma1").setMin(5)
-    fitter.w.var("sigma2").setMin(8)
+    # parametrise non res part with gaus
+    #fitter.w.var("meanN") .setMin(90.)
+    #fitter.w.var("sigmaN").setMin(15.)
 
+    fitter.w.var("f_g1")  .setMin(0.05)
+    fitter.w.var("f_res") .setMin(0.35) #following Thea's suggestion to set the minimum to a higher value to make the fit converge
+    # parametrise W with Gaussian
+    fitter.w.var("meanW") .setMin(75.)
+    fitter.w.var("sigmaW").setMin(5)
+    # parametrise T with Gaussian
+    fitter.w.var("meanT") .setMin(160.)
+    fitter.w.var("sigmaT").setMin(8)
+
+    # parametrise W with CB
+    #fitter.w.var("meanW") .setMin(75.)
+    #fitter.w.var("sigmaW").setMin(5)
+    #fitter.w.var("alpha1W").setMin(1.2)
+    #fitter.w.var("n1W").setMin(10)
+    #fitter.w.var("alpha2W").setMin(1)
+    #fitter.w.var("n2W").setMin(1)
+    # parametrise T with CB
+    #fitter.w.var("meanT") .setMin(160.)
+    #fitter.w.var("sigmaT").setMin(8)
+    #fitter.w.var("alpha1T").setMin(0)
+    #fitter.w.var("n1T").setMin(90)
+    #fitter.w.var("alpha2T").setMin(1)
+    #fitter.w.var("n2T").setMin(1)
+
+    # ****      Higher value
+    # parametrise non res part with exp err
     fitter.w.var("c_0")   .setMin(-0.20)
     fitter.w.var("c_1")   .setMax(600) #offset
     fitter.w.var("c_2")   .setMax(200) #width
+    # parametrise non res part with gaus
+    #fitter.w.var("meanN") .setMax(160)
+    #fitter.w.var("sigmaN").setMax(150.)
     fitter.w.var("f_g1")  .setMax(0.9)
     fitter.w.var("f_res") .setMax(0.9)
-    fitter.w.var("mean1") .setMax(90)
-    fitter.w.var("mean2") .setMax(180)
-    fitter.w.var("sigma1").setMax(9.)
-    fitter.w.var("sigma2").setMax(16.)
+    # parametrise W with Gaussian
+    fitter.w.var("meanW") .setMax(90)
+    fitter.w.var("sigmaW").setMax(9.)
+    # parametrise T with Gaussian
+    fitter.w.var("meanT") .setMax(180)
+    fitter.w.var("sigmaT").setMax(16.)
+
+    # parametrise W with CB
+    #fitter.w.var("meanW") .setMax(90)
+    #fitter.w.var("sigmaW").setMax(9.)
+    #fitter.w.var("alpha1W").setMax(1.8)
+    #fitter.w.var("n1W").setMax(20)
+    #fitter.w.var("alpha2W").setMax(1)
+    #fitter.w.var("n2W").setMax(100)
+    # parametrise T with CB
+    #fitter.w.var("meanT") .setMax(180)
+    #fitter.w.var("sigmaT").setMax(16.)
+    #fitter.w.var("alpha1T").setMax(3)
+    #fitter.w.var("n1T").setMax(110)
+    #fitter.w.var("alpha2T").setMax(1)
+    #fitter.w.var("n2T").setMax(100)
     
     
     fitter.importBinnedData(projY,['x'],'data_full')
     fitter.fit('model','data_full',[ROOT.RooFit.SumW2Error(False),ROOT.RooFit.Save(1),ROOT.RooFit.Range(options.mini,options.maxi),ROOT.RooFit.Minimizer('Minuit2','migrad'), ROOT.RooFit.Extended(True)],requireConvergence=False) #55,140 works well with fitting only the resonant part
-    fitter.projection_ratioplot("model","data_full","x","%s/%s_fullMjjSpectra.pdf"%(debug_out,options.output),0,False,"m_{jet} (GeV)",options.output.split("_")[-2]+" "+options.output.split("_")[-1])
+    fitter.projection_ratioplot("model","data_full","x","%s/%s_fullMjjSpectra.pdf"%(debug_out,options.output),0,False,"m_{jet} (GeV)",category)
     string = '{'
     for var,graph in graphs.iteritems():
         value,error=fitter.fetch(var)
-        string = string+'"%s": "%f",'%(var,value)
+        string = string+'"%s": "%f %f",'%(var,value,error)
     string = string +'}'
     f=open(options.output+"_inclusive.json","w")
     json.dump(string,f)
@@ -304,51 +429,94 @@ def doFit(th1_projY,mjj_mean,mjj_error,N):
   th1_projY.Rebin(2)
   fitter.importBinnedData(th1_projY,['x'],'data')
   fitter.fit('model','data',[ROOT.RooFit.SumW2Error(False),ROOT.RooFit.Save(1),ROOT.RooFit.Range(options.mini,options.maxi),ROOT.RooFit.Minimizer('Minuit2','migrad'), ROOT.RooFit.Extended(True)],requireConvergence=False) #Set SumW2 false for cov matrix to converge, see https://root-forum.cern.ch/t/covqual-with-sumw2error/17662/6
-  fitter.projection_ratioplot("model","data","x","%s/%s_%s.pdf"%(debug_out,options.output,th1_projY.GetName()),0,False,"m_{jet} (GeV)",options.output.split("_")[-2]+" "+options.output.split("_")[-1],options.mini,options.maxi)
+  fitter.projection_ratioplot("model","data","x","%s/%s_%s.pdf"%(debug_out,options.output,th1_projY.GetName()),0,False,"m_{jet} (GeV)",category,options.mini,options.maxi)
   
   for var,graph in graphs.iteritems():
       value,error=fitter.fetch(var)
       graph.SetPoint(N,mjj_mean,value)
       graph.SetPointError(N,0.0,error) #No error x
       # graph.SetPointError(N,mjj_error,error) #error x is number of bins in mVV
-      
+
   fitter.delete()    
 
-def doParametrizations(graphs,ff):
+def doParametrizations(graphs,ff,category):
   ranges = {}
+  # parametrise non res part with exp err
   ranges["c_0"   ]= [-0.2,0.2]
   ranges["c_1"   ]= [100.,600.]
   ranges["c_2"   ]= [40.,200.]
+  # parametrise non res part with exp gauss
+  #ranges["meanN" ]= [100.,160.]
+  #ranges["sigmaN" ]= [0.,80.]
+
   ranges["f_g1"  ]= [0.,0.8]
   ranges["f_res" ]= [0.0,0.9]
-  ranges["mean1" ]= [77.,87.]
-  ranges["mean2" ]= [160.,190.]
-  ranges["sigma1"]= [0.,12.]
-  ranges["sigma2"]= [6.,20.]
+  ranges["meanW" ]= [77.,87.]
+  ranges["meanT" ]= [160.,190.]
+  ranges["sigmaW"]= [0.,14.]
+  ranges["sigmaT"]= [6.,20.]
+
+  #CB
+  #ranges["alpha1W" ]= [0.,2.]
+  #ranges["n1W" ]= [0.,200.]
+  #ranges["alpha2W"]= [0.,2.]
+  #ranges["n2W"]= [0.,100.]
+  #ranges["alpha1T" ]= [0.,40.]
+  #ranges["n1T" ]= [0.,200.]
+  #ranges["alpha2T"]= [0.,2.]
+  #ranges["n2T"]= [0.,100.]
   
   inits = {}
+  # parametrise non res part with exp err
   inits["c_0"   ]= [0.,9.7E07,3]
   inits["c_1"   ]= [350.,0.,0.]
-  inits["c_2"   ]= [98.,-4E14,4.]
+  inits["c_2"   ]= [98.,-4E14,4.] #erf + 2gaus
+  #inits["c_2"   ]= [60.,-4E10,4] #erf + 2CB
+  # parametrise non res part with gauss
+  #inits["meanN" ]= [100.,-1.6E19,5]
+  #inits["sigmaN"]= [100.,9.7E16,5,12.]
+
   inits["f_g1"  ]= [0.,3.4E16,5]
   inits["f_res" ]= [0.,-5.3E16,5]
-  inits["mean1" ]= [81.,1.4E18,5]
-  inits["mean2" ]= [176.,-1.6E19,5]
-  inits["sigma1"]= [6,9.7E16,5,12.]
-  inits["sigma2"]= [13.,2.5E15,5]
-  
+  inits["meanW" ]= [81.,1.4E18,5]
+  inits["meanT" ]= [176.,-1.6E19,5]
+  inits["sigmaW"]= [6,9.7E16,5,12.]
+  inits["sigmaT"]= [13.,2.5E15,5]
+
+  #CB
+  #inits["alpha1W" ]= [1.3,1E21,5]
+  #inits["n1W" ]= [4.,-6E11,3]
+  #inits["alpha2W"]= [1.,0.,1.]
+  #inits["n2W"]= [10.,1.,1,]
+  #inits["alpha1T" ]= [20.,3.4E16,5]
+  #inits["n1T" ]= [80,0,-1]
+  #inits["alpha2T"]= [1.,0.,1.]
+  #inits["n2T"]= [10.,1.,1,]
   
 
   titles = {}
+  # parametrise non res part with exp err
   titles["c_0"   ] = "c_{0} (ErfExp)"   
   titles["c_1"   ] = "c_{1} (ErfExp)"   
   titles["c_2"   ] = "c_{2} (ErfExp)"   
-  titles["f_g1"  ] = "F(Gauss_{W}, Gauss_{t})"  
-  titles["f_res" ] = "F(res., non-res.)" 
-  titles["mean1" ] = "<m>_{W}" 
-  titles["mean2" ] = "<m>_{t}" 
-  titles["sigma1"] = "#sigma_{W}"
-  titles["sigma2"] = "#sigma_{t}"
+  # parametrise non res part with exp gauss
+  #titles["meanN" ] = "mean-non res"
+  #titles["sigmaN"] = "width-non res"
+  titles["f_g1"  ] = "F(Gauss_{W}, Gauss_{t})"
+  titles["f_res" ] = "F(res., non-res.)"
+  titles["meanW" ] = "<m>_{W}"
+  titles["meanT" ] = "<m>_{t}"
+  titles["sigmaW"] = "#sigma_{W}"
+  titles["sigmaT"] = "#sigma_{t}"
+  #titles["alpha1W" ] = "#alpha1_{W}"
+  #titles["alpha2W" ] = "#alpha2_{W}"
+  #titles["n1W" ] = "n1_{W}"
+  #titles["n2W" ] = "n2_{W}"
+  #titles["alpha1T" ] = "#alpha1_{t}"
+  #titles["alpha2T" ] = "#alpha2_{t}"
+  #titles["n1T" ] = "n1_{t}"
+  #titles["n2T" ] = "n2_{t}"
+
 
   parametrisation = "[0]+[1]*pow(x,-[2])"
 
@@ -380,21 +548,21 @@ def doParametrizations(graphs,ff):
     leg.Draw()
     
     pavePars = ( [ int(func.GetParameter(i)) for i in range(func.GetNpar()) ])
-    paveStr='y(x)=A+B#timesx^{-C}'
+    paveStr='y(x)=A+B#times x^{-C}'
     paveStr1='A=%i'%(pavePars[0])
     paveStr2='B=%.2g'  %(pavePars[1])
     paveStr3='C=%i'  %(pavePars[2])
     
     addInfo = getPaveText()
-    addInfo.AddText(options.output.split("_")[-2]+" "+options.output.split("_")[-1])
+    addInfo.AddText(category)
     addInfo.AddText(paveStr)
     addInfo.AddText(paveStr1)
     addInfo.AddText(paveStr2)
     addInfo.AddText(paveStr3)
     addInfo.Draw()
-        
+
     c.SaveAs(debug_out+options.output+"_"+var+".pdf")
-    
+
     fittedPars = ( [ func.GetParameter(i) for i in range(func.GetNpar()) ])
     st='(0+({}+{}*pow(MJJ,-{})))'.format(*fittedPars)
     parametrizations[var] = st
@@ -403,16 +571,30 @@ def doParametrizations(graphs,ff):
   
 if __name__ == "__main__":
   
-  graphs={'mean1':ROOT.TGraphErrors(),'sigma1':ROOT.TGraphErrors(),'mean2':ROOT.TGraphErrors(),'sigma2':ROOT.TGraphErrors(),'f_g1':ROOT.TGraphErrors(),'f_res':ROOT.TGraphErrors(),
-            'c_0':ROOT.TGraphErrors(),'c_1':ROOT.TGraphErrors(),'c_2':ROOT.TGraphErrors()}
+  graphs={'meanW':ROOT.TGraphErrors(),'sigmaW':ROOT.TGraphErrors(),'meanT':ROOT.TGraphErrors(),'sigmaT':ROOT.TGraphErrors(),'f_g1':ROOT.TGraphErrors(),'f_res':ROOT.TGraphErrors(),
+          #'meanN':ROOT.TGraphErrors(),'sigmaN':ROOT.TGraphErrors(),
+          #'alpha1W':ROOT.TGraphErrors(),'n1W':ROOT.TGraphErrors(),#'alpha2W':ROOT.TGraphErrors(),'n2W':ROOT.TGraphErrors(),
+          #'alpha1T':ROOT.TGraphErrors(),'n1T':ROOT.TGraphErrors()} #, #'alpha2T':ROOT.TGraphErrors(),'n2T':ROOT.TGraphErrors()}
+          'c_0':ROOT.TGraphErrors(),'c_1':ROOT.TGraphErrors(),'c_2':ROOT.TGraphErrors()}
+
+  category = options.output.split("_")[-2]+" "+options.output.split("_")[-1]
+  if options.output.find("VBF") !=-1:
+    category = "VBF "+category
+
 
   samples = getFileList()
   plotters = getPlotters(samples)
-  h2D_l1,h2D_l2,h2D = get2DHist(plotters) 
+  h2D_l1,h2D_l2,h2D = get2DHist(plotters,category)
   tmpfile = ROOT.TFile("testTT.root","RECREATE")
+
+
   
   coarse_bins_low  = [1,3,5,7,7,7]
   coarse_bins_high = [2,4,6,79,79,79]
+  if options.output.find("VBF") !=-1:
+    coarse_bins_low  = [1,3,5,5,5,5]
+    coarse_bins_high = [2,4,79,79,79,79]
+
   projX = h2D.ProjectionX()
   projY = h2D.ProjectionY()
   for bin in range(0,len(coarse_bins_low)):
@@ -425,7 +607,7 @@ if __name__ == "__main__":
     if bin == (len(coarse_bins_low)-1):
       mjj_mean = options.maxMVV
     tmp = h2D.ProjectionY("mjjmean%i_binL%i_binH%i"%(mjj_mean,binL,binH),coarse_bins_low[bin],coarse_bins_high[bin])
-    doFit(tmp,mjj_mean,mjj_error,bin)
+    doFit(tmp,mjj_mean,mjj_error,bin,category)
     tmpfile.cd()
     tmp.Write()
   tmpfile.cd()
@@ -436,7 +618,7 @@ if __name__ == "__main__":
       graph.Write(name)
   tmpfile.Close()
   ff=ROOT.TFile(debug_out+options.output+".root","RECREATE")
-  parametrizations = doParametrizations(graphs,ff)
+  parametrizations = doParametrizations(graphs,ff,category)
   ff.Close()
   f=open(options.output+".json","w")
   json.dump(parametrizations,f)
@@ -445,10 +627,8 @@ if __name__ == "__main__":
   
   colors = ["#CD3700","#EE4000","#FF4500","#CD4F39","#EE5C42","#EE6A50","#FF7256","#FA8072","#FFA07A","#EEB4B4"]*3
   jsonfile_ = options.output+".json"
-  category = options.output.split("_")[-2]+" "+options.output.split("_")[-1]
   drawFromJson(jsonfile_, category,debug_out+options.output+"_draw_from_json.pdf")
   doClosure([h2D_l1,h2D_l2],['m_{jet1}','m_{jet2}'],jsonfile_, category)
-  
   
   
   

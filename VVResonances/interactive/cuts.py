@@ -85,6 +85,8 @@ class cuts():
     WPNPLPl2Htag = ""
 
     tagger_pt_dependence = 1.
+    PU_uncertainties = 1.
+    tt_smooth = {}
 
     cuts={}
     
@@ -154,7 +156,8 @@ class cuts():
             self.Htag_slope = data["htag_slope"]
             self.Htag_intercept = data["htag_intercept"]
             self.tagger_pt_dependence = data["tagger_pt_dependence"]
-
+            self.PU_uncertainties = data["PU_unc"]
+            self.tt_smooth = data["tt_smoothening"]
             #print " lumi run2 ",self.lumi["Run2"]
             for year in years:
                 if year=="2016":
@@ -346,6 +349,7 @@ if __name__ == "__main__":
     print "lumi ",c.lumi["lumi16"]
     print c.fixParsSig["ZprimeWW"]['NP']
     print c.minMX
+    print c.tt_smooth
     #print c.catHtag['LP1']
     #print c.maxMX
     #print c.HCALbinsMVV 
