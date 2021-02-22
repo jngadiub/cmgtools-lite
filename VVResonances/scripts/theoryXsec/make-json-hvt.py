@@ -1,5 +1,7 @@
 import json, sys
 from array import array
+import ROOT
+import pandas as pd
 
 def get_theo_map(sqrts,model=""):
 
@@ -56,3 +58,118 @@ f=open("HVTB.json","w")
 json.dump(fdict,f)
 f.close()
 
+yTH = array('d',[])
+x = array('d',[])
+for i,m in enumerate(mass):
+  x.append(m/1000.)
+  yTH.append(fdict[str(int(m))]['CX0(pb)']*fdict[str(int(m))]['BRZh'])
+
+
+fout = ROOT.TFile.Open('ZprimeZH.root','RECREATE') 
+graphTH = ROOT.TGraph(len(x),x,yTH)
+graphTH.SetName('gtheory')
+graphTH.Write()  
+fout.Close()
+
+yTH = array('d',[])
+for i,m in enumerate(mass):
+  yTH.append(fdict[str(int(m))]['CX0(pb)']*fdict[str(int(m))]['BRWW'])
+
+
+fout = ROOT.TFile.Open('ZprimeWW.root','RECREATE') 
+graphTH = ROOT.TGraph(len(x),x,yTH)
+graphTH.SetName('gtheory')
+graphTH.Write()  
+fout.Close()
+
+yTH = array('d',[])
+for i,m in enumerate(mass):
+  yTH.append( (fdict[str(int(m))]['CX+(pb)']+fdict[str(int(m))]['CX-(pb)'])*fdict[str(int(m))]['BRWZ'])
+  
+
+fout = ROOT.TFile.Open('WprimeWZ.root','RECREATE') 
+graphTH = ROOT.TGraph(len(x),x,yTH)
+graphTH.SetName('gtheory')
+graphTH.Write()  
+fout.Close()
+
+yTH = array('d',[])
+for i,m in enumerate(mass):
+  yTH.append( (fdict[str(int(m))]['CX+(pb)']+fdict[str(int(m))]['CX-(pb)'])*fdict[str(int(m))]['BRWh'])
+  
+
+fout = ROOT.TFile.Open('WprimeWH.root','RECREATE') 
+graphTH = ROOT.TGraph(len(x),x,yTH)
+graphTH.SetName('gtheory')
+graphTH.Write()  
+fout.Close()
+
+df = pd.read_csv('HVTC.csv') 
+
+mass = df['M'].values
+xsec_zpr = df['Zprime_cH1'].values
+br_zpr_ww = df['BrZprimeToWW'].values
+br_zpr_zh = df['BrZprimeToZH'].values
+xsec_wpr = df['Wprime_cH1'].values
+br_wpr_wz = df['BrWprimeToWZ'].values
+br_wpr_wh = df['BrWprimeToWH'].values
+
+fdict = {}
+for i,m in enumerate(mass):
+ fdict[str(int(m))] = {}
+ fdict[str(int(m))]['Zprime_cH1'] = xsec_zpr[i]
+ fdict[str(int(m))]['BRWW'] = br_zpr_ww[i]
+ fdict[str(int(m))]['BRZh'] = br_zpr_zh[i]
+ fdict[str(int(m))]['Wprime_cH1'] = xsec_wpr[i]
+ fdict[str(int(m))]['BRWh'] = br_wpr_wh[i]
+ fdict[str(int(m))]['BRWZ'] = br_wpr_wz[i]
+ 
+f=open("HVTC.json","w")
+json.dump(fdict,f)
+f.close() 
+
+yTH = array('d',[])
+x = array('d',[])
+for i,m in enumerate(mass):
+  x.append(m/1000.)
+  yTH.append(fdict[str(int(m))]['Zprime_cH1']*fdict[str(int(m))]['BRZh'])
+
+
+fout = ROOT.TFile.Open('HVTC_ZprimeZH.root','RECREATE') 
+graphTH = ROOT.TGraph(len(x),x,yTH)
+graphTH.SetName('gtheory')
+graphTH.Write()  
+fout.Close()
+
+yTH = array('d',[])
+for i,m in enumerate(mass):
+  yTH.append(fdict[str(int(m))]['Zprime_cH1']*fdict[str(int(m))]['BRWW'])
+
+
+fout = ROOT.TFile.Open('HVTC_ZprimeWW.root','RECREATE') 
+graphTH = ROOT.TGraph(len(x),x,yTH)
+graphTH.SetName('gtheory')
+graphTH.Write()  
+fout.Close()
+
+yTH = array('d',[])
+for i,m in enumerate(mass):
+  yTH.append(fdict[str(int(m))]['Wprime_cH1']*fdict[str(int(m))]['BRWZ'])
+
+
+fout = ROOT.TFile.Open('HVTC_WprimeWZ.root','RECREATE') 
+graphTH = ROOT.TGraph(len(x),x,yTH)
+graphTH.SetName('gtheory')
+graphTH.Write()  
+fout.Close()
+
+yTH = array('d',[])
+for i,m in enumerate(mass):
+  yTH.append(fdict[str(int(m))]['Wprime_cH1']*fdict[str(int(m))]['BRWh'])
+
+
+fout = ROOT.TFile.Open('HVTC_WprimeWH.root','RECREATE') 
+graphTH = ROOT.TGraph(len(x),x,yTH)
+graphTH.SetName('gtheory')
+graphTH.Write()  
+fout.Close()
